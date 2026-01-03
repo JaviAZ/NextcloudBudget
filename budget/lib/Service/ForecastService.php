@@ -302,7 +302,6 @@ class ForecastService {
         int $forecastMonths
     ): array {
         $accountId = $account->getId();
-
         // Get historical data
         $endDate = date('Y-m-d');
         $startDate = date('Y-m-d', strtotime("-{$basedOnMonths} months"));

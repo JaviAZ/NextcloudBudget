@@ -79,7 +79,6 @@ class SetupController extends Controller {
         try {
             $categories = $this->categoryService->findAll($this->userId);
             $rules = $this->importRuleService->findAll($this->userId);
-
             return new DataResponse([
                 'initialized' => count($categories) > 0,
                 'categoriesCount' => count($categories),

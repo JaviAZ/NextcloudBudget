@@ -55,7 +55,6 @@ class ImportRuleMapper extends QBMapper {
             ->andWhere($qb->expr()->eq('active', $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)))
             ->orderBy('priority', 'DESC')
             ->addOrderBy('id', 'ASC');
-
         return $this->findEntities($qb);
     }
 
