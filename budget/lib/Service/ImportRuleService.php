@@ -290,7 +290,6 @@ class ImportRuleService extends AbstractCrudService {
     public function testRules(string $userId, array $transactionData): array {
         $rules = $this->mapper->findActive($userId);
         $results = [];
-
         foreach ($rules as $rule) {
             $matches = $this->testRule($rule, $transactionData);
             if ($matches) {

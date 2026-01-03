@@ -678,7 +678,6 @@ class CategoryService extends AbstractCrudService {
                 ];
             }
         }
-
         return $analysis;
     }
 

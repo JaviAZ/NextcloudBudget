@@ -728,7 +728,6 @@ class TransactionMapper extends QBMapper {
         $result = $qb->executeQuery();
         $count = $result->fetchOne();
         $result->closeCursor();
-
         return $count > 0;
     }
 

@@ -2150,7 +2150,6 @@ button.danger:hover {
 }
 
 @media (max-width: 768px) {
-
     .view-controls {
         gap: 5px;
     }
