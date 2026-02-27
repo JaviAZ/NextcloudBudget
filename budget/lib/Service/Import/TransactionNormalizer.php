@@ -22,6 +22,9 @@ class TransactionNormalizer {
         'm.d.Y',
     ];
 
+    /** @var string|null Cached date format detected from batch analysis */
+    private ?string $detectedDateFormat = null;
+
     /**
      * Map a CSV row to a transaction using the provided column mapping.
      *
@@ -136,6 +139,60 @@ class TransactionNormalizer {
     }
 
     /**
+     * Detect the date format used across a batch of date strings.
+     *
+     * Scans all dates to find a format that parses every date without
+     * overflow warnings. This disambiguates DD/MM vs MM/DD when any
+     * date in the batch has a day value > 12.
+     *
+     * @param string[] $dateStrings Raw date strings from the import file
+     */
+    public function detectDateFormat(array $dateStrings): void {
+        $this->detectedDateFormat = null;
+
+        // Filter out empty strings and already-normalized dates
+        $candidates = [];
+        foreach ($dateStrings as $d) {
+            $d = trim($d);
+            if ($d === '' || preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) || preg_match('/^\d{8}/', $d)) {
+                continue;
+            }
+            $candidates[] = $d;
+        }
+
+        if (empty($candidates)) {
+            return;
+        }
+
+        foreach (self::DATE_FORMATS as $format) {
+            $allValid = true;
+            foreach ($candidates as $d) {
+                $parsed = \DateTime::createFromFormat($format, $d);
+                if ($parsed === false) {
+                    $allValid = false;
+                    break;
+                }
+                $errors = \DateTime::getLastErrors();
+                if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+                    $allValid = false;
+                    break;
+                }
+            }
+            if ($allValid) {
+                $this->detectedDateFormat = $format;
+                return;
+            }
+        }
+    }
+
+    /**
+     * Reset the cached date format between import batches.
+     */
+    public function resetDateFormat(): void {
+        $this->detectedDateFormat = null;
+    }
+
+    /**
      * Normalize a date string to Y-m-d format.
      *
      * @param string $date The date string to normalize
@@ -155,11 +212,25 @@ class TransactionNormalizer {
             return "{$matches[1]}-{$matches[2]}-{$matches[3]}";
         }
 
-        // Try various date formats
+        // Use batch-detected format if available
+        if ($this->detectedDateFormat !== null) {
+            $parsed = \DateTime::createFromFormat($this->detectedDateFormat, $date);
+            if ($parsed !== false) {
+                $errors = \DateTime::getLastErrors();
+                if ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0)) {
+                    return $parsed->format('Y-m-d');
+                }
+            }
+        }
+
+        // Fall back to trying each format with overflow rejection
         foreach (self::DATE_FORMATS as $format) {
             $parsed = \DateTime::createFromFormat($format, $date);
             if ($parsed !== false) {
-                return $parsed->format('Y-m-d');
+                $errors = \DateTime::getLastErrors();
+                if ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0)) {
+                    return $parsed->format('Y-m-d');
+                }
             }
         }
 
