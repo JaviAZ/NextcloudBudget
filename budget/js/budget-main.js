@@ -27580,7 +27580,7 @@ var PensionsModule = /*#__PURE__*/function () {
   }, {
     key: "updatePensionsSummary",
     value: function updatePensionsSummary(summary) {
-      var currency = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPrimaryCurrency(this.app.accounts, this.settings);
+      var currency = summary.baseCurrency || _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPrimaryCurrency(this.app.accounts, this.settings);
       var pensionWorth = summary.totalPensionWorth || 0;
       var projectedIncome = summary.totalProjectedIncome || 0;
       var count = summary.pensionCount || 0;
@@ -27622,7 +27622,7 @@ var PensionsModule = /*#__PURE__*/function () {
   }, {
     key: "updatePensionsProjection",
     value: function updatePensionsProjection(projection) {
-      var currency = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPrimaryCurrency(this.app.accounts, this.settings);
+      var currency = projection.baseCurrency || _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPrimaryCurrency(this.app.accounts, this.settings);
       var projectedValueEl = document.getElementById('pensions-projected-value');
       var projectedIncomeEl = document.getElementById('pensions-projected-income');
       if (projectedValueEl) {

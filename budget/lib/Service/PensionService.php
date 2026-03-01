@@ -16,15 +16,18 @@ class PensionService {
     private PensionAccountMapper $pensionMapper;
     private PensionSnapshotMapper $snapshotMapper;
     private PensionContributionMapper $contributionMapper;
+    private CurrencyConversionService $conversionService;
 
     public function __construct(
         PensionAccountMapper $pensionMapper,
         PensionSnapshotMapper $snapshotMapper,
-        PensionContributionMapper $contributionMapper
+        PensionContributionMapper $contributionMapper,
+        CurrencyConversionService $conversionService
     ) {
         $this->pensionMapper = $pensionMapper;
         $this->snapshotMapper = $snapshotMapper;
         $this->contributionMapper = $contributionMapper;
+        $this->conversionService = $conversionService;
     }
 
     // =====================
@@ -248,9 +251,11 @@ class PensionService {
 
     /**
      * Get summary of all pensions for a user.
+     * Values are converted to the user's base currency.
      */
     public function getSummary(string $userId): array {
         $pensions = $this->pensionMapper->findAll($userId);
+        $baseCurrency = $this->conversionService->getBaseCurrency($userId);
 
         $totalDCBalance = 0.0;
         $totalDBTransferValue = 0.0;
@@ -261,15 +266,21 @@ class PensionService {
         $stateCount = 0;
 
         foreach ($pensions as $pension) {
+            $pensionCurrency = $pension->getCurrency() ?: $baseCurrency;
+
             if ($pension->isDefinedContribution()) {
-                $totalDCBalance += $pension->getCurrentBalance() ?? 0;
+                $balance = $pension->getCurrentBalance() ?? 0;
+                $totalDCBalance += $this->convertAmount($balance, $pensionCurrency, $baseCurrency, $userId);
                 $dcCount++;
             } elseif ($pension->isDefinedBenefit()) {
-                $totalDBTransferValue += $pension->getTransferValue() ?? 0;
-                $totalDBIncome += $pension->getAnnualIncome() ?? 0;
+                $transferValue = $pension->getTransferValue() ?? 0;
+                $income = $pension->getAnnualIncome() ?? 0;
+                $totalDBTransferValue += $this->convertAmount($transferValue, $pensionCurrency, $baseCurrency, $userId);
+                $totalDBIncome += $this->convertAmount($income, $pensionCurrency, $baseCurrency, $userId);
                 $dbCount++;
             } elseif ($pension->isStatePension()) {
-                $stateIncome += $pension->getAnnualIncome() ?? 0;
+                $income = $pension->getAnnualIncome() ?? 0;
+                $stateIncome += $this->convertAmount($income, $pensionCurrency, $baseCurrency, $userId);
                 $stateCount++;
             }
         }
@@ -288,7 +299,18 @@ class PensionService {
             'dcCount' => $dcCount,
             'dbCount' => $dbCount,
             'stateCount' => $stateCount,
+            'baseCurrency' => $baseCurrency,
         ];
+    }
+
+    /**
+     * Convert an amount to the base currency if different.
+     */
+    private function convertAmount(float $amount, string $fromCurrency, string $baseCurrency, string $userId): float {
+        if ($amount == 0 || strtoupper($fromCurrency) === strtoupper($baseCurrency)) {
+            return $amount;
+        }
+        return $this->conversionService->convertToBaseFloat($amount, $fromCurrency, $userId);
     }
 
     /**

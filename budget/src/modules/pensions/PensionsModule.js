@@ -124,7 +124,7 @@ export default class PensionsModule {
     }
 
     updatePensionsSummary(summary) {
-        const currency = formatters.getPrimaryCurrency(this.app.accounts, this.settings);
+        const currency = summary.baseCurrency || formatters.getPrimaryCurrency(this.app.accounts, this.settings);
         const pensionWorth = summary.totalPensionWorth || 0;
         const projectedIncome = summary.totalProjectedIncome || 0;
         const count = summary.pensionCount || 0;
@@ -168,7 +168,7 @@ export default class PensionsModule {
     }
 
     updatePensionsProjection(projection) {
-        const currency = formatters.getPrimaryCurrency(this.app.accounts, this.settings);
+        const currency = projection.baseCurrency || formatters.getPrimaryCurrency(this.app.accounts, this.settings);
 
         const projectedValueEl = document.getElementById('pensions-projected-value');
         const projectedIncomeEl = document.getElementById('pensions-projected-income');

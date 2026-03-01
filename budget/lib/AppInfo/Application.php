@@ -457,7 +457,8 @@ class Application extends App implements IBootstrap {
             return new \OCA\Budget\Service\PensionService(
                 $c->get(\OCA\Budget\Db\PensionAccountMapper::class),
                 $c->get(\OCA\Budget\Db\PensionSnapshotMapper::class),
-                $c->get(\OCA\Budget\Db\PensionContributionMapper::class)
+                $c->get(\OCA\Budget\Db\PensionContributionMapper::class),
+                $c->get(\OCA\Budget\Service\CurrencyConversionService::class)
             );
         });
         $context->registerServiceAlias('PensionService', \OCA\Budget\Service\PensionService::class);
@@ -465,7 +466,8 @@ class Application extends App implements IBootstrap {
         $context->registerService(\OCA\Budget\Service\PensionProjector::class, function($c) {
             return new \OCA\Budget\Service\PensionProjector(
                 $c->get(\OCA\Budget\Db\PensionAccountMapper::class),
-                $c->get(\OCA\Budget\Service\PensionService::class)
+                $c->get(\OCA\Budget\Service\PensionService::class),
+                $c->get(\OCA\Budget\Service\CurrencyConversionService::class)
             );
         });
         $context->registerServiceAlias('PensionProjector', \OCA\Budget\Service\PensionProjector::class);
