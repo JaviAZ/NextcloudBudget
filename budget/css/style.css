@@ -6821,18 +6821,18 @@ button.danger:hover {
 }
 
 .bill-status.overdue .status-badge {
-    background: var(--color-error);
-    color: white;
+    background: #d32f2f;
+    color: #fff;
 }
 
 .bill-status.due-soon .status-badge {
-    background: var(--color-warning);
-    color: white;
+    background: #ed6c02;
+    color: #fff;
 }
 
 .bill-status.paid .status-badge {
-    background: var(--color-success);
-    color: white;
+    background: #2e7d32;
+    color: #fff;
 }
 
 .bill-status.upcoming .status-badge {

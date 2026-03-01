@@ -19322,7 +19322,7 @@ var BillsModule = /*#__PURE__*/function () {
     value: function () {
       var _markBillPaid = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(billId) {
         var _this3 = this;
-        var bill, previousPaidDate, currentDate, response, _t6;
+        var bill, previousPaidDate, response, _t6;
         return _regenerator().w(function (_context6) {
           while (1) switch (_context6.p = _context6.n) {
             case 0:
@@ -19337,7 +19337,6 @@ var BillsModule = /*#__PURE__*/function () {
               throw new Error('Bill not found');
             case 1:
               previousPaidDate = bill.lastPaidDate || bill.last_paid_date || null;
-              currentDate = new Date().toISOString().split('T')[0];
               _context6.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId, "/paid")), {
                 method: 'POST',
@@ -19346,7 +19345,6 @@ var BillsModule = /*#__PURE__*/function () {
                   'requesttoken': OC.requestToken
                 },
                 body: JSON.stringify({
-                  paidDate: currentDate,
                   createNextTransaction: true
                 })
               });

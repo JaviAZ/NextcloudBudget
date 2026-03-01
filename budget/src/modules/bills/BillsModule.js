@@ -608,7 +608,6 @@ export default class BillsModule {
             }
 
             const previousPaidDate = bill.lastPaidDate || bill.last_paid_date || null;
-            const currentDate = new Date().toISOString().split('T')[0];
 
             const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}/paid`), {
                 method: 'POST',
@@ -617,7 +616,6 @@ export default class BillsModule {
                     'requesttoken': OC.requestToken
                 },
                 body: JSON.stringify({
-                    paidDate: currentDate,
                     createNextTransaction: true
                 })
             });

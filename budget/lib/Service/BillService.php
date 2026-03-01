@@ -249,7 +249,7 @@ class BillService {
      *
      * @param int $id Bill ID
      * @param string $userId User ID
-     * @param string|null $paidDate Date bill was paid (defaults to today)
+     * @param string|null $paidDate Date bill was paid (defaults to the bill's current due date)
      * @param bool $createNextTransaction Whether to create transaction for next occurrence
      * @return Bill Updated bill
      */
@@ -261,7 +261,11 @@ class BillService {
             $bill->setAutoPayFailed(false);
         }
 
-        $paidDate = $paidDate ?? date('Y-m-d');
+        // Use the bill's current due date as the paid date — this is the billing
+        // period being satisfied. Avoids marking the wrong period as paid when
+        // the user clicks "Mark Paid" after the due date has passed (e.g. paying
+        // a February bill on March 1st should set last_paid_date to Feb 28, not Mar 1).
+        $paidDate = $paidDate ?? $bill->getNextDueDate() ?? date('Y-m-d');
         $bill->setLastPaidDate($paidDate);
 
         // Auto-deactivate one-time bills after payment
