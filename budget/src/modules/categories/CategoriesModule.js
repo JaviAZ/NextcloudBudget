@@ -691,13 +691,14 @@ export default class CategoriesModule {
 
         title.textContent = 'Add Category';
         this.resetCategoryForm();
-        this.populateCategoryParentDropdown();
 
-        // Pre-select the current category type tab
+        // Set category type BEFORE populating parent dropdown so it filters correctly
         const typeSelect = document.getElementById('category-type');
         if (typeSelect && this.currentCategoryType) {
             typeSelect.value = this.currentCategoryType;
         }
+
+        this.populateCategoryParentDropdown();
 
         // Show empty state for tag sets (can't add tag sets until category is saved)
         this.app.renderCategoryTagSetsUI(null);
