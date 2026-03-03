@@ -37968,25 +37968,11 @@ var TransactionsModule = /*#__PURE__*/function () {
       return toggleTransactionReconciliation;
     }() // Rendering
   }, {
-    key: "renderTransactionsTable",
-    value: function renderTransactionsTable(transactions) {
-      var _this4 = this;
-      var today = new Date().toISOString().split('T')[0];
-      return transactions.map(function (t) {
-        var isSplit = t.isSplit || t.is_split;
-        var isScheduled = t.status === 'scheduled';
-        var rowClasses = [isSplit ? 'split-transaction' : '', isScheduled ? 'scheduled-transaction' : ''].filter(Boolean).join(' ');
-        var categoryDisplay = isSplit ? '<span class="split-indicator" title="This transaction is split across multiple categories">Split</span>' : t.categoryName ? "<span class=\"category-name\">".concat(_this4.escapeHtml(t.categoryName), "</span>") : '-';
-        var scheduledBadge = isScheduled ? '<span class="scheduled-badge">Scheduled</span>' : '';
-        return "\n            <tr class=\"".concat(rowClasses, "\">\n                <td class=\"select-column\">\n                    <input type=\"checkbox\" class=\"transaction-checkbox\" data-transaction-id=\"").concat(t.id, "\">\n                </td>\n                <td>").concat(_this4.formatDate(t.date)).concat(scheduledBadge, "</td>\n                <td>").concat(_this4.escapeHtml(t.description), "</td>\n                <td>").concat(categoryDisplay, "</td>\n                <td class=\"amount ").concat(t.type, "\">").concat(_this4.formatCurrency(t.amount, t.accountCurrency), "</td>\n                <td>").concat(_this4.escapeHtml(t.accountName), "</td>\n                <td class=\"reconcile-column\"></td>\n                <td>\n                    <button class=\"tertiary transaction-split-btn\" data-transaction-id=\"").concat(t.id, "\" title=\"").concat(isSplit ? 'Edit splits' : 'Split transaction', "\">\n                        ").concat(isSplit ? 'Splits' : 'Split', "\n                    </button>\n                    <button class=\"tertiary transaction-edit-btn\" data-transaction-id=\"").concat(t.id, "\" aria-label=\"Edit transaction: ").concat(t.description, "\">Edit</button>\n                    <button class=\"error transaction-delete-btn\" data-transaction-id=\"").concat(t.id, "\" aria-label=\"Delete transaction: ").concat(t.description, "\">Delete</button>\n                </td>\n            </tr>\n            ");
-      }).join('');
-    }
-  }, {
     key: "renderTransactionsList",
     value: function renderTransactionsList(transactions) {
-      var _this5 = this;
+      var _this4 = this;
       return transactions.map(function (t) {
-        return "\n            <div class=\"transaction-item\">\n                <span class=\"transaction-date\">".concat(_this5.formatDate(t.date), "</span>\n                <span class=\"transaction-description\">").concat(t.description, "</span>\n                <span class=\"amount ").concat(t.type, "\">").concat(_this5.formatCurrency(t.amount, t.accountCurrency), "</span>\n            </div>\n        ");
+        return "\n            <div class=\"transaction-item\">\n                <span class=\"transaction-date\">".concat(_this4.formatDate(t.date), "</span>\n                <span class=\"transaction-description\">").concat(t.description, "</span>\n                <span class=\"amount ").concat(t.type, "\">").concat(_this4.formatCurrency(t.amount, t.accountCurrency), "</span>\n            </div>\n        ");
       }).join('');
     }
   }, {
@@ -38056,7 +38042,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "renderCategoryOptions",
     value: function renderCategoryOptions(selectElement, categories) {
-      var _this6 = this;
+      var _this5 = this;
       var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       categories.forEach(function (category) {
         var option = document.createElement('option');
@@ -38066,14 +38052,14 @@ var TransactionsModule = /*#__PURE__*/function () {
 
         // Recursively add child categories
         if (category.children && category.children.length > 0) {
-          _this6.renderCategoryOptions(selectElement, category.children, level + 1);
+          _this5.renderCategoryOptions(selectElement, category.children, level + 1);
         }
       });
     }
   }, {
     key: "showTransactionModal",
     value: function showTransactionModal() {
-      var _this7 = this;
+      var _this6 = this;
       var transaction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var preSelectedAccountId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var modal = document.getElementById('transaction-modal');
@@ -38117,7 +38103,7 @@ var TransactionsModule = /*#__PURE__*/function () {
           categorySelect.onchange = function () {
             if (oldListener) oldListener();
             var transactionId = document.getElementById('transaction-id').value;
-            _this7.app.renderTransactionTagSelectors(categorySelect.value || null, transactionId || null);
+            _this6.app.renderTransactionTagSelectors(categorySelect.value || null, transactionId || null);
           };
         }
 
@@ -38643,7 +38629,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var _showMatchingModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(transactionId) {
         var _this$transactions,
           _this$accounts2,
-          _this8 = this;
+          _this7 = this;
         var transaction, modal, sourceDetails, loadingEl, emptyEl, listEl, account, currency, typeClass, result, _t12;
         return _regenerator().w(function (_context11) {
           while (1) switch (_context11.p = _context11.n) {
@@ -38694,13 +38680,13 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 4:
               // Render matches
               listEl.innerHTML = result.matches.map(function (match) {
-                var _this8$accounts;
-                var matchAccount = (_this8$accounts = _this8.accounts) === null || _this8$accounts === void 0 ? void 0 : _this8$accounts.find(function (a) {
+                var _this7$accounts;
+                var matchAccount = (_this7$accounts = _this7.accounts) === null || _this7$accounts === void 0 ? void 0 : _this7$accounts.find(function (a) {
                   return a.id === match.accountId;
                 });
-                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this8.getPrimaryCurrency();
+                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this7.getPrimaryCurrency();
                 var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this8.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this8.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this8.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || 'Unknown', "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            Link as Transfer\n                        </button>\n                    </div>\n                ");
+                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this7.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this7.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this7.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || 'Unknown', "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            Link as Transfer\n                        </button>\n                    </div>\n                ");
               }).join('');
               _context11.n = 6;
               break;
@@ -38799,7 +38785,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var _showSplitModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14(transactionId) {
         var _this$transactions2,
           _this$accounts3,
-          _this9 = this;
+          _this8 = this;
         var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, _t15;
         return _regenerator().w(function (_context14) {
           while (1) switch (_context14.p = _context14.n) {
@@ -38852,7 +38838,7 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 4:
               splits = _context14.v;
               splits.forEach(function (split, index) {
-                _this9.addSplitRow(splitsContainer, split, index === 0);
+                _this8.addSplitRow(splitsContainer, split, index === 0);
               });
               _context14.n = 6;
               break;
@@ -38887,7 +38873,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "addSplitRow",
     value: function addSplitRow(container) {
       var _this$transactions3,
-        _this0 = this;
+        _this9 = this;
       var split = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var modal = document.getElementById('split-modal');
@@ -38907,12 +38893,12 @@ var TransactionsModule = /*#__PURE__*/function () {
 
       // Add event listeners
       row.querySelector('.split-amount').addEventListener('input', function () {
-        return _this0.updateSplitRemaining();
+        return _this9.updateSplitRemaining();
       });
       row.querySelector('.split-remove-btn').addEventListener('click', function (e) {
         if (!e.currentTarget.classList.contains('disabled')) {
           row.remove();
-          _this0.updateSplitRemaining();
+          _this9.updateSplitRemaining();
         }
       });
       container.appendChild(row);
@@ -38920,7 +38906,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "getCategoryOptions",
     value: function getCategoryOptions() {
-      var _this1 = this;
+      var _this0 = this;
       var selectedId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var transactionType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       if (!this.categories) return '';
@@ -38931,7 +38917,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       return this.categories.filter(function (c) {
         return c.type === categoryType;
       }).map(function (c) {
-        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this1.escapeHtml(c.name), "</option>");
+        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this0.escapeHtml(c.name), "</option>");
       }).join('');
     }
   }, {
@@ -39181,7 +39167,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "showBulkMatchModal",
     value: function () {
       var _showBulkMatchModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee19() {
-        var _this10 = this;
+        var _this1 = this;
         var modal, loadingEl, resultsEl, emptyEl, autoMatchedSection, needsReviewSection, autoMatchedList, needsReviewList, result, _t18;
         return _regenerator().w(function (_context19) {
           while (1) switch (_context19.p = _context19.n) {
@@ -39228,7 +39214,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (result.autoMatched && result.autoMatched.length > 0) {
                 autoMatchedSection.style.display = 'block';
                 autoMatchedList.innerHTML = result.autoMatched.map(function (pair) {
-                  return _this10.renderAutoMatchedPair(pair);
+                  return _this1.renderAutoMatchedPair(pair);
                 }).join('');
               }
 
@@ -39236,7 +39222,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (result.needsReview && result.needsReview.length > 0) {
                 needsReviewSection.style.display = 'block';
                 needsReviewList.innerHTML = result.needsReview.map(function (item, index) {
-                  return _this10.renderNeedsReviewItem(item, index);
+                  return _this1.renderNeedsReviewItem(item, index);
                 }).join('');
               }
               _context19.n = 5;
@@ -39272,14 +39258,14 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "renderNeedsReviewItem",
     value: function renderNeedsReviewItem(item, index) {
-      var _this11 = this;
+      var _this10 = this;
       var tx = item.transaction;
       var txCurrency = tx.account_currency || this.getPrimaryCurrency();
       var txTypeClass = tx.type === 'credit' ? 'positive' : 'negative';
       var matchesHtml = item.matches.map(function (match) {
-        var matchCurrency = match.accountCurrency || _this11.getPrimaryCurrency();
+        var matchCurrency = match.accountCurrency || _this10.getPrimaryCurrency();
         var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-        return "\n                <label class=\"review-match-option\">\n                    <input type=\"radio\" name=\"review-match-".concat(index, "\" value=\"").concat(match.id, "\">\n                    <div class=\"match-info\">\n                        <div class=\"match-info-main\">\n                            <span class=\"match-date\">").concat(_this11.formatDate(match.date), "</span>\n                            <span class=\"match-description\">").concat(_this11.escapeHtml(match.description), "</span>\n                        </div>\n                        <span class=\"pair-amount ").concat(matchTypeClass, "\">").concat(_this11.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"pair-account\">").concat(_this11.escapeHtml(match.accountName), "</span>\n                    </div>\n                </label>\n            ");
+        return "\n                <label class=\"review-match-option\">\n                    <input type=\"radio\" name=\"review-match-".concat(index, "\" value=\"").concat(match.id, "\">\n                    <div class=\"match-info\">\n                        <div class=\"match-info-main\">\n                            <span class=\"match-date\">").concat(_this10.formatDate(match.date), "</span>\n                            <span class=\"match-description\">").concat(_this10.escapeHtml(match.description), "</span>\n                        </div>\n                        <span class=\"pair-amount ").concat(matchTypeClass, "\">").concat(_this10.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"pair-account\">").concat(_this10.escapeHtml(match.accountName), "</span>\n                    </div>\n                </label>\n            ");
       }).join('');
       return "\n            <div class=\"bulk-review-item\" data-tx-id=\"".concat(tx.id, "\" data-index=\"").concat(index, "\">\n                <div class=\"review-source\">\n                    <div class=\"review-source-info\">\n                        <span class=\"review-source-date\">").concat(this.formatDate(tx.date), "</span>\n                        <span class=\"review-source-description\">").concat(this.escapeHtml(tx.description), "</span>\n                        <div class=\"review-source-details\">\n                            <span class=\"pair-amount ").concat(txTypeClass, "\">").concat(this.formatCurrency(tx.amount, txCurrency), "</span>\n                            <span class=\"pair-account\">").concat(this.escapeHtml(tx.account_name), "</span>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"review-matches-label\">Select a match (").concat(item.matchCount, " options):</div>\n                <div class=\"review-matches\">\n                    ").concat(matchesHtml, "\n                </div>\n                <button class=\"link-selected-btn\" data-tx-id=\"").concat(tx.id, "\" data-index=\"").concat(index, "\" disabled>Link Selected</button>\n            </div>\n        ");
     }
@@ -39386,7 +39372,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "setupInlineEditingListeners",
     value: function setupInlineEditingListeners() {
-      var _this12 = this;
+      var _this11 = this;
       var transactionsTable = document.getElementById('transactions-table');
       if (!transactionsTable) {
         return;
@@ -39398,14 +39384,14 @@ var TransactionsModule = /*#__PURE__*/function () {
         if (cell && !cell.classList.contains('editing')) {
           // Don't trigger if clicking on checkbox
           if (e.target.type === 'checkbox') return;
-          _this12.startInlineEdit(cell);
+          _this11.startInlineEdit(cell);
         }
       });
 
       // Close any open inline editors when clicking outside
       document.addEventListener('click', function (e) {
         if (!e.target.closest('.editable-cell') && !e.target.closest('.category-autocomplete-dropdown')) {
-          _this12.closeAllInlineEditors();
+          _this11.closeAllInlineEditors();
         }
       });
     }
@@ -39532,7 +39518,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "createCategoryEditor",
     value: function createCategoryEditor(cell, currentCategoryId) {
-      var _this13 = this;
+      var _this12 = this;
       var container = document.createElement('div');
       container.className = 'category-autocomplete';
       var input = document.createElement('input');
@@ -39599,19 +39585,19 @@ var TransactionsModule = /*#__PURE__*/function () {
           input.dataset.categoryId = item.dataset.categoryId;
           input.value = item.dataset.categoryName;
           dropdown.style.display = 'none';
-          _this13.saveInlineEdit(cell, 'categoryId', item.dataset.categoryId);
+          _this12.saveInlineEdit(cell, 'categoryId', item.dataset.categoryId);
         }
       });
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this13.cancelInlineEdit(cell);
+          _this12.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           dropdown.style.display = 'none';
-          _this13.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
+          _this12.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
           e.preventDefault();
-          _this13.navigateCategoryDropdown(dropdown, e.key === 'ArrowDown' ? 1 : -1, input);
+          _this12.navigateCategoryDropdown(dropdown, e.key === 'ArrowDown' ? 1 : -1, input);
         }
       });
       input.addEventListener('blur', function () {
@@ -39619,9 +39605,9 @@ var TransactionsModule = /*#__PURE__*/function () {
           if (!container.contains(document.activeElement)) {
             dropdown.style.display = 'none';
             if (input.dataset.categoryId !== (currentCategoryId || '')) {
-              _this13.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
+              _this12.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
             } else {
-              _this13.cancelInlineEdit(cell);
+              _this12.cancelInlineEdit(cell);
             }
           }
         }, 200);
@@ -39658,7 +39644,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createAccountEditor",
     value: function createAccountEditor(cell, currentAccountId) {
       var _this$accounts4,
-        _this14 = this;
+        _this13 = this;
       var select = document.createElement('select');
       select.className = 'inline-edit-select';
       (_this$accounts4 = this.accounts) === null || _this$accounts4 === void 0 || _this$accounts4.forEach(function (account) {
@@ -39670,19 +39656,19 @@ var TransactionsModule = /*#__PURE__*/function () {
       });
       select.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this14.cancelInlineEdit(cell);
+          _this13.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          _this14.saveInlineEdit(cell, 'accountId', select.value);
+          _this13.saveInlineEdit(cell, 'accountId', select.value);
         }
       });
       select.addEventListener('change', function () {
-        _this14.saveInlineEdit(cell, 'accountId', select.value);
+        _this13.saveInlineEdit(cell, 'accountId', select.value);
       });
       select.addEventListener('blur', function () {
         setTimeout(function () {
           if (cell.classList.contains('editing')) {
-            _this14.cancelInlineEdit(cell);
+            _this13.cancelInlineEdit(cell);
           }
         }, 100);
       });
@@ -39694,7 +39680,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createTagsEditor",
     value: function () {
       var _createTagsEditor = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee22(cell, transaction) {
-        var _this15 = this;
+        var _this14 = this;
         var categoryId, tagSets, currentTagIds, selectedTags, container, input, dropdown, allTags, renderDropdown, _t21;
         return _regenerator().w(function (_context22) {
           while (1) switch (_context22.p = _context22.n) {
@@ -39706,7 +39692,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               }
               cell.innerHTML = '<span style="color: var(--color-text-maxcontrast); font-size: 11px; font-style: italic;">Select category first</span>';
               setTimeout(function () {
-                return _this15.cancelInlineEdit(cell);
+                return _this14.cancelInlineEdit(cell);
               }, 1500);
               return _context22.a(2);
             case 1:
@@ -39722,7 +39708,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               }
               cell.innerHTML = '<span style="color: var(--color-text-maxcontrast); font-size: 11px; font-style: italic;">No tag sets</span>';
               setTimeout(function () {
-                return _this15.cancelInlineEdit(cell);
+                return _this14.cancelInlineEdit(cell);
               }, 1500);
               return _context22.a(2);
             case 4:
@@ -39768,10 +39754,10 @@ var TransactionsModule = /*#__PURE__*/function () {
                 });
                 var html = '';
                 Object.values(grouped).forEach(function (group) {
-                  html += "<div class=\"tags-group-header\">".concat(_this15.escapeHtml(group.name), "</div>");
+                  html += "<div class=\"tags-group-header\">".concat(_this14.escapeHtml(group.name), "</div>");
                   group.tags.forEach(function (tag) {
                     var isSelected = selectedTags.has(tag.id);
-                    html += "\n                            <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                                 data-tag-id=\"").concat(tag.id, "\">\n                                <span class=\"tag-chip\"\n                                      style=\"display: inline-flex; align-items: center; background-color: ").concat(_this15.escapeHtml(tag.color), "; color: white;\n                                             padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                    ").concat(_this15.escapeHtml(tag.name), "\n                                </span>\n                                <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                            </div>\n                        ");
+                    html += "\n                            <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                                 data-tag-id=\"").concat(tag.id, "\">\n                                <span class=\"tag-chip\"\n                                      style=\"display: inline-flex; align-items: center; background-color: ").concat(_this14.escapeHtml(tag.color), "; color: white;\n                                             padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                    ").concat(_this14.escapeHtml(tag.name), "\n                                </span>\n                                <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                            </div>\n                        ");
                   });
                 });
                 dropdown.innerHTML = html || '<div class="tags-autocomplete-empty">No tags found</div>';
@@ -39813,16 +39799,16 @@ var TransactionsModule = /*#__PURE__*/function () {
               });
               input.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
-                  _this15.cancelInlineEdit(cell);
+                  _this14.cancelInlineEdit(cell);
                 } else if (e.key === 'Enter') {
                   e.preventDefault();
-                  _this15.saveTagsFromEditor(cell, selectedTags, transaction.id);
+                  _this14.saveTagsFromEditor(cell, selectedTags, transaction.id);
                 }
               });
               input.addEventListener('blur', function () {
                 setTimeout(function () {
                   if (cell.classList.contains('editing')) {
-                    _this15.saveTagsFromEditor(cell, selectedTags, transaction.id);
+                    _this14.saveTagsFromEditor(cell, selectedTags, transaction.id);
                   }
                 }, 200);
               });
@@ -39838,7 +39824,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               console.error('Failed to load tag sets:', _t21);
               cell.innerHTML = '<span style="color: var(--color-error); font-size: 11px;">Error loading tags</span>';
               setTimeout(function () {
-                return _this15.cancelInlineEdit(cell);
+                return _this14.cancelInlineEdit(cell);
               }, 1500);
             case 6:
               return _context22.a(2);
@@ -39951,19 +39937,19 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "setupEditorEvents",
     value: function setupEditorEvents(input, cell, field) {
-      var _this16 = this;
+      var _this15 = this;
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this16.cancelInlineEdit(cell);
+          _this15.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           if (field === 'amount') {
             var type = input.dataset.type;
-            _this16.saveInlineEdit(cell, field, input.value, {
+            _this15.saveInlineEdit(cell, field, input.value, {
               type: type
             });
           } else {
-            _this16.saveInlineEdit(cell, field, input.value);
+            _this15.saveInlineEdit(cell, field, input.value);
           }
         }
       });
@@ -39976,11 +39962,11 @@ var TransactionsModule = /*#__PURE__*/function () {
           if (cell.classList.contains('editing')) {
             if (field === 'amount') {
               var type = input.dataset.type;
-              _this16.saveInlineEdit(cell, field, input.value, {
+              _this15.saveInlineEdit(cell, field, input.value, {
                 type: type
               });
             } else {
-              _this16.saveInlineEdit(cell, field, input.value);
+              _this15.saveInlineEdit(cell, field, input.value);
             }
           }
         }, 100);
@@ -40120,10 +40106,10 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "closeAllInlineEditors",
     value: function closeAllInlineEditors() {
-      var _this17 = this;
+      var _this16 = this;
       var editingCells = document.querySelectorAll('.editable-cell.editing');
       editingCells.forEach(function (cell) {
-        _this17.cancelInlineEdit(cell);
+        _this16.cancelInlineEdit(cell);
       });
     }
 
@@ -43677,11 +43663,6 @@ var BudgetApp = /*#__PURE__*/function () {
     key: "setupInlineEditingListeners",
     value: function setupInlineEditingListeners() {
       return this.transactionsModule.setupInlineEditingListeners();
-    }
-  }, {
-    key: "renderTransactionsTable",
-    value: function renderTransactionsTable(transactions) {
-      return this.transactionsModule.renderTransactionsTable(transactions);
     }
   }, {
     key: "renderEnhancedTransactionsTable",

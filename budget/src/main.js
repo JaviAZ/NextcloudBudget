@@ -845,10 +845,6 @@ class BudgetApp {
         return this.transactionsModule.setupInlineEditingListeners();
     }
 
-    renderTransactionsTable(transactions) {
-        return this.transactionsModule.renderTransactionsTable(transactions);
-    }
-
     renderEnhancedTransactionsTable() {
         const tbody = document.querySelector('#transactions-table tbody');
         if (!tbody || !this.transactions) return;

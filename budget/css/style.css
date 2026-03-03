@@ -3222,15 +3222,14 @@ button.danger:hover {
 }
 
 .category-badge.categorized {
-    background: var(--color-success-bg, #e8f5e8);
-    color: var(--color-success, #2e7d32);
-    border: 1px solid var(--color-success-border, #c8e6c9);
+    background: var(--color-background-dark);
+    color: var(--color-main-text);
 }
 
 .category-badge.uncategorized {
-    background: var(--color-warning-bg, #fff3cd);
-    color: var(--color-warning, #856404);
-    border: 1px solid var(--color-warning-border, #ffeaa7);
+    background: var(--color-background-dark);
+    color: var(--color-text-maxcontrast);
+    font-style: italic;
 }
 
 .amount.positive {
@@ -10207,7 +10206,6 @@ tr.scheduled-transaction:hover {
     color: var(--color-error);
 }
 
-/* Split indicator in transaction table */
 /* Category display in transactions table */
 .transactions-table .category-name {
     display: inline-block;
@@ -10217,6 +10215,11 @@ tr.scheduled-transaction:hover {
     border-radius: 10px;
     font-size: 12px;
     font-weight: 500;
+}
+
+.transactions-table .category-name.uncategorized {
+    color: var(--color-text-maxcontrast);
+    font-style: italic;
 }
 
 .split-indicator {
@@ -12558,6 +12561,7 @@ tr.scheduled-transaction:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--color-main-text);
 }
 
 .category-amount {
