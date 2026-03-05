@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-03-05
+
+### Added
+- **Configurable budget cycle start day**: Set a custom start day for budget periods instead of always using the 1st of the month ([#54](https://github.com/otherworld-dev/budget/issues/54))
+- **Exchange rate support for non-ECB currencies**: Currencies not covered by the European Central Bank now fetch rates from fallback providers ([#55](https://github.com/otherworld-dev/budget/issues/55))
+- **Transaction status column**: Scheduled future transactions can be excluded from reports and balance calculations ([#56](https://github.com/otherworld-dev/budget/issues/56))
+
+### Fixed
+- Reports account filtering, year-over-year filtering, and export errors ([#62](https://github.com/otherworld-dev/budget/issues/62))
+- Category text unreadable in light theme ([#17](https://github.com/otherworld-dev/budget/issues/17))
+- Import rule matching now uses v2 schema during file import ([#57](https://github.com/otherworld-dev/budget/issues/57))
+- Bills page title changed from "Recurring Bills" to "Bills"
+
 ## [2.5.0] - 2026-03-02
 
 ### Added
