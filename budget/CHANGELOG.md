@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-03-07
+
+### Fixed
+- **Migration failure on upgrade from 2.6.x to 2.7.0**: `Undefined constant OCP\IDBConnection::PARAM_INT` in opening balance migration — used wrong constant class ([#66](https://github.com/otherworld-dev/budget/issues/66))
+- **Log error spam from missing notification icon**: Notifier referenced non-existent `app-dark.svg`, causing RuntimeException on every notification poll ([#65](https://github.com/otherworld-dev/budget/issues/65))
+
 ## [2.7.0] - 2026-03-07
 
 ### Added

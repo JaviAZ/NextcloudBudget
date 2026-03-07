@@ -81,7 +81,7 @@ class Notifier implements INotifier {
                 );
 
                 $notification->setIcon($this->urlGenerator->getAbsoluteURL(
-                    $this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+                    $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg')
                 ));
 
                 $notification->setLink($this->urlGenerator->linkToRouteAbsolute(
@@ -129,7 +129,7 @@ class Notifier implements INotifier {
                 );
 
                 $notification->setIcon($this->urlGenerator->getAbsoluteURL(
-                    $this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+                    $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg')
                 ));
 
                 $notification->setLink($this->urlGenerator->linkToRouteAbsolute(
@@ -172,7 +172,7 @@ class Notifier implements INotifier {
                 );
 
                 $notification->setIcon($this->urlGenerator->getAbsoluteURL(
-                    $this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+                    $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg')
                 ));
 
                 $notification->setLink($this->urlGenerator->linkToRouteAbsolute(
@@ -215,7 +215,7 @@ class Notifier implements INotifier {
                 );
 
                 $notification->setIcon($this->urlGenerator->getAbsoluteURL(
-                    $this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg')
+                    $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg')
                 ));
 
                 $notification->setLink($this->urlGenerator->linkToRouteAbsolute(

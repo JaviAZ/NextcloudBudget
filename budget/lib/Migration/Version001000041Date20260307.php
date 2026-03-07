@@ -6,6 +6,7 @@ namespace OCA\Budget\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
@@ -71,7 +72,7 @@ class Version001000041Date20260307 extends SimpleMigrationStep {
 					'net_change'
 				)
 				->from('budget_transactions', 't')
-				->where($qb2->expr()->eq('t.account_id', $qb2->createNamedParameter($accountId, \OCP\IDBConnection::PARAM_INT)));
+				->where($qb2->expr()->eq('t.account_id', $qb2->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)));
 
 			$txResult = $qb2->executeQuery();
 			$netChange = (float) $txResult->fetchOne();
@@ -83,7 +84,7 @@ class Version001000041Date20260307 extends SimpleMigrationStep {
 			$qb3 = $this->db->getQueryBuilder();
 			$qb3->update('budget_accounts')
 				->set('opening_balance', $qb3->createNamedParameter(sprintf('%.2f', $openingBalance)))
-				->where($qb3->expr()->eq('id', $qb3->createNamedParameter($accountId, \OCP\IDBConnection::PARAM_INT)));
+				->where($qb3->expr()->eq('id', $qb3->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)));
 			$qb3->executeStatement();
 		}
 	}
