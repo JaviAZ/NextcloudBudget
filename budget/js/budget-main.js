@@ -25646,7 +25646,8 @@ var DashboardModule = /*#__PURE__*/function () {
 
       // Wire up add buttons
       menuList.querySelectorAll('.add-tile-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
           var widgetId = btn.dataset.widgetId;
           var category = btn.dataset.category;
           _this21.showWidget(widgetId, category);

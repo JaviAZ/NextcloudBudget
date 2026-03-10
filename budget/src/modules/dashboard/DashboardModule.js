@@ -2202,7 +2202,8 @@ export default class DashboardModule {
 
         // Wire up add buttons
         menuList.querySelectorAll('.add-tile-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const widgetId = btn.dataset.widgetId;
                 const category = btn.dataset.category;
                 this.showWidget(widgetId, category);
