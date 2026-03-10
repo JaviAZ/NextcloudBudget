@@ -257,13 +257,7 @@ class BillController extends Controller {
 
             return new DataResponse($bill, Http::STATUS_CREATED);
         } catch (\Exception $e) {
-            // Log full error details for debugging
-            error_log('BillController create error: ' . $e->getMessage());
-            error_log('Stack trace: ' . $e->getTraceAsString());
-            return new DataResponse([
-                'error' => 'Failed to create bill: ' . $e->getMessage(),
-                'details' => $e->getTraceAsString()
-            ], Http::STATUS_BAD_REQUEST);
+            return $this->handleError($e, 'Failed to create bill');
         }
     }
 

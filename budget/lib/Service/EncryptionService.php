@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Budget\Service;
 
 use OCP\Security\ICrypto;
+use Psr\Log\LoggerInterface;
 
 /**
  * Encryption service for sensitive banking data.
@@ -14,9 +15,11 @@ class EncryptionService {
     private const ENCRYPTED_PREFIX = 'enc:';
 
     private ICrypto $crypto;
+    private LoggerInterface $logger;
 
-    public function __construct(ICrypto $crypto) {
+    public function __construct(ICrypto $crypto, LoggerInterface $logger) {
         $this->crypto = $crypto;
+        $this->logger = $logger;
     }
 
     /**
@@ -53,7 +56,7 @@ class EncryptionService {
             return $this->crypto->decrypt($encrypted);
         } catch (\Exception $e) {
             // Log decryption failure - likely due to changed encryption key or corrupted data
-            \OC::$server->get(\Psr\Log\LoggerInterface::class)->error(
+            $this->logger->error(
                 'Failed to decrypt value: ' . $e->getMessage(),
                 ['exception' => $e]
             );

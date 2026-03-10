@@ -58,7 +58,8 @@ class Application extends App implements IBootstrap {
 
         $context->registerService(\OCA\Budget\Service\EncryptionService::class, function($c) {
             return new \OCA\Budget\Service\EncryptionService(
-                $c->get(\OCP\Security\ICrypto::class)
+                $c->get(\OCP\Security\ICrypto::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
             );
         });
 

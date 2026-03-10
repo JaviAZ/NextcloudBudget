@@ -7,14 +7,17 @@ namespace OCA\Budget\Tests\Unit\Service;
 use OCA\Budget\Service\EncryptionService;
 use OCP\Security\ICrypto;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class EncryptionServiceTest extends TestCase {
 	private EncryptionService $service;
 	private ICrypto $crypto;
+	private LoggerInterface $logger;
 
 	protected function setUp(): void {
 		$this->crypto = $this->createMock(ICrypto::class);
-		$this->service = new EncryptionService($this->crypto);
+		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->service = new EncryptionService($this->crypto, $this->logger);
 	}
 
 	// ── encrypt ─────────────────────────────────────────────────────
@@ -75,15 +78,16 @@ class EncryptionServiceTest extends TestCase {
 	}
 
 	public function testDecryptFailureReturnsNull(): void {
-		// The decrypt method catches exceptions and logs via \OC::$server
-		// which isn't available in unit tests. Skip if OC class or server not set up.
-		if (!class_exists('\OC') || \OC::$server === null) {
-			$this->markTestSkipped('Requires Nextcloud runtime (OC class with server) for error logging');
-		}
-
 		$this->crypto->expects($this->once())
 			->method('decrypt')
 			->willThrowException(new \Exception('Decryption failed'));
+
+		$this->logger->expects($this->once())
+			->method('error')
+			->with(
+				$this->stringContains('Failed to decrypt value'),
+				$this->arrayHasKey('exception')
+			);
 
 		$result = $this->service->decrypt('enc:corrupted_data');
 		$this->assertNull($result);

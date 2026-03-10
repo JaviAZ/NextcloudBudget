@@ -30,15 +30,21 @@ class BillControllerTest extends TestCase {
 
 		// Default validation mocks (pass-through)
 		$this->validationService->method('validateName')
-			->willReturn(['valid' => true, 'sanitized' => 'Test Bill']);
+			->willReturnCallback(function ($name) {
+				return ['valid' => true, 'sanitized' => $name];
+			});
 		$this->validationService->method('validateFrequency')
 			->willReturnCallback(function ($freq) {
 				return ['valid' => true, 'formatted' => $freq];
 			});
 		$this->validationService->method('validatePattern')
-			->willReturn(['valid' => true, 'sanitized' => 'PATTERN']);
+			->willReturnCallback(function ($pattern) {
+				return ['valid' => true, 'sanitized' => $pattern];
+			});
 		$this->validationService->method('validateNotes')
-			->willReturn(['valid' => true, 'sanitized' => 'some notes']);
+			->willReturnCallback(function ($notes) {
+				return ['valid' => true, 'sanitized' => $notes];
+			});
 		$this->validationService->method('validateDate')
 			->willReturn(['valid' => true]);
 
