@@ -196,6 +196,7 @@ class TransactionController extends Controller {
         ?float $amount = null,
         ?string $type = null,
         ?int $categoryId = null,
+        ?int $accountId = null,
         ?string $vendor = null,
         ?string $reference = null,
         ?string $notes = null,
@@ -263,6 +264,9 @@ class TransactionController extends Controller {
             }
             if ($categoryId !== null) {
                 $updates['categoryId'] = $categoryId;
+            }
+            if ($accountId !== null) {
+                $updates['accountId'] = $accountId;
             }
             if ($reconciled !== null) {
                 $updates['reconciled'] = $reconciled;

@@ -224,6 +224,13 @@ class TransactionService {
         $transaction = $this->find($id, $userId);
         $oldAmount = $transaction->getAmount();
         $oldType = $transaction->getType();
+        $oldAccountId = $transaction->getAccountId();
+
+        // If changing account, verify new account belongs to user
+        $accountChanging = isset($updates['accountId']) && $updates['accountId'] !== $oldAccountId;
+        if ($accountChanging) {
+            $this->accountMapper->find($updates['accountId'], $userId);
+        }
 
         // Apply updates
         foreach ($updates as $key => $value) {
@@ -237,28 +244,32 @@ class TransactionService {
         $transaction->setUpdatedAt(date('Y-m-d H:i:s'));
         $transaction = $this->mapper->update($transaction);
 
-        // Update account balance only if amount or type actually changed
         $newAmount = $updates['amount'] ?? $oldAmount;
         $newType = $updates['type'] ?? $oldType;
 
-        if ($newAmount != $oldAmount || $newType != $oldType) {
+        if ($accountChanging) {
+            // Moving to a different account: reverse on old, apply on new
+            $oldAccount = $this->accountMapper->find($oldAccountId, $userId);
+            $reverseType = $oldType === 'credit' ? 'debit' : 'credit';
+            $this->updateAccountBalance($oldAccount, $oldAmount, $reverseType, $userId);
+
+            $newAccount = $this->accountMapper->find($updates['accountId'], $userId);
+            $this->updateAccountBalance($newAccount, $newAmount, $newType, $userId);
+        } elseif ($newAmount != $oldAmount || $newType != $oldType) {
+            // Same account, but amount or type changed
             $account = $this->accountMapper->find($transaction->getAccountId(), $userId);
             $currentBalance = (string) $account->getBalance();
 
-            // Calculate the net balance change using MoneyCalculator for precision
-            // Old effect: what was already applied to the balance
             $oldAmountStr = (string) $oldAmount;
             $oldEffect = $oldType === 'credit'
                 ? $oldAmountStr
                 : MoneyCalculator::multiply($oldAmountStr, '-1');
 
-            // New effect: what should be applied to the balance
             $newAmountStr = (string) $newAmount;
             $newEffect = $newType === 'credit'
                 ? $newAmountStr
                 : MoneyCalculator::multiply($newAmountStr, '-1');
 
-            // Net change to apply
             $netChange = MoneyCalculator::subtract($newEffect, $oldEffect);
             $newBalance = MoneyCalculator::add($currentBalance, $netChange);
 
