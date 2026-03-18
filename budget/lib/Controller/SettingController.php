@@ -113,7 +113,6 @@ class SettingController extends Controller {
      *
      * @NoAdminRequired
      */
-    #[UserRateLimit(limit: 30, period: 60)]
     public function update(): DataResponse {
         try {
             $data = $this->request->getParams();

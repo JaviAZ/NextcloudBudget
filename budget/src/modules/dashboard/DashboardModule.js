@@ -18,6 +18,53 @@ import { showSuccess, showError } from '../../utils/notifications.js';
 export default class DashboardModule {
     constructor(app) {
         this.app = app;
+        this._pendingSettings = {};
+        this._saveSettingsTimer = null;
+        this._saveSettingsPromise = null;
+    }
+
+    /**
+     * Debounced settings save — coalesces multiple rapid updates into a single
+     * API call. Merges all pending key/value pairs and flushes after 300ms of
+     * inactivity. Returns a promise that resolves when the save completes.
+     */
+    _saveSettings(settings) {
+        Object.assign(this._pendingSettings, settings);
+
+        if (this._saveSettingsTimer) {
+            clearTimeout(this._saveSettingsTimer);
+        }
+
+        this._saveSettingsPromise = new Promise((resolve, reject) => {
+            this._saveSettingsTimer = setTimeout(async () => {
+                const toSave = { ...this._pendingSettings };
+                this._pendingSettings = {};
+                this._saveSettingsTimer = null;
+
+                try {
+                    const response = await fetch(OC.generateUrl('/apps/budget/api/settings'), {
+                        method: 'PUT',
+                        headers: {
+                            'requesttoken': OC.requestToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(toSave)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    // Update local settings cache
+                    Object.assign(this.settings, toSave);
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            }, 300);
+        });
+
+        return this._saveSettingsPromise;
     }
 
     // State proxies
@@ -1731,27 +1778,10 @@ export default class DashboardModule {
 
     async saveDashboardVisibility() {
         try {
-            const settings = {
+            await this._saveSettings({
                 dashboard_hero_config: JSON.stringify(this.dashboardConfig.hero),
                 dashboard_widgets_config: JSON.stringify(this.dashboardConfig.widgets)
-            };
-
-            const response = await fetch(OC.generateUrl('/apps/budget/api/settings'), {
-                method: 'PUT',
-                headers: {
-                    'requesttoken': OC.requestToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(settings)
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to save dashboard config');
-            }
-
-            this.settings.dashboard_hero_config = settings.dashboard_hero_config;
-            this.settings.dashboard_widgets_config = settings.dashboard_widgets_config;
-
         } catch (error) {
             console.error('Failed to save dashboard config:', error);
             showError('Failed to save dashboard layout');
@@ -2007,25 +2037,9 @@ export default class DashboardModule {
 
         // Save state to backend
         try {
-            const settings = {
+            await this._saveSettings({
                 dashboard_locked: this.app.dashboardLocked.toString()
-            };
-
-            const response = await fetch(OC.generateUrl('/apps/budget/api/settings'), {
-                method: 'PUT',
-                headers: {
-                    'requesttoken': OC.requestToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(settings)
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to save lock state');
-            }
-
-            this.settings.dashboard_locked = settings.dashboard_locked;
-
         } catch (error) {
             console.error('Failed to save lock state:', error);
             showError('Failed to save dashboard lock state');
@@ -2427,28 +2441,12 @@ export default class DashboardModule {
         // Update config
         config.order = order;
 
-        // Persist to backend
+        // Persist to backend (debounced to coalesce rapid reorders)
         try {
             const settingKey = category === 'hero' ? 'dashboard_hero_config' : 'dashboard_widgets_config';
-            const settings = {
+            await this._saveSettings({
                 [settingKey]: JSON.stringify(config)
-            };
-
-            const response = await fetch(OC.generateUrl('/apps/budget/api/settings'), {
-                method: 'PUT',
-                headers: {
-                    'requesttoken': OC.requestToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(settings)
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to save widget order');
-            }
-
-            this.settings[settingKey] = settings[settingKey];
-
         } catch (error) {
             console.error('Failed to save widget order:', error);
             showError('Failed to save widget order');
