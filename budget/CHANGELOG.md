@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Consistent date formatting**: Replace native date inputs with flatpickr across the app so the user's chosen date format is used everywhere — transaction forms, filters, inline editing ([#72](https://github.com/otherworld-dev/budget/issues/72))
+
+### Fixed
+- **Category dropdown not working**: Categories stopped appearing in transaction dropdown after a recent UI update ([#87](https://github.com/otherworld-dev/budget/issues/87))
+- **NC33 background job error**: Log error when starting Nextcloud 33 with Budget enabled ([#86](https://github.com/otherworld-dev/budget/issues/86))
+- **Interest rate limit**: Error saving account when interest rate exceeds 9.99% ([#74](https://github.com/otherworld-dev/budget/issues/74))
+- **Liability sign/color inversion**: Liability account cards showed a forced negative sign on positive balances; Total Assets summary used static green color even when negative ([#85](https://github.com/otherworld-dev/budget/issues/85))
+- **One-time bill transactions not created**: Marking a one-time bill as paid did not create a transaction or deduct from account balance because the bill was deactivated before the transaction creation check ([#89](https://github.com/otherworld-dev/budget/issues/89))
+- **Dashboard tile reordering errors**: "Failed to save widget order" and "Failed to save dashboard lock state" errors caused by race conditions during rapid drag-and-drop; settings saves are now debounced ([#77](https://github.com/otherworld-dev/budget/issues/77))
+- **Asset detail edit button broken**: Edit button in asset detail panel did nothing due to a button ID mismatch between template and JavaScript ([#76](https://github.com/otherworld-dev/budget/issues/76))
+- **Split transaction cannot be undone**: The "Unsplit Transaction" button existed but was never shown or connected to its handler; now visible when editing a split transaction ([#75](https://github.com/otherworld-dev/budget/issues/75))
+- **Inline account change**: Support changing a transaction's account via inline edit ([#70](https://github.com/otherworld-dev/budget/issues/70))
+
 ## [2.7.2] - 2026-03-09
 
 ### Fixed
