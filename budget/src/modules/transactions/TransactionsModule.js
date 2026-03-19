@@ -1483,6 +1483,13 @@ export default class TransactionsModule {
             this.addSplitRow(splitsContainer, null, false);
         }
 
+        // Show/hide unsplit button and wire up handler
+        const unsplitBtn = document.getElementById('split-unsplit-btn');
+        if (unsplitBtn) {
+            unsplitBtn.style.display = isSplit ? '' : 'none';
+            unsplitBtn.onclick = () => this.unsplitTransaction();
+        }
+
         this.updateSplitRemaining();
         modal.style.display = 'flex';
     }

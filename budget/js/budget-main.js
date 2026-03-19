@@ -42331,7 +42331,7 @@ var TransactionsModule = /*#__PURE__*/function () {
         var _this$transactions2,
           _this$accounts3,
           _this8 = this;
-        var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, _t15;
+        var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, unsplitBtn, _t15;
         return _regenerator().w(function (_context14) {
           while (1) switch (_context14.p = _context14.n) {
             case 0:
@@ -42402,6 +42402,14 @@ var TransactionsModule = /*#__PURE__*/function () {
               this.addSplitRow(splitsContainer, null, true);
               this.addSplitRow(splitsContainer, null, false);
             case 8:
+              // Show/hide unsplit button and wire up handler
+              unsplitBtn = document.getElementById('split-unsplit-btn');
+              if (unsplitBtn) {
+                unsplitBtn.style.display = isSplit ? '' : 'none';
+                unsplitBtn.onclick = function () {
+                  return _this8.unsplitTransaction();
+                };
+              }
               this.updateSplitRemaining();
               modal.style.display = 'flex';
             case 9:
