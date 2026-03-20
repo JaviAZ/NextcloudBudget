@@ -256,12 +256,13 @@ export default class AccountsModule {
         const typeInfo = this.getAccountTypeInfo(accountType);
         const healthStatus = this.getAccountHealthStatus(account);
 
-        // For liabilities (credit cards, loans), show absolute value with "Owed" label
+        // For liabilities: negative = you owe, positive = overpayment/credit, zero = paid off
         const isLiability = ['credit_card', 'loan'].includes(accountType);
         const displayBalance = isLiability ? Math.abs(accountBalance) : accountBalance;
-        const balanceClass = isLiability
-            ? (accountBalance === 0 ? 'positive' : 'negative')
-            : (accountBalance >= 0 ? 'positive' : 'negative');
+        const balanceClass = accountBalance >= 0 ? 'positive' : 'negative';
+        const balanceLabel = isLiability
+            ? (accountBalance < 0 ? 'Owed' : accountBalance > 0 ? 'Credit' : 'Balance')
+            : 'Balance';
 
         return `
             <div class="account-card" data-type="${accountType}" data-account-id="${accountId}">
@@ -280,7 +281,7 @@ export default class AccountsModule {
 
                 <div class="account-card-balance">
                     <div class="balance-info">
-                        <span class="balance-label">${isLiability ? 'Owed' : 'Balance'}</span>
+                        <span class="balance-label">${balanceLabel}</span>
                         <span class="balance-amount ${balanceClass}">
                             ${this.formatCurrency(displayBalance, accountCurrency)}
                         </span>
