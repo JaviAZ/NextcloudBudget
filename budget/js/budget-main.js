@@ -18817,7 +18817,7 @@ var AccountsModule = /*#__PURE__*/function () {
         });
         liabilities.forEach(function (acc) {
           var balance = parseFloat(getField(acc, 'balance')) || 0;
-          totalLiabilities += Math.abs(balance);
+          totalLiabilities -= balance; // balances are negative when owed, so negate to get positive total
         });
       }
       var netWorth = totalAssets - totalLiabilities;

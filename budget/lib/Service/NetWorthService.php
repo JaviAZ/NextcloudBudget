@@ -82,10 +82,11 @@ class NetWorthService {
             }
 
             if ($this->isLiabilityType($type)) {
-                // Liabilities: use absolute value
-                $totalLiabilities = MoneyCalculator::add(
+                // Liabilities: negate balance (negative = owed, positive = credit/overpayment)
+                // so that credits offset debt in the total
+                $totalLiabilities = MoneyCalculator::subtract(
                     $totalLiabilities,
-                    MoneyCalculator::abs($balance)
+                    $balance
                 );
             } else {
                 // Assets: add balance directly

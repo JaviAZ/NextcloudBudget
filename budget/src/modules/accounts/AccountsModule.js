@@ -178,7 +178,7 @@ export default class AccountsModule {
             });
             liabilities.forEach(acc => {
                 const balance = parseFloat(getField(acc, 'balance')) || 0;
-                totalLiabilities += Math.abs(balance);
+                totalLiabilities -= balance; // balances are negative when owed, so negate to get positive total
             });
         }
 

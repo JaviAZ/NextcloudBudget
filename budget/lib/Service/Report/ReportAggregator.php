@@ -147,7 +147,7 @@ class ReportAggregator {
 
             $summary['totals']['currentBalance'] += $currentBalance;
             if (in_array($account->getType(), $liabilityTypes, true)) {
-                $totalLiabilities += abs($currentBalance);
+                $totalLiabilities -= $currentBalance; // negative = owed, positive = credit; negate so credits offset debt
             } else {
                 $totalAssets += $currentBalance;
             }
