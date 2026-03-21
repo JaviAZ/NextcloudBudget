@@ -272,7 +272,7 @@ class BillService {
         // (Recurring bills already have a pre-scheduled transaction for the current period)
         if ($bill->getFrequency() === 'one-time' && $createNextTransaction && $bill->getAccountId() !== null) {
             try {
-                $this->transactionService->createFromBill($userId, $bill, $paidDate, 'cleared');
+                $this->transactionService->createFromBill($userId, $bill, date('Y-m-d'), 'cleared');
             } catch (\Exception $e) {
                 error_log("Failed to create transaction for one-time bill {$id}: {$e->getMessage()}");
             }
