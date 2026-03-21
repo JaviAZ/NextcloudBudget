@@ -21390,7 +21390,7 @@ var AssetsModule = /*#__PURE__*/function () {
         document.getElementById('asset-current-value').value = asset.currentValue || '';
         document.getElementById('asset-purchase-price').value = asset.purchasePrice || '';
         (0,_utils_datepicker_js__WEBPACK_IMPORTED_MODULE_3__.setDateValue)('asset-purchase-date', asset.purchaseDate || '');
-        document.getElementById('asset-annual-rate').value = asset.annualChangeRate !== null ? asset.annualChangeRate * 100 : '';
+        document.getElementById('asset-annual-change-rate').value = asset.annualChangeRate !== null ? asset.annualChangeRate * 100 : '';
       } else {
         title.textContent = 'Add Asset';
         document.getElementById('asset-id').value = '';
