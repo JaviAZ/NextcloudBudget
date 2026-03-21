@@ -5193,6 +5193,32 @@ style('budget', 'budget-main');
     </div>
 </div>
 
+<!-- Edit Tag Modal -->
+<div id="edit-tag-modal" class="modal" style="display: none;">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>Edit Tag</h3>
+        </div>
+        <form id="edit-tag-form" class="modal-form">
+            <input type="hidden" id="edit-tag-id" name="tagId">
+            <input type="hidden" id="edit-tag-tag-set-id" name="tagSetId">
+            <input type="hidden" id="edit-tag-category-id" name="categoryId">
+            <div class="form-group">
+                <label for="edit-tag-name">Tag Name *</label>
+                <input type="text" id="edit-tag-name" name="name" required placeholder="e.g., Fishing, Rods, Online">
+            </div>
+            <div class="form-group">
+                <label for="edit-tag-color">Color</label>
+                <input type="color" id="edit-tag-color" name="color" value="#4A90E2">
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="primary">Save Changes</button>
+                <button type="button" class="secondary cancel-tag-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Edit Tag Set Modal -->
 <div id="edit-tag-set-modal" class="modal" style="display: none;">
     <div class="modal-content modal-small">

@@ -84,6 +84,29 @@ class TagMapper extends QBMapper {
     }
 
     /**
+     * Check if a tag name already exists within a tag set
+     *
+     * @param int|null $excludeId Tag ID to exclude (for updates)
+     */
+    public function nameExists(int $tagSetId, string $name, ?int $excludeId = null): bool {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select($qb->createFunction('COUNT(*)'))
+            ->from($this->getTableName())
+            ->where($qb->expr()->eq('tag_set_id', $qb->createNamedParameter($tagSetId, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->eq($qb->createFunction('LOWER(name)'), $qb->createNamedParameter(strtolower($name))));
+
+        if ($excludeId !== null) {
+            $qb->andWhere($qb->expr()->neq('id', $qb->createNamedParameter($excludeId, IQueryBuilder::PARAM_INT)));
+        }
+
+        $result = $qb->executeQuery();
+        $count = (int) $result->fetchOne();
+        $result->closeCursor();
+
+        return $count > 0;
+    }
+
+    /**
      * Find multiple tags by IDs in a single query
      *
      * @param int[] $ids

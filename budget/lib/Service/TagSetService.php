@@ -50,6 +50,11 @@ class TagSetService extends AbstractCrudService {
         // Validate category exists and belongs to user
         $this->categoryMapper->find($categoryId, $userId);
 
+        // Check for duplicate name within category
+        if ($this->mapper->nameExists($categoryId, $name)) {
+            throw new \InvalidArgumentException("A tag set named '$name' already exists in this category");
+        }
+
         $tagSet = new TagSet();
         $tagSet->setCategoryId($categoryId);
         $tagSet->setName($name);
@@ -141,6 +146,11 @@ class TagSetService extends AbstractCrudService {
         // Validate tag set exists and belongs to user
         $this->find($tagSetId, $userId);
 
+        // Check for duplicate name within tag set
+        if ($this->tagMapper->nameExists($tagSetId, $name)) {
+            throw new \InvalidArgumentException("A tag named '$name' already exists in this tag set");
+        }
+
         $tag = new Tag();
         $tag->setTagSetId($tagSetId);
         $tag->setName($name);
@@ -156,6 +166,13 @@ class TagSetService extends AbstractCrudService {
      */
     public function updateTag(int $tagId, string $userId, array $updates): Tag {
         $tag = $this->tagMapper->find($tagId, $userId);
+
+        // Check for duplicate name within tag set
+        if (isset($updates['name'])) {
+            if ($this->tagMapper->nameExists($tag->getTagSetId(), $updates['name'], $tag->getId())) {
+                throw new \InvalidArgumentException("A tag named '{$updates['name']}' already exists in this tag set");
+            }
+        }
 
         $this->applyUpdates($tag, $updates);
 
@@ -184,6 +201,15 @@ class TagSetService extends AbstractCrudService {
         // Validate new category if being updated
         if (isset($updates['categoryId'])) {
             $this->categoryMapper->find($updates['categoryId'], $userId);
+        }
+
+        // Check for duplicate name within category
+        if (isset($updates['name'])) {
+            /** @var TagSet $entity */
+            $categoryId = $updates['categoryId'] ?? $entity->getCategoryId();
+            if ($this->mapper->nameExists($categoryId, $updates['name'], $entity->getId())) {
+                throw new \InvalidArgumentException("A tag set named '{$updates['name']}' already exists in this category");
+            }
         }
     }
 

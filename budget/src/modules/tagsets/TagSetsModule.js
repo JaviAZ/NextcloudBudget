@@ -160,6 +160,7 @@ export default class TagSetsModule {
                             ${tagSet.tags && tagSet.tags.length > 0 ? tagSet.tags.map(tag => `
                                 <span class="tag-badge" style="background-color: ${tag.color || '#666'}">
                                     ${dom.escapeHtml(tag.name)}
+                                    <button type="button" class="edit-tag-btn" data-tag-id="${tag.id}" data-tag-set-id="${tagSet.id}" data-tag-name="${dom.escapeHtml(tag.name)}" data-tag-color="${tag.color || '#666666'}" title="Edit tag">✎</button>
                                     <button type="button" class="delete-tag-btn" data-tag-id="${tag.id}" data-tag-set-id="${tagSet.id}">×</button>
                                 </span>
                             `).join('') : '<span style="color: #999; font-size: 12px;">No tags yet</span>'}
@@ -184,6 +185,15 @@ export default class TagSetsModule {
             btn.addEventListener('click', async () => {
                 const name = prompt('Enter tag set name (e.g., "Priority", "Status"):');
                 if (!name) return;
+
+                // Check for duplicate name
+                const duplicate = this.selectedCategoryTagSets.find(
+                    ts => ts.name.toLowerCase() === name.trim().toLowerCase()
+                );
+                if (duplicate) {
+                    showError(`A tag set named "${name.trim()}" already exists in this category`);
+                    return;
+                }
 
                 const description = prompt('Enter description (optional):');
 
@@ -222,6 +232,18 @@ export default class TagSetsModule {
                 const name = prompt('Enter tag name:');
                 if (!name) return;
 
+                // Check for duplicate tag name within the tag set
+                const tagSet = this.selectedCategoryTagSets.find(ts => ts.id === tagSetId);
+                if (tagSet && tagSet.tags) {
+                    const duplicate = tagSet.tags.find(
+                        t => t.name.toLowerCase() === name.trim().toLowerCase()
+                    );
+                    if (duplicate) {
+                        showError(`A tag named "${name.trim()}" already exists in this tag set`);
+                        return;
+                    }
+                }
+
                 const color = prompt('Enter color (e.g., #FF5733):') || '#666666';
 
                 try {
@@ -232,6 +254,15 @@ export default class TagSetsModule {
                     console.error('Failed to create tag:', error);
                     showError('Failed to create tag');
                 }
+            });
+        });
+
+        // Edit tag buttons
+        document.querySelectorAll('.edit-tag-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tagId = parseInt(btn.dataset.tagId);
+                const tagSetId = parseInt(btn.dataset.tagSetId);
+                this.showEditTagModal(tagId, tagSetId, btn.dataset.tagName, btn.dataset.tagColor, categoryId);
             });
         });
 
@@ -459,6 +490,7 @@ export default class TagSetsModule {
                                 ${tagSet.tags && tagSet.tags.length > 0 ? tagSet.tags.map(tag => `
                                     <span class="tag-badge" style="background-color: ${tag.color || '#666'}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
                                         ${dom.escapeHtml(tag.name)}
+                                        <button class="edit-tag-btn" data-tag-id="${tag.id}" data-tag-set-id="${tagSet.id}" data-tag-name="${dom.escapeHtml(tag.name)}" data-tag-color="${tag.color || '#666666'}" title="Edit tag" style="background: none; border: none; color: white; cursor: pointer; padding: 0; font-size: 12px; line-height: 1; opacity: 0.7;">✎</button>
                                         <button class="delete-tag-btn" data-tag-id="${tag.id}" data-tag-set-id="${tagSet.id}" title="Delete tag" style="background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 2px; font-size: 16px; line-height: 1; opacity: 0.7;">×</button>
                                     </span>
                                 `).join('') : '<span class="no-tags-text" style="color: var(--color-text-maxcontrast); font-size: 12px; font-style: italic;">No tags yet</span>'}
@@ -547,6 +579,17 @@ export default class TagSetsModule {
             });
         });
 
+        // Edit Tag buttons
+        document.querySelectorAll('.edit-tag-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const tagId = parseInt(btn.dataset.tagId);
+                const tagSetId = parseInt(btn.dataset.tagSetId);
+                this.showEditTagModal(tagId, tagSetId, btn.dataset.tagName, btn.dataset.tagColor, categoryId);
+            });
+        });
+
         // Delete Tag buttons
         document.querySelectorAll('.delete-tag-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
@@ -577,8 +620,17 @@ export default class TagSetsModule {
         e.preventDefault();
 
         const categoryId = document.getElementById('tag-set-category-id').value;
-        const name = document.getElementById('tag-set-name').value;
+        const name = document.getElementById('tag-set-name').value.trim();
         const description = document.getElementById('tag-set-description').value;
+
+        // Check for duplicate name
+        const duplicate = this.selectedCategoryTagSets.find(
+            ts => ts.name.toLowerCase() === name.toLowerCase()
+        );
+        if (duplicate) {
+            this.showNotification(`A tag set named "${name}" already exists in this category`, 'error');
+            return;
+        }
 
         try {
             await this.createTagSet(parseInt(categoryId), name, description);
@@ -645,8 +697,17 @@ export default class TagSetsModule {
 
         const tagSetId = parseInt(document.getElementById('edit-tag-set-id').value);
         const categoryId = parseInt(document.getElementById('edit-tag-set-category-id').value);
-        const name = document.getElementById('edit-tag-set-name').value;
+        const name = document.getElementById('edit-tag-set-name').value.trim();
         const description = document.getElementById('edit-tag-set-description').value;
+
+        // Check for duplicate name (exclude self)
+        const duplicate = this.selectedCategoryTagSets.find(
+            ts => ts.name.toLowerCase() === name.toLowerCase() && ts.id !== tagSetId
+        );
+        if (duplicate) {
+            this.showNotification(`A tag set named "${name}" already exists in this category`, 'error');
+            return;
+        }
 
         try {
             await this.updateTagSet(tagSetId, name, description);
@@ -777,8 +838,20 @@ export default class TagSetsModule {
 
         const tagSetId = parseInt(document.getElementById('tag-set-id').value);
         const categoryId = parseInt(document.getElementById('tag-category-id').value);
-        const name = document.getElementById('tag-name').value;
+        const name = document.getElementById('tag-name').value.trim();
         const color = document.getElementById('tag-color').value;
+
+        // Check for duplicate tag name within the tag set
+        const tagSet = this.selectedCategoryTagSets.find(ts => ts.id === tagSetId);
+        if (tagSet && tagSet.tags) {
+            const duplicate = tagSet.tags.find(
+                t => t.name.toLowerCase() === name.toLowerCase()
+            );
+            if (duplicate) {
+                this.showNotification(`A tag named "${name}" already exists in this tag set`, 'error');
+                return;
+            }
+        }
 
         try {
             await this.createTag(tagSetId, name, color);
@@ -792,6 +865,88 @@ export default class TagSetsModule {
     }
 
     /**
+     * Update an existing tag
+     */
+    async updateTag(tagSetId, tagId, updates) {
+        const response = await fetch(OC.generateUrl(`/apps/budget/api/tag-sets/${tagSetId}/tags/${tagId}`), {
+            method: 'PUT',
+            headers: {
+                'requesttoken': OC.requestToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updates)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update tag');
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Show modal for editing a tag
+     */
+    showEditTagModal(tagId, tagSetId, tagName, tagColor, categoryId) {
+        const modal = document.getElementById('edit-tag-modal');
+        if (!modal) {
+            console.error('Edit tag modal not found');
+            return;
+        }
+
+        document.getElementById('edit-tag-id').value = tagId;
+        document.getElementById('edit-tag-tag-set-id').value = tagSetId;
+        document.getElementById('edit-tag-category-id').value = categoryId;
+        document.getElementById('edit-tag-name').value = tagName;
+        document.getElementById('edit-tag-color').value = tagColor;
+
+        modal.style.display = 'flex';
+
+        // Setup form submission (remove old listener first)
+        const form = document.getElementById('edit-tag-form');
+        if (form) {
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            newForm.addEventListener('submit', (e) => this.saveEditTag(e));
+        }
+    }
+
+    /**
+     * Save edited tag from the modal form
+     */
+    async saveEditTag(e) {
+        e.preventDefault();
+
+        const tagId = parseInt(document.getElementById('edit-tag-id').value);
+        const tagSetId = parseInt(document.getElementById('edit-tag-tag-set-id').value);
+        const categoryId = parseInt(document.getElementById('edit-tag-category-id').value);
+        const name = document.getElementById('edit-tag-name').value.trim();
+        const color = document.getElementById('edit-tag-color').value;
+
+        // Check for duplicate tag name within the tag set (exclude self)
+        const tagSet = this.selectedCategoryTagSets.find(ts => ts.id === tagSetId);
+        if (tagSet && tagSet.tags) {
+            const duplicate = tagSet.tags.find(
+                t => t.name.toLowerCase() === name.toLowerCase() && t.id !== tagId
+            );
+            if (duplicate) {
+                this.showNotification(`A tag named "${name}" already exists in this tag set`, 'error');
+                return;
+            }
+        }
+
+        try {
+            await this.updateTag(tagSetId, tagId, { name, color });
+            this.hideModals();
+            await this.renderCategoryTagSetsList(categoryId);
+            this.showNotification('Tag updated successfully', 'success');
+        } catch (error) {
+            console.error('Failed to update tag:', error);
+            this.showNotification('Failed to update tag', 'error');
+        }
+    }
+
+    /**
      * Setup event listeners for tag modals
      */
     setupAddTagModalListeners() {
@@ -800,17 +955,12 @@ export default class TagSetsModule {
             form.addEventListener('submit', (e) => this.saveTag(e));
         }
 
-        // Cancel buttons for all tag modals
-        document.querySelectorAll('.cancel-tag-btn, .cancel-tag-set-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.hideModals());
-        });
-
-        // Close on background click for all tag modals
-        ['add-tag-modal', 'add-tag-set-modal', 'edit-tag-set-modal'].forEach(modalId => {
+        // Cancel buttons and background click for all tag modals (delegated)
+        ['add-tag-modal', 'add-tag-set-modal', 'edit-tag-modal', 'edit-tag-set-modal'].forEach(modalId => {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
+                    if (e.target === modal || e.target.closest('.cancel-tag-btn, .cancel-tag-set-btn')) {
                         this.hideModals();
                     }
                 });
@@ -828,6 +978,7 @@ export default class TagSetsModule {
         const modals = [
             'add-tag-set-modal',
             'add-tag-modal',
+            'edit-tag-modal',
             'edit-tag-set-modal'
         ];
 

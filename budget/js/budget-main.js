@@ -39614,7 +39614,7 @@ var TagSetsModule = /*#__PURE__*/function () {
               if (tagSets.length > 0) {
                 tagSets.forEach(function (tagSet) {
                   html += "\n                    <div class=\"tag-set-card\">\n                        <div class=\"tag-set-header\">\n                            <h5>".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tagSet.name), "</h5>\n                            <div class=\"tag-set-actions\">\n                                <button type=\"button\" class=\"add-tag-btn\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Add tag\">\n                                    <span class=\"icon-add\" aria-hidden=\"true\"></span>\n                                </button>\n                                <button type=\"button\" class=\"delete-tag-set-btn\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Delete tag set\">\n                                    <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                                </button>\n                            </div>\n                        </div>\n                        ").concat(tagSet.description ? "<p class=\"tag-set-description\">".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tagSet.description), "</p>") : '', "\n                        <div class=\"tags-list\">\n                            ").concat(tagSet.tags && tagSet.tags.length > 0 ? tagSet.tags.map(function (tag) {
-                    return "\n                                <span class=\"tag-badge\" style=\"background-color: ".concat(tag.color || '#666', "\">\n                                    ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\n                                    <button type=\"button\" class=\"delete-tag-btn\" data-tag-id=\"").concat(tag.id, "\" data-tag-set-id=\"").concat(tagSet.id, "\">\xD7</button>\n                                </span>\n                            ");
+                    return "\n                                <span class=\"tag-badge\" style=\"background-color: ".concat(tag.color || '#666', "\">\n                                    ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\n                                    <button type=\"button\" class=\"edit-tag-btn\" data-tag-id=\"").concat(tag.id, "\" data-tag-set-id=\"").concat(tagSet.id, "\" data-tag-name=\"").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\" data-tag-color=\"").concat(tag.color || '#666666', "\" title=\"Edit tag\">\u270E</button>\n                                    <button type=\"button\" class=\"delete-tag-btn\" data-tag-id=\"").concat(tag.id, "\" data-tag-set-id=\"").concat(tagSet.id, "\">\xD7</button>\n                                </span>\n                            ");
                   }).join('') : '<span style="color: #999; font-size: 12px;">No tags yet</span>', "\n                        </div>\n                    </div>\n                ");
                 });
               }
@@ -39643,7 +39643,7 @@ var TagSetsModule = /*#__PURE__*/function () {
       // Add tag set button
       document.querySelectorAll('.add-tag-set-btn').forEach(function (btn) {
         btn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
-          var name, description, _t4;
+          var name, duplicate, description, _t4;
           return _regenerator().w(function (_context5) {
             while (1) switch (_context5.p = _context5.n) {
               case 0:
@@ -39654,26 +39654,37 @@ var TagSetsModule = /*#__PURE__*/function () {
                 }
                 return _context5.a(2);
               case 1:
+                // Check for duplicate name
+                duplicate = _this2.selectedCategoryTagSets.find(function (ts) {
+                  return ts.name.toLowerCase() === name.trim().toLowerCase();
+                });
+                if (!duplicate) {
+                  _context5.n = 2;
+                  break;
+                }
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)("A tag set named \"".concat(name.trim(), "\" already exists in this category"));
+                return _context5.a(2);
+              case 2:
                 description = prompt('Enter description (optional):');
-                _context5.p = 2;
-                _context5.n = 3;
-                return _this2.createTagSet(categoryId, name, description);
-              case 3:
+                _context5.p = 3;
                 _context5.n = 4;
-                return _this2.renderCategoryTagSetsUI(categoryId);
+                return _this2.createTagSet(categoryId, name, description);
               case 4:
-                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Tag set created successfully');
-                _context5.n = 6;
-                break;
+                _context5.n = 5;
+                return _this2.renderCategoryTagSetsUI(categoryId);
               case 5:
-                _context5.p = 5;
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Tag set created successfully');
+                _context5.n = 7;
+                break;
+              case 6:
+                _context5.p = 6;
                 _t4 = _context5.v;
                 console.error('Failed to create tag set:', _t4);
                 (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to create tag set');
-              case 6:
+              case 7:
                 return _context5.a(2);
             }
-          }, _callee5, null, [[2, 5]]);
+          }, _callee5, null, [[3, 6]]);
         })));
       });
 
@@ -39716,7 +39727,7 @@ var TagSetsModule = /*#__PURE__*/function () {
       // Add tag buttons
       document.querySelectorAll('.add-tag-btn').forEach(function (btn) {
         btn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
-          var tagSetId, name, color, _t6;
+          var tagSetId, name, tagSet, duplicate, color, _t6;
           return _regenerator().w(function (_context7) {
             while (1) switch (_context7.p = _context7.n) {
               case 0:
@@ -39728,27 +39739,54 @@ var TagSetsModule = /*#__PURE__*/function () {
                 }
                 return _context7.a(2);
               case 1:
+                // Check for duplicate tag name within the tag set
+                tagSet = _this2.selectedCategoryTagSets.find(function (ts) {
+                  return ts.id === tagSetId;
+                });
+                if (!(tagSet && tagSet.tags)) {
+                  _context7.n = 2;
+                  break;
+                }
+                duplicate = tagSet.tags.find(function (t) {
+                  return t.name.toLowerCase() === name.trim().toLowerCase();
+                });
+                if (!duplicate) {
+                  _context7.n = 2;
+                  break;
+                }
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)("A tag named \"".concat(name.trim(), "\" already exists in this tag set"));
+                return _context7.a(2);
+              case 2:
                 color = prompt('Enter color (e.g., #FF5733):') || '#666666';
-                _context7.p = 2;
-                _context7.n = 3;
-                return _this2.createTag(tagSetId, name, color);
-              case 3:
+                _context7.p = 3;
                 _context7.n = 4;
-                return _this2.renderCategoryTagSetsUI(categoryId);
+                return _this2.createTag(tagSetId, name, color);
               case 4:
-                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Tag created successfully');
-                _context7.n = 6;
-                break;
+                _context7.n = 5;
+                return _this2.renderCategoryTagSetsUI(categoryId);
               case 5:
-                _context7.p = 5;
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Tag created successfully');
+                _context7.n = 7;
+                break;
+              case 6:
+                _context7.p = 6;
                 _t6 = _context7.v;
                 console.error('Failed to create tag:', _t6);
                 (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to create tag');
-              case 6:
+              case 7:
                 return _context7.a(2);
             }
-          }, _callee7, null, [[2, 5]]);
+          }, _callee7, null, [[3, 6]]);
         })));
+      });
+
+      // Edit tag buttons
+      document.querySelectorAll('.edit-tag-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tagId = parseInt(btn.dataset.tagId);
+          var tagSetId = parseInt(btn.dataset.tagSetId);
+          _this2.showEditTagModal(tagId, tagSetId, btn.dataset.tagName, btn.dataset.tagColor, categoryId);
+        });
       });
 
       // Delete tag buttons
@@ -40107,7 +40145,7 @@ var TagSetsModule = /*#__PURE__*/function () {
                   row.className = 'tag-set-row';
                   row.style.borderBottom = '1px solid var(--color-border)';
                   row.innerHTML = "\n                        <td class=\"tag-set-name-cell\" style=\"padding: 12px 8px; vertical-align: top; width: 25%;\">\n                            <div class=\"tag-set-name\" style=\"font-weight: 600; margin-bottom: 4px;\">\n                                ".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tagSet.name), "\n                            </div>\n                            ").concat(tagSet.description ? "\n                                <div class=\"tag-set-description\" style=\"font-size: 12px; color: var(--color-text-maxcontrast);\">\n                                    ".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tagSet.description), "\n                                </div>\n                            ") : '', "\n                        </td>\n                        <td class=\"tag-set-tags-cell\" style=\"padding: 12px 8px; vertical-align: top;\">\n                            <div class=\"tags-container\" style=\"display: flex; flex-wrap: wrap; gap: 6px;\">\n                                ").concat(tagSet.tags && tagSet.tags.length > 0 ? tagSet.tags.map(function (tag) {
-                    return "\n                                    <span class=\"tag-badge\" style=\"background-color: ".concat(tag.color || '#666', "; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;\">\n                                        ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\n                                        <button class=\"delete-tag-btn\" data-tag-id=\"").concat(tag.id, "\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Delete tag\" style=\"background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 2px; font-size: 16px; line-height: 1; opacity: 0.7;\">\xD7</button>\n                                    </span>\n                                ");
+                    return "\n                                    <span class=\"tag-badge\" style=\"background-color: ".concat(tag.color || '#666', "; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;\">\n                                        ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\n                                        <button class=\"edit-tag-btn\" data-tag-id=\"").concat(tag.id, "\" data-tag-set-id=\"").concat(tagSet.id, "\" data-tag-name=\"").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\" data-tag-color=\"").concat(tag.color || '#666666', "\" title=\"Edit tag\" style=\"background: none; border: none; color: white; cursor: pointer; padding: 0; font-size: 12px; line-height: 1; opacity: 0.7;\">\u270E</button>\n                                        <button class=\"delete-tag-btn\" data-tag-id=\"").concat(tag.id, "\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Delete tag\" style=\"background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 2px; font-size: 16px; line-height: 1; opacity: 0.7;\">\xD7</button>\n                                    </span>\n                                ");
                   }).join('') : '<span class="no-tags-text" style="color: var(--color-text-maxcontrast); font-size: 12px; font-style: italic;">No tags yet</span>', "\n                            </div>\n                        </td>\n                        <td class=\"tag-set-actions-cell\" style=\"padding: 12px 8px; vertical-align: top; width: 120px; text-align: right;\">\n                            <div class=\"tag-set-actions\" style=\"display: flex; gap: 4px; justify-content: flex-end;\">\n                                <button class=\"action-btn add-tag-btn\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Add Tag\" style=\"padding: 6px 8px;\">\n                                    <span class=\"icon-add\" aria-hidden=\"true\"></span>\n                                </button>\n                                <button class=\"action-btn edit-tag-set-btn\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Edit Tag Set\" style=\"padding: 6px 8px;\">\n                                    <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                                </button>\n                                <button class=\"action-btn delete-tag-set-btn\" data-tag-set-id=\"").concat(tagSet.id, "\" title=\"Delete Tag Set\" style=\"padding: 6px 8px;\">\n                                    <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                                </button>\n                            </div>\n                        </td>\n                    ");
                   tbody.appendChild(row);
                 });
@@ -40210,6 +40248,17 @@ var TagSetsModule = /*#__PURE__*/function () {
         })));
       });
 
+      // Edit Tag buttons
+      document.querySelectorAll('.edit-tag-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var tagId = parseInt(btn.dataset.tagId);
+          var tagSetId = parseInt(btn.dataset.tagSetId);
+          _this4.showEditTagModal(tagId, tagSetId, btn.dataset.tagName, btn.dataset.tagColor, categoryId);
+        });
+      });
+
       // Delete Tag buttons
       document.querySelectorAll('.delete-tag-btn').forEach(function (btn) {
         btn.addEventListener('click', /*#__PURE__*/function () {
@@ -40260,14 +40309,24 @@ var TagSetsModule = /*#__PURE__*/function () {
     key: "saveTagSet",
     value: (function () {
       var _saveTagSet = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee17(e) {
-        var categoryId, name, description, _t1;
+        var categoryId, name, description, duplicate, _t1;
         return _regenerator().w(function (_context17) {
           while (1) switch (_context17.p = _context17.n) {
             case 0:
               e.preventDefault();
               categoryId = document.getElementById('tag-set-category-id').value;
-              name = document.getElementById('tag-set-name').value;
-              description = document.getElementById('tag-set-description').value;
+              name = document.getElementById('tag-set-name').value.trim();
+              description = document.getElementById('tag-set-description').value; // Check for duplicate name
+              duplicate = this.selectedCategoryTagSets.find(function (ts) {
+                return ts.name.toLowerCase() === name.toLowerCase();
+              });
+              if (!duplicate) {
+                _context17.n = 1;
+                break;
+              }
+              this.showNotification("A tag set named \"".concat(name, "\" already exists in this category"), 'error');
+              return _context17.a(2);
+            case 1:
               _context17.p = 1;
               _context17.n = 2;
               return this.createTagSet(parseInt(categoryId), name, description);
@@ -40375,15 +40434,25 @@ var TagSetsModule = /*#__PURE__*/function () {
     key: "saveEditTagSet",
     value: (function () {
       var _saveEditTagSet = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee19(e) {
-        var tagSetId, categoryId, name, description, _t10;
+        var tagSetId, categoryId, name, description, duplicate, _t10;
         return _regenerator().w(function (_context19) {
           while (1) switch (_context19.p = _context19.n) {
             case 0:
               e.preventDefault();
               tagSetId = parseInt(document.getElementById('edit-tag-set-id').value);
               categoryId = parseInt(document.getElementById('edit-tag-set-category-id').value);
-              name = document.getElementById('edit-tag-set-name').value;
-              description = document.getElementById('edit-tag-set-description').value;
+              name = document.getElementById('edit-tag-set-name').value.trim();
+              description = document.getElementById('edit-tag-set-description').value; // Check for duplicate name (exclude self)
+              duplicate = this.selectedCategoryTagSets.find(function (ts) {
+                return ts.name.toLowerCase() === name.toLowerCase() && ts.id !== tagSetId;
+              });
+              if (!duplicate) {
+                _context19.n = 1;
+                break;
+              }
+              this.showNotification("A tag set named \"".concat(name, "\" already exists in this category"), 'error');
+              return _context19.a(2);
+            case 1:
               _context19.p = 1;
               _context19.n = 2;
               return this.updateTagSet(tagSetId, name, description);
@@ -40578,15 +40647,32 @@ var TagSetsModule = /*#__PURE__*/function () {
     key: "saveTag",
     value: (function () {
       var _saveTag = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee22(e) {
-        var tagSetId, categoryId, name, color, _t12;
+        var tagSetId, categoryId, name, color, tagSet, duplicate, _t12;
         return _regenerator().w(function (_context22) {
           while (1) switch (_context22.p = _context22.n) {
             case 0:
               e.preventDefault();
               tagSetId = parseInt(document.getElementById('tag-set-id').value);
               categoryId = parseInt(document.getElementById('tag-category-id').value);
-              name = document.getElementById('tag-name').value;
-              color = document.getElementById('tag-color').value;
+              name = document.getElementById('tag-name').value.trim();
+              color = document.getElementById('tag-color').value; // Check for duplicate tag name within the tag set
+              tagSet = this.selectedCategoryTagSets.find(function (ts) {
+                return ts.id === tagSetId;
+              });
+              if (!(tagSet && tagSet.tags)) {
+                _context22.n = 1;
+                break;
+              }
+              duplicate = tagSet.tags.find(function (t) {
+                return t.name.toLowerCase() === name.toLowerCase();
+              });
+              if (!duplicate) {
+                _context22.n = 1;
+                break;
+              }
+              this.showNotification("A tag named \"".concat(name, "\" already exists in this tag set"), 'error');
+              return _context22.a(2);
+            case 1:
               _context22.p = 1;
               _context22.n = 2;
               return this.createTag(tagSetId, name, color);
@@ -40614,34 +40700,162 @@ var TagSetsModule = /*#__PURE__*/function () {
       return saveTag;
     }()
     /**
+     * Update an existing tag
+     */
+    )
+  }, {
+    key: "updateTag",
+    value: (function () {
+      var _updateTag = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee23(tagSetId, tagId, updates) {
+        var response;
+        return _regenerator().w(function (_context23) {
+          while (1) switch (_context23.n) {
+            case 0:
+              _context23.n = 1;
+              return fetch(OC.generateUrl("/apps/budget/api/tag-sets/".concat(tagSetId, "/tags/").concat(tagId)), {
+                method: 'PUT',
+                headers: {
+                  'requesttoken': OC.requestToken,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updates)
+              });
+            case 1:
+              response = _context23.v;
+              if (response.ok) {
+                _context23.n = 2;
+                break;
+              }
+              throw new Error('Failed to update tag');
+            case 2:
+              _context23.n = 3;
+              return response.json();
+            case 3:
+              return _context23.a(2, _context23.v);
+          }
+        }, _callee23);
+      }));
+      function updateTag(_x24, _x25, _x26) {
+        return _updateTag.apply(this, arguments);
+      }
+      return updateTag;
+    }()
+    /**
+     * Show modal for editing a tag
+     */
+    )
+  }, {
+    key: "showEditTagModal",
+    value: function showEditTagModal(tagId, tagSetId, tagName, tagColor, categoryId) {
+      var _this9 = this;
+      var modal = document.getElementById('edit-tag-modal');
+      if (!modal) {
+        console.error('Edit tag modal not found');
+        return;
+      }
+      document.getElementById('edit-tag-id').value = tagId;
+      document.getElementById('edit-tag-tag-set-id').value = tagSetId;
+      document.getElementById('edit-tag-category-id').value = categoryId;
+      document.getElementById('edit-tag-name').value = tagName;
+      document.getElementById('edit-tag-color').value = tagColor;
+      modal.style.display = 'flex';
+
+      // Setup form submission (remove old listener first)
+      var form = document.getElementById('edit-tag-form');
+      if (form) {
+        var newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        newForm.addEventListener('submit', function (e) {
+          return _this9.saveEditTag(e);
+        });
+      }
+    }
+
+    /**
+     * Save edited tag from the modal form
+     */
+  }, {
+    key: "saveEditTag",
+    value: (function () {
+      var _saveEditTag = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee24(e) {
+        var tagId, tagSetId, categoryId, name, color, tagSet, duplicate, _t13;
+        return _regenerator().w(function (_context24) {
+          while (1) switch (_context24.p = _context24.n) {
+            case 0:
+              e.preventDefault();
+              tagId = parseInt(document.getElementById('edit-tag-id').value);
+              tagSetId = parseInt(document.getElementById('edit-tag-tag-set-id').value);
+              categoryId = parseInt(document.getElementById('edit-tag-category-id').value);
+              name = document.getElementById('edit-tag-name').value.trim();
+              color = document.getElementById('edit-tag-color').value; // Check for duplicate tag name within the tag set (exclude self)
+              tagSet = this.selectedCategoryTagSets.find(function (ts) {
+                return ts.id === tagSetId;
+              });
+              if (!(tagSet && tagSet.tags)) {
+                _context24.n = 1;
+                break;
+              }
+              duplicate = tagSet.tags.find(function (t) {
+                return t.name.toLowerCase() === name.toLowerCase() && t.id !== tagId;
+              });
+              if (!duplicate) {
+                _context24.n = 1;
+                break;
+              }
+              this.showNotification("A tag named \"".concat(name, "\" already exists in this tag set"), 'error');
+              return _context24.a(2);
+            case 1:
+              _context24.p = 1;
+              _context24.n = 2;
+              return this.updateTag(tagSetId, tagId, {
+                name: name,
+                color: color
+              });
+            case 2:
+              this.hideModals();
+              _context24.n = 3;
+              return this.renderCategoryTagSetsList(categoryId);
+            case 3:
+              this.showNotification('Tag updated successfully', 'success');
+              _context24.n = 5;
+              break;
+            case 4:
+              _context24.p = 4;
+              _t13 = _context24.v;
+              console.error('Failed to update tag:', _t13);
+              this.showNotification('Failed to update tag', 'error');
+            case 5:
+              return _context24.a(2);
+          }
+        }, _callee24, this, [[1, 4]]);
+      }));
+      function saveEditTag(_x27) {
+        return _saveEditTag.apply(this, arguments);
+      }
+      return saveEditTag;
+    }()
+    /**
      * Setup event listeners for tag modals
      */
     )
   }, {
     key: "setupAddTagModalListeners",
     value: function setupAddTagModalListeners() {
-      var _this9 = this;
+      var _this0 = this;
       var form = document.getElementById('add-tag-form');
       if (form) {
         form.addEventListener('submit', function (e) {
-          return _this9.saveTag(e);
+          return _this0.saveTag(e);
         });
       }
 
-      // Cancel buttons for all tag modals
-      document.querySelectorAll('.cancel-tag-btn, .cancel-tag-set-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          return _this9.hideModals();
-        });
-      });
-
-      // Close on background click for all tag modals
-      ['add-tag-modal', 'add-tag-set-modal', 'edit-tag-set-modal'].forEach(function (modalId) {
+      // Cancel buttons and background click for all tag modals (delegated)
+      ['add-tag-modal', 'add-tag-set-modal', 'edit-tag-modal', 'edit-tag-set-modal'].forEach(function (modalId) {
         var modal = document.getElementById(modalId);
         if (modal) {
           modal.addEventListener('click', function (e) {
-            if (e.target === modal) {
-              _this9.hideModals();
+            if (e.target === modal || e.target.closest('.cancel-tag-btn, .cancel-tag-set-btn')) {
+              _this0.hideModals();
             }
           });
         }
@@ -40658,7 +40872,7 @@ var TagSetsModule = /*#__PURE__*/function () {
     key: "hideModals",
     value: function hideModals() {
       // Hide all modals
-      var modals = ['add-tag-set-modal', 'add-tag-modal', 'edit-tag-set-modal'];
+      var modals = ['add-tag-set-modal', 'add-tag-modal', 'edit-tag-modal', 'edit-tag-set-modal'];
       modals.forEach(function (modalId) {
         var modal = document.getElementById(modalId);
         if (modal) {
@@ -50563,7 +50777,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "hideModals",
     value: function hideModals() {
-      var modalIds = ['transaction-modal', 'account-modal', 'category-modal', 'split-modal', 'matching-modal', 'bulk-match-modal', 'add-tag-set-modal', 'add-tag-modal', 'edit-tag-set-modal', 'factory-reset-modal', 'rule-modal', 'apply-rules-modal', 'goal-modal', 'add-to-goal-modal', 'pension-modal', 'pension-balance-modal', 'pension-contribution-modal', 'asset-modal', 'asset-value-modal', 'manual-rate-modal'];
+      var modalIds = ['transaction-modal', 'account-modal', 'category-modal', 'split-modal', 'matching-modal', 'bulk-match-modal', 'add-tag-set-modal', 'add-tag-modal', 'edit-tag-modal', 'edit-tag-set-modal', 'factory-reset-modal', 'rule-modal', 'apply-rules-modal', 'goal-modal', 'add-to-goal-modal', 'pension-modal', 'pension-balance-modal', 'pension-contribution-modal', 'asset-modal', 'asset-value-modal', 'manual-rate-modal'];
       modalIds.forEach(function (modalId) {
         var modal = document.getElementById(modalId);
         if (modal) {

@@ -3041,6 +3041,7 @@ class BudgetApp {
             'bulk-match-modal',
             'add-tag-set-modal',
             'add-tag-modal',
+            'edit-tag-modal',
             'edit-tag-set-modal',
             'factory-reset-modal',
             'rule-modal',
