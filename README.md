@@ -8,13 +8,15 @@ A comprehensive financial management app for Nextcloud. Track spending habits, m
 
 ![Dashboard Screenshot](screenshots/dashboard.png)
 
-## What's New in v2.6.0
+## What's New in v2.8.0
 
-- **Configurable Budget Cycle Start Day** - Set a custom start day for budget periods instead of always using the 1st of the month
-- **Exchange Rate Support for Non-ECB Currencies** - Currencies not covered by the European Central Bank now fetch rates from fallback providers
-- **Transaction Status Column** - Scheduled future transactions can be excluded from reports and balance calculations
-- **Report Fixes** - Account filtering, year-over-year filtering, and export errors resolved
-- **Light Theme Fix** - Category text now readable in light theme
+- **Redesigned Category Details Panel** - Spending breakdown chart with monthly trends, top vendors, and budget progress
+- **Redesigned Assets Page** - Styled asset cards with full-page detail view
+- **Redesigned Transaction Actions** - Horizontal icon toolbar replacing the more-actions dropdown
+- **Consistent Date Formatting** - Flatpickr replaces native date inputs so your chosen date format is used everywhere
+- **Tag Set Editing** - Edit existing tag sets and tags with duplicate name validation
+- **Inline Amount Editor** - Text-only input with automatic type detection based on sign
+- **20+ Bug Fixes** - Liability totals, one-time bill payments, dashboard tile reordering, split transactions, and more
 
 See the [full changelog](budget/CHANGELOG.md) for details.
 
