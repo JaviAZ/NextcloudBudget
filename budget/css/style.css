@@ -3337,24 +3337,35 @@ button.danger:hover {
     position: fixed;
     z-index: 1000;
     background: var(--color-main-background);
-    border: none;
-    padding: 2px 0;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 4px;
+    display: flex;
+    gap: 2px;
 }
 
 .action-menu-item {
-    display: block;
-    width: 100%;
-    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
     border: none;
     background: none;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 13px;
     color: var(--color-main-text);
-    text-align: left;
+    transition: background-color 0.15s ease;
 }
 
 .action-menu-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--color-background-hover);
+}
+
+.action-menu-item svg {
+    flex-shrink: 0;
 }
 
 /* Inline Editing */

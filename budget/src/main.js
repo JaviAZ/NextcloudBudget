@@ -339,14 +339,23 @@ class BudgetApp {
 
                 const menu = document.createElement('div');
                 menu.className = 'action-menu-fixed';
-                menu.style.top = `${rect.bottom + 2}px`;
-                menu.style.left = `${rect.left}px`;
+                menu.style.top = `${rect.top + (rect.height / 2)}px`;
+                menu.style.left = `${rect.left - 4}px`;
+                menu.style.transform = 'translate(-100%, -50%)';
                 menu.innerHTML = `
-                    <button class="action-menu-item transaction-split-btn" data-transaction-id="${transactionId}">Split</button>
-                    <button class="action-menu-item transaction-share-btn" data-transaction-id="${transactionId}">Share</button>
+                    <button class="action-menu-item transaction-split-btn" data-transaction-id="${transactionId}" title="Split transaction">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22V8"/><path d="M3 8l9-5 9 5"/></svg>
+                    </button>
+                    <button class="action-menu-item transaction-share-btn" data-transaction-id="${transactionId}" title="Share expense">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </button>
                     ${isLinked
-                        ? `<button class="action-menu-item transaction-unlink-btn" data-transaction-id="${transactionId}">Unlink Transfer</button>`
-                        : `<button class="action-menu-item transaction-match-btn" data-transaction-id="${transactionId}">Match Transfer</button>`
+                        ? `<button class="action-menu-item transaction-unlink-btn" data-transaction-id="${transactionId}" title="Unlink transfer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.84 12.25l1.72-1.71a4 4 0 0 0-5.66-5.66l-1.71 1.72"/><path d="M5.17 11.75l-1.71 1.71a4 4 0 0 0 5.66 5.66l1.71-1.71"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                        </button>`
+                        : `<button class="action-menu-item transaction-match-btn" data-transaction-id="${transactionId}" title="Match transfer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        </button>`
                     }
                 `;
                 document.body.appendChild(menu);
