@@ -4537,10 +4537,10 @@ style('budget', 'budget-main');
                 <h4>Bank Information</h4>
 
                 <div class="form-group">
-                    <label for="account-institution">Institution</label>
-                    <input type="text" id="account-institution" aria-describedby="account-institution-help" maxlength="255" autocomplete="off">
+                    <label for="form-institution">Institution</label>
+                    <input type="text" id="form-institution" aria-describedby="form-institution-help" maxlength="255" autocomplete="off">
                     <div id="institution-suggestions" class="autocomplete-dropdown" style="display: none;"></div>
-                    <small id="account-institution-help" class="form-text">Bank or financial institution name</small>
+                    <small id="form-institution-help" class="form-text">Bank or financial institution name</small>
                 </div>
 
                 <div class="form-group">

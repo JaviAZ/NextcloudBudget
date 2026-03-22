@@ -1270,7 +1270,7 @@ export default class AccountsModule {
                 name: getFormValue('account-name', ''),
                 type: getFormValue('account-type', ''),
                 currency: getFormValue('account-currency', 'USD'),
-                institution: getFormValue('account-institution'),
+                institution: getFormValue('form-institution'),
                 accountHolderName: getFormValue('account-holder-name'),
                 openingDate: getFormValue('account-opening-date'),
                 interestRate: getFormValue('account-interest-rate', null, true),
@@ -1486,7 +1486,7 @@ export default class AccountsModule {
             }
 
             document.getElementById('account-currency').value = account.currency;
-            document.getElementById('account-institution').value = account.institution || '';
+            document.getElementById('form-institution').value = account.institution || '';
 
             // Sensitive fields: don't populate with masked values, use placeholder instead
             // This prevents the masked value from being saved back and corrupting the data
@@ -1683,7 +1683,7 @@ export default class AccountsModule {
     }
 
     async setupInstitutionAutocomplete() {
-        const input = document.getElementById('account-institution');
+        const input = document.getElementById('form-institution');
         const suggestions = document.getElementById('institution-suggestions');
         const query = input.value.toLowerCase();
 
@@ -1726,7 +1726,7 @@ export default class AccountsModule {
     }
 
     selectInstitution(bankName) {
-        document.getElementById('account-institution').value = bankName;
+        document.getElementById('form-institution').value = bankName;
         document.getElementById('institution-suggestions').style.display = 'none';
     }
 

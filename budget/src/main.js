@@ -252,7 +252,7 @@ class BudgetApp {
         }
 
         // Institution autocomplete
-        const institutionInput = document.getElementById('account-institution');
+        const institutionInput = document.getElementById('form-institution');
         if (institutionInput) {
             institutionInput.addEventListener('input', () => {
                 this.setupInstitutionAutocomplete();

@@ -20092,7 +20092,7 @@ var AccountsModule = /*#__PURE__*/function () {
                 name: getFormValue('account-name', ''),
                 type: getFormValue('account-type', ''),
                 currency: getFormValue('account-currency', 'USD'),
-                institution: getFormValue('account-institution'),
+                institution: getFormValue('form-institution'),
                 accountHolderName: getFormValue('account-holder-name'),
                 openingDate: getFormValue('account-opening-date'),
                 interestRate: getFormValue('account-interest-rate', null, true),
@@ -20360,7 +20360,7 @@ var AccountsModule = /*#__PURE__*/function () {
                 openingBalanceField.value = (_account$openingBalan = account.openingBalance) !== null && _account$openingBalan !== void 0 ? _account$openingBalan : 0;
               }
               document.getElementById('account-currency').value = account.currency;
-              document.getElementById('account-institution').value = account.institution || '';
+              document.getElementById('form-institution').value = account.institution || '';
 
               // Sensitive fields: don't populate with masked values, use placeholder instead
               // This prevents the masked value from being saved back and corrupting the data
@@ -20650,7 +20650,7 @@ var AccountsModule = /*#__PURE__*/function () {
         return _regenerator().w(function (_context13) {
           while (1) switch (_context13.p = _context13.n) {
             case 0:
-              input = document.getElementById('account-institution');
+              input = document.getElementById('form-institution');
               suggestions = document.getElementById('institution-suggestions');
               query = input.value.toLowerCase();
               if (!(query.length < 2)) {
@@ -20719,7 +20719,7 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "selectInstitution",
     value: function selectInstitution(bankName) {
-      document.getElementById('account-institution').value = bankName;
+      document.getElementById('form-institution').value = bankName;
       document.getElementById('institution-suggestions').style.display = 'none';
     }
 
@@ -47044,7 +47044,7 @@ var BudgetApp = /*#__PURE__*/function () {
       }
 
       // Institution autocomplete
-      var institutionInput = document.getElementById('account-institution');
+      var institutionInput = document.getElementById('form-institution');
       if (institutionInput) {
         institutionInput.addEventListener('input', function () {
           _this.setupInstitutionAutocomplete();
