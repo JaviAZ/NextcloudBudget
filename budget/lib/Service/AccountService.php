@@ -75,7 +75,7 @@ class AccountService extends AbstractCrudService {
         // Check if account has transactions
         $transactions = $this->transactionMapper->findByAccount($entity->getId(), 1);
         if (!empty($transactions)) {
-            throw new \Exception('Cannot delete account with existing transactions');
+            throw new \Exception('Cannot delete account with existing transactions. Please delete all transactions first.');
         }
     }
 

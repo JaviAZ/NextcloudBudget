@@ -11,6 +11,7 @@ use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
@@ -418,8 +419,10 @@ class AccountController extends Controller {
             $this->auditService->logAccountDeleted($this->userId, $id, $accountName);
 
             return new DataResponse(['status' => 'success']);
-        } catch (\Exception $e) {
+        } catch (DoesNotExistException $e) {
             return $this->handleNotFoundError($e, 'Account', ['accountId' => $id]);
+        } catch (\Exception $e) {
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
         }
     }
 
