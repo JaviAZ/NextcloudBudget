@@ -43573,54 +43573,15 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "createAmountEditor",
     value: function createAmountEditor(cell, transaction) {
-      var container = document.createElement('div');
-      container.style.display = 'flex';
-      container.style.alignItems = 'center';
-      container.style.gap = '4px';
-
-      // Type toggle
-      var typeToggle = document.createElement('div');
-      typeToggle.className = 'inline-type-toggle';
-      var creditBtn = document.createElement('button');
-      creditBtn.type = 'button';
-      creditBtn.className = "inline-type-btn ".concat(transaction.type === 'credit' ? 'active' : '');
-      creditBtn.textContent = '+';
-      creditBtn.title = 'Income';
-      var debitBtn = document.createElement('button');
-      debitBtn.type = 'button';
-      debitBtn.className = "inline-type-btn ".concat(transaction.type === 'debit' ? 'active' : '');
-      debitBtn.textContent = '-';
-      debitBtn.title = 'Expense';
-      typeToggle.appendChild(creditBtn);
-      typeToggle.appendChild(debitBtn);
-
-      // Amount input
       var input = document.createElement('input');
       input.type = 'number';
       input.className = 'inline-edit-input';
-      input.value = transaction.amount;
+      input.value = transaction.type === 'debit' ? -Math.abs(transaction.amount) : Math.abs(transaction.amount);
       input.step = '0.01';
-      input.min = '0';
       input.dataset.type = transaction.type;
-
-      // Type toggle events
-      creditBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        creditBtn.classList.add('active');
-        debitBtn.classList.remove('active');
-        input.dataset.type = 'credit';
-      });
-      debitBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        debitBtn.classList.add('active');
-        creditBtn.classList.remove('active');
-        input.dataset.type = 'debit';
-      });
       this.setupEditorEvents(input, cell, 'amount');
-      container.appendChild(typeToggle);
-      container.appendChild(input);
       cell.innerHTML = '';
-      cell.appendChild(container);
+      cell.appendChild(input);
       input.focus();
       input.select();
     }
@@ -44053,8 +44014,9 @@ var TransactionsModule = /*#__PURE__*/function () {
         } else if (e.key === 'Enter') {
           e.preventDefault();
           if (field === 'amount') {
-            var type = input.dataset.type;
-            _this16.saveInlineEdit(cell, field, input.value, {
+            var raw = parseFloat(input.value) || 0;
+            var type = raw < 0 ? 'debit' : 'credit';
+            _this16.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
               type: type
             });
           } else {
@@ -44063,15 +44025,12 @@ var TransactionsModule = /*#__PURE__*/function () {
         }
       });
       input.addEventListener('blur', function (e) {
-        var _e$relatedTarget;
-        if ((_e$relatedTarget = e.relatedTarget) !== null && _e$relatedTarget !== void 0 && _e$relatedTarget.closest('.inline-type-toggle')) {
-          return;
-        }
         setTimeout(function () {
           if (cell.classList.contains('editing')) {
             if (field === 'amount') {
-              var type = input.dataset.type;
-              _this16.saveInlineEdit(cell, field, input.value, {
+              var raw = parseFloat(input.value) || 0;
+              var type = raw < 0 ? 'debit' : 'credit';
+              _this16.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
                 type: type
               });
             } else {
