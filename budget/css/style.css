@@ -3436,6 +3436,7 @@ button.danger:hover {
 .editable-cell.editing {
     padding: 0 !important;
     background: var(--color-main-background);
+    overflow: visible !important;
 }
 
 .inline-edit-input {
