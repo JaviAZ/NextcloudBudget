@@ -1097,59 +1097,81 @@ style('budget', 'budget-main');
                                 <span class="icon-download" aria-hidden="true"></span>
                                 Export
                             </button>
+                            <button id="account-toggle-filters-btn" class="secondary" title="Toggle advanced filters">
+                                <span class="icon-filter" aria-hidden="true"></span>
+                                Filters
+                            </button>
                         </div>
                     </div>
 
                     <!-- Account Transaction Filters -->
-                    <div id="account-transaction-filters" class="filters-panel">
-                        <div class="filters-grid">
-                            <div class="filter-group">
-                                <label for="account-filter-category">Category</label>
-                                <select id="account-filter-category">
-                                    <option value="">All Categories</option>
-                                    <option value="uncategorized">Uncategorized</option>
-                                </select>
+                    <div id="account-transaction-filters" class="filters-panel" style="display: none;">
+                        <div class="filters-section">
+                            <h3>Filter Transactions</h3>
+                            <div class="filters-grid">
+                                <div class="filter-group">
+                                    <label for="account-filter-category">Category</label>
+                                    <select id="account-filter-category">
+                                        <option value="">All Categories</option>
+                                        <option value="uncategorized">Uncategorized</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="account-filter-type">Type</label>
+                                    <select id="account-filter-type">
+                                        <option value="">All Types</option>
+                                        <option value="credit">Income</option>
+                                        <option value="debit">Expense</option>
+                                        <option value="split">Split</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="account-filter-status">Status</label>
+                                    <select id="account-filter-status">
+                                        <option value="">All</option>
+                                        <option value="cleared">Cleared</option>
+                                        <option value="scheduled">Scheduled</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="account-filter-date-from">From Date</label>
+                                    <input type="date" id="account-filter-date-from">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="account-filter-date-to">To Date</label>
+                                    <input type="date" id="account-filter-date-to">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="account-filter-amount-min">Min Amount</label>
+                                    <input type="number" id="account-filter-amount-min" step="0.01" placeholder="0.00">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label for="account-filter-amount-max">Max Amount</label>
+                                    <input type="number" id="account-filter-amount-max" step="0.01" placeholder="1000.00">
+                                </div>
+
+                                <div class="filter-group full-width">
+                                    <label for="account-filter-search">Search</label>
+                                    <input type="text" id="account-filter-search" placeholder="Description, vendor, reference...">
+                                </div>
+
+                                <div class="filter-group">
+                                    <label>Tags</label>
+                                    <div id="account-filter-tags" class="tags-autocomplete"></div>
+                                </div>
                             </div>
-                            <div class="filter-group">
-                                <label for="account-filter-type">Type</label>
-                                <select id="account-filter-type">
-                                    <option value="">All Types</option>
-                                    <option value="credit">Income</option>
-                                    <option value="debit">Expense</option>
-                                </select>
+
+                            <div class="filters-actions">
+                                <button id="account-apply-filters-btn" class="primary">Apply Filters</button>
+                                <button id="account-clear-filters-btn" class="secondary">Clear All</button>
+                                <button id="account-save-filter-preset-btn" class="secondary">Save Preset</button>
                             </div>
-                            <div class="filter-group">
-                                <label for="account-filter-status">Status</label>
-                                <select id="account-filter-status">
-                                    <option value="">All</option>
-                                    <option value="cleared">Cleared</option>
-                                    <option value="scheduled">Scheduled</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="account-filter-date-from">From Date</label>
-                                <input type="date" id="account-filter-date-from">
-                            </div>
-                            <div class="filter-group">
-                                <label for="account-filter-date-to">To Date</label>
-                                <input type="date" id="account-filter-date-to">
-                            </div>
-                            <div class="filter-group">
-                                <label for="account-filter-amount-min">Min Amount</label>
-                                <input type="number" id="account-filter-amount-min" step="0.01" placeholder="0.00">
-                            </div>
-                            <div class="filter-group">
-                                <label for="account-filter-amount-max">Max Amount</label>
-                                <input type="number" id="account-filter-amount-max" step="0.01" placeholder="1000.00">
-                            </div>
-                            <div class="filter-group full-width">
-                                <label for="account-filter-search">Search</label>
-                                <input type="text" id="account-filter-search" placeholder="Description, vendor...">
-                            </div>
-                        </div>
-                        <div class="filters-actions">
-                            <button id="account-apply-filters-btn" class="primary">Apply Filters</button>
-                            <button id="account-clear-filters-btn" class="secondary">Clear All</button>
                         </div>
                     </div>
 
@@ -1248,6 +1270,7 @@ style('budget', 'budget-main');
                                 <option value="">All Types</option>
                                 <option value="credit">Income</option>
                                 <option value="debit">Expense</option>
+                                <option value="split">Split</option>
                             </select>
                         </div>
 

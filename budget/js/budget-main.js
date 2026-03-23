@@ -18570,6 +18570,8 @@ var AccountsModule = /*#__PURE__*/function () {
     };
     this.accountTotalPages = 1;
     this.accountTotal = 0;
+    this.selectedAccountFilterTags = new Set();
+    this.allAccountFilterTagSets = null;
   }
 
   // ============================================
@@ -19278,6 +19280,11 @@ var AccountsModule = /*#__PURE__*/function () {
               if (filters.amountMin) params.set('amountMin', filters.amountMin);
               if (filters.amountMax) params.set('amountMax', filters.amountMax);
               if (filters.search) params.set('search', filters.search);
+              if (filters.tagIds && filters.tagIds.length > 0) {
+                filters.tagIds.forEach(function (tagId) {
+                  params.append('tagIds[]', tagId);
+                });
+              }
               _context5.n = 1;
               return fetch(OC.generateUrl('/apps/budget/api/transactions?' + params.toString()), {
                 headers: {
@@ -19549,6 +19556,14 @@ var AccountsModule = /*#__PURE__*/function () {
     key: "setupAccountFilterEventListeners",
     value: function setupAccountFilterEventListeners() {
       var _this7 = this;
+      // Toggle filters button
+      var toggleBtn = document.getElementById('account-toggle-filters-btn');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+          return _this7.toggleAccountFiltersPanel();
+        });
+      }
+
       // Apply filters button
       var applyBtn = document.getElementById('account-apply-filters-btn');
       if (applyBtn) {
@@ -19573,6 +19588,198 @@ var AccountsModule = /*#__PURE__*/function () {
           categoryFilter.innerHTML += "<option value=\"".concat(category.id, "\">").concat(category.name, "</option>");
         });
       }
+
+      // Load and populate tags filter
+      this.loadAccountFilterTags().then(function () {
+        return _this7.populateAccountFilterTagsDropdown();
+      });
+    }
+  }, {
+    key: "toggleAccountFiltersPanel",
+    value: function toggleAccountFiltersPanel() {
+      var filtersPanel = document.getElementById('account-transaction-filters');
+      var toggleBtn = document.getElementById('account-toggle-filters-btn');
+      if (filtersPanel.style.display === 'none') {
+        filtersPanel.style.display = 'block';
+        toggleBtn.classList.add('active');
+      } else {
+        filtersPanel.style.display = 'none';
+        toggleBtn.classList.remove('active');
+      }
+    }
+  }, {
+    key: "loadAccountFilterTags",
+    value: function () {
+      var _loadAccountFilterTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
+        var response, _t7;
+        return _regenerator().w(function (_context7) {
+          while (1) switch (_context7.p = _context7.n) {
+            case 0:
+              _context7.p = 0;
+              _context7.n = 1;
+              return fetch(OC.generateUrl('/apps/budget/api/tag-sets'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 1:
+              response = _context7.v;
+              if (!response.ok) {
+                _context7.n = 3;
+                break;
+              }
+              _context7.n = 2;
+              return response.json();
+            case 2:
+              this.allAccountFilterTagSets = _context7.v;
+            case 3:
+              _context7.n = 5;
+              break;
+            case 4:
+              _context7.p = 4;
+              _t7 = _context7.v;
+              console.error('Failed to load tags for account filter:', _t7);
+            case 5:
+              return _context7.a(2);
+          }
+        }, _callee7, this, [[0, 4]]);
+      }));
+      function loadAccountFilterTags() {
+        return _loadAccountFilterTags.apply(this, arguments);
+      }
+      return loadAccountFilterTags;
+    }()
+  }, {
+    key: "populateAccountFilterTagsDropdown",
+    value: function populateAccountFilterTagsDropdown() {
+      var _this8 = this;
+      var container = document.getElementById('account-filter-tags');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!this.allAccountFilterTagSets || this.allAccountFilterTagSets.length === 0) {
+        container.innerHTML = '<div style="padding: 8px; color: var(--color-text-lighter); font-style: italic;">No tags available</div>';
+        return;
+      }
+      var chipsArea = document.createElement('div');
+      chipsArea.className = 'filter-tags-chips';
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'account-filter-tags-input';
+      input.className = 'tags-autocomplete-input';
+      input.placeholder = 'Type to filter tags...';
+      var dropdown = document.createElement('div');
+      dropdown.className = 'tags-autocomplete-dropdown';
+      dropdown.style.display = 'none';
+      container.appendChild(chipsArea);
+      container.appendChild(input);
+      container.appendChild(dropdown);
+      var allTags = [];
+      this.allAccountFilterTagSets.forEach(function (tagSet) {
+        if (tagSet.tags && tagSet.tags.length > 0) {
+          tagSet.tags.forEach(function (tag) {
+            allTags.push({
+              id: tag.id,
+              name: tag.name,
+              color: tag.color,
+              tagSetName: tagSet.name,
+              tagSetId: tagSet.id
+            });
+          });
+        }
+      });
+      var _renderSelectedChips = function renderSelectedChips() {
+        chipsArea.innerHTML = '';
+        if (_this8.selectedAccountFilterTags.size === 0) {
+          chipsArea.style.display = 'none';
+          return;
+        }
+        chipsArea.style.display = 'flex';
+        _this8.selectedAccountFilterTags.forEach(function (tagId) {
+          var tag = allTags.find(function (t) {
+            return t.id === tagId;
+          });
+          if (!tag) return;
+          var chip = document.createElement('span');
+          chip.className = 'filter-tag-chip';
+          chip.style.cssText = "display: inline-flex; align-items: center; gap: 4px; background-color: ".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.color || '#888'), "; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; cursor: pointer;");
+          chip.innerHTML = "".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), " <span style=\"font-weight: bold; margin-left: 2px;\">\xD7</span>");
+          chip.addEventListener('click', function () {
+            _this8.selectedAccountFilterTags["delete"](tagId);
+            _renderSelectedChips();
+            renderDropdown(input.value);
+          });
+          chipsArea.appendChild(chip);
+        });
+      };
+      var renderDropdown = function renderDropdown() {
+        var filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var filtered = filter ? allTags.filter(function (t) {
+          return t.name.toLowerCase().includes(filter.toLowerCase()) || t.tagSetName.toLowerCase().includes(filter.toLowerCase());
+        }) : allTags;
+        var grouped = {};
+        filtered.forEach(function (tag) {
+          if (!grouped[tag.tagSetId]) {
+            grouped[tag.tagSetId] = {
+              name: tag.tagSetName,
+              tags: []
+            };
+          }
+          grouped[tag.tagSetId].tags.push(tag);
+        });
+        var html = '';
+        Object.values(grouped).forEach(function (group) {
+          html += "<div class=\"tags-group-header\">".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(group.name), "</div>");
+          group.tags.forEach(function (tag) {
+            var isSelected = _this8.selectedAccountFilterTags.has(tag.id);
+            html += "\n                        <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                             data-tag-id=\"").concat(tag.id, "\">\n                            <span class=\"tag-chip\"\n                                  style=\"display: inline-flex; align-items: center; background-color: ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.color || '#888'), "; color: white;\n                                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(tag.name), "\n                            </span>\n                            <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                        </div>\n                    ");
+          });
+        });
+        dropdown.innerHTML = html || '<div class="tags-autocomplete-empty">No tags found</div>';
+        dropdown.style.display = 'block';
+      };
+      input.addEventListener('focus', function () {
+        return renderDropdown(input.value);
+      });
+      input.addEventListener('input', function () {
+        return renderDropdown(input.value);
+      });
+      dropdown.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+      });
+      dropdown.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var item = e.target.closest('.tags-autocomplete-item');
+        if (item) {
+          var tagId = parseInt(item.dataset.tagId);
+          var clickedTag = allTags.find(function (t) {
+            return t.id === tagId;
+          });
+          if (!clickedTag) return;
+
+          // Single selection per tag set
+          var tagsFromSameSet = allTags.filter(function (t) {
+            return t.tagSetId === clickedTag.tagSetId;
+          });
+          tagsFromSameSet.forEach(function (t) {
+            if (t.id !== tagId) {
+              _this8.selectedAccountFilterTags["delete"](t.id);
+            }
+          });
+          if (_this8.selectedAccountFilterTags.has(tagId)) {
+            _this8.selectedAccountFilterTags["delete"](tagId);
+          } else {
+            _this8.selectedAccountFilterTags.add(tagId);
+          }
+          _renderSelectedChips();
+          renderDropdown(input.value);
+        }
+      });
+      _renderSelectedChips();
+      document.addEventListener('click', function (e) {
+        if (!container.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
     }
   }, {
     key: "applyAccountFilters",
@@ -19587,7 +19794,8 @@ var AccountsModule = /*#__PURE__*/function () {
         dateTo: ((_document$getElementB5 = document.getElementById('account-filter-date-to')) === null || _document$getElementB5 === void 0 ? void 0 : _document$getElementB5.value) || '',
         amountMin: ((_document$getElementB6 = document.getElementById('account-filter-amount-min')) === null || _document$getElementB6 === void 0 ? void 0 : _document$getElementB6.value) || '',
         amountMax: ((_document$getElementB7 = document.getElementById('account-filter-amount-max')) === null || _document$getElementB7 === void 0 ? void 0 : _document$getElementB7.value) || '',
-        search: ((_document$getElementB8 = document.getElementById('account-filter-search')) === null || _document$getElementB8 === void 0 ? void 0 : _document$getElementB8.value) || ''
+        search: ((_document$getElementB8 = document.getElementById('account-filter-search')) === null || _document$getElementB8 === void 0 ? void 0 : _document$getElementB8.value) || '',
+        tagIds: Array.from(this.selectedAccountFilterTags)
       };
 
       // Reset to first page and reload
@@ -19607,6 +19815,10 @@ var AccountsModule = /*#__PURE__*/function () {
       document.getElementById('account-filter-amount-max').value = '';
       document.getElementById('account-filter-search').value = '';
 
+      // Clear tags
+      this.selectedAccountFilterTags.clear();
+      this.populateAccountFilterTagsDropdown();
+
       // Clear filters and reload
       this.accountFilters = {};
       this.accountCurrentPage = 1;
@@ -19622,15 +19834,15 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "reconcileAccount",
     value: function () {
-      var _reconcileAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(accountId) {
+      var _reconcileAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(accountId) {
         var reconcileAccountSelect, reconcilePanel;
-        return _regenerator().w(function (_context7) {
-          while (1) switch (_context7.n) {
+        return _regenerator().w(function (_context8) {
+          while (1) switch (_context8.n) {
             case 0:
               // Navigate to transactions page and open reconciliation panel
               window.location.hash = '#/transactions';
               this.app.showView('transactions');
-              _context7.n = 1;
+              _context8.n = 1;
               return this.app.loadTransactions();
             case 1:
               reconcileAccountSelect = document.getElementById('reconcile-account');
@@ -19649,9 +19861,9 @@ var AccountsModule = /*#__PURE__*/function () {
                 reconcilePanel.style.display = 'block';
               }
             case 2:
-              return _context7.a(2);
+              return _context8.a(2);
           }
-        }, _callee7, this);
+        }, _callee8, this);
       }));
       function reconcileAccount(_x5) {
         return _reconcileAccount.apply(this, arguments);
@@ -19680,10 +19892,10 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "loadCategories",
     value: function () {
-      var _loadCategories = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
-        var response, categories, _t7;
-        return _regenerator().w(function (_context8) {
-          while (1) switch (_context8.p = _context8.n) {
+      var _loadCategories = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+        var response, categories, _t8;
+        return _regenerator().w(function (_context9) {
+          while (1) switch (_context9.p = _context9.n) {
             case 0:
               // Initialize category state with defaults
               this.categoryTree = [];
@@ -19691,38 +19903,38 @@ var AccountsModule = /*#__PURE__*/function () {
               this.currentCategoryType = this.currentCategoryType || 'expense';
               this.selectedCategory = null;
               this.expandedCategories = this.expandedCategories || new Set();
-              _context8.p = 1;
-              _context8.n = 2;
+              _context9.p = 1;
+              _context9.n = 2;
               return fetch(OC.generateUrl('/apps/budget/api/categories/tree'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context8.v;
-              _context8.n = 3;
+              response = _context9.v;
+              _context9.n = 3;
               return response.json();
             case 3:
-              categories = _context8.v;
+              categories = _context9.v;
               // Update category state with fetched data
               if (Array.isArray(categories)) {
                 this.categoryTree = categories;
                 this.allCategories = categories;
               }
-              _context8.n = 5;
+              _context9.n = 5;
               break;
             case 4:
-              _context8.p = 4;
-              _t7 = _context8.v;
-              console.error('Failed to load categories:', _t7);
+              _context9.p = 4;
+              _t8 = _context9.v;
+              console.error('Failed to load categories:', _t8);
             case 5:
               // Always setup event listeners and render (even if fetch failed)
               this.setupCategoriesEventListeners();
               this.renderCategoriesTree();
             case 6:
-              return _context8.a(2);
+              return _context9.a(2);
           }
-        }, _callee8, this, [[1, 4]]);
+        }, _callee9, this, [[1, 4]]);
       }));
       function loadCategories() {
         return _loadCategories.apply(this, arguments);
@@ -19732,10 +19944,10 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "saveTransaction",
     value: function () {
-      var _saveTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var getFormValue, accountId, date, type, amount, description, formData, transactionId, url, method, response, result, savedTransactionId, selectedTagIds, errorMessage, errorData, _t8, _t9;
-        return _regenerator().w(function (_context9) {
-          while (1) switch (_context9.p = _context9.n) {
+      var _saveTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
+        var getFormValue, accountId, date, type, amount, description, formData, transactionId, url, method, response, result, savedTransactionId, selectedTagIds, errorMessage, errorData, _t9, _t0;
+        return _regenerator().w(function (_context0) {
+          while (1) switch (_context0.p = _context0.n) {
             case 0:
               // Helper function to safely get and clean form values
               getFormValue = function getFormValue(id) {
@@ -19762,46 +19974,46 @@ var AccountsModule = /*#__PURE__*/function () {
               amount = getFormValue('transaction-amount', null, true);
               description = getFormValue('transaction-description');
               if (accountId) {
-                _context9.n = 2;
+                _context0.n = 2;
                 break;
               }
               if (!(!Array.isArray(this.accounts) || this.accounts.length === 0)) {
-                _context9.n = 1;
+                _context0.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('No accounts available. Please create an account first.');
-              return _context9.a(2);
+              return _context0.a(2);
             case 1:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please select an account');
-              return _context9.a(2);
+              return _context0.a(2);
             case 2:
               if (date) {
-                _context9.n = 3;
+                _context0.n = 3;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please enter a date');
-              return _context9.a(2);
+              return _context0.a(2);
             case 3:
               if (type) {
-                _context9.n = 4;
+                _context0.n = 4;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please select a transaction type');
-              return _context9.a(2);
+              return _context0.a(2);
             case 4:
               if (!(amount === null || amount <= 0)) {
-                _context9.n = 5;
+                _context0.n = 5;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please enter a valid amount');
-              return _context9.a(2);
+              return _context0.a(2);
             case 5:
               if (description) {
-                _context9.n = 6;
+                _context0.n = 6;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please enter a description');
-              return _context9.a(2);
+              return _context0.a(2);
             case 6:
               formData = {
                 accountId: accountId,
@@ -19814,10 +20026,10 @@ var AccountsModule = /*#__PURE__*/function () {
                 notes: getFormValue('transaction-notes')
               };
               transactionId = getFormValue('transaction-id');
-              _context9.p = 7;
+              _context0.p = 7;
               url = transactionId ? "/apps/budget/api/transactions/".concat(transactionId) : '/apps/budget/api/transactions';
               method = transactionId ? 'PUT' : 'POST';
-              _context9.n = 8;
+              _context0.n = 8;
               return fetch(OC.generateUrl(url), {
                 method: method,
                 headers: {
@@ -19827,22 +20039,22 @@ var AccountsModule = /*#__PURE__*/function () {
                 body: JSON.stringify(formData)
               });
             case 8:
-              response = _context9.v;
+              response = _context0.v;
               if (!response.ok) {
-                _context9.n = 11;
+                _context0.n = 11;
                 break;
               }
-              _context9.n = 9;
+              _context0.n = 9;
               return response.json();
             case 9:
-              result = _context9.v;
+              result = _context0.v;
               savedTransactionId = result.id || transactionId; // Save tags if any are selected
               selectedTagIds = this.getSelectedTransactionTags();
               if (!(selectedTagIds.length > 0 && savedTransactionId)) {
-                _context9.n = 10;
+                _context0.n = 10;
                 break;
               }
-              _context9.n = 10;
+              _context0.n = 10;
               return this.saveTransactionTags(savedTransactionId, selectedTagIds);
             case 10:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Transaction saved successfully');
@@ -19852,38 +20064,38 @@ var AccountsModule = /*#__PURE__*/function () {
               if (this.currentView === 'account-details' && this.currentAccount) {
                 this.loadAccountTransactions(this.currentAccount.id);
               }
-              _context9.n = 16;
+              _context0.n = 16;
               break;
             case 11:
               // Try to get the actual error message from backend
               errorMessage = 'Failed to save transaction';
-              _context9.p = 12;
-              _context9.n = 13;
+              _context0.p = 12;
+              _context0.n = 13;
               return response.json();
             case 13:
-              errorData = _context9.v;
+              errorData = _context0.v;
               if (errorData.error) {
                 errorMessage = errorData.error;
               }
-              _context9.n = 15;
+              _context0.n = 15;
               break;
             case 14:
-              _context9.p = 14;
-              _t8 = _context9.v;
+              _context0.p = 14;
+              _t9 = _context0.v;
             case 15:
               throw new Error(errorMessage);
             case 16:
-              _context9.n = 18;
+              _context0.n = 18;
               break;
             case 17:
-              _context9.p = 17;
-              _t9 = _context9.v;
-              console.error('Failed to save transaction:', _t9);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(_t9.message || 'Failed to save transaction');
+              _context0.p = 17;
+              _t0 = _context0.v;
+              console.error('Failed to save transaction:', _t0);
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(_t0.message || 'Failed to save transaction');
             case 18:
-              return _context9.a(2);
+              return _context0.a(2);
           }
-        }, _callee9, this, [[12, 14], [7, 17]]);
+        }, _callee0, this, [[12, 14], [7, 17]]);
       }));
       function saveTransaction() {
         return _saveTransaction.apply(this, arguments);
@@ -19893,10 +20105,10 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "saveQuickAddTransaction",
     value: function () {
-      var _saveQuickAddTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
-        var getFormValue, accountId, date, type, amount, description, messageEl, formData, response, errorMessage, errorData, _t0, _t1;
-        return _regenerator().w(function (_context0) {
-          while (1) switch (_context0.p = _context0.n) {
+      var _saveQuickAddTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
+        var getFormValue, accountId, date, type, amount, description, messageEl, formData, response, errorMessage, errorData, _t1, _t10;
+        return _regenerator().w(function (_context1) {
+          while (1) switch (_context1.p = _context1.n) {
             case 0:
               // Helper function to safely get and clean form values
               getFormValue = function getFormValue(id) {
@@ -19924,46 +20136,46 @@ var AccountsModule = /*#__PURE__*/function () {
               description = getFormValue('quick-add-description');
               messageEl = document.getElementById('quick-add-message');
               if (accountId) {
-                _context0.n = 2;
+                _context1.n = 2;
                 break;
               }
               if (!(!Array.isArray(this.accounts) || this.accounts.length === 0)) {
-                _context0.n = 1;
+                _context1.n = 1;
                 break;
               }
               this.showQuickAddMessage('No accounts available. Please create an account first.', 'error');
-              return _context0.a(2);
+              return _context1.a(2);
             case 1:
               this.showQuickAddMessage('Please select an account', 'error');
-              return _context0.a(2);
+              return _context1.a(2);
             case 2:
               if (date) {
-                _context0.n = 3;
+                _context1.n = 3;
                 break;
               }
               this.showQuickAddMessage('Please enter a date', 'error');
-              return _context0.a(2);
+              return _context1.a(2);
             case 3:
               if (type) {
-                _context0.n = 4;
+                _context1.n = 4;
                 break;
               }
               this.showQuickAddMessage('Please select a transaction type', 'error');
-              return _context0.a(2);
+              return _context1.a(2);
             case 4:
               if (!(amount === null || amount <= 0)) {
-                _context0.n = 5;
+                _context1.n = 5;
                 break;
               }
               this.showQuickAddMessage('Please enter a valid amount', 'error');
-              return _context0.a(2);
+              return _context1.a(2);
             case 5:
               if (description) {
-                _context0.n = 6;
+                _context1.n = 6;
                 break;
               }
               this.showQuickAddMessage('Please enter a description', 'error');
-              return _context0.a(2);
+              return _context1.a(2);
             case 6:
               formData = {
                 accountId: accountId,
@@ -19975,8 +20187,8 @@ var AccountsModule = /*#__PURE__*/function () {
                 categoryId: getFormValue('quick-add-category', null, false, true),
                 notes: null
               };
-              _context0.p = 7;
-              _context0.n = 8;
+              _context1.p = 7;
+              _context1.n = 8;
               return fetch(OC.generateUrl('/apps/budget/api/transactions'), {
                 method: 'POST',
                 headers: {
@@ -19986,9 +20198,9 @@ var AccountsModule = /*#__PURE__*/function () {
                 body: JSON.stringify(formData)
               });
             case 8:
-              response = _context0.v;
+              response = _context1.v;
               if (!response.ok) {
-                _context0.n = 9;
+                _context1.n = 9;
                 break;
               }
               this.showQuickAddMessage('Transaction added successfully!', 'success');
@@ -20001,37 +20213,37 @@ var AccountsModule = /*#__PURE__*/function () {
               if (this.currentView === 'dashboard') {
                 this.loadDashboard();
               }
-              _context0.n = 14;
+              _context1.n = 14;
               break;
             case 9:
               errorMessage = 'Failed to add transaction';
-              _context0.p = 10;
-              _context0.n = 11;
+              _context1.p = 10;
+              _context1.n = 11;
               return response.json();
             case 11:
-              errorData = _context0.v;
+              errorData = _context1.v;
               if (errorData.error) {
                 errorMessage = errorData.error;
               }
-              _context0.n = 13;
+              _context1.n = 13;
               break;
             case 12:
-              _context0.p = 12;
-              _t0 = _context0.v;
+              _context1.p = 12;
+              _t1 = _context1.v;
             case 13:
               throw new Error(errorMessage);
             case 14:
-              _context0.n = 16;
+              _context1.n = 16;
               break;
             case 15:
-              _context0.p = 15;
-              _t1 = _context0.v;
-              console.error('Failed to save quick add transaction:', _t1);
-              this.showQuickAddMessage(_t1.message || 'Failed to add transaction', 'error');
+              _context1.p = 15;
+              _t10 = _context1.v;
+              console.error('Failed to save quick add transaction:', _t10);
+              this.showQuickAddMessage(_t10.message || 'Failed to add transaction', 'error');
             case 16:
-              return _context0.a(2);
+              return _context1.a(2);
           }
-        }, _callee0, this, [[10, 12], [7, 15]]);
+        }, _callee1, this, [[10, 12], [7, 15]]);
       }));
       function saveQuickAddTransaction() {
         return _saveQuickAddTransaction.apply(this, arguments);
@@ -20109,30 +20321,30 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "saveAccount",
     value: function () {
-      var _saveAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
-        var nameElement, typeElement, getFormValue, accountId, isEdit, formData, openingBalance, sensitiveFields, sensitiveFieldIds, url, method, response, result, contentType, text, detailsView, updatedAccount, errorMessage, _contentType, _text, errorData, errorMsg, _t10, _t11;
-        return _regenerator().w(function (_context1) {
-          while (1) switch (_context1.p = _context1.n) {
+      var _saveAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
+        var nameElement, typeElement, getFormValue, accountId, isEdit, formData, openingBalance, sensitiveFields, sensitiveFieldIds, url, method, response, result, contentType, text, detailsView, updatedAccount, errorMessage, _contentType, _text, errorData, errorMsg, _t11, _t12;
+        return _regenerator().w(function (_context10) {
+          while (1) switch (_context10.p = _context10.n) {
             case 0:
-              _context1.p = 0;
+              _context10.p = 0;
               // Get form elements
               nameElement = document.getElementById('account-name');
               typeElement = document.getElementById('account-type');
               if (nameElement) {
-                _context1.n = 1;
+                _context10.n = 1;
                 break;
               }
               console.error('Account name element not found');
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Form error: Account name field not found');
-              return _context1.a(2);
+              return _context10.a(2);
             case 1:
               if (typeElement) {
-                _context1.n = 2;
+                _context10.n = 2;
                 break;
               }
               console.error('Account type element not found');
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Form error: Account type field not found');
-              return _context1.a(2);
+              return _context10.a(2);
             case 2:
               // Helper function to safely get and clean form values
               getFormValue = function getFormValue(id) {
@@ -20195,43 +20407,43 @@ var AccountsModule = /*#__PURE__*/function () {
 
               // Validate required fields on frontend
               if (!(!formData.name || formData.name === '')) {
-                _context1.n = 3;
+                _context10.n = 3;
                 break;
               }
               console.error('Account name is empty');
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please enter an account name');
               nameElement.focus();
-              return _context1.a(2);
+              return _context10.a(2);
             case 3:
               if (!(!formData.type || formData.type === '')) {
-                _context1.n = 4;
+                _context10.n = 4;
                 break;
               }
               console.error('Account type is empty');
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please select an account type');
               typeElement.focus();
-              return _context1.a(2);
+              return _context10.a(2);
             case 4:
               if (!(formData.name.length > 255)) {
-                _context1.n = 5;
+                _context10.n = 5;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Account name is too long (maximum 255 characters)');
               nameElement.focus();
-              return _context1.a(2);
+              return _context10.a(2);
             case 5:
               if (!(!isEdit && isNaN(formData.balance))) {
-                _context1.n = 6;
+                _context10.n = 6;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Please enter a valid balance amount');
               document.getElementById('account-balance').focus();
-              return _context1.a(2);
+              return _context10.a(2);
             case 6:
               // Make API request (accountId already defined above for isEdit check)
               url = accountId ? "/apps/budget/api/accounts/".concat(accountId) : '/apps/budget/api/accounts';
               method = accountId ? 'PUT' : 'POST';
-              _context1.n = 7;
+              _context10.n = 7;
               return fetch(OC.generateUrl(url), {
                 method: method,
                 headers: {
@@ -20241,39 +20453,39 @@ var AccountsModule = /*#__PURE__*/function () {
                 body: JSON.stringify(formData)
               });
             case 7:
-              response = _context1.v;
+              response = _context10.v;
               if (!response.ok) {
-                _context1.n = 13;
+                _context10.n = 13;
                 break;
               }
               // Try to parse response as JSON, but handle empty responses
               result = {};
               contentType = response.headers.get('content-type');
               if (!(contentType && contentType.includes('application/json'))) {
-                _context1.n = 9;
+                _context10.n = 9;
                 break;
               }
-              _context1.n = 8;
+              _context10.n = 8;
               return response.text();
             case 8:
-              text = _context1.v;
+              text = _context10.v;
               if (text.trim()) {
                 result = JSON.parse(text);
               }
             case 9:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Account saved successfully');
               this.hideModals();
-              _context1.n = 10;
+              _context10.n = 10;
               return this.loadAccounts();
             case 10:
-              _context1.n = 11;
+              _context10.n = 11;
               return this.loadInitialData();
             case 11:
               if (!(window.location.hash === '' || window.location.hash === '#/dashboard')) {
-                _context1.n = 12;
+                _context10.n = 12;
                 break;
               }
-              _context1.n = 12;
+              _context10.n = 12;
               return this.app.loadDashboard();
             case 12:
               // Refresh account details view if it's currently visible
@@ -20287,57 +20499,57 @@ var AccountsModule = /*#__PURE__*/function () {
                   this.populateAccountOverview(updatedAccount);
                 }
               }
-              _context1.n = 20;
+              _context10.n = 20;
               break;
             case 13:
               // Handle error responses more safely
               errorMessage = 'Failed to save account';
-              _context1.p = 14;
+              _context10.p = 14;
               _contentType = response.headers.get('content-type');
               if (!(_contentType && _contentType.includes('application/json'))) {
-                _context1.n = 16;
+                _context10.n = 16;
                 break;
               }
-              _context1.n = 15;
+              _context10.n = 15;
               return response.text();
             case 15:
-              _text = _context1.v;
+              _text = _context10.v;
               if (_text.trim()) {
                 errorData = JSON.parse(_text);
                 errorMessage = errorData.error || errorMessage;
               }
-              _context1.n = 17;
+              _context10.n = 17;
               break;
             case 16:
               // Non-JSON response, get status text
               errorMessage = "HTTP ".concat(response.status, ": ").concat(response.statusText);
             case 17:
-              _context1.n = 19;
+              _context10.n = 19;
               break;
             case 18:
-              _context1.p = 18;
-              _t10 = _context1.v;
-              console.error('Error parsing response:', _t10);
+              _context10.p = 18;
+              _t11 = _context10.v;
+              console.error('Error parsing response:', _t11);
               errorMessage = "HTTP ".concat(response.status, ": ").concat(response.statusText);
             case 19:
               throw new Error(errorMessage);
             case 20:
-              _context1.n = 22;
+              _context10.n = 22;
               break;
             case 21:
-              _context1.p = 21;
-              _t11 = _context1.v;
-              console.error('Failed to save account:', _t11);
+              _context10.p = 21;
+              _t12 = _context10.v;
+              console.error('Failed to save account:', _t12);
 
               // Show specific error message if available
-              errorMsg = _t11.message || 'Unknown error occurred';
+              errorMsg = _t12.message || 'Unknown error occurred';
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)("Failed to save account: ".concat(errorMsg));
 
               // Don't hide modal on error so user can fix and retry
             case 22:
-              return _context1.a(2);
+              return _context10.a(2);
           }
-        }, _callee1, this, [[14, 18], [0, 21]]);
+        }, _callee10, this, [[14, 18], [0, 21]]);
       }));
       function saveAccount() {
         return _saveAccount.apply(this, arguments);
@@ -20347,7 +20559,7 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "showAccountModal",
     value: function showAccountModal() {
-      var _this8 = this;
+      var _this9 = this;
       var accountId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var modal = document.getElementById('account-modal');
       var title = document.getElementById('account-modal-title');
@@ -20365,8 +20577,8 @@ var AccountsModule = /*#__PURE__*/function () {
 
       // Setup conditional fields and validation
       setTimeout(function () {
-        _this8.setupAccountTypeConditionals();
-        _this8.setupBankingFieldValidation();
+        _this9.setupAccountTypeConditionals();
+        _this9.setupBankingFieldValidation();
       }, 100);
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden', 'false');
@@ -20380,24 +20592,24 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "loadAccountData",
     value: function () {
-      var _loadAccountData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(accountId) {
-        var response, account, balanceField, balanceLabel, openingBalanceGroup, openingBalanceField, _account$openingBalan, sensitiveFields, _t12;
-        return _regenerator().w(function (_context10) {
-          while (1) switch (_context10.p = _context10.n) {
+      var _loadAccountData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(accountId) {
+        var response, account, balanceField, balanceLabel, openingBalanceGroup, openingBalanceField, _account$openingBalan, sensitiveFields, _t13;
+        return _regenerator().w(function (_context11) {
+          while (1) switch (_context11.p = _context11.n) {
             case 0:
-              _context10.p = 0;
-              _context10.n = 1;
+              _context11.p = 0;
+              _context11.n = 1;
               return fetch(OC.generateUrl("/apps/budget/api/accounts/".concat(accountId)), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 1:
-              response = _context10.v;
-              _context10.n = 2;
+              response = _context11.v;
+              _context11.n = 2;
               return response.json();
             case 2:
-              account = _context10.v;
+              account = _context11.v;
               document.getElementById('account-id').value = account.id;
               document.getElementById('account-name').value = account.name;
               document.getElementById('account-type').value = account.type;
@@ -20461,17 +20673,17 @@ var AccountsModule = /*#__PURE__*/function () {
               document.getElementById('account-interest-rate').value = account.interestRate || '';
               document.getElementById('account-credit-limit').value = account.creditLimit || '';
               document.getElementById('account-overdraft-limit').value = account.overdraftLimit || '';
-              _context10.n = 4;
+              _context11.n = 4;
               break;
             case 3:
-              _context10.p = 3;
-              _t12 = _context10.v;
-              console.error('Failed to load account data:', _t12);
+              _context11.p = 3;
+              _t13 = _context11.v;
+              console.error('Failed to load account data:', _t13);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to load account data');
             case 4:
-              return _context10.a(2);
+              return _context11.a(2);
           }
-        }, _callee10, null, [[0, 3]]);
+        }, _callee11, null, [[0, 3]]);
       }));
       function loadAccountData(_x6) {
         return _loadAccountData.apply(this, arguments);
@@ -20517,15 +20729,15 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "editAccount",
     value: function () {
-      var _editAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(id) {
-        return _regenerator().w(function (_context11) {
-          while (1) switch (_context11.n) {
+      var _editAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(id) {
+        return _regenerator().w(function (_context12) {
+          while (1) switch (_context12.n) {
             case 0:
               this.showAccountModal(id);
             case 1:
-              return _context11.a(2);
+              return _context12.a(2);
           }
-        }, _callee11, this);
+        }, _callee12, this);
       }));
       function editAccount(_x7) {
         return _editAccount.apply(this, arguments);
@@ -20535,19 +20747,19 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "deleteAccount",
     value: function () {
-      var _deleteAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(id) {
-        var response, error, _t13;
-        return _regenerator().w(function (_context12) {
-          while (1) switch (_context12.p = _context12.n) {
+      var _deleteAccount = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(id) {
+        var response, error, _t14;
+        return _regenerator().w(function (_context13) {
+          while (1) switch (_context13.p = _context13.n) {
             case 0:
               if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
-                _context12.n = 1;
+                _context13.n = 1;
                 break;
               }
-              return _context12.a(2);
+              return _context13.a(2);
             case 1:
-              _context12.p = 1;
-              _context12.n = 2;
+              _context13.p = 1;
+              _context13.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/accounts/".concat(id)), {
                 method: 'DELETE',
                 headers: {
@@ -20555,45 +20767,45 @@ var AccountsModule = /*#__PURE__*/function () {
                 }
               });
             case 2:
-              response = _context12.v;
+              response = _context13.v;
               if (!response.ok) {
-                _context12.n = 6;
+                _context13.n = 6;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Account deleted successfully');
-              _context12.n = 3;
+              _context13.n = 3;
               return this.loadAccounts();
             case 3:
-              _context12.n = 4;
+              _context13.n = 4;
               return this.loadInitialData();
             case 4:
               if (!(window.location.hash === '' || window.location.hash === '#/dashboard')) {
-                _context12.n = 5;
+                _context13.n = 5;
                 break;
               }
-              _context12.n = 5;
+              _context13.n = 5;
               return this.app.loadDashboard();
             case 5:
-              _context12.n = 8;
+              _context13.n = 8;
               break;
             case 6:
-              _context12.n = 7;
+              _context13.n = 7;
               return response.json();
             case 7:
-              error = _context12.v;
+              error = _context13.v;
               throw new Error(error.error || 'Failed to delete account');
             case 8:
-              _context12.n = 10;
+              _context13.n = 10;
               break;
             case 9:
-              _context12.p = 9;
-              _t13 = _context12.v;
-              console.error('Failed to delete account:', _t13);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to delete account: ' + _t13.message);
+              _context13.p = 9;
+              _t14 = _context13.v;
+              console.error('Failed to delete account:', _t14);
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to delete account: ' + _t14.message);
             case 10:
-              return _context12.a(2);
+              return _context13.a(2);
           }
-        }, _callee12, this, [[1, 9]]);
+        }, _callee13, this, [[1, 9]]);
       }));
       function deleteAccount(_x8) {
         return _deleteAccount.apply(this, arguments);
@@ -20603,10 +20815,10 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "setupAccountTypeConditionals",
     value: function () {
-      var _setupAccountTypeConditionals = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13() {
-        var accountType, currency, requirements, response, walletGroup, balanceInput, _balanceInput, _t14, _t15;
-        return _regenerator().w(function (_context13) {
-          while (1) switch (_context13.p = _context13.n) {
+      var _setupAccountTypeConditionals = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14() {
+        var accountType, currency, requirements, response, walletGroup, balanceInput, _balanceInput, _t15, _t16;
+        return _regenerator().w(function (_context14) {
+          while (1) switch (_context14.p = _context14.n) {
             case 0:
               accountType = document.getElementById('account-type').value;
               currency = document.getElementById('account-currency').value || 'USD'; // Hide all conditional groups first
@@ -20616,28 +20828,28 @@ var AccountsModule = /*#__PURE__*/function () {
 
               // Get banking field requirements for the selected currency
               requirements = {};
-              _context13.p = 1;
-              _context13.n = 2;
+              _context14.p = 1;
+              _context14.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/accounts/banking-requirements/".concat(currency)), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context13.v;
-              _context13.n = 3;
+              response = _context14.v;
+              _context14.n = 3;
               return response.json();
             case 3:
-              requirements = _context13.v;
-              _context13.n = 5;
+              requirements = _context14.v;
+              _context14.n = 5;
               break;
             case 4:
-              _context13.p = 4;
-              _t14 = _context13.v;
-              console.warn('Failed to load banking requirements:', _t14);
+              _context14.p = 4;
+              _t15 = _context14.v;
+              console.warn('Failed to load banking requirements:', _t15);
             case 5:
-              _t15 = accountType;
-              _context13.n = _t15 === 'checking' ? 6 : _t15 === 'savings' ? 6 : _t15 === 'credit_card' ? 7 : _t15 === 'loan' ? 8 : _t15 === 'investment' ? 9 : _t15 === 'cash' ? 10 : _t15 === 'cryptocurrency' ? 11 : 12;
+              _t16 = accountType;
+              _context14.n = _t16 === 'checking' ? 6 : _t16 === 'savings' ? 6 : _t16 === 'credit_card' ? 7 : _t16 === 'loan' ? 8 : _t16 === 'investment' ? 9 : _t16 === 'cash' ? 10 : _t16 === 'cryptocurrency' ? 11 : 12;
               break;
             case 6:
               // Show banking fields based on currency
@@ -20655,25 +20867,25 @@ var AccountsModule = /*#__PURE__*/function () {
               if (accountType === 'savings') {
                 document.getElementById('interest-rate-group').style.display = 'block';
               }
-              return _context13.a(3, 12);
+              return _context14.a(3, 12);
             case 7:
               // Show credit card specific fields
               document.getElementById('credit-limit-group').style.display = 'block';
               document.getElementById('interest-rate-group').style.display = 'block';
-              return _context13.a(3, 12);
+              return _context14.a(3, 12);
             case 8:
               // Show loan specific fields
               document.getElementById('interest-rate-group').style.display = 'block';
-              return _context13.a(3, 12);
+              return _context14.a(3, 12);
             case 9:
               // Show investment account fields
               document.getElementById('swift-bic-group').style.display = 'block';
               if (requirements.iban) {
                 document.getElementById('iban-group').style.display = 'block';
               }
-              return _context13.a(3, 12);
+              return _context14.a(3, 12);
             case 10:
-              return _context13.a(3, 12);
+              return _context14.a(3, 12);
             case 11:
               // Show wallet address field only
               walletGroup = document.getElementById('wallet-address-group');
@@ -20685,7 +20897,7 @@ var AccountsModule = /*#__PURE__*/function () {
               if (balanceInput) {
                 balanceInput.step = '0.00000001';
               }
-              return _context13.a(3, 12);
+              return _context14.a(3, 12);
             case 12:
               // Reset balance step to fiat default for non-crypto types
               if (accountType !== 'cryptocurrency') {
@@ -20695,9 +20907,9 @@ var AccountsModule = /*#__PURE__*/function () {
                 }
               }
             case 13:
-              return _context13.a(2);
+              return _context14.a(2);
           }
-        }, _callee13, null, [[1, 4]]);
+        }, _callee14, null, [[1, 4]]);
       }));
       function setupAccountTypeConditionals() {
         return _setupAccountTypeConditionals.apply(this, arguments);
@@ -20707,38 +20919,38 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "setupInstitutionAutocomplete",
     value: function () {
-      var _setupInstitutionAutocomplete = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14() {
-        var input, suggestions, query, response, currency, currencyMap, region, banks, filteredBanks, _t16;
-        return _regenerator().w(function (_context14) {
-          while (1) switch (_context14.p = _context14.n) {
+      var _setupInstitutionAutocomplete = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee15() {
+        var input, suggestions, query, response, currency, currencyMap, region, banks, filteredBanks, _t17;
+        return _regenerator().w(function (_context15) {
+          while (1) switch (_context15.p = _context15.n) {
             case 0:
               input = document.getElementById('form-institution');
               suggestions = document.getElementById('institution-suggestions');
               query = input.value.toLowerCase();
               if (!(query.length < 2)) {
-                _context14.n = 1;
+                _context15.n = 1;
                 break;
               }
               suggestions.style.display = 'none';
-              return _context14.a(2);
+              return _context15.a(2);
             case 1:
-              _context14.p = 1;
+              _context15.p = 1;
               if (this.bankingInstitutions) {
-                _context14.n = 4;
+                _context15.n = 4;
                 break;
               }
-              _context14.n = 2;
+              _context15.n = 2;
               return fetch(OC.generateUrl('/apps/budget/api/accounts/banking-institutions'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context14.v;
-              _context14.n = 3;
+              response = _context15.v;
+              _context15.n = 3;
               return response.json();
             case 3:
-              this.bankingInstitutions = _context14.v;
+              this.bankingInstitutions = _context15.v;
             case 4:
               // Get currency to show relevant banks
               currency = document.getElementById('account-currency').value || 'USD';
@@ -20761,17 +20973,17 @@ var AccountsModule = /*#__PURE__*/function () {
               } else {
                 suggestions.style.display = 'none';
               }
-              _context14.n = 6;
+              _context15.n = 6;
               break;
             case 5:
-              _context14.p = 5;
-              _t16 = _context14.v;
-              console.warn('Failed to load banking institutions:', _t16);
+              _context15.p = 5;
+              _t17 = _context15.v;
+              console.warn('Failed to load banking institutions:', _t17);
               suggestions.style.display = 'none';
             case 6:
-              return _context14.a(2);
+              return _context15.a(2);
           }
-        }, _callee14, this, [[1, 5]]);
+        }, _callee15, this, [[1, 5]]);
       }));
       function setupInstitutionAutocomplete() {
         return _setupInstitutionAutocomplete.apply(this, arguments);
@@ -20789,20 +21001,20 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "validateBankingField",
     value: function () {
-      var _validateBankingField = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee15(fieldType, value, fieldId) {
-        var response, result, _t17;
-        return _regenerator().w(function (_context15) {
-          while (1) switch (_context15.p = _context15.n) {
+      var _validateBankingField = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16(fieldType, value, fieldId) {
+        var response, result, _t18;
+        return _regenerator().w(function (_context16) {
+          while (1) switch (_context16.p = _context16.n) {
             case 0:
               if (!(!value || value.length < 3)) {
-                _context15.n = 1;
+                _context16.n = 1;
                 break;
               }
               this.clearValidationFeedback(fieldId);
-              return _context15.a(2);
+              return _context16.a(2);
             case 1:
-              _context15.p = 1;
-              _context15.n = 2;
+              _context16.p = 1;
+              _context16.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/accounts/validate/".concat(fieldType)), {
                 method: 'POST',
                 headers: {
@@ -20812,27 +21024,27 @@ var AccountsModule = /*#__PURE__*/function () {
                 body: JSON.stringify(_defineProperty({}, fieldType.replace('-', ''), value))
               });
             case 2:
-              response = _context15.v;
-              _context15.n = 3;
+              response = _context16.v;
+              _context16.n = 3;
               return response.json();
             case 3:
-              result = _context15.v;
+              result = _context16.v;
               this.showValidationFeedback(fieldId, result);
 
               // Auto-format if validation succeeded
               if (result.valid && result.formatted && result.formatted !== value) {
                 document.getElementById(fieldId).value = result.formatted;
               }
-              _context15.n = 5;
+              _context16.n = 5;
               break;
             case 4:
-              _context15.p = 4;
-              _t17 = _context15.v;
-              console.warn("Failed to validate ".concat(fieldType, ":"), _t17);
+              _context16.p = 4;
+              _t18 = _context16.v;
+              console.warn("Failed to validate ".concat(fieldType, ":"), _t18);
             case 5:
-              return _context15.a(2);
+              return _context16.a(2);
           }
-        }, _callee15, this, [[1, 4]]);
+        }, _callee16, this, [[1, 4]]);
       }));
       function validateBankingField(_x9, _x0, _x1) {
         return _validateBankingField.apply(this, arguments);
@@ -20881,12 +21093,12 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "setupBankingFieldValidation",
     value: function setupBankingFieldValidation() {
-      var _this9 = this;
+      var _this0 = this;
       // IBAN validation
       var ibanField = document.getElementById('form-iban');
       if (ibanField) {
         ibanField.addEventListener('blur', function () {
-          _this9.validateBankingField('iban', ibanField.value, 'form-iban');
+          _this0.validateBankingField('iban', ibanField.value, 'form-iban');
         });
       }
 
@@ -20894,7 +21106,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var routingField = document.getElementById('form-routing-number');
       if (routingField) {
         routingField.addEventListener('blur', function () {
-          _this9.validateBankingField('routing-number', routingField.value, 'form-routing-number');
+          _this0.validateBankingField('routing-number', routingField.value, 'form-routing-number');
         });
       }
 
@@ -20902,7 +21114,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var sortCodeField = document.getElementById('form-sort-code');
       if (sortCodeField) {
         sortCodeField.addEventListener('blur', function () {
-          _this9.validateBankingField('sort-code', sortCodeField.value, 'form-sort-code');
+          _this0.validateBankingField('sort-code', sortCodeField.value, 'form-sort-code');
         });
       }
 
@@ -20910,7 +21122,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var swiftField = document.getElementById('form-swift-bic');
       if (swiftField) {
         swiftField.addEventListener('blur', function () {
-          _this9.validateBankingField('swift-bic', swiftField.value, 'form-swift-bic');
+          _this0.validateBankingField('swift-bic', swiftField.value, 'form-swift-bic');
         });
       }
 
@@ -20918,7 +21130,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var currencyField = document.getElementById('account-currency');
       if (currencyField) {
         currencyField.addEventListener('change', function () {
-          _this9.setupAccountTypeConditionals();
+          _this0.setupAccountTypeConditionals();
         });
       }
     }

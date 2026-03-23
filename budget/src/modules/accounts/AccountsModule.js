@@ -19,6 +19,8 @@ export default class AccountsModule {
         this.accountSort = { field: 'date', direction: 'desc' };
         this.accountTotalPages = 1;
         this.accountTotal = 0;
+        this.selectedAccountFilterTags = new Set();
+        this.allAccountFilterTagSets = null;
     }
 
     // ============================================
@@ -579,6 +581,11 @@ export default class AccountsModule {
             if (filters.amountMin) params.set('amountMin', filters.amountMin);
             if (filters.amountMax) params.set('amountMax', filters.amountMax);
             if (filters.search) params.set('search', filters.search);
+            if (filters.tagIds && filters.tagIds.length > 0) {
+                filters.tagIds.forEach(tagId => {
+                    params.append('tagIds[]', tagId);
+                });
+            }
 
             const response = await fetch(OC.generateUrl('/apps/budget/api/transactions?' + params.toString()), {
                 headers: { 'requesttoken': OC.requestToken }
@@ -848,6 +855,12 @@ export default class AccountsModule {
     }
 
     setupAccountFilterEventListeners() {
+        // Toggle filters button
+        const toggleBtn = document.getElementById('account-toggle-filters-btn');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggleAccountFiltersPanel());
+        }
+
         // Apply filters button
         const applyBtn = document.getElementById('account-apply-filters-btn');
         if (applyBtn) {
@@ -868,6 +881,184 @@ export default class AccountsModule {
                 categoryFilter.innerHTML += `<option value="${category.id}">${category.name}</option>`;
             });
         }
+
+        // Load and populate tags filter
+        this.loadAccountFilterTags().then(() => this.populateAccountFilterTagsDropdown());
+    }
+
+    toggleAccountFiltersPanel() {
+        const filtersPanel = document.getElementById('account-transaction-filters');
+        const toggleBtn = document.getElementById('account-toggle-filters-btn');
+
+        if (filtersPanel.style.display === 'none') {
+            filtersPanel.style.display = 'block';
+            toggleBtn.classList.add('active');
+        } else {
+            filtersPanel.style.display = 'none';
+            toggleBtn.classList.remove('active');
+        }
+    }
+
+    async loadAccountFilterTags() {
+        try {
+            const response = await fetch(
+                OC.generateUrl('/apps/budget/api/tag-sets'),
+                { headers: { 'requesttoken': OC.requestToken } }
+            );
+            if (response.ok) {
+                this.allAccountFilterTagSets = await response.json();
+            }
+        } catch (error) {
+            console.error('Failed to load tags for account filter:', error);
+        }
+    }
+
+    populateAccountFilterTagsDropdown() {
+        const container = document.getElementById('account-filter-tags');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (!this.allAccountFilterTagSets || this.allAccountFilterTagSets.length === 0) {
+            container.innerHTML = '<div style="padding: 8px; color: var(--color-text-lighter); font-style: italic;">No tags available</div>';
+            return;
+        }
+
+        const chipsArea = document.createElement('div');
+        chipsArea.className = 'filter-tags-chips';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'account-filter-tags-input';
+        input.className = 'tags-autocomplete-input';
+        input.placeholder = 'Type to filter tags...';
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'tags-autocomplete-dropdown';
+        dropdown.style.display = 'none';
+
+        container.appendChild(chipsArea);
+        container.appendChild(input);
+        container.appendChild(dropdown);
+
+        const allTags = [];
+        this.allAccountFilterTagSets.forEach(tagSet => {
+            if (tagSet.tags && tagSet.tags.length > 0) {
+                tagSet.tags.forEach(tag => {
+                    allTags.push({
+                        id: tag.id,
+                        name: tag.name,
+                        color: tag.color,
+                        tagSetName: tagSet.name,
+                        tagSetId: tagSet.id
+                    });
+                });
+            }
+        });
+
+        const renderSelectedChips = () => {
+            chipsArea.innerHTML = '';
+            if (this.selectedAccountFilterTags.size === 0) {
+                chipsArea.style.display = 'none';
+                return;
+            }
+            chipsArea.style.display = 'flex';
+            this.selectedAccountFilterTags.forEach(tagId => {
+                const tag = allTags.find(t => t.id === tagId);
+                if (!tag) return;
+                const chip = document.createElement('span');
+                chip.className = 'filter-tag-chip';
+                chip.style.cssText = `display: inline-flex; align-items: center; gap: 4px; background-color: ${dom.escapeHtml(tag.color || '#888')}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; cursor: pointer;`;
+                chip.innerHTML = `${dom.escapeHtml(tag.name)} <span style="font-weight: bold; margin-left: 2px;">×</span>`;
+                chip.addEventListener('click', () => {
+                    this.selectedAccountFilterTags.delete(tagId);
+                    renderSelectedChips();
+                    renderDropdown(input.value);
+                });
+                chipsArea.appendChild(chip);
+            });
+        };
+
+        const renderDropdown = (filter = '') => {
+            const filtered = filter
+                ? allTags.filter(t =>
+                    t.name.toLowerCase().includes(filter.toLowerCase()) ||
+                    t.tagSetName.toLowerCase().includes(filter.toLowerCase())
+                )
+                : allTags;
+
+            const grouped = {};
+            filtered.forEach(tag => {
+                if (!grouped[tag.tagSetId]) {
+                    grouped[tag.tagSetId] = { name: tag.tagSetName, tags: [] };
+                }
+                grouped[tag.tagSetId].tags.push(tag);
+            });
+
+            let html = '';
+            Object.values(grouped).forEach(group => {
+                html += `<div class="tags-group-header">${dom.escapeHtml(group.name)}</div>`;
+                group.tags.forEach(tag => {
+                    const isSelected = this.selectedAccountFilterTags.has(tag.id);
+                    html += `
+                        <div class="tags-autocomplete-item ${isSelected ? 'selected' : ''}"
+                             data-tag-id="${tag.id}">
+                            <span class="tag-chip"
+                                  style="display: inline-flex; align-items: center; background-color: ${dom.escapeHtml(tag.color || '#888')}; color: white;
+                                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;">
+                                ${dom.escapeHtml(tag.name)}
+                            </span>
+                            <span class="tag-check">${isSelected ? '✓' : ''}</span>
+                        </div>
+                    `;
+                });
+            });
+
+            dropdown.innerHTML = html || '<div class="tags-autocomplete-empty">No tags found</div>';
+            dropdown.style.display = 'block';
+        };
+
+        input.addEventListener('focus', () => renderDropdown(input.value));
+        input.addEventListener('input', () => renderDropdown(input.value));
+
+        dropdown.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+        });
+
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const item = e.target.closest('.tags-autocomplete-item');
+            if (item) {
+                const tagId = parseInt(item.dataset.tagId);
+                const clickedTag = allTags.find(t => t.id === tagId);
+                if (!clickedTag) return;
+
+                // Single selection per tag set
+                const tagsFromSameSet = allTags.filter(t => t.tagSetId === clickedTag.tagSetId);
+                tagsFromSameSet.forEach(t => {
+                    if (t.id !== tagId) {
+                        this.selectedAccountFilterTags.delete(t.id);
+                    }
+                });
+
+                if (this.selectedAccountFilterTags.has(tagId)) {
+                    this.selectedAccountFilterTags.delete(tagId);
+                } else {
+                    this.selectedAccountFilterTags.add(tagId);
+                }
+
+                renderSelectedChips();
+                renderDropdown(input.value);
+            }
+        });
+
+        renderSelectedChips();
+
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
     }
 
     applyAccountFilters() {
@@ -880,7 +1071,8 @@ export default class AccountsModule {
             dateTo: document.getElementById('account-filter-date-to')?.value || '',
             amountMin: document.getElementById('account-filter-amount-min')?.value || '',
             amountMax: document.getElementById('account-filter-amount-max')?.value || '',
-            search: document.getElementById('account-filter-search')?.value || ''
+            search: document.getElementById('account-filter-search')?.value || '',
+            tagIds: Array.from(this.selectedAccountFilterTags)
         };
 
         // Reset to first page and reload
@@ -898,6 +1090,10 @@ export default class AccountsModule {
         document.getElementById('account-filter-amount-min').value = '';
         document.getElementById('account-filter-amount-max').value = '';
         document.getElementById('account-filter-search').value = '';
+
+        // Clear tags
+        this.selectedAccountFilterTags.clear();
+        this.populateAccountFilterTagsDropdown();
 
         // Clear filters and reload
         this.accountFilters = {};

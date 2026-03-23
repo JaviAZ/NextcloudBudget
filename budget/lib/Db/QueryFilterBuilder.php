@@ -39,12 +39,19 @@ class QueryFilterBuilder {
             }
         }
 
-        // Type filter (debit/credit)
+        // Type filter (debit/credit/split)
         if (!empty($filters['type'])) {
-            $qb->andWhere($qb->expr()->eq(
-                "{$alias}.type",
-                $qb->createNamedParameter($filters['type'])
-            ));
+            if ($filters['type'] === 'split') {
+                $qb->andWhere($qb->expr()->eq(
+                    "{$alias}.is_split",
+                    $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)
+                ));
+            } else {
+                $qb->andWhere($qb->expr()->eq(
+                    "{$alias}.type",
+                    $qb->createNamedParameter($filters['type'])
+                ));
+            }
         }
 
         // Date range filters
