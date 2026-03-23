@@ -192,7 +192,6 @@ class QueryFilterBuilderTest extends TestCase {
 
     public function testTagIdsFilterJoinsAndUsesIn(): void {
         $this->qb->expects($this->once())->method('innerJoin');
-        $this->qb->expects($this->once())->method('distinct');
         $this->expr->expects($this->once())->method('in');
 
         $this->builder->applyTransactionFilters($this->qb, ['tagIds' => [1, 2, 3]], 't');

@@ -608,7 +608,9 @@ class AccountControllerTest extends TestCase {
 	}
 
 	public function testDestroyReturnsNotFoundOnError(): void {
-		$this->service->method('find')->willThrowException(new \RuntimeException('not found'));
+		$this->service->method('find')->willThrowException(
+			new \OCP\AppFramework\Db\DoesNotExistException('not found')
+		);
 
 		$response = $this->controller->destroy(999);
 

@@ -7,37 +7,33 @@ namespace OCA\Budget\Tests\Unit\BackgroundJob;
 use OCA\Budget\BackgroundJob\CleanupImportFilesJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJob;
+use OCP\Files\AppData\IAppDataFactory;
 use OCP\Files\IAppData;
 use OCP\Files\NotFoundException;
 use OCP\Files\SimpleFS\ISimpleFile;
 use OCP\Files\SimpleFS\ISimpleFolder;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 class CleanupImportFilesJobTest extends TestCase {
 	private CleanupImportFilesJob $job;
 	private ITimeFactory $timeFactory;
 	private IAppData $appData;
+	private IAppDataFactory $appDataFactory;
 	private LoggerInterface $logger;
 
 	protected function setUp(): void {
 		$this->timeFactory = $this->createMock(ITimeFactory::class);
 		$this->appData = $this->createMock(IAppData::class);
+		$this->appDataFactory = $this->createMock(IAppDataFactory::class);
+		$this->appDataFactory->method('get')->with('budget')->willReturn($this->appData);
 		$this->logger = $this->createMock(LoggerInterface::class);
 
-		$container = $this->createMock(ContainerInterface::class);
-		$container->method('get')->willReturnMap([
-			[IAppData::class, $this->appData],
-			[LoggerInterface::class, $this->logger],
-		]);
-		\OC::$server = $container;
-
-		$this->job = new CleanupImportFilesJob($this->timeFactory);
-	}
-
-	protected function tearDown(): void {
-		\OC::$server = null;
+		$this->job = new CleanupImportFilesJob(
+			$this->timeFactory,
+			$this->appDataFactory,
+			$this->logger
+		);
 	}
 
 	public function testIntervalIsSixHours(): void {

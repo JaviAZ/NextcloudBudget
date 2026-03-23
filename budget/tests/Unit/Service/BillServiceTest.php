@@ -214,15 +214,17 @@ class BillServiceTest extends TestCase {
 		$this->assertFalse($result->getAutoPayFailed());
 	}
 
-	public function testMarkPaidSkipsTransactionForDeactivatedBill(): void {
+	public function testMarkPaidCreatesTransactionForOneTimeBill(): void {
 		$bill = $this->makeBill(['frequency' => 'one-time']);
 		$this->mapper->method('find')->willReturn($bill);
 		$this->mapper->method('update')->willReturnArgument(0);
 
-		// Should NOT create next transaction since bill gets deactivated
-		$this->transactionService->expects($this->never())->method('createFromBill');
+		// One-time bills create a cleared transaction for the current payment before deactivating
+		$this->transactionService->expects($this->once())->method('createFromBill');
 
-		$this->service->markPaid(1, 'user1');
+		$result = $this->service->markPaid(1, 'user1');
+
+		$this->assertFalse($result->getIsActive());
 	}
 
 	// ── processAutoPay ──────────────────────────────────────────────
