@@ -2328,7 +2328,7 @@ button.danger:hover {
 }
 
 .balance-amount.positive {
-    color: #43a047;
+    color: #46ba61;
 }
 
 .balance-amount.negative {
@@ -3820,20 +3820,24 @@ button.danger:hover {
     background: var(--color-main-background);
     border: 1px solid var(--color-border);
     border-radius: 12px;
-    padding: 24px;
+    padding: 16px 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .account-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 16px;
-    margin-bottom: 24px;
+    flex: 1;
+    min-width: 0;
 }
 
 .account-icon-container {
-    width: 56px;
-    height: 56px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -3843,13 +3847,13 @@ button.danger:hover {
 }
 
 .account-type-icon {
-    font-size: 24px;
+    font-size: 18px;
     color: var(--color-primary);
 }
 
 .account-info h3 {
-    margin: 0 0 8px 0;
-    font-size: 20px;
+    margin: 0 0 2px 0;
+    font-size: 18px;
     font-weight: 600;
     color: var(--color-main-text);
 }
@@ -3884,26 +3888,28 @@ button.danger:hover {
 }
 
 .account-balance-section {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    align-items: center;
     gap: 24px;
-    align-items: flex-start;
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 .balance-primary {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    text-align: right;
 }
 
 .balance-primary label {
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--color-text-lighter);
+    text-transform: uppercase;
 }
 
 .balance-amount {
-    font-size: 32px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--color-main-text);
 }
@@ -3913,20 +3919,19 @@ button.danger:hover {
 }
 
 .balance-amount.positive {
-    color: #43a047;
+    color: #46ba61;
 }
 
 .balance-secondary {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    align-items: center;
+    gap: 24px;
     text-align: right;
 }
 
 .balance-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
 .balance-item label {
@@ -4106,19 +4111,22 @@ button.danger:hover {
     }
 
     .account-overview-card {
-        padding: 20px;
+        padding: 16px;
+        flex-wrap: wrap;
     }
 
     .account-header {
         flex-direction: column;
         text-align: center;
         gap: 12px;
+        flex-basis: 100%;
     }
 
     .account-balance-section {
-        grid-template-columns: 1fr;
-        gap: 16px;
-        text-align: center;
+        flex-direction: row;
+        justify-content: center;
+        margin-left: 0;
+        flex-basis: 100%;
     }
 
     .balance-secondary {
