@@ -889,7 +889,29 @@ export default class AccountsModule {
         this.currentAccount = null;
     }
 
-    // Additional missing methods
+    async reconcileAccount(accountId) {
+        // Navigate to transactions page and open reconciliation panel
+        window.location.hash = '#/transactions';
+        this.app.showView('transactions');
+        await this.app.loadTransactions();
+
+        const reconcileAccountSelect = document.getElementById('reconcile-account');
+        if (reconcileAccountSelect) {
+            // Populate the dropdown if empty (populateFilterDropdowns only runs on filter toggle)
+            if (reconcileAccountSelect.options.length <= 1 && this.accounts) {
+                reconcileAccountSelect.innerHTML = '<option value="">Select account to reconcile</option>';
+                this.accounts.forEach(account => {
+                    reconcileAccountSelect.innerHTML += `<option value="${account.id}">${account.name}</option>`;
+                });
+            }
+            reconcileAccountSelect.value = accountId;
+        }
+        const reconcilePanel = document.getElementById('reconcile-panel');
+        if (reconcilePanel) {
+            reconcilePanel.style.display = 'block';
+        }
+    }
+
     toggleTransactionReconciliation(transactionId, reconciled) {
         // This would update the transaction's reconciliation status
         // Implementation depends on backend API

@@ -2917,6 +2917,11 @@ button.danger:hover {
     outline: none;
 }
 
+#start-reconcile-btn,
+#cancel-reconcile-btn {
+    margin-bottom: 23px;
+}
+
 .reconcile-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2926,8 +2931,9 @@ button.danger:hover {
 
 .reconcile-info-float {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background: var(--color-main-background);
     border: 1px solid var(--color-border);
     border-radius: 8px;
@@ -2967,6 +2973,30 @@ button.danger:hover {
 
 .reconcile-stats .stat.unbalanced .amount {
     color: var(--color-error, #dc3545);
+}
+
+.reconcile-message {
+    font-size: 13px;
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+}
+
+.reconcile-message.balanced {
+    color: #5eea92;
+}
+
+.reconcile-message.unbalanced {
+    color: var(--color-text-lighter);
+}
+
+.reconcile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reconcile-actions button {
+    width: 100%;
 }
 
 /* Enhanced Transaction Table */
@@ -3709,10 +3739,11 @@ button.danger:hover {
 
     .reconcile-info-float {
         position: fixed;
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        width: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100% - 20px);
+        max-width: 400px;
     }
 
     /* Hide less important columns on mobile */

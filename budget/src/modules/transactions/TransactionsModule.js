@@ -811,6 +811,11 @@ export default class TransactionsModule {
         const infoPanel = document.createElement('div');
         infoPanel.id = 'reconcile-info-float';
         infoPanel.className = 'reconcile-info-float';
+        const differenceAmount = reconcileData.difference || 0;
+        const absDifference = Math.abs(differenceAmount);
+        const adjustmentType = differenceAmount > 0 ? 'credit' : 'debit';
+        const adjustmentLabel = differenceAmount > 0 ? 'deposit' : 'withdrawal';
+
         infoPanel.innerHTML = `
             <div class="reconcile-info-content">
                 <h4>Account Reconciliation</h4>
@@ -825,13 +830,24 @@ export default class TransactionsModule {
                     </div>
                     <div class="stat ${reconcileData.isBalanced ? 'balanced' : 'unbalanced'}">
                         <label>Difference:</label>
-                        <span class="amount">${this.formatCurrency(reconcileData.difference || 0)}</span>
+                        <span class="amount">${this.formatCurrency(differenceAmount)}</span>
                     </div>
                 </div>
-                <button id="finish-reconcile-btn" class="primary" ${!reconcileData.isBalanced ? 'disabled' : ''}>
-                    Finish Reconciliation
-                </button>
-                <button id="cancel-reconcile-info-btn" class="secondary">Cancel</button>
+                ${reconcileData.isBalanced
+                    ? '<p class="reconcile-message balanced">Balances match. You can finish reconciliation.</p>'
+                    : `<p class="reconcile-message unbalanced">The difference of ${this.formatCurrency(absDifference)} must be resolved before finishing. You can create an adjustment transaction to match the statement balance.</p>`
+                }
+                <div class="reconcile-actions">
+                    <button id="finish-reconcile-btn" class="primary" ${!reconcileData.isBalanced ? 'disabled' : ''}>
+                        Finish Reconciliation
+                    </button>
+                    ${!reconcileData.isBalanced ? `
+                        <button id="adjust-reconcile-btn" class="primary">
+                            Create ${this.formatCurrency(absDifference)} Adjustment (${adjustmentLabel})
+                        </button>
+                    ` : ''}
+                    <button id="cancel-reconcile-info-btn" class="secondary">Cancel</button>
+                </div>
             </div>
         `;
 
@@ -841,6 +857,13 @@ export default class TransactionsModule {
         document.getElementById('finish-reconcile-btn').addEventListener('click', () => {
             this.finishReconciliation();
         });
+
+        const adjustBtn = document.getElementById('adjust-reconcile-btn');
+        if (adjustBtn) {
+            adjustBtn.addEventListener('click', () => {
+                this.createReconciliationAdjustment(reconcileData, adjustmentType, absDifference);
+            });
+        }
 
         document.getElementById('cancel-reconcile-info-btn').addEventListener('click', () => {
             this.cancelReconciliation();
@@ -867,6 +890,64 @@ export default class TransactionsModule {
         document.getElementById('reconcile-mode-btn').classList.remove('active');
 
         this.app.loadTransactions();
+    }
+
+    finishReconciliation() {
+        this.cancelReconciliation();
+        this.app.loadAccounts();
+        showSuccess('Reconciliation completed successfully');
+    }
+
+    async createReconciliationAdjustment(reconcileData, type, amount) {
+        const accountId = document.getElementById('filter-account')?.value
+            || document.getElementById('reconcile-account')?.value;
+
+        if (!accountId) {
+            showError('No account selected for adjustment');
+            return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/transactions'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({
+                    date: today,
+                    accountId: parseInt(accountId),
+                    type: type,
+                    amount: amount,
+                    description: 'Reconciliation Adjustment',
+                    notes: `Adjustment to match statement balance of ${this.formatCurrency(reconcileData.statementBalance)}`
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to create adjustment');
+            }
+
+            showSuccess('Adjustment transaction created');
+
+            // Reload transactions and update reconcile data
+            await this.app.loadTransactions();
+            await this.app.loadAccounts();
+
+            // Re-run reconciliation with updated balances
+            this.cancelReconciliation();
+            document.getElementById('reconcile-account').value = accountId;
+            document.getElementById('reconcile-statement-balance').value = reconcileData.statementBalance;
+            document.getElementById('reconcile-statement-date').value = document.getElementById('reconcile-statement-date')?.value || today;
+            document.getElementById('reconcile-panel').style.display = 'block';
+            await this.startReconciliation();
+        } catch (error) {
+            console.error('Failed to create adjustment:', error);
+            showError('Failed to create adjustment: ' + error.message);
+        }
     }
 
     async toggleTransactionReconciliation(transactionId, checked) {
