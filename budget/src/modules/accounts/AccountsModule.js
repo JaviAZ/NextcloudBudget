@@ -799,6 +799,28 @@ export default class AccountsModule {
             reconcileBtn.addEventListener('click', () => this.reconcileAccount(this.currentAccount.id));
         }
 
+        // Import button - navigate to import view with account pre-selected
+        const importBtn = document.getElementById('account-import-btn');
+        if (importBtn) {
+            importBtn.addEventListener('click', () => {
+                const accountId = this.currentAccount?.id;
+                this.app.router.showView('import');
+                // Pre-select the current account in the import form
+                if (accountId) {
+                    const importAccountSelect = document.getElementById('import-account');
+                    if (importAccountSelect) {
+                        importAccountSelect.value = accountId;
+                    }
+                }
+            });
+        }
+
+        // Export button - download account transactions as CSV
+        const exportBtn = document.getElementById('account-export-btn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => this.exportAccountTransactions());
+        }
+
         // Account filter event listeners
         this.setupAccountFilterEventListeners();
 
@@ -1968,5 +1990,41 @@ export default class AccountsModule {
 
         // Load transactions for this account
         this.loadTransactions();
+    }
+
+    exportAccountTransactions() {
+        if (!this.accountTransactions || this.accountTransactions.length === 0) {
+            OC.Notification.showTemporary('No transactions to export');
+            return;
+        }
+
+        const account = this.currentAccount;
+        const currency = account?.currency || this.settings?.currency || 'USD';
+        const categories = this.app.categories || [];
+
+        const getCategoryName = (categoryId) => {
+            const cat = categories.find(c => c.id === categoryId);
+            return cat ? cat.name : '';
+        };
+
+        const rows = [['Date', 'Description', 'Type', 'Amount', 'Category']];
+        for (const t of this.accountTransactions) {
+            rows.push([
+                t.date,
+                `"${(t.description || '').replace(/"/g, '""')}"`,
+                t.type,
+                t.amount,
+                `"${getCategoryName(t.categoryId)}"`
+            ]);
+        }
+
+        const csv = rows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${(account?.name || 'account').replace(/[^a-zA-Z0-9]/g, '_')}_transactions.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 }
