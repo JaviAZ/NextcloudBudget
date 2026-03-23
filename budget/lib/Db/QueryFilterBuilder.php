@@ -124,9 +124,8 @@ class QueryFilterBuilder {
         }
 
         // Tag filter - filter transactions by tags
+        // UI enforces single-selection-per-tag-set, so duplicates cannot occur
         if (!empty($filters['tagIds']) && is_array($filters['tagIds'])) {
-            // Join transaction_tags table to filter by tags
-            // This will only return transactions that have at least one of the specified tags
             $qb->innerJoin(
                 $alias,
                 'budget_transaction_tags',
@@ -137,9 +136,6 @@ class QueryFilterBuilder {
                 'tt.tag_id',
                 $qb->createNamedParameter($filters['tagIds'], IQueryBuilder::PARAM_INT_ARRAY)
             ));
-
-            // Use DISTINCT to avoid duplicate rows when transaction has multiple matching tags
-            $qb->distinct();
         }
     }
 
