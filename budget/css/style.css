@@ -2806,6 +2806,14 @@ button.danger:hover {
     gap: 3px;
 }
 
+.filter-group.full-width {
+    grid-column: 1 / -1 !important;
+}
+
+.filter-group.full-width input {
+    width: 100% !important;
+}
+
 .filter-group label {
     font-size: 12px;
     font-weight: 500;

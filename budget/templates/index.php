@@ -1142,7 +1142,7 @@ style('budget', 'budget-main');
                                 <label for="account-filter-amount-max">Max Amount</label>
                                 <input type="number" id="account-filter-amount-max" step="0.01" placeholder="1000.00">
                             </div>
-                            <div class="filter-group">
+                            <div class="filter-group full-width">
                                 <label for="account-filter-search">Search</label>
                                 <input type="text" id="account-filter-search" placeholder="Description, vendor...">
                             </div>
@@ -1280,7 +1280,7 @@ style('budget', 'budget-main');
                             <input type="number" id="filter-amount-max" step="0.01" placeholder="1000.00">
                         </div>
 
-                        <div class="filter-group">
+                        <div class="filter-group full-width">
                             <label for="filter-search">Search</label>
                             <input type="text" id="filter-search" placeholder="Description, vendor, reference...">
                         </div>
