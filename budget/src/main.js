@@ -1100,6 +1100,9 @@ class BudgetApp {
 
     async loadTransactions(accountId = null) {
         try {
+            // Refresh tag filter if panel is open
+            this.transactionsModule.refreshFilterTags();
+
             // Initialize default values for enhanced features
             this.currentPage = this.currentPage || 1;
             this.rowsPerPage = this.rowsPerPage || 100;
@@ -1142,6 +1145,11 @@ class BudgetApp {
             }
             if (this.transactionFilters?.status) {
                 params.append('status', this.transactionFilters.status);
+            }
+            if (this.transactionFilters?.tagIds && this.transactionFilters.tagIds.length > 0) {
+                this.transactionFilters.tagIds.forEach(tagId => {
+                    params.append('tagIds[]', tagId);
+                });
             }
 
             // Add sorting parameters

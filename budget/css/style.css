@@ -3555,6 +3555,13 @@ button.danger:hover {
     width: 100%;
 }
 
+.filter-tags-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
 .tags-autocomplete-input {
     width: 100%;
     min-height: 28px;

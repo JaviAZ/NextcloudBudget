@@ -63,7 +63,8 @@ class TransactionController extends Controller {
         ?float $amountMax = null,
         ?string $sort = 'date',
         ?string $direction = 'desc',
-        ?string $status = null
+        ?string $status = null,
+        ?array $tagIds = null
     ): DataResponse {
         try {
             $offset = ($page - 1) * $limit;
@@ -80,6 +81,7 @@ class TransactionController extends Controller {
                 'sort' => $sort,
                 'direction' => $direction,
                 'status' => $status,
+                'tagIds' => $tagIds,
             ];
 
             $result = $this->service->findWithFilters($this->userId, $filters, $limit, $offset);

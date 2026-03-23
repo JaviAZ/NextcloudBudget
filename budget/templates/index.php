@@ -1284,6 +1284,11 @@ style('budget', 'budget-main');
                             <label for="filter-search">Search</label>
                             <input type="text" id="filter-search" placeholder="Description, vendor, reference...">
                         </div>
+
+                        <div class="filter-group">
+                            <label>Tags</label>
+                            <div id="filter-tags" class="tags-autocomplete"></div>
+                        </div>
                     </div>
 
                     <div class="filters-actions">

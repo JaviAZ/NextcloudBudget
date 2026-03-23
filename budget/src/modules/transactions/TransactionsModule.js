@@ -26,6 +26,8 @@ export default class TransactionsModule {
         this.app.currentPage = 1;
         this.app.rowsPerPage = 25;
         this.selectedTransactions = new Set();
+        this.selectedFilterTags = new Set();
+        this.allFilterTagSets = null;
         this.reconcileMode = false;
         this.reconcileData = null;
 
@@ -305,6 +307,13 @@ export default class TransactionsModule {
         }
     }
 
+    refreshFilterTags() {
+        const filtersPanel = document.getElementById('transactions-filters');
+        if (filtersPanel && filtersPanel.style.display !== 'none') {
+            this.loadFilterTags().then(() => this.populateFilterTagsDropdown());
+        }
+    }
+
     populateFilterDropdowns() {
         // Populate account filter
         const accountFilter = document.getElementById('filter-account');
@@ -332,6 +341,174 @@ export default class TransactionsModule {
                 reconcileAccount.innerHTML += `<option value="${account.id}">${account.name}</option>`;
             });
         }
+
+        // Populate tag filter dropdown
+        this.loadFilterTags().then(() => this.populateFilterTagsDropdown());
+    }
+
+    async loadFilterTags() {
+        // Always refetch to pick up newly created tag sets
+        try {
+            const response = await fetch(
+                OC.generateUrl('/apps/budget/api/tag-sets'),
+                { headers: { 'requesttoken': OC.requestToken } }
+            );
+            if (response.ok) {
+                this.allFilterTagSets = await response.json();
+            }
+        } catch (error) {
+            console.error('Failed to load tags for filter:', error);
+        }
+    }
+
+    populateFilterTagsDropdown() {
+        const container = document.getElementById('filter-tags');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (!this.allFilterTagSets || this.allFilterTagSets.length === 0) {
+            container.innerHTML = '<div style="padding: 8px; color: var(--color-text-lighter); font-style: italic;">No tags available</div>';
+            return;
+        }
+
+        const chipsArea = document.createElement('div');
+        chipsArea.className = 'filter-tags-chips';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'filter-tags-input';
+        input.className = 'tags-autocomplete-input';
+        input.placeholder = 'Type to filter tags...';
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'tags-autocomplete-dropdown';
+        dropdown.style.display = 'none';
+
+        container.appendChild(chipsArea);
+        container.appendChild(input);
+        container.appendChild(dropdown);
+
+        const renderSelectedChips = () => {
+            chipsArea.innerHTML = '';
+            if (this.selectedFilterTags.size === 0) {
+                chipsArea.style.display = 'none';
+                return;
+            }
+            chipsArea.style.display = 'flex';
+            this.selectedFilterTags.forEach(tagId => {
+                const tag = allTags.find(t => t.id === tagId);
+                if (!tag) return;
+                const chip = document.createElement('span');
+                chip.className = 'filter-tag-chip';
+                chip.style.cssText = `display: inline-flex; align-items: center; gap: 4px; background-color: ${dom.escapeHtml(tag.color || '#888')}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; cursor: pointer;`;
+                chip.innerHTML = `${dom.escapeHtml(tag.name)} <span style="font-weight: bold; margin-left: 2px;">×</span>`;
+                chip.addEventListener('click', () => {
+                    this.selectedFilterTags.delete(tagId);
+                    renderSelectedChips();
+                    renderDropdown(input.value);
+                    this.updateFilters();
+                });
+                chipsArea.appendChild(chip);
+            });
+        };
+
+        const allTags = [];
+        this.allFilterTagSets.forEach(tagSet => {
+            if (tagSet.tags && tagSet.tags.length > 0) {
+                tagSet.tags.forEach(tag => {
+                    allTags.push({
+                        id: tag.id,
+                        name: tag.name,
+                        color: tag.color,
+                        tagSetName: tagSet.name,
+                        tagSetId: tagSet.id
+                    });
+                });
+            }
+        });
+
+        const renderDropdown = (filter = '') => {
+            const filtered = filter
+                ? allTags.filter(t =>
+                    t.name.toLowerCase().includes(filter.toLowerCase()) ||
+                    t.tagSetName.toLowerCase().includes(filter.toLowerCase())
+                )
+                : allTags;
+
+            const grouped = {};
+            filtered.forEach(tag => {
+                if (!grouped[tag.tagSetId]) {
+                    grouped[tag.tagSetId] = { name: tag.tagSetName, tags: [] };
+                }
+                grouped[tag.tagSetId].tags.push(tag);
+            });
+
+            let html = '';
+            Object.values(grouped).forEach(group => {
+                html += `<div class="tags-group-header">${dom.escapeHtml(group.name)}</div>`;
+                group.tags.forEach(tag => {
+                    const isSelected = this.selectedFilterTags.has(tag.id);
+                    html += `
+                        <div class="tags-autocomplete-item ${isSelected ? 'selected' : ''}"
+                             data-tag-id="${tag.id}">
+                            <span class="tag-chip"
+                                  style="display: inline-flex; align-items: center; background-color: ${dom.escapeHtml(tag.color || '#888')}; color: white;
+                                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;">
+                                ${dom.escapeHtml(tag.name)}
+                            </span>
+                            <span class="tag-check">${isSelected ? '✓' : ''}</span>
+                        </div>
+                    `;
+                });
+            });
+
+            dropdown.innerHTML = html || '<div class="tags-autocomplete-empty">No tags found</div>';
+            dropdown.style.display = 'block';
+        };
+
+        input.addEventListener('focus', () => renderDropdown(input.value));
+        input.addEventListener('input', () => renderDropdown(input.value));
+
+        dropdown.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+        });
+
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const item = e.target.closest('.tags-autocomplete-item');
+            if (item) {
+                const tagId = parseInt(item.dataset.tagId);
+                const clickedTag = allTags.find(t => t.id === tagId);
+                if (!clickedTag) return;
+
+                // Single selection per tag set
+                const tagsFromSameSet = allTags.filter(t => t.tagSetId === clickedTag.tagSetId);
+                tagsFromSameSet.forEach(t => {
+                    if (t.id !== tagId) {
+                        this.selectedFilterTags.delete(t.id);
+                    }
+                });
+
+                if (this.selectedFilterTags.has(tagId)) {
+                    this.selectedFilterTags.delete(tagId);
+                } else {
+                    this.selectedFilterTags.add(tagId);
+                }
+
+                renderSelectedChips();
+                renderDropdown(input.value);
+                this.updateFilters();
+            }
+        });
+
+        renderSelectedChips();
+
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
     }
 
     updateFilters() {
@@ -344,7 +521,8 @@ export default class TransactionsModule {
             dateTo: document.getElementById('filter-date-to')?.value || '',
             amountMin: document.getElementById('filter-amount-min')?.value || '',
             amountMax: document.getElementById('filter-amount-max')?.value || '',
-            search: document.getElementById('filter-search')?.value || ''
+            search: document.getElementById('filter-search')?.value || '',
+            tagIds: Array.from(this.selectedFilterTags)
         };
 
         // Always auto-apply filters (including when clearing them)
@@ -369,6 +547,9 @@ export default class TransactionsModule {
                 }
             }
         });
+
+        this.selectedFilterTags.clear();
+        this.populateFilterTagsDropdown();
 
         this.app.transactionFilters = {};
         this.app.currentPage = 1;
