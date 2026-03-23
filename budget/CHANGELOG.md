@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.2] - 2026-03-23
+
+### Added
+- **Tag filter on transaction list**: Filter transactions by tag directly from the transaction page ([#96](https://github.com/otherworld-dev/budget/issues/96))
+- **Split type filter and account filter matching**: Filter transactions by split type (unsplit, split parent, split child); account filter options now match the accounts dropdown ([#97](https://github.com/otherworld-dev/budget/issues/97))
+
+### Fixed
+- European-format zeros (e.g. `0,00`) in dual-column CSV import no longer treated as valid amounts ([#95](https://github.com/otherworld-dev/budget/issues/95))
+- Bill name field clarified as "Vendor / Payee" to match its actual purpose ([#94](https://github.com/otherworld-dev/budget/issues/94))
+- Removed undefined `distinct()` call in QueryFilterBuilder that could cause errors on some databases
+- Category dropdown clipped by `overflow:hidden` on table cells
+- Search filter inputs now span full width of the filter grid
+
 ## [2.8.1] - 2026-03-23
 
 ### Added
