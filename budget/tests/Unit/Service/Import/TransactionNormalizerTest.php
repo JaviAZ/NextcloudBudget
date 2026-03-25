@@ -454,6 +454,44 @@ class TransactionNormalizerTest extends TestCase {
 		$this->assertSame('2024-03-15', $this->normalizer->normalizeDate('15.03.2024'));
 	}
 
+	public function testNormalizeDateTwoDigitYearEuropeanDot(): void {
+		// DKB (Deutsche Kredit Bank) exports dates as DD.MM.YY
+		$this->assertSame('2026-03-25', $this->normalizer->normalizeDate('25.03.26'));
+	}
+
+	public function testDetectDateFormatTwoDigitYearBatch(): void {
+		// Batch detection should find d.m.y for 2-digit year dates
+		$dates = ['25.03.26', '24.03.26', '15.01.26'];
+		$this->normalizer->detectDateFormat($dates);
+
+		$result = $this->normalizer->normalizeDate('01.06.26');
+		$this->assertSame('2026-06-01', $result);
+	}
+
+	public function testMapRowDkbCsvFormat(): void {
+		// Simulates a DKB bank export row (issue #100)
+		$row = [
+			'Buchungsdatum' => '25.03.26',
+			'Zahlungsempfänger*in' => 'Lidl',
+			'Verwendungszweck' => 'VISA Debitkartenumsatz vom 24.03.2026',
+			'Betrag (€)' => '-57,68',
+		];
+		$mapping = [
+			'date' => 'Buchungsdatum',
+			'description' => 'Verwendungszweck',
+			'amount' => 'Betrag (€)',
+			'vendor' => 'Zahlungsempfänger*in',
+		];
+
+		$this->normalizer->detectDateFormat(['25.03.26', '25.03.26', '25.03.26']);
+		$result = $this->normalizer->mapRowToTransaction($row, $mapping);
+
+		$this->assertSame('2026-03-25', $result['date']);
+		$this->assertEqualsWithDelta(57.68, $result['amount'], 0.001);
+		$this->assertSame('debit', $result['type']);
+		$this->assertSame('Lidl', $result['vendor']);
+	}
+
 	public function testNormalizeDateTrimsWhitespace(): void {
 		$this->assertSame('2024-03-15', $this->normalizer->normalizeDate('  2024-03-15  '));
 	}

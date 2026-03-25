@@ -20,6 +20,11 @@ class TransactionNormalizer {
         'Y/m/d',
         'd.m.Y',
         'm.d.Y',
+        // 2-digit year variants (must come AFTER 4-digit to avoid
+        // misinterpreting e.g. "25.03.2026" by consuming only "20")
+        'm/d/y',
+        'd/m/y',
+        'd.m.y',
     ];
 
     /** @var string|null Cached date format detected from batch analysis */
@@ -174,13 +179,7 @@ class TransactionNormalizer {
         foreach (self::DATE_FORMATS as $format) {
             $allValid = true;
             foreach ($candidates as $d) {
-                $parsed = \DateTime::createFromFormat($format, $d);
-                if ($parsed === false) {
-                    $allValid = false;
-                    break;
-                }
-                $errors = \DateTime::getLastErrors();
-                if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+                if (!$this->isValidDateParse($format, $d)) {
                     $allValid = false;
                     break;
                 }
@@ -221,23 +220,17 @@ class TransactionNormalizer {
 
         // Use batch-detected format if available
         if ($this->detectedDateFormat !== null) {
-            $parsed = \DateTime::createFromFormat($this->detectedDateFormat, $date);
-            if ($parsed !== false) {
-                $errors = \DateTime::getLastErrors();
-                if ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0)) {
-                    return $parsed->format('Y-m-d');
-                }
+            $parsed = $this->tryParseDate($this->detectedDateFormat, $date);
+            if ($parsed !== null) {
+                return $parsed;
             }
         }
 
         // Fall back to trying each format with overflow rejection
         foreach (self::DATE_FORMATS as $format) {
-            $parsed = \DateTime::createFromFormat($format, $date);
-            if ($parsed !== false) {
-                $errors = \DateTime::getLastErrors();
-                if ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0)) {
-                    return $parsed->format('Y-m-d');
-                }
+            $parsed = $this->tryParseDate($format, $date);
+            if ($parsed !== null) {
+                return $parsed;
             }
         }
 
@@ -307,6 +300,41 @@ class TransactionNormalizer {
         $description = preg_replace('/\s+/', ' ', $description);
 
         return $description;
+    }
+
+    /**
+     * Check if a date string validly parses with the given format.
+     *
+     * Rejects parses that produce no errors but are implausible, e.g.
+     * a 4-digit year format (Y) consuming a 2-digit input like "26" → year 0026.
+     */
+    private function isValidDateParse(string $format, string $date): bool {
+        $parsed = \DateTime::createFromFormat($format, $date);
+        if ($parsed === false) {
+            return false;
+        }
+        $errors = \DateTime::getLastErrors();
+        if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+            return false;
+        }
+        // Reject if a 4-digit year format produced a year < 100 (mismatched input)
+        if (str_contains($format, 'Y') && (int) $parsed->format('Y') < 100) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Try to parse a date string with the given format.
+     *
+     * @return string|null Normalized Y-m-d string, or null on failure
+     */
+    private function tryParseDate(string $format, string $date): ?string {
+        if (!$this->isValidDateParse($format, $date)) {
+            return null;
+        }
+        $parsed = \DateTime::createFromFormat($format, $date);
+        return $parsed->format('Y-m-d');
     }
 
     /**
