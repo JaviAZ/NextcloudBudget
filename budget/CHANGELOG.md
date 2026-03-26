@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.4] - 2026-03-26
+
+### Added
+- **Running balance column on transactions table**: Bank-statement-style cumulative balance column that shows the account balance at each transaction. Auto-hides when viewing multiple accounts or using non-date sorting/filters ([#79](https://github.com/otherworld-dev/budget/issues/79))
+- **Bi-weekly frequency for bills, income, and transfers**: New bi-weekly option across all frequency dropdowns ([#88](https://github.com/otherworld-dev/budget/issues/88))
+- **One-time income support**: Non-recurring income entries that auto-deactivate after being marked as received; also adds semi-annually frequency to income ([#91](https://github.com/otherworld-dev/budget/issues/91))
+- **Redesigned Match All with scan/review flow**: Split bulk-match into separate scan and link steps with a pre-scan config dialog for date window and auto/review mode. Adds currency check to prevent cross-currency matching and fixes N+1 account queries ([#82](https://github.com/otherworld-dev/budget/issues/82))
+
+### Fixed
+- **Recurring bill payment not creating transaction for current period**: Marking a recurring bill as paid only created a scheduled transaction for the next period — the current payment was never recorded. Now finds and clears any pre-existing scheduled transaction, or creates a new cleared one ([#99](https://github.com/otherworld-dev/budget/issues/99))
+- **Pension return rate displayed as decimal in edit form**: The edit form showed the raw decimal (e.g. 0.05) instead of the percentage (5%). Now correctly converts between display and storage formats ([#101](https://github.com/otherworld-dev/budget/issues/101))
+- **Reconciliation using wrong balance**: Reconciliation used the raw stored balance (including future scheduled deductions) instead of the adjusted current balance shown on the account card
+
 ## [2.8.3] - 2026-03-25
 
 ### Added
