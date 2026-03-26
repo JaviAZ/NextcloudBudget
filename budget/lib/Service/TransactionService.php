@@ -348,7 +348,47 @@ class TransactionService {
     }
 
     public function findWithFilters(string $userId, array $filters, int $limit, int $offset): array {
-        return $this->mapper->findWithFilters($userId, $filters, $limit, $offset);
+        $result = $this->mapper->findWithFilters($userId, $filters, $limit, $offset);
+
+        // Compute running balance when viewing a single account sorted by date
+        // with no non-date filters that break chronological contiguity
+        $accountId = $filters['accountId'] ?? null;
+        $sort = $filters['sort'] ?? 'date';
+
+        $hasContiguityBreakingFilters =
+            !empty($filters['category']) ||
+            !empty($filters['type']) ||
+            !empty($filters['search']) ||
+            !empty($filters['amountMin']) ||
+            !empty($filters['amountMax']) ||
+            !empty($filters['status']) ||
+            !empty($filters['tagIds']);
+
+        if ($accountId && $sort === 'date' && !$hasContiguityBreakingFilters
+            && !empty($result['transactions'])) {
+
+            $account = $this->accountMapper->find($accountId, $userId);
+            $openingBalance = (string)($account->getOpeningBalance() ?? 0);
+
+            // Find the chronologically earliest transaction on this page (date ASC, id ASC)
+            $earliest = $result['transactions'][0];
+            foreach ($result['transactions'] as $tx) {
+                if ($tx['date'] < $earliest['date']
+                    || ($tx['date'] === $earliest['date'] && $tx['id'] < $earliest['id'])) {
+                    $earliest = $tx;
+                }
+            }
+
+            $netBefore = $this->mapper->getNetChangeBefore(
+                $accountId,
+                $earliest['date'],
+                $earliest['id']
+            );
+
+            $result['balanceBeforePage'] = MoneyCalculator::add($openingBalance, $netBefore);
+        }
+
+        return $result;
     }
 
     public function bulkCategorize(string $userId, array $updates): array {

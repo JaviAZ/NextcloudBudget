@@ -919,6 +919,23 @@ class BudgetApp {
         const tbody = document.querySelector('#transactions-table tbody');
         if (!tbody || !this.transactions) return;
 
+        // Compute running balances if backend provided balanceBeforePage
+        let balanceMap = null;
+        if (this.balanceBeforePage !== null && this.balanceBeforePage !== undefined) {
+            balanceMap = {};
+            const chronological = [...this.transactions].sort((a, b) => {
+                if (a.date < b.date) return -1;
+                if (a.date > b.date) return 1;
+                return a.id - b.id;
+            });
+            let running = parseFloat(this.balanceBeforePage);
+            for (const tx of chronological) {
+                const amount = parseFloat(tx.amount) || 0;
+                running += (tx.type === 'credit' ? amount : -amount);
+                balanceMap[tx.id] = running;
+            }
+        }
+
         tbody.innerHTML = this.transactions.map(transaction => {
             const account = this.accounts?.find(a => a.id === transaction.accountId);
             const category = this.categories?.find(c => c.id === transaction.categoryId);
@@ -992,6 +1009,11 @@ class BudgetApp {
                         data-type="${transaction.type}"
                         data-transaction-id="${transaction.id}">
                         <span class="amount cell-display ${typeClass}">${formattedAmount}</span>
+                    </td>
+                    <td class="balance-column">
+                        ${balanceMap !== null && balanceMap[transaction.id] !== undefined
+                            ? `<span class="transaction-balance ${balanceMap[transaction.id] >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(balanceMap[transaction.id], currency)}</span>`
+                            : ''}
                     </td>
                     <td class="account-column editable-cell"
                         data-field="accountId"
@@ -1184,6 +1206,7 @@ class BudgetApp {
 
             const result = await response.json();
             this.transactions = Array.isArray(result) ? result : (result.transactions || result);
+            this.balanceBeforePage = result.balanceBeforePage ?? null;
 
             // Load tags for all displayed transactions
             await this.loadAllTransactionTags();
@@ -3295,6 +3318,7 @@ class BudgetApp {
             vendor: true,
             category: true,
             amount: true,
+            balance: true,
             account: true
         };
 
@@ -3320,6 +3344,7 @@ class BudgetApp {
             vendor: 'vendor-column',
             category: 'category-column',
             amount: 'amount-column',
+            balance: 'balance-column',
             account: 'account-column'
         };
 
@@ -3327,10 +3352,16 @@ class BudgetApp {
             const className = columnMap[key];
             if (!className) return;
 
+            // Balance column auto-hides when data isn't available
+            let isVisible = visible;
+            if (key === 'balance' && (this.balanceBeforePage === null || this.balanceBeforePage === undefined)) {
+                isVisible = false;
+            }
+
             // Apply to all cells with this class (header and body)
             const cells = table.querySelectorAll(`th.${className}, td.${className}`);
             cells.forEach(cell => {
-                cell.style.display = visible ? '' : 'none';
+                cell.style.display = isVisible ? '' : 'none';
             });
         });
     }

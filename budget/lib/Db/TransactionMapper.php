@@ -765,6 +765,44 @@ class TransactionMapper extends QBMapper {
     }
 
     /**
+     * Calculate the net change of all transactions chronologically before a given (date, id) boundary.
+     * Used for computing running balance: balanceBeforePage = openingBalance + getNetChangeBefore().
+     *
+     * Chronological order: date ASC, id ASC.
+     * "Before" means: date < boundaryDate, OR (date = boundaryDate AND id < boundaryId).
+     *
+     * @param int $accountId Account to compute balance for
+     * @param string $boundaryDate The date of the boundary transaction
+     * @param int $boundaryId The ID of the boundary transaction
+     * @return string Net change as string (for BCMath precision)
+     */
+    public function getNetChangeBefore(int $accountId, string $boundaryDate, int $boundaryId): string {
+        $qb = $this->db->getQueryBuilder();
+
+        $qb->selectAlias(
+                $qb->createFunction('COALESCE(SUM(CASE WHEN t.type = \'credit\' THEN t.amount ELSE -t.amount END), 0)'),
+                'net_change'
+            )
+            ->from($this->getTableName(), 't')
+            ->where($qb->expr()->eq('t.account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->lt('t.date', $qb->createNamedParameter($boundaryDate)),
+                    $qb->expr()->andX(
+                        $qb->expr()->eq('t.date', $qb->createNamedParameter($boundaryDate)),
+                        $qb->expr()->lt('t.id', $qb->createNamedParameter($boundaryId, IQueryBuilder::PARAM_INT))
+                    )
+                )
+            );
+
+        $result = $qb->executeQuery();
+        $netChange = $result->fetchOne();
+        $result->closeCursor();
+
+        return (string)($netChange ?: '0');
+    }
+
+    /**
      * Calculate the net effect of future transactions for multiple accounts (batch version).
      * Used to derive "balance as of date" by subtracting from stored balances.
      *

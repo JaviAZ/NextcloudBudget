@@ -596,6 +596,7 @@ export default class AccountsModule {
                 this.accountTransactions = result.transactions || result; // Handle both formats
                 this.accountTotalPages = result.totalPages || 1;
                 this.accountTotal = result.total || this.accountTransactions.length;
+                this.accountBalanceBeforePage = result.balanceBeforePage ?? null;
             } else {
                 // Fallback: filter from all transactions
                 await this.loadTransactions();
@@ -635,29 +636,25 @@ export default class AccountsModule {
             return;
         }
 
-        // Calculate running balance
-        let runningBalance = this.currentAccount?.balance || 0;
-        const transactionsWithBalance = [...this.accountTransactions].reverse().map(transaction => {
-            const amount = parseFloat(transaction.amount) || 0;
-            if (transaction.type === 'credit') {
-                runningBalance -= amount; // Remove to get previous balance
-            } else {
-                runningBalance += amount; // Add back to get previous balance
+        // Compute running balances from server-provided balanceBeforePage
+        let balanceMap = null;
+        if (this.accountBalanceBeforePage !== null && this.accountBalanceBeforePage !== undefined) {
+            balanceMap = {};
+            const chronological = [...this.accountTransactions].sort((a, b) => {
+                if (a.date < b.date) return -1;
+                if (a.date > b.date) return 1;
+                return a.id - b.id;
+            });
+            let running = parseFloat(this.accountBalanceBeforePage);
+            for (const tx of chronological) {
+                const amount = parseFloat(tx.amount) || 0;
+                running += (tx.type === 'credit' ? amount : -amount);
+                balanceMap[tx.id] = running;
             }
-            const balanceAtTime = runningBalance;
-
-            // Adjust for next iteration
-            if (transaction.type === 'credit') {
-                runningBalance += amount;
-            } else {
-                runningBalance -= amount;
-            }
-
-            return { ...transaction, balanceAtTime };
-        }).reverse();
+        }
 
         const today = formatters.getTodayDateString();
-        tbody.innerHTML = transactionsWithBalance.map(transaction => {
+        tbody.innerHTML = this.accountTransactions.map(transaction => {
             const amount = parseFloat(transaction.amount) || 0;
             const currency = this.currentAccount?.currency || this.getPrimaryCurrency();
             const category = this.categories?.find(c => c.id === transaction.categoryId);
@@ -687,9 +684,9 @@ export default class AccountsModule {
                         </span>
                     </td>
                     <td class="balance-column">
-                        <span class="transaction-balance ${transaction.balanceAtTime >= 0 ? 'positive' : 'negative'}">
-                            ${this.formatCurrency(transaction.balanceAtTime, currency)}
-                        </span>
+                        ${balanceMap !== null && balanceMap[transaction.id] !== undefined
+                            ? `<span class="transaction-balance ${balanceMap[transaction.id] >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(balanceMap[transaction.id], currency)}</span>`
+                            : ''}
                     </td>
                     <td class="actions-column">
                         <div class="transaction-actions">

@@ -18523,8 +18523,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/notifications.js */ "./src/utils/notifications.js");
 /* harmony import */ var _utils_datepicker_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/datepicker.js */ "./src/utils/datepicker.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -19258,7 +19256,7 @@ var AccountsModule = /*#__PURE__*/function () {
     key: "loadAccountTransactions",
     value: function () {
       var _loadAccountTransactions = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(accountId) {
-        var params, filters, response, result, _t6;
+        var params, filters, response, _result$balanceBefore, result, _t6;
         return _regenerator().w(function (_context5) {
           while (1) switch (_context5.p = _context5.n) {
             case 0:
@@ -19304,6 +19302,7 @@ var AccountsModule = /*#__PURE__*/function () {
               this.accountTransactions = result.transactions || result; // Handle both formats
               this.accountTotalPages = result.totalPages || 1;
               this.accountTotal = result.total || this.accountTransactions.length;
+              this.accountBalanceBeforePage = (_result$balanceBefore = result.balanceBeforePage) !== null && _result$balanceBefore !== void 0 ? _result$balanceBefore : null;
               _context5.n = 5;
               break;
             case 3:
@@ -19341,8 +19340,7 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "renderAccountTransactions",
     value: function renderAccountTransactions() {
-      var _this$currentAccount,
-        _this4 = this;
+      var _this4 = this;
       var tbody = document.getElementById('account-transactions-body');
       if (!tbody) return;
       if (!this.accountTransactions || this.accountTransactions.length === 0) {
@@ -19350,29 +19348,33 @@ var AccountsModule = /*#__PURE__*/function () {
         return;
       }
 
-      // Calculate running balance
-      var runningBalance = ((_this$currentAccount = this.currentAccount) === null || _this$currentAccount === void 0 ? void 0 : _this$currentAccount.balance) || 0;
-      var transactionsWithBalance = _toConsumableArray(this.accountTransactions).reverse().map(function (transaction) {
-        var amount = parseFloat(transaction.amount) || 0;
-        if (transaction.type === 'credit') {
-          runningBalance -= amount; // Remove to get previous balance
-        } else {
-          runningBalance += amount; // Add back to get previous balance
-        }
-        var balanceAtTime = runningBalance;
-
-        // Adjust for next iteration
-        if (transaction.type === 'credit') {
-          runningBalance += amount;
-        } else {
-          runningBalance -= amount;
-        }
-        return _objectSpread(_objectSpread({}, transaction), {}, {
-          balanceAtTime: balanceAtTime
+      // Compute running balances from server-provided balanceBeforePage
+      var balanceMap = null;
+      if (this.accountBalanceBeforePage !== null && this.accountBalanceBeforePage !== undefined) {
+        balanceMap = {};
+        var chronological = _toConsumableArray(this.accountTransactions).sort(function (a, b) {
+          if (a.date < b.date) return -1;
+          if (a.date > b.date) return 1;
+          return a.id - b.id;
         });
-      }).reverse();
+        var running = parseFloat(this.accountBalanceBeforePage);
+        var _iterator2 = _createForOfIteratorHelper(chronological),
+          _step2;
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var tx = _step2.value;
+            var amount = parseFloat(tx.amount) || 0;
+            running += tx.type === 'credit' ? amount : -amount;
+            balanceMap[tx.id] = running;
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+      }
       var today = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getTodayDateString();
-      tbody.innerHTML = transactionsWithBalance.map(function (transaction) {
+      tbody.innerHTML = this.accountTransactions.map(function (transaction) {
         var _this4$currentAccount, _this4$categories;
         var amount = parseFloat(transaction.amount) || 0;
         var currency = ((_this4$currentAccount = _this4.currentAccount) === null || _this4$currentAccount === void 0 ? void 0 : _this4$currentAccount.currency) || _this4.getPrimaryCurrency();
@@ -19381,7 +19383,7 @@ var AccountsModule = /*#__PURE__*/function () {
         });
         var isScheduled = transaction.status === 'scheduled';
         var scheduledBadge = isScheduled ? '<span class="scheduled-badge">Scheduled</span>' : '';
-        return "\n                <tr class=\"transaction-row".concat(isScheduled ? ' scheduled-transaction' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"date-column\">\n                        <span class=\"transaction-date\">").concat(_this4.formatDate(transaction.date), "</span>").concat(scheduledBadge, "\n                    </td>\n                    <td class=\"description-column\">\n                        <div class=\"transaction-description\">\n                            <span class=\"description-main\">").concat(transaction.description || 'No description', "</span>\n                            ").concat(transaction.vendor ? "<span class=\"vendor-name\">".concat(transaction.vendor, "</span>") : '', "\n                        </div>\n                    </td>\n                    <td class=\"category-column\">\n                        <span class=\"category-name ").concat(category ? '' : 'uncategorized', "\">\n                            ").concat(category ? category.name : 'Uncategorized', "\n                        </span>\n                        <div class=\"transaction-tags-display\" data-transaction-id=\"").concat(transaction.id, "\" style=\"margin-top: 4px;\"></div>\n                    </td>\n                    <td class=\"amount-column\">\n                        <span class=\"transaction-amount ").concat(transaction.type, "\">\n                            ").concat(transaction.type === 'credit' ? '+' : '-').concat(_this4.formatCurrency(Math.abs(amount), currency), "\n                        </span>\n                    </td>\n                    <td class=\"balance-column\">\n                        <span class=\"transaction-balance ").concat(transaction.balanceAtTime >= 0 ? 'positive' : 'negative', "\">\n                            ").concat(_this4.formatCurrency(transaction.balanceAtTime, currency), "\n                        </span>\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"icon-rename edit-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Edit transaction\"></button>\n                            <button class=\"icon-delete delete-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Delete transaction\"></button>\n                        </div>\n                    </td>\n                </tr>\n            ");
+        return "\n                <tr class=\"transaction-row".concat(isScheduled ? ' scheduled-transaction' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"date-column\">\n                        <span class=\"transaction-date\">").concat(_this4.formatDate(transaction.date), "</span>").concat(scheduledBadge, "\n                    </td>\n                    <td class=\"description-column\">\n                        <div class=\"transaction-description\">\n                            <span class=\"description-main\">").concat(transaction.description || 'No description', "</span>\n                            ").concat(transaction.vendor ? "<span class=\"vendor-name\">".concat(transaction.vendor, "</span>") : '', "\n                        </div>\n                    </td>\n                    <td class=\"category-column\">\n                        <span class=\"category-name ").concat(category ? '' : 'uncategorized', "\">\n                            ").concat(category ? category.name : 'Uncategorized', "\n                        </span>\n                        <div class=\"transaction-tags-display\" data-transaction-id=\"").concat(transaction.id, "\" style=\"margin-top: 4px;\"></div>\n                    </td>\n                    <td class=\"amount-column\">\n                        <span class=\"transaction-amount ").concat(transaction.type, "\">\n                            ").concat(transaction.type === 'credit' ? '+' : '-').concat(_this4.formatCurrency(Math.abs(amount), currency), "\n                        </span>\n                    </td>\n                    <td class=\"balance-column\">\n                        ").concat(balanceMap !== null && balanceMap[transaction.id] !== undefined ? "<span class=\"transaction-balance ".concat(balanceMap[transaction.id] >= 0 ? 'positive' : 'negative', "\">").concat(_this4.formatCurrency(balanceMap[transaction.id], currency), "</span>") : '', "\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"icon-rename edit-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Edit transaction\"></button>\n                            <button class=\"icon-delete delete-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Delete transaction\"></button>\n                        </div>\n                    </td>\n                </tr>\n            ");
       }).join('');
 
       // Add event listeners for transaction actions
@@ -19416,7 +19418,7 @@ var AccountsModule = /*#__PURE__*/function () {
     key: "loadAccountMetrics",
     value: function () {
       var _loadAccountMetrics = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(accountId) {
-        var _this$currentAccount2, now, startOfMonth, endOfMonth, thisMonthTransactions, totalTransactions, thisMonthIncome, thisMonthExpenses, avgTransaction, currency;
+        var _this$currentAccount, now, startOfMonth, endOfMonth, thisMonthTransactions, totalTransactions, thisMonthIncome, thisMonthExpenses, avgTransaction, currency;
         return _regenerator().w(function (_context6) {
           while (1) switch (_context6.n) {
             case 0:
@@ -19443,7 +19445,7 @@ var AccountsModule = /*#__PURE__*/function () {
                 avgTransaction = totalTransactions > 0 ? this.accountTransactions.reduce(function (sum, t) {
                   return sum + Math.abs(parseFloat(t.amount) || 0);
                 }, 0) / totalTransactions : 0;
-                currency = ((_this$currentAccount2 = this.currentAccount) === null || _this$currentAccount2 === void 0 ? void 0 : _this$currentAccount2.currency) || this.getPrimaryCurrency(); // Update metrics display
+                currency = ((_this$currentAccount = this.currentAccount) === null || _this$currentAccount === void 0 ? void 0 : _this$currentAccount.currency) || this.getPrimaryCurrency(); // Update metrics display
                 document.getElementById('total-transactions').textContent = totalTransactions.toLocaleString();
                 document.getElementById('total-income').textContent = this.formatCurrency(thisMonthIncome, currency);
                 document.getElementById('total-expenses').textContent = this.formatCurrency(thisMonthExpenses, currency);
@@ -21262,17 +21264,17 @@ var AccountsModule = /*#__PURE__*/function () {
         return cat ? cat.name : '';
       };
       var rows = [['Date', 'Description', 'Type', 'Amount', 'Category']];
-      var _iterator2 = _createForOfIteratorHelper(this.accountTransactions),
-        _step2;
+      var _iterator3 = _createForOfIteratorHelper(this.accountTransactions),
+        _step3;
       try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var t = _step2.value;
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var t = _step3.value;
           rows.push([t.date, "\"".concat((t.description || '').replace(/"/g, '""'), "\""), t.type, t.amount, "\"".concat(getCategoryName(t.categoryId), "\"")]);
         }
       } catch (err) {
-        _iterator2.e(err);
+        _iterator3.e(err);
       } finally {
-        _iterator2.f();
+        _iterator3.f();
       }
       var csv = rows.map(function (r) {
         return r.join(',');
@@ -47706,6 +47708,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t["return"] || t["return"](); } finally { if (u) throw o; } } }; }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
@@ -48948,6 +48951,32 @@ var BudgetApp = /*#__PURE__*/function () {
       var _this4 = this;
       var tbody = document.querySelector('#transactions-table tbody');
       if (!tbody || !this.transactions) return;
+
+      // Compute running balances if backend provided balanceBeforePage
+      var balanceMap = null;
+      if (this.balanceBeforePage !== null && this.balanceBeforePage !== undefined) {
+        balanceMap = {};
+        var chronological = _toConsumableArray(this.transactions).sort(function (a, b) {
+          if (a.date < b.date) return -1;
+          if (a.date > b.date) return 1;
+          return a.id - b.id;
+        });
+        var running = parseFloat(this.balanceBeforePage);
+        var _iterator = _createForOfIteratorHelper(chronological),
+          _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var tx = _step.value;
+            var amount = parseFloat(tx.amount) || 0;
+            running += tx.type === 'credit' ? amount : -amount;
+            balanceMap[tx.id] = running;
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      }
       tbody.innerHTML = this.transactions.map(function (transaction) {
         var _this4$accounts, _this4$categories, _this4$transactionsMo;
         var account = (_this4$accounts = _this4.accounts) === null || _this4$accounts === void 0 ? void 0 : _this4$accounts.find(function (a) {
@@ -48964,7 +48993,7 @@ var BudgetApp = /*#__PURE__*/function () {
         var isSplit = transaction.isSplit || transaction.is_split;
         var splitBadge = isSplit ? "<span class=\"split-indicator\" title=\"Split transaction\">Split</span>" : '';
         var matchOption = !isLinked ? "<option value=\"match\">Match Transfer</option>" : "<option value=\"unlink\">Unlink Transfer</option>";
-        return "\n                <tr class=\"transaction-row ".concat(isLinked ? 'is-linked' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"select-column\">\n                        <input type=\"checkbox\" class=\"transaction-checkbox\"\n                               data-transaction-id=\"").concat(transaction.id, "\"\n                               ").concat((_this4$transactionsMo = _this4.transactionsModule.selectedTransactions) !== null && _this4$transactionsMo !== void 0 && _this4$transactionsMo.has(transaction.id) ? 'checked' : '', ">\n                    </td>\n                    <td class=\"date-column editable-cell\"\n                        data-field=\"date\"\n                        data-value=\"").concat(transaction.date, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this4.formatDate(transaction.date), "</span>\n                    </td>\n                    <td class=\"description-column editable-cell\"\n                        data-field=\"description\"\n                        data-value=\"").concat(_this4.escapeHtml(transaction.description), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <div class=\"transaction-description\">\n                            <span class=\"primary-text cell-display\">").concat(_this4.escapeHtml(transaction.description) || 'No description', "</span>\n                            ").concat(transaction.reference ? "<span class=\"secondary-text\">".concat(_this4.escapeHtml(transaction.reference), "</span>") : '', "\n                            ").concat(linkedBadge, "\n                            ").concat(splitBadge, "\n                        </div>\n                    </td>\n                    <td class=\"vendor-column editable-cell\"\n                        data-field=\"vendor\"\n                        data-value=\"").concat(_this4.escapeHtml(transaction.vendor || ''), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this4.escapeHtml(transaction.vendor) || '-', "</span>\n                    </td>\n                    <td class=\"category-column editable-cell\"\n                        data-field=\"categoryId\"\n                        data-value=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"category-badge cell-display ").concat(category ? 'categorized' : 'uncategorized', "\">\n                            ").concat(category ? _this4.escapeHtml(category.name) : 'Uncategorized', "\n                        </span>\n                    </td>\n                    <td class=\"tags-column editable-cell\"\n                        data-field=\"tags\"\n                        data-value=\"").concat(_this4.getTransactionTagIds(transaction.id).join(','), "\"\n                        data-category-id=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">\n                            ").concat(_this4.renderTransactionTags(transaction.id), "\n                        </span>\n                    </td>\n                    <td class=\"amount-column editable-cell\"\n                        data-field=\"amount\"\n                        data-value=\"").concat(transaction.amount, "\"\n                        data-type=\"").concat(transaction.type, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"amount cell-display ").concat(typeClass, "\">").concat(formattedAmount, "</span>\n                    </td>\n                    <td class=\"account-column editable-cell\"\n                        data-field=\"accountId\"\n                        data-value=\"").concat(transaction.accountId, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"account-name cell-display\">").concat(account ? _this4.escapeHtml(account.name) : 'Unknown Account', "</span>\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"action-btn more-actions-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"More actions\">\n                                <span aria-hidden=\"true\">&#x22EE;</span>\n                            </button>\n                            <button class=\"action-btn edit-btn transaction-edit-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Edit transaction\">\n                                <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                            </button>\n                            <button class=\"action-btn delete-btn transaction-delete-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Delete transaction\">\n                                <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                            </button>\n                        </div>\n                    </td>\n                </tr>\n            ");
+        return "\n                <tr class=\"transaction-row ".concat(isLinked ? 'is-linked' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"select-column\">\n                        <input type=\"checkbox\" class=\"transaction-checkbox\"\n                               data-transaction-id=\"").concat(transaction.id, "\"\n                               ").concat((_this4$transactionsMo = _this4.transactionsModule.selectedTransactions) !== null && _this4$transactionsMo !== void 0 && _this4$transactionsMo.has(transaction.id) ? 'checked' : '', ">\n                    </td>\n                    <td class=\"date-column editable-cell\"\n                        data-field=\"date\"\n                        data-value=\"").concat(transaction.date, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this4.formatDate(transaction.date), "</span>\n                    </td>\n                    <td class=\"description-column editable-cell\"\n                        data-field=\"description\"\n                        data-value=\"").concat(_this4.escapeHtml(transaction.description), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <div class=\"transaction-description\">\n                            <span class=\"primary-text cell-display\">").concat(_this4.escapeHtml(transaction.description) || 'No description', "</span>\n                            ").concat(transaction.reference ? "<span class=\"secondary-text\">".concat(_this4.escapeHtml(transaction.reference), "</span>") : '', "\n                            ").concat(linkedBadge, "\n                            ").concat(splitBadge, "\n                        </div>\n                    </td>\n                    <td class=\"vendor-column editable-cell\"\n                        data-field=\"vendor\"\n                        data-value=\"").concat(_this4.escapeHtml(transaction.vendor || ''), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this4.escapeHtml(transaction.vendor) || '-', "</span>\n                    </td>\n                    <td class=\"category-column editable-cell\"\n                        data-field=\"categoryId\"\n                        data-value=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"category-badge cell-display ").concat(category ? 'categorized' : 'uncategorized', "\">\n                            ").concat(category ? _this4.escapeHtml(category.name) : 'Uncategorized', "\n                        </span>\n                    </td>\n                    <td class=\"tags-column editable-cell\"\n                        data-field=\"tags\"\n                        data-value=\"").concat(_this4.getTransactionTagIds(transaction.id).join(','), "\"\n                        data-category-id=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">\n                            ").concat(_this4.renderTransactionTags(transaction.id), "\n                        </span>\n                    </td>\n                    <td class=\"amount-column editable-cell\"\n                        data-field=\"amount\"\n                        data-value=\"").concat(transaction.amount, "\"\n                        data-type=\"").concat(transaction.type, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"amount cell-display ").concat(typeClass, "\">").concat(formattedAmount, "</span>\n                    </td>\n                    <td class=\"balance-column\">\n                        ").concat(balanceMap !== null && balanceMap[transaction.id] !== undefined ? "<span class=\"transaction-balance ".concat(balanceMap[transaction.id] >= 0 ? 'positive' : 'negative', "\">").concat(_this4.formatCurrency(balanceMap[transaction.id], currency), "</span>") : '', "\n                    </td>\n                    <td class=\"account-column editable-cell\"\n                        data-field=\"accountId\"\n                        data-value=\"").concat(transaction.accountId, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"account-name cell-display\">").concat(account ? _this4.escapeHtml(account.name) : 'Unknown Account', "</span>\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"action-btn more-actions-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"More actions\">\n                                <span aria-hidden=\"true\">&#x22EE;</span>\n                            </button>\n                            <button class=\"action-btn edit-btn transaction-edit-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Edit transaction\">\n                                <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                            </button>\n                            <button class=\"action-btn delete-btn transaction-delete-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Delete transaction\">\n                                <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                            </button>\n                        </div>\n                    </td>\n                </tr>\n            ");
       }).join('');
     }
 
@@ -49265,6 +49294,7 @@ var BudgetApp = /*#__PURE__*/function () {
           _this$transactionFilt8,
           _this$transactionFilt9,
           _this$transactionFilt0,
+          _result$balanceBefore,
           url,
           params,
           response,
@@ -49355,6 +49385,7 @@ var BudgetApp = /*#__PURE__*/function () {
             case 4:
               result = _context28.v;
               this.transactions = Array.isArray(result) ? result : result.transactions || result;
+              this.balanceBeforePage = (_result$balanceBefore = result.balanceBeforePage) !== null && _result$balanceBefore !== void 0 ? _result$balanceBefore : null;
 
               // Load tags for all displayed transactions
               _context28.n = 5;
@@ -52246,6 +52277,7 @@ var BudgetApp = /*#__PURE__*/function () {
         vendor: true,
         category: true,
         amount: true,
+        balance: true,
         account: true
       };
       if (!settingValue) return defaults;
@@ -52261,6 +52293,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "applyColumnVisibility",
     value: function applyColumnVisibility() {
+      var _this21 = this;
       var table = document.getElementById('transactions-table');
       if (!table) return;
       var columnMap = {
@@ -52269,6 +52302,7 @@ var BudgetApp = /*#__PURE__*/function () {
         vendor: 'vendor-column',
         category: 'category-column',
         amount: 'amount-column',
+        balance: 'balance-column',
         account: 'account-column'
       };
       Object.entries(this.columnVisibility).forEach(function (_ref6) {
@@ -52278,10 +52312,16 @@ var BudgetApp = /*#__PURE__*/function () {
         var className = columnMap[key];
         if (!className) return;
 
+        // Balance column auto-hides when data isn't available
+        var isVisible = visible;
+        if (key === 'balance' && (_this21.balanceBeforePage === null || _this21.balanceBeforePage === undefined)) {
+          isVisible = false;
+        }
+
         // Apply to all cells with this class (header and body)
         var cells = table.querySelectorAll("th.".concat(className, ", td.").concat(className));
         cells.forEach(function (cell) {
-          cell.style.display = visible ? '' : 'none';
+          cell.style.display = isVisible ? '' : 'none';
         });
       });
     }
@@ -52562,12 +52602,12 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "flattenCategories",
     value: function flattenCategories(categories) {
-      var _this21 = this;
+      var _this22 = this;
       var result = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       categories.forEach(function (cat) {
         result.push(cat);
         if (cat.children && cat.children.length > 0) {
-          _this21.flattenCategories(cat.children, result);
+          _this22.flattenCategories(cat.children, result);
         }
       });
       return result;
@@ -52575,7 +52615,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "populateCurrencyDropdowns",
     value: function populateCurrencyDropdowns() {
-      var _this22 = this;
+      var _this23 = this;
       // Populate all currency dropdowns with options from backend
       if (!this.options.currencies || !Array.isArray(this.options.currencies)) {
         return;
@@ -52589,7 +52629,7 @@ var BudgetApp = /*#__PURE__*/function () {
         select.innerHTML = '';
 
         // Add all currency options
-        _this22.options.currencies.forEach(function (currency) {
+        _this23.options.currencies.forEach(function (currency) {
           var option = document.createElement('option');
           option.value = currency.code;
           option.textContent = "".concat(currency.code, " - ").concat(currency.name, " (").concat(currency.symbol, ")");

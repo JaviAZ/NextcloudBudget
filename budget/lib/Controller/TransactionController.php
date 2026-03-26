@@ -86,12 +86,18 @@ class TransactionController extends Controller {
 
             $result = $this->service->findWithFilters($this->userId, $filters, $limit, $offset);
 
-            return new DataResponse([
+            $responseData = [
                 'transactions' => $result['transactions'],
                 'total' => $result['total'],
                 'page' => $page,
                 'totalPages' => ceil($result['total'] / $limit)
-            ]);
+            ];
+
+            if (isset($result['balanceBeforePage'])) {
+                $responseData['balanceBeforePage'] = $result['balanceBeforePage'];
+            }
+
+            return new DataResponse($responseData);
         } catch (\Exception $e) {
             return $this->handleError($e, 'Failed to retrieve transactions');
         }

@@ -1397,6 +1397,10 @@ style('budget', 'budget-main');
                                         <span>Amount</span>
                                     </label>
                                     <label>
+                                        <input type="checkbox" id="col-toggle-balance" checked>
+                                        <span>Balance</span>
+                                    </label>
+                                    <label>
                                         <input type="checkbox" id="col-toggle-account" checked>
                                         <span>Account</span>
                                     </label>
@@ -1446,6 +1450,7 @@ style('budget', 'budget-main');
                                 Amount
                                 <span class="sort-indicator" aria-hidden="true"></span>
                             </th>
+                            <th class="balance-column">Balance</th>
                             <th class="sortable account-column" data-sort="account">
                                 Account
                                 <span class="sort-indicator" aria-hidden="true"></span>
