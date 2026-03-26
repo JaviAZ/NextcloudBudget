@@ -148,7 +148,7 @@ class PensionController extends Controller {
                 return new DataResponse(['error' => 'Monthly contribution cannot be negative'], Http::STATUS_BAD_REQUEST);
             }
             if ($expectedReturnRate !== null && ($expectedReturnRate < 0 || $expectedReturnRate > 1)) {
-                return new DataResponse(['error' => 'Expected return rate must be between 0 and 1'], Http::STATUS_BAD_REQUEST);
+                return new DataResponse(['error' => 'Expected return rate must be between 0% and 100%'], Http::STATUS_BAD_REQUEST);
             }
             if ($retirementAge !== null && ($retirementAge < 18 || $retirementAge > 100)) {
                 return new DataResponse(['error' => 'Retirement age must be between 18 and 100'], Http::STATUS_BAD_REQUEST);
@@ -242,7 +242,7 @@ class PensionController extends Controller {
                 return new DataResponse(['error' => 'Monthly contribution cannot be negative'], Http::STATUS_BAD_REQUEST);
             }
             if ($expectedReturnRate !== null && ($expectedReturnRate < 0 || $expectedReturnRate > 1)) {
-                return new DataResponse(['error' => 'Expected return rate must be between 0 and 1'], Http::STATUS_BAD_REQUEST);
+                return new DataResponse(['error' => 'Expected return rate must be between 0% and 100%'], Http::STATUS_BAD_REQUEST);
             }
             if ($retirementAge !== null && ($retirementAge < 18 || $retirementAge > 100)) {
                 return new DataResponse(['error' => 'Retirement age must be between 18 and 100'], Http::STATUS_BAD_REQUEST);

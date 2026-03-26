@@ -231,7 +231,7 @@ class PensionControllerTest extends TestCase {
 		$response = $this->controller->create();
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertStringContainsString('between 0 and 1', $response->getData()['error']);
+		$this->assertStringContainsString('between 0% and 100%', $response->getData()['error']);
 	}
 
 	public function testCreateInvalidRetirementAge(): void {

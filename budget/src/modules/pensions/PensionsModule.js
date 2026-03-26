@@ -325,7 +325,7 @@ export default class PensionsModule {
             if (pension.isDefinedContribution) {
                 document.getElementById('pension-balance').value = pension.currentBalance || '';
                 document.getElementById('pension-monthly').value = pension.monthlyContribution || '';
-                document.getElementById('pension-return').value = pension.expectedReturnRate || '';
+                document.getElementById('pension-return').value = pension.expectedReturnRate ? (pension.expectedReturnRate * 100) : '';
                 document.getElementById('pension-retirement-age').value = pension.retirementAge || '';
             } else {
                 document.getElementById('pension-income').value = pension.annualIncome || '';
@@ -367,7 +367,7 @@ export default class PensionsModule {
         if (isDefinedContribution) {
             data.currentBalance = formData.get('currentBalance') ? parseFloat(formData.get('currentBalance')) : null;
             data.monthlyContribution = formData.get('monthlyContribution') ? parseFloat(formData.get('monthlyContribution')) : null;
-            data.expectedReturnRate = formData.get('expectedReturnRate') ? parseFloat(formData.get('expectedReturnRate')) : null;
+            data.expectedReturnRate = formData.get('expectedReturnRate') ? parseFloat(formData.get('expectedReturnRate')) / 100 : null;
             data.retirementAge = formData.get('retirementAge') ? parseInt(formData.get('retirementAge'), 10) : null;
         } else {
             data.annualIncome = formData.get('annualIncome') ? parseFloat(formData.get('annualIncome')) : null;
