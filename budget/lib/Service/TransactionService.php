@@ -243,6 +243,22 @@ class TransactionService {
     }
 
     /**
+     * Find a scheduled transaction for a bill and mark it as cleared.
+     *
+     * @return Transaction|null The cleared transaction, or null if none found
+     */
+    public function clearScheduledBillTransaction(string $userId, int $billId, string $clearedDate): ?Transaction {
+        $scheduled = $this->mapper->findScheduledByBillId($billId);
+        if ($scheduled) {
+            return $this->update($scheduled->getId(), $userId, [
+                'status' => 'cleared',
+                'date' => $clearedDate,
+            ]);
+        }
+        return null;
+    }
+
+    /**
      * Apply tag IDs to a transaction (used when creating transactions from bills).
      * @param int $transactionId
      * @param int[] $tagIds

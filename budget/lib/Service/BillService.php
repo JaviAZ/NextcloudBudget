@@ -268,13 +268,20 @@ class BillService {
         $paidDate = $paidDate ?? $bill->getNextDueDate() ?? date('Y-m-d');
         $bill->setLastPaidDate($paidDate);
 
-        // Create a cleared transaction for the current payment for one-time bills
-        // (Recurring bills already have a pre-scheduled transaction for the current period)
-        if ($bill->getFrequency() === 'one-time' && $createNextTransaction && $bill->getAccountId() !== null) {
+        // Create a cleared transaction for the current payment
+        if ($createNextTransaction && $bill->getAccountId() !== null) {
             try {
-                $this->transactionService->createFromBill($userId, $bill, date('Y-m-d'), 'cleared');
+                if ($bill->getFrequency() === 'one-time') {
+                    $this->transactionService->createFromBill($userId, $bill, date('Y-m-d'), 'cleared');
+                } else {
+                    // Recurring: clear pre-existing scheduled transaction, or create new cleared one
+                    $cleared = $this->transactionService->clearScheduledBillTransaction($userId, $bill->getId(), $paidDate);
+                    if (!$cleared) {
+                        $this->transactionService->createFromBill($userId, $bill, $paidDate, 'cleared');
+                    }
+                }
             } catch (\Exception $e) {
-                error_log("Failed to create transaction for one-time bill {$id}: {$e->getMessage()}");
+                error_log("Failed to create transaction for bill {$id}: {$e->getMessage()}");
             }
         }
 

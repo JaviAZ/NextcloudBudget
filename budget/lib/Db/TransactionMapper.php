@@ -730,6 +730,22 @@ class TransactionMapper extends QBMapper {
      * @param string $afterDate Transactions strictly after this date are summed
      * @return float Net effect (credits positive, debits negative)
      */
+    public function findScheduledByBillId(int $billId): ?Transaction {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->eq('bill_id', $qb->createNamedParameter($billId, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->eq('status', $qb->createNamedParameter('scheduled')))
+            ->orderBy('date', 'ASC')
+            ->setMaxResults(1);
+
+        try {
+            return $this->findEntity($qb);
+        } catch (DoesNotExistException $e) {
+            return null;
+        }
+    }
+
     public function getNetChangeAfterDate(int $accountId, string $afterDate): float {
         $qb = $this->db->getQueryBuilder();
 
