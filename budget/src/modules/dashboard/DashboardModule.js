@@ -235,6 +235,13 @@ export default class DashboardModule {
             this.populateAccountSelector('trend-account-select');
             this.populateAccountSelector('hero-account-income-select');
             this.populateAccountSelector('hero-account-expenses-select');
+            this.populateAccountSelector('spending-account-select');
+            this.populateAccountSelector('net-worth-account-select');
+            this.populateAccountSelector('recent-transactions-account-select');
+
+            // Refresh widgets that have a saved account selection
+            // (initial load fetched "All Accounts" data, so we need targeted refreshes)
+            await this.refreshSavedWidgetSelections();
 
             // Apply dashboard widget order (must be before visibility)
             this.applyDashboardOrder();
@@ -396,10 +403,45 @@ export default class DashboardModule {
             select.appendChild(option);
         });
 
-        // Restore saved selection
-        const savedValue = this.dashboardConfig.hero?.settings?.[selectId];
+        // Restore saved selection (check hero settings first, then widget settings)
+        const savedValue = this.dashboardConfig.hero?.settings?.[selectId]
+            ?? this.dashboardConfig.widgets?.settings?.[selectId];
         if (savedValue && select.querySelector(`option[value="${savedValue}"]`)) {
             select.value = savedValue;
+        }
+    }
+
+    async refreshSavedWidgetSelections() {
+        const refreshes = [];
+
+        const trendAcct = document.getElementById('trend-account-select');
+        if (trendAcct?.value) {
+            const periodEl = document.getElementById('trend-period-select');
+            const months = periodEl ? parseInt(periodEl.value) : 6;
+            refreshes.push(this.refreshTrendChart(months, trendAcct.value));
+        }
+
+        const spendingAcct = document.getElementById('spending-account-select');
+        if (spendingAcct?.value) {
+            const periodEl = document.getElementById('spending-period-select');
+            const period = periodEl ? periodEl.value : 'month';
+            refreshes.push(this.refreshSpendingChart(period, spendingAcct.value));
+        }
+
+        const netWorthAcct = document.getElementById('net-worth-account-select');
+        if (netWorthAcct?.value) {
+            const activeBtn = document.querySelector('#net-worth-period-selector .period-btn.active');
+            const days = activeBtn ? parseInt(activeBtn.dataset.days) : 30;
+            refreshes.push(this.refreshNetWorthChart(days, netWorthAcct.value));
+        }
+
+        const recentTxAcct = document.getElementById('recent-transactions-account-select');
+        if (recentTxAcct?.value) {
+            refreshes.push(this.refreshRecentTransactions(recentTxAcct.value));
+        }
+
+        if (refreshes.length > 0) {
+            await Promise.all(refreshes);
         }
     }
 
@@ -444,6 +486,14 @@ export default class DashboardModule {
             this.dashboardConfig.hero.settings = {};
         }
         this.dashboardConfig.hero.settings[selectId] = accountId;
+        await this.saveDashboardVisibility();
+    }
+
+    async saveWidgetAccountSelection(selectId, accountId) {
+        if (!this.dashboardConfig.widgets.settings) {
+            this.dashboardConfig.widgets.settings = {};
+        }
+        this.dashboardConfig.widgets.settings[selectId] = accountId;
         await this.saveDashboardVisibility();
     }
 
@@ -1302,7 +1352,7 @@ export default class DashboardModule {
         });
     }
 
-    updateNetWorthHistoryChart(snapshots) {
+    updateNetWorthHistoryChart(data, accountId = null) {
         const canvas = document.getElementById('net-worth-chart');
         const emptyState = document.getElementById('net-worth-chart-empty');
         const statusEl = document.getElementById('net-worth-snapshot-status');
@@ -1314,7 +1364,7 @@ export default class DashboardModule {
         }
 
         // Handle empty state
-        if (!snapshots || snapshots.length === 0) {
+        if (!data || data.length === 0) {
             canvas.style.display = 'none';
             if (emptyState) emptyState.style.display = 'block';
             if (statusEl) statusEl.style.display = 'none';
@@ -1325,49 +1375,59 @@ export default class DashboardModule {
         canvas.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
 
-        // Update status with last automatic snapshot info
-        this.updateNetWorthStatus(snapshots, statusEl);
-
         const currency = this.getPrimaryCurrency();
-        const labels = snapshots.map(s => s.date);
-        const netWorthData = snapshots.map(s => s.netWorth);
-        const assetsData = snapshots.map(s => s.totalAssets);
-        const liabilitiesData = snapshots.map(s => s.totalLiabilities);
+        const labels = data.map(s => s.date);
+
+        let datasets;
+        if (accountId) {
+            // Single account: balance-history format { date, balance }
+            if (statusEl) statusEl.style.display = 'none';
+            datasets = [{
+                label: 'Balance',
+                data: data.map(s => s.balance),
+                borderColor: '#0082c9',
+                backgroundColor: 'rgba(0, 130, 201, 0.1)',
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2
+            }];
+        } else {
+            // All accounts: snapshot format { date, netWorth, totalAssets, totalLiabilities, source }
+            this.updateNetWorthStatus(data, statusEl);
+            datasets = [
+                {
+                    label: 'Net Worth',
+                    data: data.map(s => s.netWorth),
+                    borderColor: '#46ba61',
+                    backgroundColor: 'rgba(70, 186, 97, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Assets',
+                    data: data.map(s => s.totalAssets),
+                    borderColor: '#0082c9',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 1.5
+                },
+                {
+                    label: 'Liabilities',
+                    data: data.map(s => s.totalLiabilities),
+                    borderColor: '#e9322d',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 1.5
+                }
+            ];
+        }
 
         this.charts.netWorth = new Chart(canvas, {
             type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: 'Net Worth',
-                        data: netWorthData,
-                        borderColor: '#46ba61',
-                        backgroundColor: 'rgba(70, 186, 97, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        borderWidth: 2
-                    },
-                    {
-                        label: 'Assets',
-                        data: assetsData,
-                        borderColor: '#0082c9',
-                        borderDash: [5, 5],
-                        fill: false,
-                        tension: 0.3,
-                        borderWidth: 1.5
-                    },
-                    {
-                        label: 'Liabilities',
-                        data: liabilitiesData,
-                        borderColor: '#e9322d',
-                        borderDash: [5, 5],
-                        fill: false,
-                        tension: 0.3,
-                        borderWidth: 1.5
-                    }
-                ]
-            },
+            data: { labels, datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -1475,6 +1535,7 @@ export default class DashboardModule {
                 const months = periodSelect ? parseInt(periodSelect.value) : 6;
                 const accountId = trendAccountSelect.value || null;
                 await this.refreshTrendChart(months, accountId);
+                await this.saveWidgetAccountSelection('trend-account-select', trendAccountSelect.value);
             });
         }
 
@@ -1490,13 +1551,41 @@ export default class DashboardModule {
             });
         }
 
+        // Spending account selector
+        const spendingAccountSelect = document.getElementById('spending-account-select');
+        if (spendingAccountSelect && !spendingAccountSelect.hasAttribute('data-initialized')) {
+            spendingAccountSelect.setAttribute('data-initialized', 'true');
+            spendingAccountSelect.addEventListener('change', async () => {
+                const periodSelect = document.getElementById('spending-period-select');
+                const period = periodSelect ? periodSelect.value : 'month';
+                const accountId = spendingAccountSelect.value || null;
+                await this.refreshSpendingChart(period, accountId);
+                await this.saveWidgetAccountSelection('spending-account-select', spendingAccountSelect.value);
+            });
+        }
+
         // Spending period selector
         const spendingPeriodSelect = document.getElementById('spending-period-select');
         if (spendingPeriodSelect && !spendingPeriodSelect.hasAttribute('data-initialized')) {
             spendingPeriodSelect.setAttribute('data-initialized', 'true');
             spendingPeriodSelect.addEventListener('change', async (e) => {
                 const period = e.target.value;
-                await this.refreshSpendingChart(period);
+                const accountSelect = document.getElementById('spending-account-select');
+                const accountId = accountSelect ? (accountSelect.value || null) : null;
+                await this.refreshSpendingChart(period, accountId);
+            });
+        }
+
+        // Net Worth account selector
+        const netWorthAccountSelect = document.getElementById('net-worth-account-select');
+        if (netWorthAccountSelect && !netWorthAccountSelect.hasAttribute('data-initialized')) {
+            netWorthAccountSelect.setAttribute('data-initialized', 'true');
+            netWorthAccountSelect.addEventListener('change', async () => {
+                const activeBtn = document.querySelector('#net-worth-period-selector .period-btn.active');
+                const days = activeBtn ? parseInt(activeBtn.dataset.days) : 30;
+                const accountId = netWorthAccountSelect.value || null;
+                await this.refreshNetWorthChart(days, accountId);
+                await this.saveWidgetAccountSelection('net-worth-account-select', netWorthAccountSelect.value);
             });
         }
 
@@ -1509,9 +1598,11 @@ export default class DashboardModule {
                     // Update active button
                     netWorthPeriodSelector.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
-                    // Refresh chart with new period
+                    // Refresh chart with new period, respecting account filter
                     const days = parseInt(e.target.dataset.days);
-                    await this.refreshNetWorthChart(days);
+                    const accountSelect = document.getElementById('net-worth-account-select');
+                    const accountId = accountSelect ? (accountSelect.value || null) : null;
+                    await this.refreshNetWorthChart(days, accountId);
                 }
             });
         }
@@ -1522,6 +1613,17 @@ export default class DashboardModule {
             recordNetWorthBtn.setAttribute('data-initialized', 'true');
             recordNetWorthBtn.addEventListener('click', async () => {
                 await this.recordNetWorthSnapshot();
+            });
+        }
+
+        // Recent Transactions account selector
+        const recentTxAccountSelect = document.getElementById('recent-transactions-account-select');
+        if (recentTxAccountSelect && !recentTxAccountSelect.hasAttribute('data-initialized')) {
+            recentTxAccountSelect.setAttribute('data-initialized', 'true');
+            recentTxAccountSelect.addEventListener('change', async () => {
+                const accountId = recentTxAccountSelect.value || null;
+                await this.refreshRecentTransactions(accountId);
+                await this.saveWidgetAccountSelection('recent-transactions-account-select', recentTxAccountSelect.value);
             });
         }
 
@@ -1566,7 +1668,7 @@ export default class DashboardModule {
         }
     }
 
-    async refreshSpendingChart(period) {
+    async refreshSpendingChart(period, accountId = null) {
         try {
             let startDate = new Date();
             const endDate = new Date();
@@ -1583,8 +1685,13 @@ export default class DashboardModule {
                     break;
             }
 
+            let url = `/apps/budget/api/reports/spending?startDate=${formatters.formatDateForAPI(startDate)}&endDate=${formatters.formatDateForAPI(endDate)}`;
+            if (accountId) {
+                url += `&accountId=${accountId}`;
+            }
+
             const response = await fetch(
-                OC.generateUrl(`/apps/budget/api/reports/spending?startDate=${formatters.formatDateForAPI(startDate)}&endDate=${formatters.formatDateForAPI(endDate)}`),
+                OC.generateUrl(url),
                 { headers: { 'requesttoken': OC.requestToken } }
             );
             const data = await response.json();
@@ -1597,17 +1704,47 @@ export default class DashboardModule {
         }
     }
 
-    async refreshNetWorthChart(days) {
+    async refreshNetWorthChart(days, accountId = null) {
         try {
-            const response = await fetch(
-                OC.generateUrl(`/apps/budget/api/net-worth/snapshots?days=${days}`),
-                { headers: { 'requesttoken': OC.requestToken } }
-            );
-            if (!response.ok) throw new Error('Failed to fetch net worth snapshots');
-            const snapshots = await response.json();
-            this.updateNetWorthHistoryChart(snapshots);
+            if (accountId) {
+                // Single account: use balance-history endpoint
+                const response = await fetch(
+                    OC.generateUrl(`/apps/budget/api/accounts/${accountId}/balance-history?days=${days}`),
+                    { headers: { 'requesttoken': OC.requestToken } }
+                );
+                if (!response.ok) throw new Error('Failed to fetch balance history');
+                const history = await response.json();
+                this.updateNetWorthHistoryChart(history, accountId);
+            } else {
+                // All accounts: aggregate net worth snapshots
+                const response = await fetch(
+                    OC.generateUrl(`/apps/budget/api/net-worth/snapshots?days=${days}`),
+                    { headers: { 'requesttoken': OC.requestToken } }
+                );
+                if (!response.ok) throw new Error('Failed to fetch net worth snapshots');
+                const snapshots = await response.json();
+                this.updateNetWorthHistoryChart(snapshots, null);
+            }
         } catch (error) {
             console.error('Failed to refresh net worth chart:', error);
+        }
+    }
+
+    async refreshRecentTransactions(accountId = null) {
+        try {
+            let url = '/apps/budget/api/transactions?limit=8';
+            if (accountId) {
+                url += `&accountId=${accountId}`;
+            }
+            const response = await fetch(
+                OC.generateUrl(url),
+                { headers: { 'requesttoken': OC.requestToken } }
+            );
+            if (!response.ok) throw new Error('Failed to fetch recent transactions');
+            const transactions = await response.json();
+            this.updateRecentTransactions(transactions);
+        } catch (error) {
+            console.error('Failed to refresh recent transactions:', error);
         }
     }
 

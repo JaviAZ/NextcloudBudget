@@ -524,6 +524,9 @@ style('budget', 'budget-main');
                         <div class="card-header">
                             <h3>Spending by Category</h3>
                             <div class="card-header-controls">
+                                <select id="spending-account-select" class="card-select">
+                                    <option value="">All Accounts</option>
+                                </select>
                                 <select id="spending-period-select" class="card-select">
                                     <option value="month">This Month</option>
                                     <option value="3months">Last 3 Months</option>
@@ -543,7 +546,10 @@ style('budget', 'budget-main');
                     <div id="net-worth-history-card" class="dashboard-card" data-widget-id="netWorthHistory" data-widget-category="widget">
                         <div class="card-header">
                             <h3>Net Worth History</h3>
-                            <div class="card-controls">
+                            <div class="card-header-controls">
+                                <select id="net-worth-account-select" class="card-select">
+                                    <option value="">All Accounts</option>
+                                </select>
                                 <div class="period-selector" id="net-worth-period-selector">
                                     <button class="period-btn active" data-days="30">30D</button>
                                     <button class="period-btn" data-days="90">90D</button>
@@ -568,7 +574,12 @@ style('budget', 'budget-main');
                     <div id="recent-transactions-card" class="dashboard-card" data-widget-id="recentTransactions" data-widget-category="widget">
                         <div class="card-header">
                             <h3>Recent Transactions</h3>
-                            <a href="#transactions" class="card-link">View All</a>
+                            <div class="card-header-controls">
+                                <select id="recent-transactions-account-select" class="card-select">
+                                    <option value="">All Accounts</option>
+                                </select>
+                                <a href="#transactions" class="card-link">View All</a>
+                            </div>
                         </div>
                         <div id="recent-transactions" class="recent-transactions-list"></div>
                     </div>
