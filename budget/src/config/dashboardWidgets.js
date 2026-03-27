@@ -32,6 +32,7 @@ export const DASHBOARD_WIDGETS = {
         trendChart: { id: 'trend-chart-card', name: 'Income vs Expenses', size: 'large', defaultVisible: true },
         spendingChart: { id: 'spending-chart-card', name: 'Spending by Category', size: 'medium', defaultVisible: true },
         netWorthHistory: { id: 'net-worth-history-card', name: 'Net Worth History', size: 'medium', defaultVisible: true },
+        assetValueHistory: { id: 'asset-value-history-card', name: 'Asset Value History', size: 'medium', defaultVisible: true },
         recentTransactions: { id: 'recent-transactions-card', name: 'Recent Transactions', size: 'medium', defaultVisible: true },
         accounts: { id: 'accounts-card', name: 'Accounts', size: 'small', defaultVisible: true },
         budgetAlerts: { id: 'budget-alerts-card', name: 'Budget Alerts', size: 'small', defaultVisible: true },

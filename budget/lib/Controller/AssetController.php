@@ -381,4 +381,24 @@ class AssetController extends Controller {
 			return $this->handleError($e, 'Failed to retrieve combined asset projection');
 		}
 	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function valueHistory(?int $days = null): DataResponse {
+		try {
+			$days = $days ?? 30;
+			if ($days < 1) {
+				$days = 1;
+			}
+			if ($days > 365) {
+				$days = 365;
+			}
+
+			$result = $this->service->getValueHistory($this->getUserId(), $days);
+			return new DataResponse($result);
+		} catch (\Exception $e) {
+			return $this->handleError($e, 'Failed to retrieve asset value history');
+		}
+	}
 }

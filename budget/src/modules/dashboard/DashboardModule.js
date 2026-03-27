@@ -115,7 +115,7 @@ export default class DashboardModule {
             const cacheBuster = Date.now();
 
             // Load all dashboard data in parallel for better performance
-            const [summaryResponse, trendResponse, transResponse, billsResponse, budgetResponse, goalsResponse, pensionResponse, assetResponse, netWorthResponse, alertsResponse, debtResponse] = await Promise.all([
+            const [summaryResponse, trendResponse, transResponse, billsResponse, budgetResponse, goalsResponse, pensionResponse, assetResponse, netWorthResponse, alertsResponse, debtResponse, assetHistoryResponse] = await Promise.all([
                 // Current month summary for hero stats
                 fetch(OC.generateUrl(`/apps/budget/api/reports/summary?startDate=${startOfMonth}&endDate=${endOfMonth}&_=${cacheBuster}`), {
                     headers: { 'requesttoken': OC.requestToken }
@@ -150,6 +150,9 @@ export default class DashboardModule {
                 }).catch(() => ({ ok: false })),
                 fetch(OC.generateUrl('/apps/budget/api/debts/summary'), {
                     headers: { 'requesttoken': OC.requestToken }
+                }).catch(() => ({ ok: false })),
+                fetch(OC.generateUrl('/apps/budget/api/assets/value-history?days=30'), {
+                    headers: { 'requesttoken': OC.requestToken }
                 }).catch(() => ({ ok: false }))
             ]);
 
@@ -165,6 +168,7 @@ export default class DashboardModule {
             const netWorthSnapshots = netWorthResponse.ok ? await netWorthResponse.json() : [];
             const budgetAlerts = alertsResponse.ok ? await alertsResponse.json() : [];
             const debtSummary = debtResponse.ok ? await debtResponse.json() : null;
+            const assetValueHistory = assetHistoryResponse.ok ? await assetHistoryResponse.json() : null;
 
             // Update Hero Section (current month data)
             this.updateDashboardHero(summary);
@@ -191,7 +195,7 @@ export default class DashboardModule {
             this.updatePensionsSummary(pensionSummary);
 
             // Update Assets Dashboard Card
-            this.updateAssetsSummary(assetSummary);
+            this.updateAssetsSummary(assetSummary, assetValueHistory);
 
             // Update Debt Payoff Dashboard Card
             this.updateDebtPayoffWidget(debtSummary);
@@ -227,6 +231,11 @@ export default class DashboardModule {
 
             // Update Net Worth History Chart
             this.updateNetWorthHistoryChart(netWorthSnapshots);
+
+            // Update Asset Value History Chart
+            if (assetValueHistory) {
+                this.updateAssetValueHistoryChart(assetValueHistory);
+            }
 
             // Setup dashboard controls
             this.setupDashboardControls();
@@ -925,7 +934,7 @@ export default class DashboardModule {
         }
     }
 
-    updateAssetsSummary(summary) {
+    updateAssetsSummary(summary, valueHistory = null) {
         const currency = summary.baseCurrency || this.getPrimaryCurrency();
         const assetWorth = summary.totalAssetWorth || 0;
         const count = summary.assetCount || 0;
@@ -943,12 +952,26 @@ export default class DashboardModule {
         // Update dashboard hero card
         const heroAssetsValue = document.getElementById('hero-assets-value');
         const heroAssetsCount = document.getElementById('hero-assets-count');
+        const heroAssetsChange = document.getElementById('hero-assets-change');
 
         if (heroAssetsValue) {
             heroAssetsValue.textContent = this.formatCurrency(assetWorth, currency);
         }
         if (heroAssetsCount) {
             heroAssetsCount.textContent = count === 1 ? '1 asset' : `${count} assets`;
+        }
+
+        // Show 30-day change indicator
+        if (heroAssetsChange && valueHistory?.change) {
+            const { amount, percentage } = valueHistory.change;
+            if (amount !== 0) {
+                const arrow = amount >= 0 ? '\u2191' : '\u2193';
+                const absAmount = this.formatCurrency(Math.abs(amount), currency);
+                heroAssetsChange.textContent = `${arrow} ${absAmount} (${Math.abs(percentage).toFixed(1)}%) vs 30d ago`;
+                heroAssetsChange.className = `hero-change ${amount >= 0 ? 'positive' : 'negative'}`;
+            } else {
+                heroAssetsChange.textContent = '';
+            }
         }
     }
 
@@ -1468,6 +1491,95 @@ export default class DashboardModule {
         });
     }
 
+    updateAssetValueHistoryChart(data) {
+        const canvas = document.getElementById('asset-value-history-chart');
+        const emptyState = document.getElementById('asset-value-chart-empty');
+        if (!canvas) return;
+
+        // Destroy existing chart
+        if (this.charts.assetValueHistory) {
+            this.charts.assetValueHistory.destroy();
+        }
+
+        const history = data?.history || [];
+
+        // Handle empty state
+        if (history.length === 0) {
+            canvas.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+
+        canvas.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+
+        const currency = data.baseCurrency || this.getPrimaryCurrency();
+        const labels = history.map(p => p.date);
+        const values = history.map(p => p.totalValue);
+
+        this.charts.assetValueHistory = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Asset Value',
+                    data: values,
+                    borderColor: '#ff9800',
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                return `Portfolio: ${this.formatCurrency(context.raw, currency)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => this.formatCurrency(value, currency)
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 8
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async refreshAssetValueChart(days) {
+        try {
+            const response = await fetch(
+                OC.generateUrl(`/apps/budget/api/assets/value-history?days=${days}`),
+                { headers: { 'requesttoken': OC.requestToken } }
+            );
+            if (!response.ok) throw new Error('Failed to fetch asset value history');
+            const data = await response.json();
+            this.updateAssetValueHistoryChart(data);
+        } catch (error) {
+            console.error('Failed to refresh asset value chart:', error);
+        }
+    }
+
     updateNetWorthStatus(snapshots, statusEl) {
         if (!statusEl) return;
 
@@ -1603,6 +1715,20 @@ export default class DashboardModule {
                     const accountSelect = document.getElementById('net-worth-account-select');
                     const accountId = accountSelect ? (accountSelect.value || null) : null;
                     await this.refreshNetWorthChart(days, accountId);
+                }
+            });
+        }
+
+        // Asset Value period selector
+        const assetValuePeriodSelector = document.getElementById('asset-value-period-selector');
+        if (assetValuePeriodSelector && !assetValuePeriodSelector.hasAttribute('data-initialized')) {
+            assetValuePeriodSelector.setAttribute('data-initialized', 'true');
+            assetValuePeriodSelector.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('period-btn')) {
+                    assetValuePeriodSelector.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    const days = parseInt(e.target.dataset.days);
+                    await this.refreshAssetValueChart(days);
                 }
             });
         }

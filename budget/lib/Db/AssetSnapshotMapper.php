@@ -82,6 +82,44 @@ class AssetSnapshotMapper extends QBMapper {
 	}
 
 	/**
+	 * Get all snapshots for all assets belonging to a user within a date range.
+	 * Ordered by date ASC, then asset_id ASC.
+	 *
+	 * @return AssetSnapshot[]
+	 */
+	public function findAllByUserInRange(string $userId, string $startDate, string $endDate): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+			->andWhere($qb->expr()->gte('date', $qb->createNamedParameter($startDate)))
+			->andWhere($qb->expr()->lte('date', $qb->createNamedParameter($endDate)))
+			->orderBy('date', 'ASC')
+			->addOrderBy('asset_id', 'ASC');
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Get snapshots before a given date for all assets of a user.
+	 * Ordered by asset_id ASC, date DESC so caller can deduplicate
+	 * to get the latest snapshot per asset before the date.
+	 *
+	 * @return AssetSnapshot[]
+	 */
+	public function findLatestBeforeDate(string $userId, string $startDate): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+			->andWhere($qb->expr()->lt('date', $qb->createNamedParameter($startDate)))
+			->orderBy('asset_id', 'ASC')
+			->addOrderBy('date', 'DESC');
+
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * Delete all snapshots for an asset.
 	 */
 	public function deleteByAsset(int $assetId, string $userId): void {

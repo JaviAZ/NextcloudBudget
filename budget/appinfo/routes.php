@@ -179,6 +179,7 @@ return [
         ['name' => 'asset#create', 'url' => '/api/assets', 'verb' => 'POST'],
         ['name' => 'asset#summary', 'url' => '/api/assets/summary', 'verb' => 'GET'],
         ['name' => 'asset#combinedProjection', 'url' => '/api/assets/projection', 'verb' => 'GET'],
+        ['name' => 'asset#valueHistory', 'url' => '/api/assets/value-history', 'verb' => 'GET'],
         ['name' => 'asset#show', 'url' => '/api/assets/{id}', 'verb' => 'GET'],
         ['name' => 'asset#update', 'url' => '/api/assets/{id}', 'verb' => 'PUT'],
         ['name' => 'asset#destroy', 'url' => '/api/assets/{id}', 'verb' => 'DELETE'],

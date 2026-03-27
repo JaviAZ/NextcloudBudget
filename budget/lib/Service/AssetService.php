@@ -247,6 +247,105 @@ class AssetService {
 	}
 
 	/**
+	 * Get aggregated asset portfolio value history.
+	 *
+	 * For each date in the range, computes the combined value of all assets
+	 * in the user's base currency. Uses carry-forward: if an asset has no
+	 * snapshot on a given date, its last known value is used.
+	 *
+	 * @return array{history: array, baseCurrency: string, change: array}
+	 */
+	public function getValueHistory(string $userId, int $days = 30): array {
+		$baseCurrency = $this->conversionService->getBaseCurrency($userId);
+		$endDate = date('Y-m-d');
+		$startDate = date('Y-m-d', strtotime("-{$days} days"));
+
+		$assets = $this->assetMapper->findAll($userId);
+		if (empty($assets)) {
+			return [
+				'history' => [],
+				'baseCurrency' => $baseCurrency,
+				'change' => ['amount' => 0, 'percentage' => 0],
+			];
+		}
+
+		// Build asset lookup: id -> Asset
+		$assetMap = [];
+		foreach ($assets as $asset) {
+			$assetMap[$asset->getId()] = $asset;
+		}
+
+		// Get seed snapshots (latest before range start) and range snapshots
+		$seedSnapshots = $this->snapshotMapper->findLatestBeforeDate($userId, $startDate);
+		$rangeSnapshots = $this->snapshotMapper->findAllByUserInRange($userId, $startDate, $endDate);
+
+		// Deduplicate seeds: keep only first per assetId (ordered asset_id ASC, date DESC)
+		$currentValues = [];
+		foreach ($seedSnapshots as $snap) {
+			$aid = $snap->getAssetId();
+			if (!isset($currentValues[$aid])) {
+				$currentValues[$aid] = (float)$snap->getValue();
+			}
+		}
+
+		// Build per-asset snapshot timeline: assetId -> [date -> value]
+		$assetTimelines = [];
+		foreach ($rangeSnapshots as $snap) {
+			$aid = $snap->getAssetId();
+			$assetTimelines[$aid][$snap->getDate()] = (float)$snap->getValue();
+		}
+
+		// Generate daily time series
+		$history = [];
+		$dateCursor = new \DateTime($startDate);
+		$end = new \DateTime($endDate);
+
+		while ($dateCursor <= $end) {
+			$dateStr = $dateCursor->format('Y-m-d');
+			$dayTotal = 0.0;
+
+			foreach ($assetMap as $assetId => $asset) {
+				// Update carry-forward if snapshot exists on this date
+				if (isset($assetTimelines[$assetId][$dateStr])) {
+					$currentValues[$assetId] = $assetTimelines[$assetId][$dateStr];
+				}
+
+				$value = $currentValues[$assetId] ?? 0.0;
+				if ($value == 0) {
+					continue;
+				}
+
+				$assetCurrency = $asset->getCurrency() ?: $baseCurrency;
+				$dayTotal += $this->convertAmount($value, $assetCurrency, $baseCurrency, $userId);
+			}
+
+			$history[] = [
+				'date' => $dateStr,
+				'totalValue' => round($dayTotal, 2),
+			];
+
+			$dateCursor->modify('+1 day');
+		}
+
+		// Calculate change (first vs last data point)
+		$change = ['amount' => 0.0, 'percentage' => 0.0];
+		if (count($history) >= 2) {
+			$firstValue = $history[0]['totalValue'];
+			$lastValue = $history[count($history) - 1]['totalValue'];
+			$change['amount'] = round($lastValue - $firstValue, 2);
+			$change['percentage'] = $firstValue > 0
+				? round(($lastValue - $firstValue) / $firstValue * 100, 1)
+				: 0.0;
+		}
+
+		return [
+			'history' => $history,
+			'baseCurrency' => $baseCurrency,
+			'change' => $change,
+		];
+	}
+
+	/**
 	 * Convert an amount to the base currency if different.
 	 */
 	private function convertAmount(float $amount, string $fromCurrency, string $baseCurrency, string $userId): float {

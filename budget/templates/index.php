@@ -346,6 +346,7 @@ style('budget', 'budget-main');
                     <div class="hero-content">
                         <span class="hero-label">Assets Worth</span>
                         <span id="hero-assets-value" class="hero-value">--</span>
+                        <span id="hero-assets-change" class="hero-change"></span>
                         <span id="hero-assets-count" class="hero-subtext"></span>
                     </div>
                 </div>
@@ -566,6 +567,29 @@ style('budget', 'budget-main');
                                 <p class="empty-state-title">No net worth history yet</p>
                                 <p class="empty-state-subtitle">Snapshots are recorded automatically every day. Your first snapshot will appear within 24 hours.</p>
                                 <button id="record-net-worth-btn" class="btn btn-secondary btn-small">Record snapshot now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asset Value History Chart -->
+                    <div id="asset-value-history-card" class="dashboard-card" data-widget-id="assetValueHistory" data-widget-category="widget">
+                        <div class="card-header">
+                            <h3>Asset Value History</h3>
+                            <div class="card-header-controls">
+                                <div class="period-selector" id="asset-value-period-selector">
+                                    <button class="period-btn active" data-days="30">30D</button>
+                                    <button class="period-btn" data-days="90">90D</button>
+                                    <button class="period-btn" data-days="365">1Y</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container chart-container-medium">
+                            <canvas id="asset-value-history-chart"></canvas>
+                        </div>
+                        <div id="asset-value-chart-empty" class="chart-empty-state" style="display: none;">
+                            <div class="empty-state-content">
+                                <p class="empty-state-title">No asset value history yet</p>
+                                <p class="empty-state-subtitle">Add snapshots to your assets to track their combined value over time.</p>
                             </div>
                         </div>
                     </div>

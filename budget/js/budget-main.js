@@ -18141,6 +18141,12 @@ var DASHBOARD_WIDGETS = {
       size: 'medium',
       defaultVisible: true
     },
+    assetValueHistory: {
+      id: 'asset-value-history-card',
+      name: 'Asset Value History',
+      size: 'medium',
+      defaultVisible: true
+    },
     recentTransactions: {
       id: 'recent-transactions-card',
       name: 'Recent Transactions',
@@ -26304,7 +26310,7 @@ var DashboardModule = /*#__PURE__*/function () {
     key: "loadDashboard",
     value: function () {
       var _loadDashboard = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var now, startOfMonth, endOfMonth, sixMonthsAgoDate, sixMonthsAgo, cacheBuster, _yield$Promise$all, _yield$Promise$all2, summaryResponse, trendResponse, transResponse, billsResponse, budgetResponse, goalsResponse, pensionResponse, assetResponse, netWorthResponse, alertsResponse, debtResponse, summary, trendData, transactions, bills, budgetDataRaw, budgetData, savingsGoals, pensionSummary, assetSummary, netWorthSnapshots, budgetAlerts, debtSummary, _t2, _t3, _t4, _t5, _t6, _t7, _t8, _t9, _t0;
+        var now, startOfMonth, endOfMonth, sixMonthsAgoDate, sixMonthsAgo, cacheBuster, _yield$Promise$all, _yield$Promise$all2, summaryResponse, trendResponse, transResponse, billsResponse, budgetResponse, goalsResponse, pensionResponse, assetResponse, netWorthResponse, alertsResponse, debtResponse, assetHistoryResponse, summary, trendData, transactions, bills, budgetDataRaw, budgetData, savingsGoals, pensionSummary, assetSummary, netWorthSnapshots, budgetAlerts, debtSummary, assetValueHistory, _t2, _t3, _t4, _t5, _t6, _t7, _t8, _t9, _t0, _t1;
         return _regenerator().w(function (_context2) {
           while (1) switch (_context2.p = _context2.n) {
             case 0:
@@ -26397,10 +26403,18 @@ var DashboardModule = /*#__PURE__*/function () {
                 return {
                   ok: false
                 };
+              }), fetch(OC.generateUrl('/apps/budget/api/assets/value-history?days=30'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              })["catch"](function () {
+                return {
+                  ok: false
+                };
               })]);
             case 1:
               _yield$Promise$all = _context2.v;
-              _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 11);
+              _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 12);
               summaryResponse = _yield$Promise$all2[0];
               trendResponse = _yield$Promise$all2[1];
               transResponse = _yield$Promise$all2[2];
@@ -26412,6 +26426,7 @@ var DashboardModule = /*#__PURE__*/function () {
               netWorthResponse = _yield$Promise$all2[8];
               alertsResponse = _yield$Promise$all2[9];
               debtResponse = _yield$Promise$all2[10];
+              assetHistoryResponse = _yield$Promise$all2[11];
               _context2.n = 2;
               return summaryResponse.json();
             case 2:
@@ -26545,6 +26560,20 @@ var DashboardModule = /*#__PURE__*/function () {
               _t9 = null;
             case 28:
               debtSummary = _t9;
+              if (!assetHistoryResponse.ok) {
+                _context2.n = 30;
+                break;
+              }
+              _context2.n = 29;
+              return assetHistoryResponse.json();
+            case 29:
+              _t0 = _context2.v;
+              _context2.n = 31;
+              break;
+            case 30:
+              _t0 = null;
+            case 31:
+              assetValueHistory = _t0;
               // Update Hero Section (current month data)
               this.updateDashboardHero(summary);
 
@@ -26570,7 +26599,7 @@ var DashboardModule = /*#__PURE__*/function () {
               this.updatePensionsSummary(pensionSummary);
 
               // Update Assets Dashboard Card
-              this.updateAssetsSummary(assetSummary);
+              this.updateAssetsSummary(assetSummary, assetValueHistory);
 
               // Update Debt Payoff Dashboard Card
               this.updateDebtPayoffWidget(debtSummary);
@@ -26607,6 +26636,11 @@ var DashboardModule = /*#__PURE__*/function () {
               // Update Net Worth History Chart
               this.updateNetWorthHistoryChart(netWorthSnapshots);
 
+              // Update Asset Value History Chart
+              if (assetValueHistory) {
+                this.updateAssetValueHistoryChart(assetValueHistory);
+              }
+
               // Setup dashboard controls
               this.setupDashboardControls();
 
@@ -26620,9 +26654,9 @@ var DashboardModule = /*#__PURE__*/function () {
 
               // Refresh widgets that have a saved account selection
               // (initial load fetched "All Accounts" data, so we need targeted refreshes)
-              _context2.n = 29;
+              _context2.n = 32;
               return this.refreshSavedWidgetSelections();
-            case 29:
+            case 32:
               // Apply dashboard widget order (must be before visibility)
               this.applyDashboardOrder();
 
@@ -26634,16 +26668,16 @@ var DashboardModule = /*#__PURE__*/function () {
 
               // Apply responsive layout ordering
               this.applyDashboardLayout();
-              _context2.n = 31;
+              _context2.n = 34;
               break;
-            case 30:
-              _context2.p = 30;
-              _t0 = _context2.v;
-              console.error('Failed to load dashboard:', _t0);
-            case 31:
+            case 33:
+              _context2.p = 33;
+              _t1 = _context2.v;
+              console.error('Failed to load dashboard:', _t1);
+            case 34:
               return _context2.a(2);
           }
-        }, _callee2, this, [[0, 30]]);
+        }, _callee2, this, [[0, 33]]);
       }));
       function loadDashboard() {
         return _loadDashboard.apply(this, arguments);
@@ -27240,6 +27274,7 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "updateAssetsSummary",
     value: function updateAssetsSummary(summary) {
+      var valueHistory = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var currency = summary.baseCurrency || this.getPrimaryCurrency();
       var assetWorth = summary.totalAssetWorth || 0;
       var count = summary.assetCount || 0;
@@ -27255,11 +27290,27 @@ var DashboardModule = /*#__PURE__*/function () {
       // Update dashboard hero card
       var heroAssetsValue = document.getElementById('hero-assets-value');
       var heroAssetsCount = document.getElementById('hero-assets-count');
+      var heroAssetsChange = document.getElementById('hero-assets-change');
       if (heroAssetsValue) {
         heroAssetsValue.textContent = this.formatCurrency(assetWorth, currency);
       }
       if (heroAssetsCount) {
         heroAssetsCount.textContent = count === 1 ? '1 asset' : "".concat(count, " assets");
+      }
+
+      // Show 30-day change indicator
+      if (heroAssetsChange && valueHistory !== null && valueHistory !== void 0 && valueHistory.change) {
+        var _valueHistory$change = valueHistory.change,
+          amount = _valueHistory$change.amount,
+          percentage = _valueHistory$change.percentage;
+        if (amount !== 0) {
+          var arrow = amount >= 0 ? "\u2191" : "\u2193";
+          var absAmount = this.formatCurrency(Math.abs(amount), currency);
+          heroAssetsChange.textContent = "".concat(arrow, " ").concat(absAmount, " (").concat(Math.abs(percentage).toFixed(1), "%) vs 30d ago");
+          heroAssetsChange.className = "hero-change ".concat(amount >= 0 ? 'positive' : 'negative');
+        } else {
+          heroAssetsChange.textContent = '';
+        }
       }
     }
 
@@ -27737,9 +27788,132 @@ var DashboardModule = /*#__PURE__*/function () {
       });
     }
   }, {
+    key: "updateAssetValueHistoryChart",
+    value: function updateAssetValueHistoryChart(data) {
+      var _this15 = this;
+      var canvas = document.getElementById('asset-value-history-chart');
+      var emptyState = document.getElementById('asset-value-chart-empty');
+      if (!canvas) return;
+
+      // Destroy existing chart
+      if (this.charts.assetValueHistory) {
+        this.charts.assetValueHistory.destroy();
+      }
+      var history = (data === null || data === void 0 ? void 0 : data.history) || [];
+
+      // Handle empty state
+      if (history.length === 0) {
+        canvas.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
+        return;
+      }
+      canvas.style.display = 'block';
+      if (emptyState) emptyState.style.display = 'none';
+      var currency = data.baseCurrency || this.getPrimaryCurrency();
+      var labels = history.map(function (p) {
+        return p.date;
+      });
+      var values = history.map(function (p) {
+        return p.totalValue;
+      });
+      this.charts.assetValueHistory = new chart_js_auto__WEBPACK_IMPORTED_MODULE_2__["default"](canvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Asset Value',
+            data: values,
+            borderColor: '#ff9800',
+            backgroundColor: 'rgba(255, 152, 0, 0.1)',
+            fill: true,
+            tension: 0.3,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function label(context) {
+                  return "Portfolio: ".concat(_this15.formatCurrency(context.raw, currency));
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function callback(value) {
+                  return _this15.formatCurrency(value, currency);
+                }
+              }
+            },
+            x: {
+              ticks: {
+                maxTicksLimit: 8
+              }
+            }
+          }
+        }
+      });
+    }
+  }, {
+    key: "refreshAssetValueChart",
+    value: function () {
+      var _refreshAssetValueChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(days) {
+        var response, data, _t10;
+        return _regenerator().w(function (_context6) {
+          while (1) switch (_context6.p = _context6.n) {
+            case 0:
+              _context6.p = 0;
+              _context6.n = 1;
+              return fetch(OC.generateUrl("/apps/budget/api/assets/value-history?days=".concat(days)), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 1:
+              response = _context6.v;
+              if (response.ok) {
+                _context6.n = 2;
+                break;
+              }
+              throw new Error('Failed to fetch asset value history');
+            case 2:
+              _context6.n = 3;
+              return response.json();
+            case 3:
+              data = _context6.v;
+              this.updateAssetValueHistoryChart(data);
+              _context6.n = 5;
+              break;
+            case 4:
+              _context6.p = 4;
+              _t10 = _context6.v;
+              console.error('Failed to refresh asset value chart:', _t10);
+            case 5:
+              return _context6.a(2);
+          }
+        }, _callee6, this, [[0, 4]]);
+      }));
+      function refreshAssetValueChart(_x5) {
+        return _refreshAssetValueChart.apply(this, arguments);
+      }
+      return refreshAssetValueChart;
+    }()
+  }, {
     key: "updateNetWorthStatus",
     value: function updateNetWorthStatus(snapshots, statusEl) {
-      var _this15 = this;
+      var _this16 = this;
       if (!statusEl) return;
 
       // Find the most recent automatic snapshot
@@ -27783,16 +27957,16 @@ var DashboardModule = /*#__PURE__*/function () {
       var inlineBtn = document.getElementById('record-net-worth-btn-inline');
       if (inlineBtn && !inlineBtn.hasAttribute('data-initialized')) {
         inlineBtn.setAttribute('data-initialized', 'true');
-        inlineBtn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6() {
-          return _regenerator().w(function (_context6) {
-            while (1) switch (_context6.n) {
+        inlineBtn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
+          return _regenerator().w(function (_context7) {
+            while (1) switch (_context7.n) {
               case 0:
-                _context6.n = 1;
-                return _this15.recordNetWorthSnapshot();
+                _context7.n = 1;
+                return _this16.recordNetWorthSnapshot();
               case 1:
-                return _context6.a(2);
+                return _context7.a(2);
             }
-          }, _callee6);
+          }, _callee7);
         })));
       }
     }
@@ -27803,28 +27977,28 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "setupDashboardControls",
     value: function setupDashboardControls() {
-      var _this16 = this;
+      var _this17 = this;
       // Trend account selector
       var trendAccountSelect = document.getElementById('trend-account-select');
       if (trendAccountSelect && !trendAccountSelect.hasAttribute('data-initialized')) {
         trendAccountSelect.setAttribute('data-initialized', 'true');
-        trendAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
+        trendAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
           var periodSelect, months, accountId;
-          return _regenerator().w(function (_context7) {
-            while (1) switch (_context7.n) {
+          return _regenerator().w(function (_context8) {
+            while (1) switch (_context8.n) {
               case 0:
                 periodSelect = document.getElementById('trend-period-select');
                 months = periodSelect ? parseInt(periodSelect.value) : 6;
                 accountId = trendAccountSelect.value || null;
-                _context7.n = 1;
-                return _this16.refreshTrendChart(months, accountId);
+                _context8.n = 1;
+                return _this17.refreshTrendChart(months, accountId);
               case 1:
-                _context7.n = 2;
-                return _this16.saveWidgetAccountSelection('trend-account-select', trendAccountSelect.value);
+                _context8.n = 2;
+                return _this17.saveWidgetAccountSelection('trend-account-select', trendAccountSelect.value);
               case 2:
-                return _context7.a(2);
+                return _context8.a(2);
             }
-          }, _callee7);
+          }, _callee8);
         })));
       }
 
@@ -27833,22 +28007,22 @@ var DashboardModule = /*#__PURE__*/function () {
       if (trendPeriodSelect && !trendPeriodSelect.hasAttribute('data-initialized')) {
         trendPeriodSelect.setAttribute('data-initialized', 'true');
         trendPeriodSelect.addEventListener('change', /*#__PURE__*/function () {
-          var _ref0 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(e) {
+          var _ref0 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(e) {
             var months, accountSelect, accountId;
-            return _regenerator().w(function (_context8) {
-              while (1) switch (_context8.n) {
+            return _regenerator().w(function (_context9) {
+              while (1) switch (_context9.n) {
                 case 0:
                   months = parseInt(e.target.value);
                   accountSelect = document.getElementById('trend-account-select');
                   accountId = accountSelect ? accountSelect.value || null : null;
-                  _context8.n = 1;
-                  return _this16.refreshTrendChart(months, accountId);
+                  _context9.n = 1;
+                  return _this17.refreshTrendChart(months, accountId);
                 case 1:
-                  return _context8.a(2);
+                  return _context9.a(2);
               }
-            }, _callee8);
+            }, _callee9);
           }));
-          return function (_x5) {
+          return function (_x6) {
             return _ref0.apply(this, arguments);
           };
         }());
@@ -27858,23 +28032,23 @@ var DashboardModule = /*#__PURE__*/function () {
       var spendingAccountSelect = document.getElementById('spending-account-select');
       if (spendingAccountSelect && !spendingAccountSelect.hasAttribute('data-initialized')) {
         spendingAccountSelect.setAttribute('data-initialized', 'true');
-        spendingAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+        spendingAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
           var periodSelect, period, accountId;
-          return _regenerator().w(function (_context9) {
-            while (1) switch (_context9.n) {
+          return _regenerator().w(function (_context0) {
+            while (1) switch (_context0.n) {
               case 0:
                 periodSelect = document.getElementById('spending-period-select');
                 period = periodSelect ? periodSelect.value : 'month';
                 accountId = spendingAccountSelect.value || null;
-                _context9.n = 1;
-                return _this16.refreshSpendingChart(period, accountId);
+                _context0.n = 1;
+                return _this17.refreshSpendingChart(period, accountId);
               case 1:
-                _context9.n = 2;
-                return _this16.saveWidgetAccountSelection('spending-account-select', spendingAccountSelect.value);
+                _context0.n = 2;
+                return _this17.saveWidgetAccountSelection('spending-account-select', spendingAccountSelect.value);
               case 2:
-                return _context9.a(2);
+                return _context0.a(2);
             }
-          }, _callee9);
+          }, _callee0);
         })));
       }
 
@@ -27883,22 +28057,22 @@ var DashboardModule = /*#__PURE__*/function () {
       if (spendingPeriodSelect && !spendingPeriodSelect.hasAttribute('data-initialized')) {
         spendingPeriodSelect.setAttribute('data-initialized', 'true');
         spendingPeriodSelect.addEventListener('change', /*#__PURE__*/function () {
-          var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(e) {
+          var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(e) {
             var period, accountSelect, accountId;
-            return _regenerator().w(function (_context0) {
-              while (1) switch (_context0.n) {
+            return _regenerator().w(function (_context1) {
+              while (1) switch (_context1.n) {
                 case 0:
                   period = e.target.value;
                   accountSelect = document.getElementById('spending-account-select');
                   accountId = accountSelect ? accountSelect.value || null : null;
-                  _context0.n = 1;
-                  return _this16.refreshSpendingChart(period, accountId);
+                  _context1.n = 1;
+                  return _this17.refreshSpendingChart(period, accountId);
                 case 1:
-                  return _context0.a(2);
+                  return _context1.a(2);
               }
-            }, _callee0);
+            }, _callee1);
           }));
-          return function (_x6) {
+          return function (_x7) {
             return _ref10.apply(this, arguments);
           };
         }());
@@ -27908,23 +28082,23 @@ var DashboardModule = /*#__PURE__*/function () {
       var netWorthAccountSelect = document.getElementById('net-worth-account-select');
       if (netWorthAccountSelect && !netWorthAccountSelect.hasAttribute('data-initialized')) {
         netWorthAccountSelect.setAttribute('data-initialized', 'true');
-        netWorthAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
+        netWorthAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
           var activeBtn, days, accountId;
-          return _regenerator().w(function (_context1) {
-            while (1) switch (_context1.n) {
+          return _regenerator().w(function (_context10) {
+            while (1) switch (_context10.n) {
               case 0:
                 activeBtn = document.querySelector('#net-worth-period-selector .period-btn.active');
                 days = activeBtn ? parseInt(activeBtn.dataset.days) : 30;
                 accountId = netWorthAccountSelect.value || null;
-                _context1.n = 1;
-                return _this16.refreshNetWorthChart(days, accountId);
+                _context10.n = 1;
+                return _this17.refreshNetWorthChart(days, accountId);
               case 1:
-                _context1.n = 2;
-                return _this16.saveWidgetAccountSelection('net-worth-account-select', netWorthAccountSelect.value);
+                _context10.n = 2;
+                return _this17.saveWidgetAccountSelection('net-worth-account-select', netWorthAccountSelect.value);
               case 2:
-                return _context1.a(2);
+                return _context10.a(2);
             }
-          }, _callee1);
+          }, _callee10);
         })));
       }
 
@@ -27933,13 +28107,13 @@ var DashboardModule = /*#__PURE__*/function () {
       if (netWorthPeriodSelector && !netWorthPeriodSelector.hasAttribute('data-initialized')) {
         netWorthPeriodSelector.setAttribute('data-initialized', 'true');
         netWorthPeriodSelector.addEventListener('click', /*#__PURE__*/function () {
-          var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(e) {
+          var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(e) {
             var days, accountSelect, accountId;
-            return _regenerator().w(function (_context10) {
-              while (1) switch (_context10.n) {
+            return _regenerator().w(function (_context11) {
+              while (1) switch (_context11.n) {
                 case 0:
                   if (!e.target.classList.contains('period-btn')) {
-                    _context10.n = 1;
+                    _context11.n = 1;
                     break;
                   }
                   // Update active button
@@ -27951,15 +28125,47 @@ var DashboardModule = /*#__PURE__*/function () {
                   days = parseInt(e.target.dataset.days);
                   accountSelect = document.getElementById('net-worth-account-select');
                   accountId = accountSelect ? accountSelect.value || null : null;
-                  _context10.n = 1;
-                  return _this16.refreshNetWorthChart(days, accountId);
+                  _context11.n = 1;
+                  return _this17.refreshNetWorthChart(days, accountId);
                 case 1:
-                  return _context10.a(2);
+                  return _context11.a(2);
               }
-            }, _callee10);
+            }, _callee11);
           }));
-          return function (_x7) {
+          return function (_x8) {
             return _ref12.apply(this, arguments);
+          };
+        }());
+      }
+
+      // Asset Value period selector
+      var assetValuePeriodSelector = document.getElementById('asset-value-period-selector');
+      if (assetValuePeriodSelector && !assetValuePeriodSelector.hasAttribute('data-initialized')) {
+        assetValuePeriodSelector.setAttribute('data-initialized', 'true');
+        assetValuePeriodSelector.addEventListener('click', /*#__PURE__*/function () {
+          var _ref13 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(e) {
+            var days;
+            return _regenerator().w(function (_context12) {
+              while (1) switch (_context12.n) {
+                case 0:
+                  if (!e.target.classList.contains('period-btn')) {
+                    _context12.n = 1;
+                    break;
+                  }
+                  assetValuePeriodSelector.querySelectorAll('.period-btn').forEach(function (btn) {
+                    return btn.classList.remove('active');
+                  });
+                  e.target.classList.add('active');
+                  days = parseInt(e.target.dataset.days);
+                  _context12.n = 1;
+                  return _this17.refreshAssetValueChart(days);
+                case 1:
+                  return _context12.a(2);
+              }
+            }, _callee12);
+          }));
+          return function (_x9) {
+            return _ref13.apply(this, arguments);
           };
         }());
       }
@@ -27968,16 +28174,16 @@ var DashboardModule = /*#__PURE__*/function () {
       var recordNetWorthBtn = document.getElementById('record-net-worth-btn');
       if (recordNetWorthBtn && !recordNetWorthBtn.hasAttribute('data-initialized')) {
         recordNetWorthBtn.setAttribute('data-initialized', 'true');
-        recordNetWorthBtn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11() {
-          return _regenerator().w(function (_context11) {
-            while (1) switch (_context11.n) {
+        recordNetWorthBtn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13() {
+          return _regenerator().w(function (_context13) {
+            while (1) switch (_context13.n) {
               case 0:
-                _context11.n = 1;
-                return _this16.recordNetWorthSnapshot();
+                _context13.n = 1;
+                return _this17.recordNetWorthSnapshot();
               case 1:
-                return _context11.a(2);
+                return _context13.a(2);
             }
-          }, _callee11);
+          }, _callee13);
         })));
       }
 
@@ -27985,21 +28191,21 @@ var DashboardModule = /*#__PURE__*/function () {
       var recentTxAccountSelect = document.getElementById('recent-transactions-account-select');
       if (recentTxAccountSelect && !recentTxAccountSelect.hasAttribute('data-initialized')) {
         recentTxAccountSelect.setAttribute('data-initialized', 'true');
-        recentTxAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12() {
+        recentTxAccountSelect.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14() {
           var accountId;
-          return _regenerator().w(function (_context12) {
-            while (1) switch (_context12.n) {
+          return _regenerator().w(function (_context14) {
+            while (1) switch (_context14.n) {
               case 0:
                 accountId = recentTxAccountSelect.value || null;
-                _context12.n = 1;
-                return _this16.refreshRecentTransactions(accountId);
+                _context14.n = 1;
+                return _this17.refreshRecentTransactions(accountId);
               case 1:
-                _context12.n = 2;
-                return _this16.saveWidgetAccountSelection('recent-transactions-account-select', recentTxAccountSelect.value);
+                _context14.n = 2;
+                return _this17.saveWidgetAccountSelection('recent-transactions-account-select', recentTxAccountSelect.value);
               case 2:
-                return _context12.a(2);
+                return _context14.a(2);
             }
-          }, _callee12);
+          }, _callee14);
         })));
       }
 
@@ -28010,11 +28216,11 @@ var DashboardModule = /*#__PURE__*/function () {
           select.setAttribute('data-initialized', 'true');
           select.addEventListener('change', function () {
             if (selectId.includes('income')) {
-              _this16.updateAccountIncomeHero();
+              _this17.updateAccountIncomeHero();
             } else {
-              _this16.updateAccountExpensesHero();
+              _this17.updateAccountExpensesHero();
             }
-            _this16.saveHeroAccountSelection(selectId, select.value);
+            _this17.saveHeroAccountSelection(selectId, select.value);
           });
         }
       });
@@ -28022,52 +28228,52 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "refreshTrendChart",
     value: function () {
-      var _refreshTrendChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(months) {
+      var _refreshTrendChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee15(months) {
         var accountId,
           startDate,
           url,
           response,
           data,
-          _args13 = arguments,
-          _t1;
-        return _regenerator().w(function (_context13) {
-          while (1) switch (_context13.p = _context13.n) {
+          _args15 = arguments,
+          _t11;
+        return _regenerator().w(function (_context15) {
+          while (1) switch (_context15.p = _context15.n) {
             case 0:
-              accountId = _args13.length > 1 && _args13[1] !== undefined ? _args13[1] : null;
-              _context13.p = 1;
+              accountId = _args15.length > 1 && _args15[1] !== undefined ? _args15[1] : null;
+              _context15.p = 1;
               startDate = new Date();
               startDate.setMonth(startDate.getMonth() - months);
               url = "/apps/budget/api/reports/summary?startDate=".concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDateForAPI(startDate));
               if (accountId) {
                 url += "&accountId=".concat(accountId);
               }
-              _context13.n = 2;
+              _context15.n = 2;
               return fetch(OC.generateUrl(url), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context13.v;
-              _context13.n = 3;
+              response = _context15.v;
+              _context15.n = 3;
               return response.json();
             case 3:
-              data = _context13.v;
+              data = _context15.v;
               if (data.trends) {
                 this.updateTrendChart(data.trends);
               }
-              _context13.n = 5;
+              _context15.n = 5;
               break;
             case 4:
-              _context13.p = 4;
-              _t1 = _context13.v;
-              console.error('Failed to refresh trend chart:', _t1);
+              _context15.p = 4;
+              _t11 = _context15.v;
+              console.error('Failed to refresh trend chart:', _t11);
             case 5:
-              return _context13.a(2);
+              return _context15.a(2);
           }
-        }, _callee13, this, [[1, 4]]);
+        }, _callee15, this, [[1, 4]]);
       }));
-      function refreshTrendChart(_x8) {
+      function refreshTrendChart(_x0) {
         return _refreshTrendChart.apply(this, arguments);
       }
       return refreshTrendChart;
@@ -28075,67 +28281,67 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "refreshSpendingChart",
     value: function () {
-      var _refreshSpendingChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14(period) {
+      var _refreshSpendingChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16(period) {
         var accountId,
           startDate,
           endDate,
           url,
           response,
           data,
-          _args14 = arguments,
-          _t10,
-          _t11;
-        return _regenerator().w(function (_context14) {
-          while (1) switch (_context14.p = _context14.n) {
+          _args16 = arguments,
+          _t12,
+          _t13;
+        return _regenerator().w(function (_context16) {
+          while (1) switch (_context16.p = _context16.n) {
             case 0:
-              accountId = _args14.length > 1 && _args14[1] !== undefined ? _args14[1] : null;
-              _context14.p = 1;
+              accountId = _args16.length > 1 && _args16[1] !== undefined ? _args16[1] : null;
+              _context16.p = 1;
               startDate = new Date();
               endDate = new Date();
-              _t10 = period;
-              _context14.n = _t10 === 'month' ? 2 : _t10 === '3months' ? 3 : _t10 === 'year' ? 4 : 5;
+              _t12 = period;
+              _context16.n = _t12 === 'month' ? 2 : _t12 === '3months' ? 3 : _t12 === 'year' ? 4 : 5;
               break;
             case 2:
               startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-              return _context14.a(3, 5);
+              return _context16.a(3, 5);
             case 3:
               startDate.setMonth(startDate.getMonth() - 3);
-              return _context14.a(3, 5);
+              return _context16.a(3, 5);
             case 4:
               startDate = new Date(endDate.getFullYear(), 0, 1);
-              return _context14.a(3, 5);
+              return _context16.a(3, 5);
             case 5:
               url = "/apps/budget/api/reports/spending?startDate=".concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDateForAPI(startDate), "&endDate=").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDateForAPI(endDate));
               if (accountId) {
                 url += "&accountId=".concat(accountId);
               }
-              _context14.n = 6;
+              _context16.n = 6;
               return fetch(OC.generateUrl(url), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 6:
-              response = _context14.v;
-              _context14.n = 7;
+              response = _context16.v;
+              _context16.n = 7;
               return response.json();
             case 7:
-              data = _context14.v;
+              data = _context16.v;
               if (data.data) {
                 this.updateSpendingChart(data.data);
               }
-              _context14.n = 9;
+              _context16.n = 9;
               break;
             case 8:
-              _context14.p = 8;
-              _t11 = _context14.v;
-              console.error('Failed to refresh spending chart:', _t11);
+              _context16.p = 8;
+              _t13 = _context16.v;
+              console.error('Failed to refresh spending chart:', _t13);
             case 9:
-              return _context14.a(2);
+              return _context16.a(2);
           }
-        }, _callee14, this, [[1, 8]]);
+        }, _callee16, this, [[1, 8]]);
       }));
-      function refreshSpendingChart(_x9) {
+      function refreshSpendingChart(_x1) {
         return _refreshSpendingChart.apply(this, arguments);
       }
       return refreshSpendingChart;
@@ -28143,77 +28349,77 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "refreshNetWorthChart",
     value: function () {
-      var _refreshNetWorthChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee15(days) {
+      var _refreshNetWorthChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee17(days) {
         var accountId,
           response,
           history,
           _response,
           snapshots,
-          _args15 = arguments,
-          _t12;
-        return _regenerator().w(function (_context15) {
-          while (1) switch (_context15.p = _context15.n) {
+          _args17 = arguments,
+          _t14;
+        return _regenerator().w(function (_context17) {
+          while (1) switch (_context17.p = _context17.n) {
             case 0:
-              accountId = _args15.length > 1 && _args15[1] !== undefined ? _args15[1] : null;
-              _context15.p = 1;
+              accountId = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : null;
+              _context17.p = 1;
               if (!accountId) {
-                _context15.n = 5;
+                _context17.n = 5;
                 break;
               }
-              _context15.n = 2;
+              _context17.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/accounts/".concat(accountId, "/balance-history?days=").concat(days)), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context15.v;
+              response = _context17.v;
               if (response.ok) {
-                _context15.n = 3;
+                _context17.n = 3;
                 break;
               }
               throw new Error('Failed to fetch balance history');
             case 3:
-              _context15.n = 4;
+              _context17.n = 4;
               return response.json();
             case 4:
-              history = _context15.v;
+              history = _context17.v;
               this.updateNetWorthHistoryChart(history, accountId);
-              _context15.n = 9;
+              _context17.n = 9;
               break;
             case 5:
-              _context15.n = 6;
+              _context17.n = 6;
               return fetch(OC.generateUrl("/apps/budget/api/net-worth/snapshots?days=".concat(days)), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 6:
-              _response = _context15.v;
+              _response = _context17.v;
               if (_response.ok) {
-                _context15.n = 7;
+                _context17.n = 7;
                 break;
               }
               throw new Error('Failed to fetch net worth snapshots');
             case 7:
-              _context15.n = 8;
+              _context17.n = 8;
               return _response.json();
             case 8:
-              snapshots = _context15.v;
+              snapshots = _context17.v;
               this.updateNetWorthHistoryChart(snapshots, null);
             case 9:
-              _context15.n = 11;
+              _context17.n = 11;
               break;
             case 10:
-              _context15.p = 10;
-              _t12 = _context15.v;
-              console.error('Failed to refresh net worth chart:', _t12);
+              _context17.p = 10;
+              _t14 = _context17.v;
+              console.error('Failed to refresh net worth chart:', _t14);
             case 11:
-              return _context15.a(2);
+              return _context17.a(2);
           }
-        }, _callee15, this, [[1, 10]]);
+        }, _callee17, this, [[1, 10]]);
       }));
-      function refreshNetWorthChart(_x0) {
+      function refreshNetWorthChart(_x10) {
         return _refreshNetWorthChart.apply(this, arguments);
       }
       return refreshNetWorthChart;
@@ -28221,51 +28427,51 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "refreshRecentTransactions",
     value: function () {
-      var _refreshRecentTransactions = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16() {
+      var _refreshRecentTransactions = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee18() {
         var accountId,
           url,
           response,
           transactions,
-          _args16 = arguments,
-          _t13;
-        return _regenerator().w(function (_context16) {
-          while (1) switch (_context16.p = _context16.n) {
+          _args18 = arguments,
+          _t15;
+        return _regenerator().w(function (_context18) {
+          while (1) switch (_context18.p = _context18.n) {
             case 0:
-              accountId = _args16.length > 0 && _args16[0] !== undefined ? _args16[0] : null;
-              _context16.p = 1;
+              accountId = _args18.length > 0 && _args18[0] !== undefined ? _args18[0] : null;
+              _context18.p = 1;
               url = '/apps/budget/api/transactions?limit=8';
               if (accountId) {
                 url += "&accountId=".concat(accountId);
               }
-              _context16.n = 2;
+              _context18.n = 2;
               return fetch(OC.generateUrl(url), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context16.v;
+              response = _context18.v;
               if (response.ok) {
-                _context16.n = 3;
+                _context18.n = 3;
                 break;
               }
               throw new Error('Failed to fetch recent transactions');
             case 3:
-              _context16.n = 4;
+              _context18.n = 4;
               return response.json();
             case 4:
-              transactions = _context16.v;
+              transactions = _context18.v;
               this.updateRecentTransactions(transactions);
-              _context16.n = 6;
+              _context18.n = 6;
               break;
             case 5:
-              _context16.p = 5;
-              _t13 = _context16.v;
-              console.error('Failed to refresh recent transactions:', _t13);
+              _context18.p = 5;
+              _t15 = _context18.v;
+              console.error('Failed to refresh recent transactions:', _t15);
             case 6:
-              return _context16.a(2);
+              return _context18.a(2);
           }
-        }, _callee16, this, [[1, 5]]);
+        }, _callee18, this, [[1, 5]]);
       }));
       function refreshRecentTransactions() {
         return _refreshRecentTransactions.apply(this, arguments);
@@ -28275,13 +28481,13 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "recordNetWorthSnapshot",
     value: function () {
-      var _recordNetWorthSnapshot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee17() {
-        var response, activeBtn, days, _t14;
-        return _regenerator().w(function (_context17) {
-          while (1) switch (_context17.p = _context17.n) {
+      var _recordNetWorthSnapshot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee19() {
+        var response, activeBtn, days, _t16;
+        return _regenerator().w(function (_context19) {
+          while (1) switch (_context19.p = _context19.n) {
             case 0:
-              _context17.p = 0;
-              _context17.n = 1;
+              _context19.p = 0;
+              _context19.n = 1;
               return fetch(OC.generateUrl('/apps/budget/api/net-worth/snapshots'), {
                 method: 'POST',
                 headers: {
@@ -28290,9 +28496,9 @@ var DashboardModule = /*#__PURE__*/function () {
                 }
               });
             case 1:
-              response = _context17.v;
+              response = _context19.v;
               if (response.ok) {
-                _context17.n = 2;
+                _context19.n = 2;
                 break;
               }
               throw new Error('Failed to record snapshot');
@@ -28302,20 +28508,20 @@ var DashboardModule = /*#__PURE__*/function () {
               // Refresh the chart with current period
               activeBtn = document.querySelector('#net-worth-period-selector .period-btn.active');
               days = activeBtn ? parseInt(activeBtn.dataset.days) : 30;
-              _context17.n = 3;
+              _context19.n = 3;
               return this.refreshNetWorthChart(days);
             case 3:
-              _context17.n = 5;
+              _context19.n = 5;
               break;
             case 4:
-              _context17.p = 4;
-              _t14 = _context17.v;
-              console.error('Failed to record net worth snapshot:', _t14);
+              _context19.p = 4;
+              _t16 = _context19.v;
+              console.error('Failed to record net worth snapshot:', _t16);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_4__.showError)('Failed to record snapshot');
             case 5:
-              return _context17.a(2);
+              return _context19.a(2);
           }
-        }, _callee17, this, [[0, 4]]);
+        }, _callee19, this, [[0, 4]]);
       }));
       function recordNetWorthSnapshot() {
         return _recordNetWorthSnapshot.apply(this, arguments);
@@ -28365,37 +28571,37 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "applyDashboardVisibility",
     value: function () {
-      var _applyDashboardVisibility = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee18() {
+      var _applyDashboardVisibility = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee20() {
         var _i, _Object$entries, _Object$entries$_i, key, visible, widget, element, updateMethod, _i2, _Object$entries2, _Object$entries2$_i, _key, _visible, _widget, _element, _updateMethod, hasConditionalHide;
-        return _regenerator().w(function (_context18) {
-          while (1) switch (_context18.n) {
+        return _regenerator().w(function (_context20) {
+          while (1) switch (_context20.n) {
             case 0:
               _i = 0, _Object$entries = Object.entries(this.dashboardConfig.hero.visibility);
             case 1:
               if (!(_i < _Object$entries.length)) {
-                _context18.n = 7;
+                _context20.n = 7;
                 break;
               }
               _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), key = _Object$entries$_i[0], visible = _Object$entries$_i[1];
               widget = _config_dashboardWidgets_js__WEBPACK_IMPORTED_MODULE_3__.DASHBOARD_WIDGETS.hero[key];
               if (widget) {
-                _context18.n = 2;
+                _context20.n = 2;
                 break;
               }
-              return _context18.a(3, 6);
+              return _context20.a(3, 6);
             case 2:
               element = document.querySelector("[data-widget-id=\"".concat(key, "\"][data-widget-category=\"hero\"]"));
               if (element) {
-                _context18.n = 3;
+                _context20.n = 3;
                 break;
               }
-              return _context18.a(3, 6);
+              return _context20.a(3, 6);
             case 3:
               if (!(visible && this.app.needsLazyLoad(key) && !this.widgetDataLoaded[key])) {
-                _context18.n = 5;
+                _context20.n = 5;
                 break;
               }
-              _context18.n = 4;
+              _context20.n = 4;
               return this.app.loadWidgetData(key);
             case 4:
               // Call the appropriate update method
@@ -28407,35 +28613,35 @@ var DashboardModule = /*#__PURE__*/function () {
               element.style.display = visible ? '' : 'none';
             case 6:
               _i++;
-              _context18.n = 1;
+              _context20.n = 1;
               break;
             case 7:
               _i2 = 0, _Object$entries2 = Object.entries(this.dashboardConfig.widgets.visibility);
             case 8:
               if (!(_i2 < _Object$entries2.length)) {
-                _context18.n = 14;
+                _context20.n = 14;
                 break;
               }
               _Object$entries2$_i = _slicedToArray(_Object$entries2[_i2], 2), _key = _Object$entries2$_i[0], _visible = _Object$entries2$_i[1];
               _widget = _config_dashboardWidgets_js__WEBPACK_IMPORTED_MODULE_3__.DASHBOARD_WIDGETS.widgets[_key];
               if (_widget) {
-                _context18.n = 9;
+                _context20.n = 9;
                 break;
               }
-              return _context18.a(3, 13);
+              return _context20.a(3, 13);
             case 9:
               _element = document.querySelector("[data-widget-id=\"".concat(_key, "\"][data-widget-category=\"widget\"]"));
               if (_element) {
-                _context18.n = 10;
+                _context20.n = 10;
                 break;
               }
-              return _context18.a(3, 13);
+              return _context20.a(3, 13);
             case 10:
               if (!(_visible && this.app.needsLazyLoad(_key) && !this.widgetDataLoaded[_key])) {
-                _context18.n = 12;
+                _context20.n = 12;
                 break;
               }
-              _context18.n = 11;
+              _context20.n = 11;
               return this.app.loadWidgetData(_key);
             case 11:
               // Call the appropriate update method
@@ -28461,12 +28667,12 @@ var DashboardModule = /*#__PURE__*/function () {
               }
             case 13:
               _i2++;
-              _context18.n = 8;
+              _context20.n = 8;
               break;
             case 14:
-              return _context18.a(2);
+              return _context20.a(2);
           }
-        }, _callee18, this);
+        }, _callee20, this);
       }));
       function applyDashboardVisibility() {
         return _applyDashboardVisibility.apply(this, arguments);
@@ -28476,30 +28682,30 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "hideWidget",
     value: function () {
-      var _hideWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee19(widgetId, category) {
+      var _hideWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee21(widgetId, category) {
         var config;
-        return _regenerator().w(function (_context19) {
-          while (1) switch (_context19.n) {
+        return _regenerator().w(function (_context21) {
+          while (1) switch (_context21.n) {
             case 0:
               config = category === 'hero' ? this.dashboardConfig.hero : this.dashboardConfig.widgets; // Update visibility
               config.visibility[widgetId] = false;
 
               // Apply to DOM
-              _context19.n = 1;
+              _context21.n = 1;
               return this.applyDashboardVisibility();
             case 1:
               // Update Add Tiles menu
               this.app.updateAddTilesMenu();
 
               // Save to backend
-              _context19.n = 2;
+              _context21.n = 2;
               return this.saveDashboardVisibility();
             case 2:
-              return _context19.a(2);
+              return _context21.a(2);
           }
-        }, _callee19, this);
+        }, _callee21, this);
       }));
-      function hideWidget(_x1, _x10) {
+      function hideWidget(_x11, _x12) {
         return _hideWidget.apply(this, arguments);
       }
       return hideWidget;
@@ -28507,16 +28713,16 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "showWidget",
     value: function () {
-      var _showWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee20(widgetId, category) {
+      var _showWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee22(widgetId, category) {
         var config;
-        return _regenerator().w(function (_context20) {
-          while (1) switch (_context20.n) {
+        return _regenerator().w(function (_context22) {
+          while (1) switch (_context22.n) {
             case 0:
               config = category === 'hero' ? this.dashboardConfig.hero : this.dashboardConfig.widgets; // Update visibility
               config.visibility[widgetId] = true;
 
               // Apply to DOM
-              _context20.n = 1;
+              _context22.n = 1;
               return this.applyDashboardVisibility();
             case 1:
               // Add remove buttons if unlocked
@@ -28528,14 +28734,14 @@ var DashboardModule = /*#__PURE__*/function () {
               this.app.updateAddTilesMenu();
 
               // Save to backend
-              _context20.n = 2;
+              _context22.n = 2;
               return this.saveDashboardVisibility();
             case 2:
-              return _context20.a(2);
+              return _context22.a(2);
           }
-        }, _callee20, this);
+        }, _callee22, this);
       }));
-      function showWidget(_x11, _x12) {
+      function showWidget(_x13, _x14) {
         return _showWidget.apply(this, arguments);
       }
       return showWidget;
@@ -28543,29 +28749,29 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "saveDashboardVisibility",
     value: function () {
-      var _saveDashboardVisibility = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee21() {
-        var _t15;
-        return _regenerator().w(function (_context21) {
-          while (1) switch (_context21.p = _context21.n) {
+      var _saveDashboardVisibility = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee23() {
+        var _t17;
+        return _regenerator().w(function (_context23) {
+          while (1) switch (_context23.p = _context23.n) {
             case 0:
-              _context21.p = 0;
-              _context21.n = 1;
+              _context23.p = 0;
+              _context23.n = 1;
               return this._saveSettings({
                 dashboard_hero_config: JSON.stringify(this.dashboardConfig.hero),
                 dashboard_widgets_config: JSON.stringify(this.dashboardConfig.widgets)
               });
             case 1:
-              _context21.n = 3;
+              _context23.n = 3;
               break;
             case 2:
-              _context21.p = 2;
-              _t15 = _context21.v;
-              console.error('Failed to save dashboard config:', _t15);
+              _context23.p = 2;
+              _t17 = _context23.v;
+              console.error('Failed to save dashboard config:', _t17);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_4__.showError)('Failed to save dashboard layout');
             case 3:
-              return _context21.a(2);
+              return _context23.a(2);
           }
-        }, _callee21, this, [[0, 2]]);
+        }, _callee23, this, [[0, 2]]);
       }));
       function saveDashboardVisibility() {
         return _saveDashboardVisibility.apply(this, arguments);
@@ -28580,7 +28786,7 @@ var DashboardModule = /*#__PURE__*/function () {
     // ===========================
 
     function setupDashboardDragAndDrop() {
-      var _this17 = this;
+      var _this18 = this;
       // Check if touch device - disable drag on mobile
       var isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
       if (isTouchDevice) {
@@ -28603,7 +28809,7 @@ var DashboardModule = /*#__PURE__*/function () {
         });
         card.addEventListener('dragend', function (e) {
           card.classList.remove('dragging');
-          _this17.clearDashboardDropIndicators();
+          _this18.clearDashboardDropIndicators();
         });
       });
 
@@ -28620,7 +28826,7 @@ var DashboardModule = /*#__PURE__*/function () {
         });
         card.addEventListener('dragend', function (e) {
           card.classList.remove('dragging');
-          _this17.clearDashboardDropIndicators();
+          _this18.clearDashboardDropIndicators();
         });
       });
 
@@ -28632,44 +28838,44 @@ var DashboardModule = /*#__PURE__*/function () {
         if (!container) return;
         container.addEventListener('dragover', function (e) {
           e.preventDefault();
-          _this17.showDashboardDropIndicator(e, container);
+          _this18.showDashboardDropIndicator(e, container);
         });
         container.addEventListener('drop', /*#__PURE__*/function () {
-          var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee22(e) {
-            var data, dropInfo, _t16;
-            return _regenerator().w(function (_context22) {
-              while (1) switch (_context22.p = _context22.n) {
+          var _ref16 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee24(e) {
+            var data, dropInfo, _t18;
+            return _regenerator().w(function (_context24) {
+              while (1) switch (_context24.p = _context24.n) {
                 case 0:
                   e.preventDefault();
-                  _this17.clearDashboardDropIndicators();
-                  _context22.p = 1;
+                  _this18.clearDashboardDropIndicators();
+                  _context24.p = 1;
                   data = JSON.parse(e.dataTransfer.getData('text/plain'));
-                  dropInfo = _this17.getDashboardDropTarget(e, container);
+                  dropInfo = _this18.getDashboardDropTarget(e, container);
                   if (!dropInfo) {
-                    _context22.n = 2;
+                    _context24.n = 2;
                     break;
                   }
-                  _context22.n = 2;
-                  return _this17.reorderDashboardWidget(data.id, dropInfo.targetId, dropInfo.position, data.category);
+                  _context24.n = 2;
+                  return _this18.reorderDashboardWidget(data.id, dropInfo.targetId, dropInfo.position, data.category);
                 case 2:
-                  _context22.n = 4;
+                  _context24.n = 4;
                   break;
                 case 3:
-                  _context22.p = 3;
-                  _t16 = _context22.v;
-                  console.error('Drop failed:', _t16);
+                  _context24.p = 3;
+                  _t18 = _context24.v;
+                  console.error('Drop failed:', _t18);
                 case 4:
-                  return _context22.a(2);
+                  return _context24.a(2);
               }
-            }, _callee22, null, [[1, 3]]);
+            }, _callee24, null, [[1, 3]]);
           }));
-          return function (_x13) {
-            return _ref15.apply(this, arguments);
+          return function (_x15) {
+            return _ref16.apply(this, arguments);
           };
         }());
         container.addEventListener('dragleave', function (e) {
           if (!container.contains(e.relatedTarget)) {
-            _this17.clearDashboardDropIndicators();
+            _this18.clearDashboardDropIndicators();
           }
         });
       });
@@ -28677,7 +28883,7 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "applyDashboardOrder",
     value: function applyDashboardOrder() {
-      var _this18 = this;
+      var _this19 = this;
       // Reorder hero cards
       var heroContainer = document.querySelector('.dashboard-hero');
       if (heroContainer) {
@@ -28705,8 +28911,8 @@ var DashboardModule = /*#__PURE__*/function () {
 
       // Sort by configured order
       allCards.sort(function (a, b) {
-        var aIndex = _this18.dashboardConfig.widgets.order.indexOf(a.dataset.widgetId);
-        var bIndex = _this18.dashboardConfig.widgets.order.indexOf(b.dataset.widgetId);
+        var aIndex = _this19.dashboardConfig.widgets.order.indexOf(a.dataset.widgetId);
+        var bIndex = _this19.dashboardConfig.widgets.order.indexOf(b.dataset.widgetId);
         return aIndex - bIndex;
       });
 
@@ -28731,7 +28937,7 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "applyDashboardLayout",
     value: function applyDashboardLayout() {
-      var _this19 = this;
+      var _this20 = this;
       var isMobile = window.innerWidth < 1200;
       if (isMobile) {
         // On mobile, apply CSS order property for single-column layout
@@ -28740,7 +28946,7 @@ var DashboardModule = /*#__PURE__*/function () {
         // Hero cards first
         this.dashboardConfig.hero.order.forEach(function (widgetId) {
           var card = document.querySelector("[data-widget-id=\"".concat(widgetId, "\"][data-widget-category=\"hero\"]"));
-          if (card && _this19.dashboardConfig.hero.visibility[widgetId]) {
+          if (card && _this20.dashboardConfig.hero.visibility[widgetId]) {
             card.style.order = orderIndex++;
           }
         });
@@ -28748,7 +28954,7 @@ var DashboardModule = /*#__PURE__*/function () {
         // Then widget cards
         this.dashboardConfig.widgets.order.forEach(function (widgetId) {
           var card = document.querySelector("[data-widget-id=\"".concat(widgetId, "\"][data-widget-category=\"widget\"]"));
-          if (card && _this19.dashboardConfig.widgets.visibility[widgetId]) {
+          if (card && _this20.dashboardConfig.widgets.visibility[widgetId]) {
             card.style.order = orderIndex++;
           }
         });
@@ -28771,35 +28977,35 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "loadWidgetData",
     value: function () {
-      var _loadWidgetData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee23(widgetKey) {
-        var uncatResp, now, thisMonth, lastMonthDate, lastMonth, _yield$Promise$all3, _yield$Promise$all4, currentResp, previousResp, largeResp, forecastResp, yoyResp, incomeResp, debtResp, rulesResp, _t17, _t18, _t19, _t20;
-        return _regenerator().w(function (_context23) {
-          while (1) switch (_context23.p = _context23.n) {
+      var _loadWidgetData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee25(widgetKey) {
+        var uncatResp, now, thisMonth, lastMonthDate, lastMonth, _yield$Promise$all3, _yield$Promise$all4, currentResp, previousResp, largeResp, forecastResp, yoyResp, incomeResp, debtResp, rulesResp, _t19, _t20, _t21, _t22;
+        return _regenerator().w(function (_context25) {
+          while (1) switch (_context25.p = _context25.n) {
             case 0:
               if (!this.widgetDataLoaded[widgetKey]) {
-                _context23.n = 1;
+                _context25.n = 1;
                 break;
               }
-              return _context23.a(2);
+              return _context25.a(2);
             case 1:
-              _context23.p = 1;
-              _t17 = widgetKey;
-              _context23.n = _t17 === 'uncategorizedCount' ? 2 : _t17 === 'monthlyComparison' ? 5 : _t17 === 'largeTransactions' ? 9 : _t17 === 'cashFlowForecast' ? 12 : _t17 === 'yoyComparison' ? 15 : _t17 === 'incomeTracking' ? 18 : _t17 === 'daysUntilDebtFree' ? 21 : _t17 === 'recentImports' ? 24 : _t17 === 'ruleEffectiveness' ? 25 : 28;
+              _context25.p = 1;
+              _t19 = widgetKey;
+              _context25.n = _t19 === 'uncategorizedCount' ? 2 : _t19 === 'monthlyComparison' ? 5 : _t19 === 'largeTransactions' ? 9 : _t19 === 'cashFlowForecast' ? 12 : _t19 === 'yoyComparison' ? 15 : _t19 === 'incomeTracking' ? 18 : _t19 === 'daysUntilDebtFree' ? 21 : _t19 === 'recentImports' ? 24 : _t19 === 'ruleEffectiveness' ? 25 : 28;
               break;
             case 2:
-              _context23.n = 3;
+              _context25.n = 3;
               return fetch(OC.generateUrl('/apps/budget/api/transactions/uncategorized?limit=100'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 3:
-              uncatResp = _context23.v;
-              _context23.n = 4;
+              uncatResp = _context25.v;
+              _context25.n = 4;
               return uncatResp.json();
             case 4:
-              this.widgetData.uncategorizedCount = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.uncategorizedCount = _context25.v;
+              return _context25.a(3, 28);
             case 5:
               now = new Date();
               thisMonth = {
@@ -28811,7 +29017,7 @@ var DashboardModule = /*#__PURE__*/function () {
                 start: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getMonthStart(lastMonthDate.getFullYear(), lastMonthDate.getMonth() + 1),
                 end: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getMonthEnd(lastMonthDate.getFullYear(), lastMonthDate.getMonth() + 1)
               };
-              _context23.n = 6;
+              _context25.n = 6;
               return Promise.all([fetch(OC.generateUrl("/apps/budget/api/reports/summary?startDate=".concat(thisMonth.start, "&endDate=").concat(thisMonth.end)), {
                 headers: {
                   'requesttoken': OC.requestToken
@@ -28822,125 +29028,125 @@ var DashboardModule = /*#__PURE__*/function () {
                 }
               })]);
             case 6:
-              _yield$Promise$all3 = _context23.v;
+              _yield$Promise$all3 = _context25.v;
               _yield$Promise$all4 = _slicedToArray(_yield$Promise$all3, 2);
               currentResp = _yield$Promise$all4[0];
               previousResp = _yield$Promise$all4[1];
-              _context23.n = 7;
+              _context25.n = 7;
               return currentResp.json();
             case 7:
-              _t18 = _context23.v;
-              _context23.n = 8;
+              _t20 = _context25.v;
+              _context25.n = 8;
               return previousResp.json();
             case 8:
-              _t19 = _context23.v;
+              _t21 = _context25.v;
               this.widgetData.monthlyComparison = {
-                current: _t18,
-                previous: _t19
+                current: _t20,
+                previous: _t21
               };
-              return _context23.a(3, 28);
+              return _context25.a(3, 28);
             case 9:
-              _context23.n = 10;
+              _context25.n = 10;
               return fetch(OC.generateUrl('/apps/budget/api/transactions?limit=10&sort=amount'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 10:
-              largeResp = _context23.v;
-              _context23.n = 11;
+              largeResp = _context25.v;
+              _context25.n = 11;
               return largeResp.json();
             case 11:
-              this.widgetData.largeTransactions = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.largeTransactions = _context25.v;
+              return _context25.a(3, 28);
             case 12:
-              _context23.n = 13;
+              _context25.n = 13;
               return fetch(OC.generateUrl('/apps/budget/api/forecast/live?days=90'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 13:
-              forecastResp = _context23.v;
-              _context23.n = 14;
+              forecastResp = _context25.v;
+              _context25.n = 14;
               return forecastResp.json();
             case 14:
-              this.widgetData.cashFlowForecast = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.cashFlowForecast = _context25.v;
+              return _context25.a(3, 28);
             case 15:
-              _context23.n = 16;
+              _context25.n = 16;
               return fetch(OC.generateUrl('/apps/budget/api/yoy/years?years=2'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 16:
-              yoyResp = _context23.v;
-              _context23.n = 17;
+              yoyResp = _context25.v;
+              _context25.n = 17;
               return yoyResp.json();
             case 17:
-              this.widgetData.yoyComparison = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.yoyComparison = _context25.v;
+              return _context25.a(3, 28);
             case 18:
-              _context23.n = 19;
+              _context25.n = 19;
               return fetch(OC.generateUrl('/apps/budget/api/recurring-income/summary'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 19:
-              incomeResp = _context23.v;
-              _context23.n = 20;
+              incomeResp = _context25.v;
+              _context25.n = 20;
               return incomeResp.json();
             case 20:
-              this.widgetData.incomeTracking = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.incomeTracking = _context25.v;
+              return _context25.a(3, 28);
             case 21:
-              _context23.n = 22;
+              _context25.n = 22;
               return fetch(OC.generateUrl('/apps/budget/api/debts/payoff-plan?strategy=avalanche'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 22:
-              debtResp = _context23.v;
-              _context23.n = 23;
+              debtResp = _context25.v;
+              _context25.n = 23;
               return debtResp.json();
             case 23:
-              this.widgetData.daysUntilDebtFree = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.daysUntilDebtFree = _context25.v;
+              return _context25.a(3, 28);
             case 24:
               // Placeholder - would use /api/import/history if it exists
               this.widgetData.recentImports = [];
-              return _context23.a(3, 28);
+              return _context25.a(3, 28);
             case 25:
-              _context23.n = 26;
+              _context25.n = 26;
               return fetch(OC.generateUrl('/apps/budget/api/import-rules'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 26:
-              rulesResp = _context23.v;
-              _context23.n = 27;
+              rulesResp = _context25.v;
+              _context25.n = 27;
               return rulesResp.json();
             case 27:
-              this.widgetData.ruleEffectiveness = _context23.v;
-              return _context23.a(3, 28);
+              this.widgetData.ruleEffectiveness = _context25.v;
+              return _context25.a(3, 28);
             case 28:
               this.widgetDataLoaded[widgetKey] = true;
-              _context23.n = 30;
+              _context25.n = 30;
               break;
             case 29:
-              _context23.p = 29;
-              _t20 = _context23.v;
-              console.error("Failed to load data for ".concat(widgetKey, ":"), _t20);
+              _context25.p = 29;
+              _t22 = _context25.v;
+              console.error("Failed to load data for ".concat(widgetKey, ":"), _t22);
             case 30:
-              return _context23.a(2);
+              return _context25.a(2);
           }
-        }, _callee23, this, [[1, 29]]);
+        }, _callee25, this, [[1, 29]]);
       }));
-      function loadWidgetData(_x14) {
+      function loadWidgetData(_x16) {
         return _loadWidgetData.apply(this, arguments);
       }
       return loadWidgetData;
@@ -28950,7 +29156,7 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "setupDashboardCustomization",
     value: function setupDashboardCustomization() {
-      var _this20 = this;
+      var _this21 = this;
       var toggleBtn = document.getElementById('toggle-dashboard-lock-btn');
       if (!toggleBtn) return;
 
@@ -28959,7 +29165,7 @@ var DashboardModule = /*#__PURE__*/function () {
       this.app.dashboardLocked = savedLockState;
       this.updateDashboardLockUI();
       toggleBtn.addEventListener('click', function () {
-        return _this20.toggleDashboardLock();
+        return _this21.toggleDashboardLock();
       });
 
       // Add Tiles dropdown
@@ -28983,10 +29189,10 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "toggleDashboardLock",
     value: function () {
-      var _toggleDashboardLock = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee24() {
-        var _t21;
-        return _regenerator().w(function (_context24) {
-          while (1) switch (_context24.p = _context24.n) {
+      var _toggleDashboardLock = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee26() {
+        var _t23;
+        return _regenerator().w(function (_context26) {
+          while (1) switch (_context26.p = _context26.n) {
             case 0:
               this.app.dashboardLocked = !this.app.dashboardLocked;
 
@@ -28997,23 +29203,23 @@ var DashboardModule = /*#__PURE__*/function () {
               this.setupDashboardDragAndDrop();
 
               // Save state to backend
-              _context24.p = 1;
-              _context24.n = 2;
+              _context26.p = 1;
+              _context26.n = 2;
               return this._saveSettings({
                 dashboard_locked: this.app.dashboardLocked.toString()
               });
             case 2:
-              _context24.n = 4;
+              _context26.n = 4;
               break;
             case 3:
-              _context24.p = 3;
-              _t21 = _context24.v;
-              console.error('Failed to save lock state:', _t21);
+              _context26.p = 3;
+              _t23 = _context26.v;
+              console.error('Failed to save lock state:', _t23);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_4__.showError)('Failed to save dashboard lock state');
             case 4:
-              return _context24.a(2);
+              return _context26.a(2);
           }
-        }, _callee24, this, [[1, 3]]);
+        }, _callee26, this, [[1, 3]]);
       }));
       function toggleDashboardLock() {
         return _toggleDashboardLock.apply(this, arguments);
@@ -29063,7 +29269,7 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "addRemoveButtons",
     value: function addRemoveButtons() {
-      var _this21 = this;
+      var _this22 = this;
       // Add remove button to hero cards
       document.querySelectorAll('.hero-card').forEach(function (card) {
         if (card.querySelector('.widget-remove-btn')) return; // Already has button
@@ -29074,7 +29280,7 @@ var DashboardModule = /*#__PURE__*/function () {
         removeBtn.innerHTML = '&times;';
         removeBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          _this21.hideWidget(card.dataset.widgetId, 'hero');
+          _this22.hideWidget(card.dataset.widgetId, 'hero');
         });
         card.appendChild(removeBtn);
       });
@@ -29089,7 +29295,7 @@ var DashboardModule = /*#__PURE__*/function () {
         removeBtn.innerHTML = '&times;';
         removeBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          _this21.hideWidget(card.dataset.widgetId, 'widget');
+          _this22.hideWidget(card.dataset.widgetId, 'widget');
         });
         card.appendChild(removeBtn);
       });
@@ -29097,7 +29303,7 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "updateAddTilesMenu",
     value: function updateAddTilesMenu() {
-      var _this22 = this;
+      var _this23 = this;
       var menuList = document.getElementById('add-tiles-menu-list');
       if (!menuList) return;
       menuList.innerHTML = '';
@@ -29106,11 +29312,11 @@ var DashboardModule = /*#__PURE__*/function () {
       var tilesByCategory = {};
 
       // Collect hidden hero tiles
-      Object.entries(_config_dashboardWidgets_js__WEBPACK_IMPORTED_MODULE_3__.DASHBOARD_WIDGETS.hero).forEach(function (_ref16) {
-        var _ref17 = _slicedToArray(_ref16, 2),
-          key = _ref17[0],
-          widget = _ref17[1];
-        if (!_this22.dashboardConfig.hero.visibility[key]) {
+      Object.entries(_config_dashboardWidgets_js__WEBPACK_IMPORTED_MODULE_3__.DASHBOARD_WIDGETS.hero).forEach(function (_ref17) {
+        var _ref18 = _slicedToArray(_ref17, 2),
+          key = _ref18[0],
+          widget = _ref18[1];
+        if (!_this23.dashboardConfig.hero.visibility[key]) {
           var category = widget.category || 'other';
           if (!tilesByCategory[category]) {
             tilesByCategory[category] = [];
@@ -29125,11 +29331,11 @@ var DashboardModule = /*#__PURE__*/function () {
       });
 
       // Collect hidden widget tiles
-      Object.entries(_config_dashboardWidgets_js__WEBPACK_IMPORTED_MODULE_3__.DASHBOARD_WIDGETS.widgets).forEach(function (_ref18) {
-        var _ref19 = _slicedToArray(_ref18, 2),
-          key = _ref19[0],
-          widget = _ref19[1];
-        if (!_this22.dashboardConfig.widgets.visibility[key]) {
+      Object.entries(_config_dashboardWidgets_js__WEBPACK_IMPORTED_MODULE_3__.DASHBOARD_WIDGETS.widgets).forEach(function (_ref19) {
+        var _ref20 = _slicedToArray(_ref19, 2),
+          key = _ref20[0],
+          widget = _ref20[1];
+        if (!_this23.dashboardConfig.widgets.visibility[key]) {
           var category = widget.category || 'other';
           if (!tilesByCategory[category]) {
             tilesByCategory[category] = [];
@@ -29189,9 +29395,9 @@ var DashboardModule = /*#__PURE__*/function () {
       }];
 
       // Render tiles grouped by category
-      categoryOrder.forEach(function (_ref20) {
-        var key = _ref20.key,
-          label = _ref20.label;
+      categoryOrder.forEach(function (_ref21) {
+        var key = _ref21.key,
+          label = _ref21.label;
         var tiles = tilesByCategory[key];
         if (!tiles || tiles.length === 0) return;
 
@@ -29219,7 +29425,7 @@ var DashboardModule = /*#__PURE__*/function () {
           e.stopPropagation();
           var widgetId = btn.dataset.widgetId;
           var category = btn.dataset.category;
-          _this22.showWidget(widgetId, category);
+          _this23.showWidget(widgetId, category);
         });
       });
     }
@@ -29313,10 +29519,10 @@ var DashboardModule = /*#__PURE__*/function () {
   }, {
     key: "reorderDashboardWidget",
     value: function () {
-      var _reorderDashboardWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee25(draggedId, targetId, position, category) {
-        var config, order, draggedIndex, targetIndex, settingKey, _t22;
-        return _regenerator().w(function (_context25) {
-          while (1) switch (_context25.p = _context25.n) {
+      var _reorderDashboardWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee27(draggedId, targetId, position, category) {
+        var config, order, draggedIndex, targetIndex, settingKey, _t24;
+        return _regenerator().w(function (_context27) {
+          while (1) switch (_context27.p = _context27.n) {
             case 0:
               // Determine which config to update
               config = category === 'hero' ? this.dashboardConfig.hero : this.dashboardConfig.widgets;
@@ -29324,7 +29530,7 @@ var DashboardModule = /*#__PURE__*/function () {
               draggedIndex = order.indexOf(draggedId);
               targetIndex = order.indexOf(targetId);
               if (!(draggedIndex === -1 || targetIndex === -1)) {
-                _context25.n = 3;
+                _context27.n = 3;
                 break;
               }
               console.warn('Widget not found in order array:', {
@@ -29335,7 +29541,7 @@ var DashboardModule = /*#__PURE__*/function () {
               });
               // If widget not in order, add it
               if (!(draggedIndex === -1 && targetIndex !== -1)) {
-                _context25.n = 2;
+                _context27.n = 2;
                 break;
               }
               // Dragged widget not in order, insert it next to target
@@ -29345,14 +29551,14 @@ var DashboardModule = /*#__PURE__*/function () {
                 order.splice(targetIndex + 1, 0, draggedId);
               }
               config.order = order;
-              _context25.n = 1;
+              _context27.n = 1;
               return this.saveDashboardVisibility();
             case 1:
               this.applyDashboardOrder();
-              return _context25.a(2);
+              return _context27.a(2);
             case 2:
               console.error('Cannot reorder - target not found');
-              return _context25.a(2);
+              return _context27.a(2);
             case 3:
               // Remove dragged item
               order.splice(draggedIndex, 1);
@@ -29373,17 +29579,17 @@ var DashboardModule = /*#__PURE__*/function () {
               config.order = order;
 
               // Persist to backend (debounced to coalesce rapid reorders)
-              _context25.p = 4;
+              _context27.p = 4;
               settingKey = category === 'hero' ? 'dashboard_hero_config' : 'dashboard_widgets_config';
-              _context25.n = 5;
+              _context27.n = 5;
               return this._saveSettings(_defineProperty({}, settingKey, JSON.stringify(config)));
             case 5:
-              _context25.n = 7;
+              _context27.n = 7;
               break;
             case 6:
-              _context25.p = 6;
-              _t22 = _context25.v;
-              console.error('Failed to save widget order:', _t22);
+              _context27.p = 6;
+              _t24 = _context27.v;
+              console.error('Failed to save widget order:', _t24);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_4__.showError)('Failed to save widget order');
             case 7:
               // Reorder DOM elements after config is saved
@@ -29392,11 +29598,11 @@ var DashboardModule = /*#__PURE__*/function () {
               // Update CSS layout properties
               this.applyDashboardLayout();
             case 8:
-              return _context25.a(2);
+              return _context27.a(2);
           }
-        }, _callee25, this, [[4, 6]]);
+        }, _callee27, this, [[4, 6]]);
       }));
-      function reorderDashboardWidget(_x15, _x16, _x17, _x18) {
+      function reorderDashboardWidget(_x17, _x18, _x19, _x20) {
         return _reorderDashboardWidget.apply(this, arguments);
       }
       return reorderDashboardWidget;
