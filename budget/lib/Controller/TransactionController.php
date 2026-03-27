@@ -213,6 +213,7 @@ class TransactionController extends Controller {
     ): DataResponse {
         try {
             $updates = [];
+            $params = $this->request->getParams();
 
             // Validate description if provided
             if ($description !== null) {
@@ -241,25 +242,27 @@ class TransactionController extends Controller {
                 $updates['type'] = $type;
             }
 
-            // Validate optional string fields
-            if ($vendor !== null) {
-                $vendorValidation = $this->validationService->validateVendor($vendor);
+            // Nullable string fields: use getParams() to distinguish "sent as null"
+            // from "not sent" (both map to null in method parameters).
+            // The validators already handle null/empty → sanitized null.
+            if (array_key_exists('vendor', $params)) {
+                $vendorValidation = $this->validationService->validateVendor($params['vendor']);
                 if (!$vendorValidation['valid']) {
                     return new DataResponse(['error' => $vendorValidation['error']], Http::STATUS_BAD_REQUEST);
                 }
                 $updates['vendor'] = $vendorValidation['sanitized'];
             }
 
-            if ($reference !== null) {
-                $refValidation = $this->validationService->validateReference($reference);
+            if (array_key_exists('reference', $params)) {
+                $refValidation = $this->validationService->validateReference($params['reference']);
                 if (!$refValidation['valid']) {
                     return new DataResponse(['error' => $refValidation['error']], Http::STATUS_BAD_REQUEST);
                 }
                 $updates['reference'] = $refValidation['sanitized'];
             }
 
-            if ($notes !== null) {
-                $notesValidation = $this->validationService->validateNotes($notes);
+            if (array_key_exists('notes', $params)) {
+                $notesValidation = $this->validationService->validateNotes($params['notes']);
                 if (!$notesValidation['valid']) {
                     return new DataResponse(['error' => $notesValidation['error']], Http::STATUS_BAD_REQUEST);
                 }
@@ -270,8 +273,9 @@ class TransactionController extends Controller {
             if ($amount !== null) {
                 $updates['amount'] = $amount;
             }
-            if ($categoryId !== null) {
-                $updates['categoryId'] = $categoryId;
+            if (array_key_exists('categoryId', $params)) {
+                $catValue = $params['categoryId'];
+                $updates['categoryId'] = ($catValue === null || $catValue === '') ? null : (int)$catValue;
             }
             if ($accountId !== null) {
                 $updates['accountId'] = $accountId;

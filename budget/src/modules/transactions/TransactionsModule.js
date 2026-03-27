@@ -1200,8 +1200,8 @@ export default class TransactionsModule {
             // Clear and rebuild options
             categorySelect.innerHTML = '<option value="">No category</option>';
 
-            // Use flat categories list if available, otherwise use hierarchical
-            const categoriesList = this.allCategories || this.categories;
+            // Use hierarchical tree for recursive rendering with indentation
+            const categoriesList = this.categoryTree || this.categories;
             this.renderCategoryOptions(categorySelect, categoriesList);
 
             // Restore previous value if it exists
