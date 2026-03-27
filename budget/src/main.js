@@ -847,6 +847,19 @@ class BudgetApp {
         return this.accountsModule.setupAccountTypeConditionals();
     }
 
+    // Quick Add Transaction delegations (Phase 4)
+    initQuickAddForm() {
+        return this.accountsModule.initQuickAddForm();
+    }
+
+    async saveQuickAddTransaction() {
+        return this.accountsModule.saveQuickAddTransaction();
+    }
+
+    resetQuickAddForm() {
+        return this.accountsModule.resetQuickAddForm();
+    }
+
     // ==================== END ACCOUNTS MODULE ====================
 
     // ============================================

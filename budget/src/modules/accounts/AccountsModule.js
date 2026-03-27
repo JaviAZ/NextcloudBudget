@@ -1389,12 +1389,12 @@ export default class AccountsModule {
                 this.showQuickAddMessage('Transaction added successfully!', 'success');
                 this.resetQuickAddForm();
                 // Reload transactions if on transactions view
-                if (this.currentView === 'transactions') {
-                    this.loadTransactions();
+                if (this.app.currentView === 'transactions') {
+                    this.app.loadTransactions();
                 }
                 // Reload dashboard to update totals
-                if (this.currentView === 'dashboard') {
-                    this.loadDashboard();
+                if (this.app.currentView === 'dashboard') {
+                    this.app.loadDashboard();
                 }
             } else {
                 let errorMessage = 'Failed to add transaction';
@@ -1460,16 +1460,12 @@ export default class AccountsModule {
             });
         }
 
-        // Populate category dropdown
+        // Populate category dropdown (hierarchical with indentation)
         const categorySelect = document.getElementById('quick-add-category');
-        if (categorySelect && this.categories) {
+        if (categorySelect) {
             categorySelect.innerHTML = '<option value="">No category</option>';
-            this.categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.textContent = category.name;
-                categorySelect.appendChild(option);
-            });
+            const categoryTree = this.app.categoryTree || this.categories || [];
+            this.renderQuickAddCategoryOptions(categorySelect, categoryTree);
         }
 
         // Set today's date as default
@@ -1477,6 +1473,18 @@ export default class AccountsModule {
         if (dateInput && !dateInput.value) {
             setDateValue(dateInput, formatters.getTodayDateString());
         }
+    }
+
+    renderQuickAddCategoryOptions(selectElement, categories, level = 0) {
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = '\u00A0\u00A0'.repeat(level) + category.name;
+            selectElement.appendChild(option);
+            if (category.children && category.children.length > 0) {
+                this.renderQuickAddCategoryOptions(selectElement, category.children, level + 1);
+            }
+        });
     }
 
     async saveAccount() {

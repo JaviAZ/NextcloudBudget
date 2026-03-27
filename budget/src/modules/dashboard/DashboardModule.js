@@ -1972,6 +1972,13 @@ export default class DashboardModule {
             const element = document.querySelector(`[data-widget-id="${key}"][data-widget-category="widget"]`);
             if (!element) continue;
 
+            // Initialize Quick Add form when it becomes visible (Phase 4)
+            // Must be checked before lazy load, which sets widgetDataLoaded
+            if (visible && key === 'quickAdd' && !this.widgetDataLoaded[key]) {
+                this.app.initQuickAddForm();
+                this.widgetDataLoaded[key] = true;
+            }
+
             // Lazy load data if becoming visible and not yet loaded
             if (visible && this.app.needsLazyLoad(key) && !this.widgetDataLoaded[key]) {
                 await this.app.loadWidgetData(key);
@@ -1980,12 +1987,6 @@ export default class DashboardModule {
                 if (typeof this[updateMethod] === 'function') {
                     this[updateMethod]();
                 }
-            }
-
-            // Initialize Quick Add form when it becomes visible (Phase 4)
-            if (visible && key === 'quickAdd' && !this.widgetDataLoaded[key]) {
-                this.app.initQuickAddForm();
-                this.widgetDataLoaded[key] = true;
             }
 
             // Respect conditional widgets (Budget Alerts, Debt Payoff)

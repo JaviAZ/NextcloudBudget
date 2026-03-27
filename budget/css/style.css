@@ -14312,6 +14312,8 @@ tr.scheduled-transaction:hover {
 
 .form-group-inline input,
 .form-group-inline select {
+    width: 100%;
+    box-sizing: border-box;
     padding: 8px 12px;
     border: 1px solid var(--color-border);
     border-radius: 4px;

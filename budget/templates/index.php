@@ -885,7 +885,7 @@ style('budget', 'budget-main');
                                 </div>
                                 <div class="form-group-inline">
                                     <label for="quick-add-description">Description</label>
-                                    <input type="text" id="quick-add-description" required maxlength="255" placeholder="Brief description">
+                                    <input type="text" id="quick-add-description" required maxlength="255" placeholder="Description">
                                 </div>
                                 <div class="form-group-inline">
                                     <label for="quick-add-category">Category</label>
