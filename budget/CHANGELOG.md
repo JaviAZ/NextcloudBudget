@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.5] - 2026-03-27
+
+### Added
+- **Asset value history dashboard widget**: Track asset values over time with a change indicator showing growth/decline ([#92](https://github.com/otherworld-dev/budget/issues/92))
+- **Account filtering on dashboard widgets**: Filter dashboard widgets by specific accounts ([#71](https://github.com/otherworld-dev/budget/issues/71))
+- **Minimum payment field on account edit form**: Track minimum payments for credit card and loan accounts ([#102](https://github.com/otherworld-dev/budget/issues/102))
+
+### Fixed
+- **Hierarchical nested category dropdowns everywhere**: All category dropdowns now show the full parent/child hierarchy consistently ([#104](https://github.com/otherworld-dev/budget/issues/104))
+- **Quick Add Transaction widget not populating accounts and categories**: Widget now correctly loads account and category options
+- **Central currency list for asset and pension dropdowns**: Asset and pension forms now use the same currency list as the rest of the app ([#103](https://github.com/otherworld-dev/budget/issues/103))
+- **Duplicate category creation and renaming**: Prevent creating or renaming categories to names that already exist
+- **Show actual error message when category create/update fails**: Error responses now display the server's message instead of a generic error
+- **Allow clearing category, vendor, notes, and reference on transactions**: These fields can now be set back to empty ([#98](https://github.com/otherworld-dev/budget/issues/98))
+- **Handle BOM and metadata preamble in DKB CSV imports**: DKB bank exports with byte-order marks and header metadata are now parsed correctly ([#100](https://github.com/otherworld-dev/budget/issues/100))
+
 ## [2.8.4] - 2026-03-26
 
 ### Added
