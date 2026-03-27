@@ -31,6 +31,7 @@ export default class AccountsModule {
     set accounts(value) { this.app.accounts = value; }
 
     get categories() { return this.app.categories; }
+    get categoryTree() { return this.app.categoryTree; }
     get settings() { return this.app.settings; }
     get data() { return this.app.data; }
 
@@ -887,9 +888,7 @@ export default class AccountsModule {
         const categoryFilter = document.getElementById('account-filter-category');
         if (categoryFilter && this.categories) {
             categoryFilter.innerHTML = '<option value="">All Categories</option><option value="uncategorized">Uncategorized</option>';
-            this.categories.forEach(category => {
-                categoryFilter.innerHTML += `<option value="${category.id}">${category.name}</option>`;
-            });
+            dom.populateCategorySelect(categoryFilter, this.categoryTree || this.categories);
         }
 
         // Load and populate tags filter
@@ -1464,8 +1463,7 @@ export default class AccountsModule {
         const categorySelect = document.getElementById('quick-add-category');
         if (categorySelect) {
             categorySelect.innerHTML = '<option value="">No category</option>';
-            const categoryTree = this.app.categoryTree || this.categories || [];
-            this.renderQuickAddCategoryOptions(categorySelect, categoryTree);
+            dom.populateCategorySelect(categorySelect, this.categoryTree || this.categories);
         }
 
         // Set today's date as default
@@ -1473,18 +1471,6 @@ export default class AccountsModule {
         if (dateInput && !dateInput.value) {
             setDateValue(dateInput, formatters.getTodayDateString());
         }
-    }
-
-    renderQuickAddCategoryOptions(selectElement, categories, level = 0) {
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = '\u00A0\u00A0'.repeat(level) + category.name;
-            selectElement.appendChild(option);
-            if (category.children && category.children.length > 0) {
-                this.renderQuickAddCategoryOptions(selectElement, category.children, level + 1);
-            }
-        });
     }
 
     async saveAccount() {

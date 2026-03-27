@@ -18595,6 +18595,11 @@ var AccountsModule = /*#__PURE__*/function () {
       return this.app.categories;
     }
   }, {
+    key: "categoryTree",
+    get: function get() {
+      return this.app.categoryTree;
+    }
+  }, {
     key: "settings",
     get: function get() {
       return this.app.settings;
@@ -19605,9 +19610,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var categoryFilter = document.getElementById('account-filter-category');
       if (categoryFilter && this.categories) {
         categoryFilter.innerHTML = '<option value="">All Categories</option><option value="uncategorized">Uncategorized</option>';
-        this.categories.forEach(function (category) {
-          categoryFilter.innerHTML += "<option value=\"".concat(category.id, "\">").concat(category.name, "</option>");
-        });
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categoryFilter, this.categoryTree || this.categories);
       }
 
       // Load and populate tags filter
@@ -20325,8 +20328,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var categorySelect = document.getElementById('quick-add-category');
       if (categorySelect) {
         categorySelect.innerHTML = '<option value="">No category</option>';
-        var categoryTree = this.app.categoryTree || this.categories || [];
-        this.renderQuickAddCategoryOptions(categorySelect, categoryTree);
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categorySelect, this.categoryTree || this.categories);
       }
 
       // Set today's date as default
@@ -20334,21 +20336,6 @@ var AccountsModule = /*#__PURE__*/function () {
       if (dateInput && !dateInput.value) {
         (0,_utils_datepicker_js__WEBPACK_IMPORTED_MODULE_3__.setDateValue)(dateInput, _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getTodayDateString());
       }
-    }
-  }, {
-    key: "renderQuickAddCategoryOptions",
-    value: function renderQuickAddCategoryOptions(selectElement, categories) {
-      var _this9 = this;
-      var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      categories.forEach(function (category) {
-        var option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = "\xA0\xA0".repeat(level) + category.name;
-        selectElement.appendChild(option);
-        if (category.children && category.children.length > 0) {
-          _this9.renderQuickAddCategoryOptions(selectElement, category.children, level + 1);
-        }
-      });
     }
   }, {
     key: "saveAccount",
@@ -20592,7 +20579,7 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "showAccountModal",
     value: function showAccountModal() {
-      var _this0 = this;
+      var _this9 = this;
       var accountId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var modal = document.getElementById('account-modal');
       var title = document.getElementById('account-modal-title');
@@ -20610,8 +20597,8 @@ var AccountsModule = /*#__PURE__*/function () {
 
       // Setup conditional fields and validation
       setTimeout(function () {
-        _this0.setupAccountTypeConditionals();
-        _this0.setupBankingFieldValidation();
+        _this9.setupAccountTypeConditionals();
+        _this9.setupBankingFieldValidation();
       }, 100);
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden', 'false');
@@ -21129,12 +21116,12 @@ var AccountsModule = /*#__PURE__*/function () {
   }, {
     key: "setupBankingFieldValidation",
     value: function setupBankingFieldValidation() {
-      var _this1 = this;
+      var _this0 = this;
       // IBAN validation
       var ibanField = document.getElementById('form-iban');
       if (ibanField) {
         ibanField.addEventListener('blur', function () {
-          _this1.validateBankingField('iban', ibanField.value, 'form-iban');
+          _this0.validateBankingField('iban', ibanField.value, 'form-iban');
         });
       }
 
@@ -21142,7 +21129,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var routingField = document.getElementById('form-routing-number');
       if (routingField) {
         routingField.addEventListener('blur', function () {
-          _this1.validateBankingField('routing-number', routingField.value, 'form-routing-number');
+          _this0.validateBankingField('routing-number', routingField.value, 'form-routing-number');
         });
       }
 
@@ -21150,7 +21137,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var sortCodeField = document.getElementById('form-sort-code');
       if (sortCodeField) {
         sortCodeField.addEventListener('blur', function () {
-          _this1.validateBankingField('sort-code', sortCodeField.value, 'form-sort-code');
+          _this0.validateBankingField('sort-code', sortCodeField.value, 'form-sort-code');
         });
       }
 
@@ -21158,7 +21145,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var swiftField = document.getElementById('form-swift-bic');
       if (swiftField) {
         swiftField.addEventListener('blur', function () {
-          _this1.validateBankingField('swift-bic', swiftField.value, 'form-swift-bic');
+          _this0.validateBankingField('swift-bic', swiftField.value, 'form-swift-bic');
         });
       }
 
@@ -21166,7 +21153,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var currencyField = document.getElementById('account-currency');
       if (currencyField) {
         currencyField.addEventListener('change', function () {
-          _this1.setupAccountTypeConditionals();
+          _this0.setupAccountTypeConditionals();
         });
       }
     }
@@ -22856,6 +22843,11 @@ var BillsModule = /*#__PURE__*/function () {
       return this.app.categories;
     }
   }, {
+    key: "categoryTree",
+    get: function get() {
+      return this.app.categoryTree;
+    }
+  }, {
     key: "settings",
     get: function get() {
       return this.app.settings;
@@ -23353,10 +23345,8 @@ var BillsModule = /*#__PURE__*/function () {
       if (categorySelect && this.categories) {
         var currentValue = categorySelect.value;
         categorySelect.innerHTML = '<option value="">No category</option>';
-        this.categories.filter(function (c) {
-          return c.type === 'expense';
-        }).forEach(function (cat) {
-          categorySelect.innerHTML += "<option value=\"".concat(cat.id, "\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(cat.name), "</option>");
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categorySelect, this.categoryTree || this.categories, {
+          typeFilter: 'expense'
         });
         if (currentValue) categorySelect.value = currentValue;
       }
@@ -24076,8 +24066,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ CategoriesModule)
 /* harmony export */ });
 /* harmony import */ var _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/formatters.js */ "./src/utils/formatters.js");
-/* harmony import */ var _utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/notifications.js */ "./src/utils/notifications.js");
-/* harmony import */ var chart_js_auto__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! chart.js/auto */ "./node_modules/chart.js/auto/auto.js");
+/* harmony import */ var _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/dom.js */ "./src/utils/dom.js");
+/* harmony import */ var _utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/notifications.js */ "./src/utils/notifications.js");
+/* harmony import */ var chart_js_auto__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! chart.js/auto */ "./node_modules/chart.js/auto/auto.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorValues(e) { if (null != e) { var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"], r = 0; if (t) return t.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) return { next: function next() { return e && r >= e.length && (e = void 0), { value: e && e[r++], done: !e }; } }; } throw new TypeError(_typeof(e) + " is not iterable"); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
@@ -24103,6 +24094,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 /**
  * Categories Module - Category management, budgets, and tree visualization
  */
+
 
 
 
@@ -24218,7 +24210,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context.p = 4;
               _t = _context.v;
               console.error('Failed to load categories:', _t);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)('Failed to load categories');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to load categories');
             case 5:
               return _context.a(2);
           }
@@ -24585,7 +24577,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context2.n = 3;
               return this.loadCategories();
             case 3:
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)('Category reordered successfully');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Category reordered successfully');
               _context2.n = 5;
               break;
             case 4:
@@ -24597,7 +24589,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context2.p = 6;
               _t2 = _context2.v;
               console.error('Failed to reorder category:', _t2);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)('Failed to reorder category');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to reorder category');
             case 7:
               return _context2.a(2);
           }
@@ -24821,7 +24813,7 @@ var CategoriesModule = /*#__PURE__*/function () {
       }
       var chartColor = ((_this$selectedCategor = this.selectedCategory) === null || _this$selectedCategor === void 0 ? void 0 : _this$selectedCategor.color) || 'rgba(54, 162, 235, 0.7)';
       var ctx = canvas.getContext('2d');
-      this.categoryChart = new chart_js_auto__WEBPACK_IMPORTED_MODULE_2__["default"](ctx, {
+      this.categoryChart = new chart_js_auto__WEBPACK_IMPORTED_MODULE_3__["default"](ctx, {
         type: 'bar',
         data: {
           labels: months,
@@ -25089,7 +25081,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 _context6.n = 6;
                 break;
               }
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)('Category deleted successfully');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Category deleted successfully');
               this.selectedCategory = null;
               _context6.n = 4;
               return this.loadCategories();
@@ -25113,7 +25105,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context6.p = 9;
               _t4 = _context6.v;
               console.error('Failed to delete category:', _t4);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t4.message || 'Failed to delete category');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(_t4.message || 'Failed to delete category');
             case 10:
               return _context6.a(2);
           }
@@ -25154,7 +25146,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 _context7.n = 5;
                 break;
               }
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)('Category deleted successfully');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Category deleted successfully');
               if (((_this$selectedCategor2 = this.selectedCategory) === null || _this$selectedCategor2 === void 0 ? void 0 : _this$selectedCategor2.id) === categoryId) {
                 this.selectedCategory = null;
                 this.showCategoryDetailsEmpty();
@@ -25181,7 +25173,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context7.p = 8;
               _t5 = _context7.v;
               console.error('Failed to delete category:', _t5);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t5.message || 'Failed to delete category');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(_t5.message || 'Failed to delete category');
             case 9:
               return _context7.a(2);
           }
@@ -25290,7 +25282,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 _context8.n = 17;
                 break;
               }
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)("".concat(deleted, " categor").concat(deleted === 1 ? 'y' : 'ies', " deleted successfully"));
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)("".concat(deleted, " categor").concat(deleted === 1 ? 'y' : 'ies', " deleted successfully"));
               this.selectedCategory = null;
               this.showCategoryDetailsEmpty();
               _context8.n = 16;
@@ -25300,7 +25292,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               return this.app.loadInitialData();
             case 17:
               if (errors.length > 0) {
-                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)("Failed to delete: ".concat(errors.join(', ')));
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)("Failed to delete: ".concat(errors.join(', ')));
               }
               this.updateBulkCategoryActions();
             case 18:
@@ -25365,27 +25357,17 @@ var CategoriesModule = /*#__PURE__*/function () {
   }, {
     key: "populateCategoryParentDropdown",
     value: function populateCategoryParentDropdown() {
-      var _this1 = this;
       var excludeId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var parentSelect = document.getElementById('category-parent');
       if (!parentSelect) return;
       var typeSelect = document.getElementById('category-type');
       var currentType = typeSelect ? typeSelect.value : 'expense';
       parentSelect.innerHTML = '<option value="">None (Top Level)</option>';
-      var _addOptions = function addOptions(categories) {
-        var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-        categories.forEach(function (cat) {
-          // Only show categories of the same type, and exclude the current category and its children
-          if (cat.type === currentType && cat.id !== excludeId) {
-            parentSelect.innerHTML += "<option value=\"".concat(cat.id, "\">").concat(prefix).concat(_this1.escapeHtml(cat.name), "</option>");
-          }
-          if (cat.children && cat.children.length > 0) {
-            _addOptions(cat.children, prefix + '  ');
-          }
-        });
-      };
       if (this.allCategories) {
-        _addOptions(this.allCategories);
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(parentSelect, this.allCategories, {
+          typeFilter: currentType,
+          excludeId: excludeId ? parseInt(excludeId) : null
+        });
       }
     }
   }, {
@@ -25405,7 +25387,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 _context9.n = 1;
                 break;
               }
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showWarning)('Category name is required');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showWarning)('Category name is required');
               return _context9.a(2);
             case 1:
               categoryData = {
@@ -25437,7 +25419,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               return response.json();
             case 4:
               savedCategory = _context9.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)(isEdit ? 'Category updated successfully' : 'Category created successfully');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)(isEdit ? 'Category updated successfully' : 'Category created successfully');
               this.app.hideModals();
               _context9.n = 5;
               return this.loadCategories();
@@ -25465,7 +25447,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context9.p = 10;
               _t8 = _context9.v;
               console.error('Failed to save category:', _t8);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t8.message || 'Failed to save category');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(_t8.message || 'Failed to save category');
             case 11:
               return _context9.a(2);
           }
@@ -25500,7 +25482,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 _context0.n = 4;
                 break;
               }
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)('Default categories created successfully');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Default categories created successfully');
               _context0.n = 2;
               return this.loadCategories();
             case 2:
@@ -25531,7 +25513,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context0.p = 10;
               _t0 = _context0.v;
               console.error('Failed to create default categories:', _t0);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t0.message || 'Failed to create default categories');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(_t0.message || 'Failed to create default categories');
             case 11:
               return _context0.a(2);
           }
@@ -25620,7 +25602,7 @@ var CategoriesModule = /*#__PURE__*/function () {
   }, {
     key: "setupBudgetEventListeners",
     value: function setupBudgetEventListeners() {
-      var _this10 = this;
+      var _this1 = this;
       // Budget type tabs
       document.querySelectorAll('.budget-tabs .tab-button').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
@@ -25628,9 +25610,9 @@ var CategoriesModule = /*#__PURE__*/function () {
             return b.classList.remove('active');
           });
           e.currentTarget.classList.add('active');
-          _this10.budgetType = e.currentTarget.dataset.budgetType;
-          _this10.renderBudgetTree();
-          _this10.updateBudgetSummary();
+          _this1.budgetType = e.currentTarget.dataset.budgetType;
+          _this1.renderBudgetTree();
+          _this1.updateBudgetSummary();
         });
       });
 
@@ -25642,12 +25624,12 @@ var CategoriesModule = /*#__PURE__*/function () {
             return _regenerator().w(function (_context10) {
               while (1) switch (_context10.n) {
                 case 0:
-                  _this10.budgetMonth = e.target.value;
+                  _this1.budgetMonth = e.target.value;
                   _context10.n = 1;
-                  return _this10.calculateCategorySpending();
+                  return _this1.calculateCategorySpending();
                 case 1:
-                  _this10.renderBudgetTree();
-                  _this10.updateBudgetSummary();
+                  _this1.renderBudgetTree();
+                  _this1.updateBudgetSummary();
                 case 2:
                   return _context10.a(2);
               }
@@ -25663,14 +25645,14 @@ var CategoriesModule = /*#__PURE__*/function () {
       var goToCategoriesBtn = document.getElementById('empty-budget-go-categories-btn');
       if (goToCategoriesBtn) {
         goToCategoriesBtn.addEventListener('click', function () {
-          _this10.app.router.showView('categories');
+          _this1.app.router.showView('categories');
         });
       }
     }
   }, {
     key: "populateBudgetMonthSelector",
     value: function populateBudgetMonthSelector() {
-      var _this11 = this;
+      var _this10 = this;
       var monthSelect = document.getElementById('budget-month');
       if (!monthSelect) return;
 
@@ -25690,14 +25672,14 @@ var CategoriesModule = /*#__PURE__*/function () {
         });
       }
       monthSelect.innerHTML = options.map(function (opt) {
-        return "<option value=\"".concat(opt.value, "\" ").concat(opt.value === _this11.budgetMonth ? 'selected' : '', ">").concat(opt.label, "</option>");
+        return "<option value=\"".concat(opt.value, "\" ").concat(opt.value === _this10.budgetMonth ? 'selected' : '', ">").concat(opt.label, "</option>");
       }).join('');
     }
   }, {
     key: "calculateCategorySpending",
     value: function () {
       var _calculateCategorySpending = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11() {
-        var _this12 = this;
+        var _this11 = this;
         var allCategories, categoriesWithBudgets, categoriesByPeriod, _loop2, _i, _Object$entries, _t10;
         return _regenerator().w(function (_context12) {
           while (1) switch (_context12.p = _context12.n) {
@@ -25733,7 +25715,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               // Fetch spending for each period
               _context12.p = 2;
               _loop2 = /*#__PURE__*/_regenerator().m(function _loop2() {
-                var _this12$app$settings;
+                var _this11$app$settings;
                 var _Object$entries$_i, period, categoryIds, startDay, dateRange, response, spendingData;
                 return _regenerator().w(function (_context11) {
                   while (1) switch (_context11.n) {
@@ -25746,7 +25728,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                       return _context11.a(2, 1);
                     case 1:
                       // Get date range for this period
-                      startDay = period === 'monthly' ? parseInt(((_this12$app$settings = _this12.app.settings) === null || _this12$app$settings === void 0 ? void 0 : _this12$app$settings.budget_start_day) || '1', 10) : 1;
+                      startDay = period === 'monthly' ? parseInt(((_this11$app$settings = _this11.app.settings) === null || _this11$app$settings === void 0 ? void 0 : _this11$app$settings.budget_start_day) || '1', 10) : 1;
                       dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay); // Fetch spending for this period
                       _context11.n = 2;
                       return fetch(OC.generateUrl("/apps/budget/api/categories/spending?startDate=".concat(dateRange.start, "&endDate=").concat(dateRange.end)), {
@@ -25767,7 +25749,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                       // Map spending to categories
                       spendingData.forEach(function (item) {
                         if (categoryIds.includes(item.categoryId)) {
-                          _this12.categorySpending[item.categoryId] = parseFloat(item.spent) || 0;
+                          _this11.categorySpending[item.categoryId] = parseFloat(item.spent) || 0;
                         }
                       });
                     case 4:
@@ -25813,7 +25795,7 @@ var CategoriesModule = /*#__PURE__*/function () {
   }, {
     key: "renderBudgetTree",
     value: function renderBudgetTree() {
-      var _this13 = this;
+      var _this12 = this;
       var treeContainer = document.getElementById('budget-tree');
       var emptyState = document.getElementById('empty-budget');
       var headerEl = document.querySelector('.budget-tree-header');
@@ -25821,7 +25803,7 @@ var CategoriesModule = /*#__PURE__*/function () {
 
       // Filter categories by type
       var filteredCategories = (this.categoryTree || []).filter(function (cat) {
-        return cat.type === _this13.budgetType;
+        return cat.type === _this12.budgetType;
       });
       if (filteredCategories.length === 0) {
         treeContainer.innerHTML = '';
@@ -25839,7 +25821,7 @@ var CategoriesModule = /*#__PURE__*/function () {
   }, {
     key: "renderBudgetCategoryNodes",
     value: function renderBudgetCategoryNodes(categories) {
-      var _this14 = this;
+      var _this13 = this;
       var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       return categories.map(function (category) {
         var hasChildren = category.children && category.children.length > 0;
@@ -25848,7 +25830,7 @@ var CategoriesModule = /*#__PURE__*/function () {
         var categoryPeriod = category.budgetPeriod || 'monthly';
 
         // Get spending for this category (already calculated for the period)
-        var spent = _this14.categorySpending[category.id] || 0;
+        var spent = _this13.categorySpending[category.id] || 0;
 
         // Get the stored budget amount
         var storedBudget = parseFloat(category.budgetAmount) || 0;
@@ -25861,20 +25843,20 @@ var CategoriesModule = /*#__PURE__*/function () {
         var progressStatus = 'good';
         if (percentage >= 100) progressStatus = 'over';else if (percentage >= 80) progressStatus = 'danger';else if (percentage >= 60) progressStatus = 'warning';
         var remainingClass = remaining > 0 ? 'positive' : remaining < 0 ? 'negative' : 'zero';
-        return "\n                <div class=\"budget-category-row ".concat(hasChildren ? 'parent-row' : '', "\" data-category-id=\"").concat(category.id, "\">\n                    <div class=\"budget-category-name level-").concat(level, "\" data-label=\"\">\n                        <span class=\"category-color\" style=\"background-color: ").concat(category.color || '#3b82f6', "\"></span>\n                        <span class=\"category-label\">").concat(category.name, "</span>\n                    </div>\n                    <div class=\"budget-input-wrapper\" data-label=\"Budget\">\n                        <input type=\"number\"\n                               class=\"budget-input\"\n                               data-category-id=\"").concat(category.id, "\"\n                               value=\"").concat(budget ? Math.round(budget * 100) / 100 : '', "\"\n                               placeholder=\"0.00\"\n                               step=\"0.01\"\n                               min=\"0\">\n                    </div>\n                    <div data-label=\"Period\">\n                        <select class=\"budget-period-select\" data-category-id=\"").concat(category.id, "\">\n                            <option value=\"monthly\" ").concat(category.budgetPeriod === 'monthly' || !category.budgetPeriod ? 'selected' : '', ">Monthly</option>\n                            <option value=\"weekly\" ").concat(category.budgetPeriod === 'weekly' ? 'selected' : '', ">Weekly</option>\n                            <option value=\"quarterly\" ").concat(category.budgetPeriod === 'quarterly' ? 'selected' : '', ">Quarterly</option>\n                            <option value=\"yearly\" ").concat(category.budgetPeriod === 'yearly' ? 'selected' : '', ">Yearly</option>\n                        </select>\n                    </div>\n                    <div class=\"budget-spent\" data-label=\"Spent\">\n                        ").concat(_this14.formatCurrency(spent), "\n                    </div>\n                    <div class=\"budget-remaining ").concat(remainingClass, "\" data-label=\"Remaining\">\n                        ").concat(budget > 0 ? _this14.formatCurrency(remaining) : '<span class="no-budget">—</span>', "\n                    </div>\n                    <div class=\"budget-progress-wrapper\" data-label=\"Progress\">\n                        ").concat(budget > 0 ? "\n                            <div class=\"budget-progress-bar\">\n                                <div class=\"budget-progress-fill ".concat(progressStatus, "\" style=\"width: ").concat(percentage, "%\"></div>\n                            </div>\n                            <span class=\"budget-progress-text\">").concat(Math.round(percentage), "%</span>\n                        ") : '<span class="no-budget">No budget set</span>', "\n                    </div>\n                </div>\n                ").concat(hasChildren ? _this14.renderBudgetCategoryNodes(category.children, level + 1) : '', "\n            ");
+        return "\n                <div class=\"budget-category-row ".concat(hasChildren ? 'parent-row' : '', "\" data-category-id=\"").concat(category.id, "\">\n                    <div class=\"budget-category-name level-").concat(level, "\" data-label=\"\">\n                        <span class=\"category-color\" style=\"background-color: ").concat(category.color || '#3b82f6', "\"></span>\n                        <span class=\"category-label\">").concat(category.name, "</span>\n                    </div>\n                    <div class=\"budget-input-wrapper\" data-label=\"Budget\">\n                        <input type=\"number\"\n                               class=\"budget-input\"\n                               data-category-id=\"").concat(category.id, "\"\n                               value=\"").concat(budget ? Math.round(budget * 100) / 100 : '', "\"\n                               placeholder=\"0.00\"\n                               step=\"0.01\"\n                               min=\"0\">\n                    </div>\n                    <div data-label=\"Period\">\n                        <select class=\"budget-period-select\" data-category-id=\"").concat(category.id, "\">\n                            <option value=\"monthly\" ").concat(category.budgetPeriod === 'monthly' || !category.budgetPeriod ? 'selected' : '', ">Monthly</option>\n                            <option value=\"weekly\" ").concat(category.budgetPeriod === 'weekly' ? 'selected' : '', ">Weekly</option>\n                            <option value=\"quarterly\" ").concat(category.budgetPeriod === 'quarterly' ? 'selected' : '', ">Quarterly</option>\n                            <option value=\"yearly\" ").concat(category.budgetPeriod === 'yearly' ? 'selected' : '', ">Yearly</option>\n                        </select>\n                    </div>\n                    <div class=\"budget-spent\" data-label=\"Spent\">\n                        ").concat(_this13.formatCurrency(spent), "\n                    </div>\n                    <div class=\"budget-remaining ").concat(remainingClass, "\" data-label=\"Remaining\">\n                        ").concat(budget > 0 ? _this13.formatCurrency(remaining) : '<span class="no-budget">—</span>', "\n                    </div>\n                    <div class=\"budget-progress-wrapper\" data-label=\"Progress\">\n                        ").concat(budget > 0 ? "\n                            <div class=\"budget-progress-bar\">\n                                <div class=\"budget-progress-fill ".concat(progressStatus, "\" style=\"width: ").concat(percentage, "%\"></div>\n                            </div>\n                            <span class=\"budget-progress-text\">").concat(Math.round(percentage), "%</span>\n                        ") : '<span class="no-budget">No budget set</span>', "\n                    </div>\n                </div>\n                ").concat(hasChildren ? _this13.renderBudgetCategoryNodes(category.children, level + 1) : '', "\n            ");
       }).join('');
     }
   }, {
     key: "setupBudgetInlineEditing",
     value: function setupBudgetInlineEditing() {
-      var _this15 = this;
+      var _this14 = this;
       // Budget amount inputs
       document.querySelectorAll('.budget-input').forEach(function (input) {
         var debounceTimer;
         input.addEventListener('change', function (e) {
           clearTimeout(debounceTimer);
           debounceTimer = setTimeout(function () {
-            _this15.saveCategoryBudget(e.target.dataset.categoryId, {
+            _this14.saveCategoryBudget(e.target.dataset.categoryId, {
               budgetAmount: e.target.value || null
             });
           }, 300);
@@ -25893,7 +25875,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                   categoryId = parseInt(e.target.dataset.categoryId);
                   newPeriod = e.target.value;
                   oldPeriod = e.target.dataset.oldPeriod || ((_e$target$querySelect = e.target.querySelector('option[selected]')) === null || _e$target$querySelect === void 0 ? void 0 : _e$target$querySelect.value) || 'monthly'; // Find the category to get current budget amount
-                  category = _this15.findCategoryById(categoryId);
+                  category = _this14.findCategoryById(categoryId);
                   if (category) {
                     _context13.n = 1;
                     break;
@@ -25904,13 +25886,13 @@ var CategoriesModule = /*#__PURE__*/function () {
                   currentPeriod = category.budgetPeriod || 'monthly'; // Pro-rate budget from current period to new period
                   proratedBudget = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.prorateBudget(currentBudget, currentPeriod, newPeriod); // Save both the new period and pro-rated amount
                   _context13.n = 2;
-                  return _this15.saveCategoryBudget(categoryId, {
+                  return _this14.saveCategoryBudget(categoryId, {
                     budgetPeriod: newPeriod,
                     budgetAmount: proratedBudget
                   });
                 case 2:
                   _context13.n = 3;
-                  return _this15.recalculateCategorySpending(categoryId, newPeriod);
+                  return _this14.recalculateCategorySpending(categoryId, newPeriod);
                 case 3:
                   // Update old period data attribute for next change
                   e.target.dataset.oldPeriod = newPeriod;
@@ -26028,7 +26010,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context15.n = 2;
               return this.app.loadDashboard();
             case 2:
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)('Budget updated');
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Budget updated');
               _context15.n = 8;
               break;
             case 3:
@@ -26057,7 +26039,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context15.p = 9;
               _t13 = _context15.v;
               console.error('Failed to save budget:', _t13);
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)("Failed to update budget: ".concat(_t13.message));
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)("Failed to update budget: ".concat(_t13.message));
             case 10:
               return _context15.a(2);
           }
@@ -26071,9 +26053,9 @@ var CategoriesModule = /*#__PURE__*/function () {
   }, {
     key: "updateBudgetSummary",
     value: function updateBudgetSummary() {
-      var _this16 = this;
+      var _this15 = this;
       var categories = this.flattenCategories(this.categoryTree || []).filter(function (cat) {
-        return cat.type === _this16.budgetType;
+        return cat.type === _this15.budgetType;
       });
       var totalBudgeted = 0;
       var totalSpent = 0;
@@ -26083,7 +26065,7 @@ var CategoriesModule = /*#__PURE__*/function () {
         var period = cat.budgetPeriod || 'monthly';
         // Normalize to monthly so the summary cards stay consistent
         var monthlyBudget = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.prorateBudget(budget, period, 'monthly');
-        var spent = _this16.categorySpending[cat.id] || 0;
+        var spent = _this15.categorySpending[cat.id] || 0;
         if (budget > 0) {
           totalBudgeted += monthlyBudget;
           categoriesWithBudget++;
@@ -26105,12 +26087,12 @@ var CategoriesModule = /*#__PURE__*/function () {
   }, {
     key: "flattenCategories",
     value: function flattenCategories(categories) {
-      var _this17 = this;
+      var _this16 = this;
       var result = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       categories.forEach(function (cat) {
         result.push(cat);
         if (cat.children && cat.children.length > 0) {
-          _this17.flattenCategories(cat.children, result);
+          _this16.flattenCategories(cat.children, result);
         }
       });
       return result;
@@ -31895,6 +31877,11 @@ var IncomeModule = /*#__PURE__*/function () {
       return this.app.categories;
     }
   }, {
+    key: "categoryTree",
+    get: function get() {
+      return this.app.categoryTree;
+    }
+  }, {
     key: "settings",
     get: function get() {
       return this.app.settings;
@@ -32288,10 +32275,8 @@ var IncomeModule = /*#__PURE__*/function () {
       if (categorySelect && this.categories) {
         var currentValue = categorySelect.value;
         categorySelect.innerHTML = '<option value="">No category</option>';
-        this.categories.filter(function (c) {
-          return c.type === 'income';
-        }).forEach(function (cat) {
-          categorySelect.innerHTML += "<option value=\"".concat(cat.id, "\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(cat.name), "</option>");
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categorySelect, this.categoryTree || this.categories, {
+          typeFilter: 'income'
         });
         if (currentValue) categorySelect.value = currentValue;
       }
@@ -36133,6 +36118,7 @@ var RulesModule = /*#__PURE__*/function () {
       // Create new ActionBuilder instance with app data
       this.actionBuilder = new _components_ActionBuilder_js__WEBPACK_IMPORTED_MODULE_3__.ActionBuilder(container, initialActions, {
         categories: this.categories,
+        categoryTree: this.app.categoryTree,
         accounts: this.accounts,
         tagSets: this.tagSets
       });
@@ -37038,6 +37024,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ActionBuilder: () => (/* binding */ ActionBuilder)
 /* harmony export */ });
 /* harmony import */ var _ActionBuilder_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ActionBuilder.css */ "./src/modules/rules/components/ActionBuilder.css");
+/* harmony import */ var _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../utils/dom.js */ "./src/utils/dom.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -37047,6 +37034,7 @@ function _defineProperties(e, r) { for (var t = 0; t < r.length; t++) { var o = 
 function _createClass(e, r, t) { return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", { writable: !1 }), e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+
 
 
 /**
@@ -37179,11 +37167,10 @@ var ActionBuilder = /*#__PURE__*/function () {
   }, {
     key: "renderCategoryAction",
     value: function renderCategoryAction(action, index) {
-      var _this2 = this;
-      var categories = this.options.categories || [];
-      return "\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Category:</label>\n\t\t\t\t<select class=\"action-value\" data-index=\"".concat(index, "\" data-field=\"value\">\n\t\t\t\t\t<option value=\"\">-- Select Category --</option>\n\t\t\t\t\t").concat(categories.map(function (cat) {
-        return "\n\t\t\t\t\t\t<option value=\"".concat(cat.id, "\" ").concat(action.value == cat.id ? 'selected' : '', ">").concat(_this2.escapeHtml(cat.name), "</option>\n\t\t\t\t\t");
-      }).join(''), "\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Behavior:</label>\n\t\t\t\t<select class=\"action-behavior\" data-index=\"").concat(index, "\" data-field=\"behavior\">\n\t\t\t\t\t<option value=\"always\" ").concat(action.behavior === 'always' ? 'selected' : '', ">Always set</option>\n\t\t\t\t\t<option value=\"if_empty\" ").concat(action.behavior === 'if_empty' ? 'selected' : '', ">Only if empty</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t");
+      var categoryTree = this.options.categoryTree || this.options.categories || [];
+      return "\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Category:</label>\n\t\t\t\t<select class=\"action-value\" data-index=\"".concat(index, "\" data-field=\"value\">\n\t\t\t\t\t<option value=\"\">-- Select Category --</option>\n\t\t\t\t\t").concat((0,_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.buildCategoryOptionsHtml)(categoryTree, {
+        selectedId: action.value
+      }), "\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Behavior:</label>\n\t\t\t\t<select class=\"action-behavior\" data-index=\"").concat(index, "\" data-field=\"behavior\">\n\t\t\t\t\t<option value=\"always\" ").concat(action.behavior === 'always' ? 'selected' : '', ">Always set</option>\n\t\t\t\t\t<option value=\"if_empty\" ").concat(action.behavior === 'if_empty' ? 'selected' : '', ">Only if empty</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t");
     }
   }, {
     key: "renderVendorAction",
@@ -37198,22 +37185,22 @@ var ActionBuilder = /*#__PURE__*/function () {
   }, {
     key: "renderTagsAction",
     value: function renderTagsAction(action, index) {
-      var _this3 = this;
+      var _this2 = this;
       var tagSets = this.options.tagSets || [];
       var selectedTagIds = Array.isArray(action.value) ? action.value : [];
       return "\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Tags to Add:</label>\n\t\t\t\t<div class=\"tags-selection\">\n\t\t\t\t\t".concat(tagSets.length === 0 ? '<p class="no-tags-message">No tag sets available</p>' : '', "\n\t\t\t\t\t").concat(tagSets.map(function (tagSet) {
-        return "\n\t\t\t\t\t\t<fieldset class=\"tag-set-group\">\n\t\t\t\t\t\t\t<legend>".concat(_this3.escapeHtml(tagSet.name), "</legend>\n\t\t\t\t\t\t\t").concat((tagSet.tags || []).map(function (tag) {
-          return "\n\t\t\t\t\t\t\t\t<label class=\"tag-checkbox\">\n\t\t\t\t\t\t\t\t\t<input type=\"checkbox\" class=\"tag-select\" data-index=\"".concat(index, "\"\n\t\t\t\t\t\t\t\t\t\tdata-tag-id=\"").concat(tag.id, "\" ").concat(selectedTagIds.includes(tag.id) ? 'checked' : '', ">\n\t\t\t\t\t\t\t\t\t<span>").concat(_this3.escapeHtml(tag.name), "</span>\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t");
+        return "\n\t\t\t\t\t\t<fieldset class=\"tag-set-group\">\n\t\t\t\t\t\t\t<legend>".concat(_this2.escapeHtml(tagSet.name), "</legend>\n\t\t\t\t\t\t\t").concat((tagSet.tags || []).map(function (tag) {
+          return "\n\t\t\t\t\t\t\t\t<label class=\"tag-checkbox\">\n\t\t\t\t\t\t\t\t\t<input type=\"checkbox\" class=\"tag-select\" data-index=\"".concat(index, "\"\n\t\t\t\t\t\t\t\t\t\tdata-tag-id=\"").concat(tag.id, "\" ").concat(selectedTagIds.includes(tag.id) ? 'checked' : '', ">\n\t\t\t\t\t\t\t\t\t<span>").concat(_this2.escapeHtml(tag.name), "</span>\n\t\t\t\t\t\t\t\t</label>\n\t\t\t\t\t\t\t");
         }).join(''), "\n\t\t\t\t\t\t</fieldset>\n\t\t\t\t\t");
       }).join(''), "\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Behavior:</label>\n\t\t\t\t<select class=\"action-behavior\" data-index=\"").concat(index, "\" data-field=\"behavior\">\n\t\t\t\t\t<option value=\"merge\" ").concat(action.behavior === 'merge' ? 'selected' : '', ">Merge with existing tags</option>\n\t\t\t\t\t<option value=\"replace\" ").concat(action.behavior === 'replace' ? 'selected' : '', ">Replace all tags</option>\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t");
     }
   }, {
     key: "renderAccountAction",
     value: function renderAccountAction(action, index) {
-      var _this4 = this;
+      var _this3 = this;
       var accounts = this.options.accounts || [];
       return "\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<label>Account:</label>\n\t\t\t\t<select class=\"action-value\" data-index=\"".concat(index, "\" data-field=\"value\">\n\t\t\t\t\t<option value=\"\">-- Select Account --</option>\n\t\t\t\t\t").concat(accounts.map(function (account) {
-        return "\n\t\t\t\t\t\t<option value=\"".concat(account.id, "\" ").concat(action.value == account.id ? 'selected' : '', ">").concat(_this4.escapeHtml(account.name), "</option>\n\t\t\t\t\t");
+        return "\n\t\t\t\t\t\t<option value=\"".concat(account.id, "\" ").concat(action.value == account.id ? 'selected' : '', ">").concat(_this3.escapeHtml(account.name), "</option>\n\t\t\t\t\t");
       }).join(''), "\n\t\t\t\t</select>\n\t\t\t</div>\n\t\t\t<div class=\"form-row\">\n\t\t\t\t<small class=\"help-text\">This will reassign the transaction to a different account</small>\n\t\t\t</div>\n\t\t");
     }
   }, {
@@ -37229,13 +37216,13 @@ var ActionBuilder = /*#__PURE__*/function () {
   }, {
     key: "attachEventListeners",
     value: function attachEventListeners() {
-      var _this5 = this;
+      var _this4 = this;
       // Add action dropdown
       var addSelect = document.getElementById('add-action-type');
       if (addSelect) {
         addSelect.addEventListener('change', function (e) {
           if (e.target.value) {
-            _this5.addAction(e.target.value);
+            _this4.addAction(e.target.value);
             e.target.value = '';
           }
         });
@@ -37245,7 +37232,7 @@ var ActionBuilder = /*#__PURE__*/function () {
       var stopCheck = document.getElementById('stop-processing-check');
       if (stopCheck) {
         stopCheck.addEventListener('change', function (e) {
-          _this5.stopProcessing = e.target.checked;
+          _this4.stopProcessing = e.target.checked;
         });
       }
 
@@ -37256,13 +37243,13 @@ var ActionBuilder = /*#__PURE__*/function () {
         var moveDownBtn = e.target.closest('.btn-move-down');
         if (removeBtn) {
           var index = parseInt(removeBtn.dataset.index);
-          _this5.removeAction(index);
+          _this4.removeAction(index);
         } else if (moveUpBtn) {
           var _index = parseInt(moveUpBtn.dataset.index);
-          _this5.moveAction(_index, -1);
+          _this4.moveAction(_index, -1);
         } else if (moveDownBtn) {
           var _index2 = parseInt(moveDownBtn.dataset.index);
-          _this5.moveAction(_index2, 1);
+          _this4.moveAction(_index2, 1);
         }
       });
 
@@ -37271,10 +37258,10 @@ var ActionBuilder = /*#__PURE__*/function () {
         if (e.target.classList.contains('action-value') || e.target.classList.contains('action-behavior') || e.target.classList.contains('action-separator')) {
           var index = parseInt(e.target.dataset.index);
           var field = e.target.dataset.field;
-          _this5.updateActionField(index, field, e.target.value);
+          _this4.updateActionField(index, field, e.target.value);
         } else if (e.target.classList.contains('tag-select')) {
           var _index3 = parseInt(e.target.dataset.index);
-          _this5.updateTagSelection(_index3);
+          _this4.updateTagSelection(_index3);
         }
       });
 
@@ -37283,7 +37270,7 @@ var ActionBuilder = /*#__PURE__*/function () {
         if (e.target.classList.contains('action-value') || e.target.classList.contains('action-separator')) {
           var index = parseInt(e.target.dataset.index);
           var field = e.target.dataset.field;
-          _this5.updateActionField(index, field, e.target.value);
+          _this4.updateActionField(index, field, e.target.value);
         }
       });
     }
@@ -42236,9 +42223,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var categoryFilter = document.getElementById('filter-category');
       if (categoryFilter && this.categories) {
         categoryFilter.innerHTML = '<option value="">All Categories</option><option value="uncategorized">Uncategorized</option>';
-        this.categories.forEach(function (category) {
-          categoryFilter.innerHTML += "<option value=\"".concat(category.id, "\">").concat(category.name, "</option>");
-        });
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categoryFilter, this.categoryTree || this.categories);
       }
 
       // Populate reconcile account select
@@ -42806,12 +42791,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       // Populate category dropdown
       if (categorySelect && this.categories) {
         categorySelect.innerHTML = '<option value="">Don\'t change</option>';
-        this.categories.forEach(function (cat) {
-          var option = document.createElement('option');
-          option.value = cat.id;
-          option.textContent = cat.name;
-          categorySelect.appendChild(option);
-        });
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categorySelect, this.categoryTree || this.categories);
       }
 
       // Reset form
@@ -43248,10 +43228,7 @@ var TransactionsModule = /*#__PURE__*/function () {
 
         // Clear and rebuild options
         categorySelect.innerHTML = '<option value="">No category</option>';
-
-        // Use hierarchical tree for recursive rendering with indentation
-        var categoriesList = this.categoryTree || this.categories;
-        this.renderCategoryOptions(categorySelect, categoriesList);
+        _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.populateCategorySelect(categorySelect, this.categoryTree || this.categories);
 
         // Restore previous value if it exists
         if (_currentValue2) {
@@ -43260,26 +43237,9 @@ var TransactionsModule = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "renderCategoryOptions",
-    value: function renderCategoryOptions(selectElement, categories) {
-      var _this8 = this;
-      var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      categories.forEach(function (category) {
-        var option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = '  '.repeat(level) + category.name;
-        selectElement.appendChild(option);
-
-        // Recursively add child categories
-        if (category.children && category.children.length > 0) {
-          _this8.renderCategoryOptions(selectElement, category.children, level + 1);
-        }
-      });
-    }
-  }, {
     key: "showTransactionModal",
     value: function showTransactionModal() {
-      var _this9 = this;
+      var _this8 = this;
       var transaction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var preSelectedAccountId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var modal = document.getElementById('transaction-modal');
@@ -43323,7 +43283,7 @@ var TransactionsModule = /*#__PURE__*/function () {
           categorySelect.onchange = function () {
             if (oldListener) oldListener();
             var transactionId = document.getElementById('transaction-id').value;
-            _this9.app.renderTransactionTagSelectors(categorySelect.value || null, transactionId || null);
+            _this8.app.renderTransactionTagSelectors(categorySelect.value || null, transactionId || null);
           };
         }
 
@@ -43849,7 +43809,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var _showMatchingModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(transactionId) {
         var _this$transactions,
           _this$accounts2,
-          _this0 = this;
+          _this9 = this;
         var transaction, modal, sourceDetails, loadingEl, emptyEl, listEl, account, currency, typeClass, result, _t14;
         return _regenerator().w(function (_context13) {
           while (1) switch (_context13.p = _context13.n) {
@@ -43900,13 +43860,13 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 4:
               // Render matches
               listEl.innerHTML = result.matches.map(function (match) {
-                var _this0$accounts;
-                var matchAccount = (_this0$accounts = _this0.accounts) === null || _this0$accounts === void 0 ? void 0 : _this0$accounts.find(function (a) {
+                var _this9$accounts;
+                var matchAccount = (_this9$accounts = _this9.accounts) === null || _this9$accounts === void 0 ? void 0 : _this9$accounts.find(function (a) {
                   return a.id === match.accountId;
                 });
-                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this0.getPrimaryCurrency();
+                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this9.getPrimaryCurrency();
                 var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this0.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this0.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this0.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || 'Unknown', "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            Link as Transfer\n                        </button>\n                    </div>\n                ");
+                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this9.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this9.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this9.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || 'Unknown', "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            Link as Transfer\n                        </button>\n                    </div>\n                ");
               }).join('');
               _context13.n = 6;
               break;
@@ -44005,7 +43965,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var _showSplitModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16(transactionId) {
         var _this$transactions2,
           _this$accounts3,
-          _this1 = this;
+          _this0 = this;
         var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, unsplitBtn, _t17;
         return _regenerator().w(function (_context16) {
           while (1) switch (_context16.p = _context16.n) {
@@ -44058,7 +44018,7 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 4:
               splits = _context16.v;
               splits.forEach(function (split, index) {
-                _this1.addSplitRow(splitsContainer, split, index === 0);
+                _this0.addSplitRow(splitsContainer, split, index === 0);
               });
               _context16.n = 6;
               break;
@@ -44082,7 +44042,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (unsplitBtn) {
                 unsplitBtn.style.display = isSplit ? '' : 'none';
                 unsplitBtn.onclick = function () {
-                  return _this1.unsplitTransaction();
+                  return _this0.unsplitTransaction();
                 };
               }
               this.updateSplitRemaining();
@@ -44101,7 +44061,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "addSplitRow",
     value: function addSplitRow(container) {
       var _this$transactions3,
-        _this10 = this;
+        _this1 = this;
       var split = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var modal = document.getElementById('split-modal');
@@ -44121,12 +44081,12 @@ var TransactionsModule = /*#__PURE__*/function () {
 
       // Add event listeners
       row.querySelector('.split-amount').addEventListener('input', function () {
-        return _this10.updateSplitRemaining();
+        return _this1.updateSplitRemaining();
       });
       row.querySelector('.split-remove-btn').addEventListener('click', function (e) {
         if (!e.currentTarget.classList.contains('disabled')) {
           row.remove();
-          _this10.updateSplitRemaining();
+          _this1.updateSplitRemaining();
         }
       });
       container.appendChild(row);
@@ -44134,7 +44094,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "getCategoryOptions",
     value: function getCategoryOptions() {
-      var _this11 = this;
+      var _this10 = this;
       var selectedId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var transactionType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       if (!this.categories) return '';
@@ -44145,7 +44105,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       return this.categories.filter(function (c) {
         return c.type === categoryType;
       }).map(function (c) {
-        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this11.escapeHtml(c.name), "</option>");
+        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this10.escapeHtml(c.name), "</option>");
       }).join('');
     }
   }, {
@@ -44544,7 +44504,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "handleAutoMode",
     value: function () {
       var _handleAutoMode = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee23(scanResult) {
-        var _this12 = this;
+        var _this11 = this;
         var loadingEl, resultsEl, autoMatchedSection, needsReviewSection, autoMatchedList, needsReviewList, singleMatches, multiMatches, autoLinkedCount, pairs, linkResult, _t21;
         return _regenerator().w(function (_context23) {
           while (1) switch (_context23.p = _context23.n) {
@@ -44602,7 +44562,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (autoLinkedCount > 0) {
                 autoMatchedSection.style.display = 'block';
                 autoMatchedList.innerHTML = singleMatches.map(function (c) {
-                  return _this12.renderAutoMatchedPair({
+                  return _this11.renderAutoMatchedPair({
                     transaction: c.transaction,
                     linkedTo: c.matches[0]
                   });
@@ -44613,7 +44573,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (multiMatches.length > 0) {
                 needsReviewSection.style.display = 'block';
                 needsReviewList.innerHTML = multiMatches.map(function (item, index) {
-                  return _this12.renderNeedsReviewItem(item, index);
+                  return _this11.renderNeedsReviewItem(item, index);
                 }).join('');
               }
               if (autoLinkedCount === 0 && multiMatches.length === 0) {
@@ -44632,7 +44592,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "handleReviewMode",
     value: function handleReviewMode(scanResult) {
-      var _this13 = this;
+      var _this12 = this;
       var resultsEl = document.getElementById('bulk-match-results');
       var autoMatchedSection = document.getElementById('auto-matched-section');
       var needsReviewSection = document.getElementById('needs-review-section');
@@ -44657,7 +44617,7 @@ var TransactionsModule = /*#__PURE__*/function () {
         autoMatchedSection.querySelector('h4').textContent = 'Exact Matches';
         autoMatchedSection.querySelector('.section-hint').textContent = 'These transactions have exactly one match. Uncheck any you don\'t want to link.';
         autoMatchedList.innerHTML = singleMatches.map(function (c, index) {
-          return _this13.renderReviewSingleMatch(c, index);
+          return _this12.renderReviewSingleMatch(c, index);
         }).join('');
       }
 
@@ -44665,7 +44625,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       if (multiMatches.length > 0) {
         needsReviewSection.style.display = 'block';
         needsReviewList.innerHTML = multiMatches.map(function (item, index) {
-          return _this13.renderNeedsReviewItem(item, index);
+          return _this12.renderNeedsReviewItem(item, index);
         }).join('');
       }
 
@@ -44699,14 +44659,14 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "renderNeedsReviewItem",
     value: function renderNeedsReviewItem(item, index) {
-      var _this14 = this;
+      var _this13 = this;
       var tx = item.transaction;
       var txCurrency = tx.account_currency || this.getPrimaryCurrency();
       var txTypeClass = tx.type === 'credit' ? 'positive' : 'negative';
       var matchesHtml = item.matches.map(function (match) {
-        var matchCurrency = match.accountCurrency || _this14.getPrimaryCurrency();
+        var matchCurrency = match.accountCurrency || _this13.getPrimaryCurrency();
         var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-        return "\n                <label class=\"review-match-option\">\n                    <input type=\"radio\" name=\"review-match-".concat(index, "\" value=\"").concat(match.id, "\">\n                    <div class=\"match-info\">\n                        <div class=\"match-info-main\">\n                            <span class=\"match-date\">").concat(_this14.formatDate(match.date), "</span>\n                            <span class=\"match-description\">").concat(_this14.escapeHtml(match.description), "</span>\n                        </div>\n                        <span class=\"pair-amount ").concat(matchTypeClass, "\">").concat(_this14.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"pair-account\">").concat(_this14.escapeHtml(match.accountName), "</span>\n                    </div>\n                </label>\n            ");
+        return "\n                <label class=\"review-match-option\">\n                    <input type=\"radio\" name=\"review-match-".concat(index, "\" value=\"").concat(match.id, "\">\n                    <div class=\"match-info\">\n                        <div class=\"match-info-main\">\n                            <span class=\"match-date\">").concat(_this13.formatDate(match.date), "</span>\n                            <span class=\"match-description\">").concat(_this13.escapeHtml(match.description), "</span>\n                        </div>\n                        <span class=\"pair-amount ").concat(matchTypeClass, "\">").concat(_this13.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"pair-account\">").concat(_this13.escapeHtml(match.accountName), "</span>\n                    </div>\n                </label>\n            ");
       }).join('');
       return "\n            <div class=\"bulk-review-item\" data-tx-id=\"".concat(tx.id, "\" data-index=\"").concat(index, "\">\n                <div class=\"review-source\">\n                    <div class=\"review-source-info\">\n                        <span class=\"review-source-date\">").concat(this.formatDate(tx.date), "</span>\n                        <span class=\"review-source-description\">").concat(this.escapeHtml(tx.description), "</span>\n                        <div class=\"review-source-details\">\n                            <span class=\"pair-amount ").concat(txTypeClass, "\">").concat(this.formatCurrency(tx.amount, txCurrency), "</span>\n                            <span class=\"pair-account\">").concat(this.escapeHtml(tx.account_name), "</span>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"review-matches-label\">Select a match (").concat(item.matchCount, " options):</div>\n                <div class=\"review-matches\">\n                    ").concat(matchesHtml, "\n                </div>\n                <button class=\"link-selected-btn\" data-tx-id=\"").concat(tx.id, "\" data-index=\"").concat(index, "\" disabled>Link Selected</button>\n            </div>\n        ");
     }
@@ -44924,7 +44884,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "setupInlineEditingListeners",
     value: function setupInlineEditingListeners() {
-      var _this15 = this;
+      var _this14 = this;
       var transactionsTable = document.getElementById('transactions-table');
       if (!transactionsTable) {
         return;
@@ -44936,14 +44896,14 @@ var TransactionsModule = /*#__PURE__*/function () {
         if (cell && !cell.classList.contains('editing')) {
           // Don't trigger if clicking on checkbox
           if (e.target.type === 'checkbox') return;
-          _this15.startInlineEdit(cell);
+          _this14.startInlineEdit(cell);
         }
       });
 
       // Close any open inline editors when clicking outside
       document.addEventListener('click', function (e) {
         if (!e.target.closest('.editable-cell') && !e.target.closest('.category-autocomplete-dropdown')) {
-          _this15.closeAllInlineEditors();
+          _this14.closeAllInlineEditors();
         }
       });
     }
@@ -44991,7 +44951,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createDateEditor",
     value: function createDateEditor(cell, value) {
       var _this$app$settings,
-        _this16 = this;
+        _this15 = this;
       var input = document.createElement('input');
       input.type = 'text';
       input.className = 'inline-edit-input';
@@ -45013,12 +44973,12 @@ var TransactionsModule = /*#__PURE__*/function () {
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
           fp.destroy();
-          _this16.cancelInlineEdit(cell);
+          _this15.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           var isoDate = getIsoDate();
           fp.destroy();
-          _this16.saveInlineEdit(cell, 'date', isoDate);
+          _this15.saveInlineEdit(cell, 'date', isoDate);
         }
       });
       input.addEventListener('blur', function () {
@@ -45026,7 +44986,7 @@ var TransactionsModule = /*#__PURE__*/function () {
           if (cell.classList.contains('editing') && !fp.isOpen) {
             var isoDate = getIsoDate();
             fp.destroy();
-            _this16.saveInlineEdit(cell, 'date', isoDate);
+            _this15.saveInlineEdit(cell, 'date', isoDate);
           }
         }, 200);
       });
@@ -45064,7 +45024,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "createCategoryEditor",
     value: function createCategoryEditor(cell, currentCategoryId) {
-      var _this17 = this;
+      var _this16 = this;
       var container = document.createElement('div');
       container.className = 'category-autocomplete';
       var input = document.createElement('input');
@@ -45131,19 +45091,19 @@ var TransactionsModule = /*#__PURE__*/function () {
           input.dataset.categoryId = item.dataset.categoryId;
           input.value = item.dataset.categoryName;
           dropdown.style.display = 'none';
-          _this17.saveInlineEdit(cell, 'categoryId', item.dataset.categoryId);
+          _this16.saveInlineEdit(cell, 'categoryId', item.dataset.categoryId);
         }
       });
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this17.cancelInlineEdit(cell);
+          _this16.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           dropdown.style.display = 'none';
-          _this17.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
+          _this16.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
           e.preventDefault();
-          _this17.navigateCategoryDropdown(dropdown, e.key === 'ArrowDown' ? 1 : -1, input);
+          _this16.navigateCategoryDropdown(dropdown, e.key === 'ArrowDown' ? 1 : -1, input);
         }
       });
       input.addEventListener('blur', function () {
@@ -45151,9 +45111,9 @@ var TransactionsModule = /*#__PURE__*/function () {
           if (!container.contains(document.activeElement)) {
             dropdown.style.display = 'none';
             if (input.dataset.categoryId !== (currentCategoryId || '')) {
-              _this17.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
+              _this16.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
             } else {
-              _this17.cancelInlineEdit(cell);
+              _this16.cancelInlineEdit(cell);
             }
           }
         }, 200);
@@ -45190,7 +45150,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createAccountEditor",
     value: function createAccountEditor(cell, currentAccountId) {
       var _this$accounts4,
-        _this18 = this;
+        _this17 = this;
       var select = document.createElement('select');
       select.className = 'inline-edit-select';
       (_this$accounts4 = this.accounts) === null || _this$accounts4 === void 0 || _this$accounts4.forEach(function (account) {
@@ -45202,19 +45162,19 @@ var TransactionsModule = /*#__PURE__*/function () {
       });
       select.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this18.cancelInlineEdit(cell);
+          _this17.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          _this18.saveInlineEdit(cell, 'accountId', select.value);
+          _this17.saveInlineEdit(cell, 'accountId', select.value);
         }
       });
       select.addEventListener('change', function () {
-        _this18.saveInlineEdit(cell, 'accountId', select.value);
+        _this17.saveInlineEdit(cell, 'accountId', select.value);
       });
       select.addEventListener('blur', function () {
         setTimeout(function () {
           if (cell.classList.contains('editing')) {
-            _this18.cancelInlineEdit(cell);
+            _this17.cancelInlineEdit(cell);
           }
         }, 100);
       });
@@ -45226,7 +45186,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createTagsEditor",
     value: function () {
       var _createTagsEditor = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee27(cell, transaction) {
-        var _this19 = this;
+        var _this18 = this;
         var categoryId, tagSets, currentTagIds, selectedTags, container, input, dropdown, allTags, renderDropdown, _t25;
         return _regenerator().w(function (_context27) {
           while (1) switch (_context27.p = _context27.n) {
@@ -45238,7 +45198,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               }
               cell.innerHTML = '<span style="color: var(--color-text-maxcontrast); font-size: 11px; font-style: italic;">Select category first</span>';
               setTimeout(function () {
-                return _this19.cancelInlineEdit(cell);
+                return _this18.cancelInlineEdit(cell);
               }, 1500);
               return _context27.a(2);
             case 1:
@@ -45254,7 +45214,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               }
               cell.innerHTML = '<span style="color: var(--color-text-maxcontrast); font-size: 11px; font-style: italic;">No tag sets</span>';
               setTimeout(function () {
-                return _this19.cancelInlineEdit(cell);
+                return _this18.cancelInlineEdit(cell);
               }, 1500);
               return _context27.a(2);
             case 4:
@@ -45300,10 +45260,10 @@ var TransactionsModule = /*#__PURE__*/function () {
                 });
                 var html = '';
                 Object.values(grouped).forEach(function (group) {
-                  html += "<div class=\"tags-group-header\">".concat(_this19.escapeHtml(group.name), "</div>");
+                  html += "<div class=\"tags-group-header\">".concat(_this18.escapeHtml(group.name), "</div>");
                   group.tags.forEach(function (tag) {
                     var isSelected = selectedTags.has(tag.id);
-                    html += "\n                            <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                                 data-tag-id=\"").concat(tag.id, "\">\n                                <span class=\"tag-chip\"\n                                      style=\"display: inline-flex; align-items: center; background-color: ").concat(_this19.escapeHtml(tag.color), "; color: white;\n                                             padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                    ").concat(_this19.escapeHtml(tag.name), "\n                                </span>\n                                <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                            </div>\n                        ");
+                    html += "\n                            <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                                 data-tag-id=\"").concat(tag.id, "\">\n                                <span class=\"tag-chip\"\n                                      style=\"display: inline-flex; align-items: center; background-color: ").concat(_this18.escapeHtml(tag.color), "; color: white;\n                                             padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                    ").concat(_this18.escapeHtml(tag.name), "\n                                </span>\n                                <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                            </div>\n                        ");
                   });
                 });
                 dropdown.innerHTML = html || '<div class="tags-autocomplete-empty">No tags found</div>';
@@ -45345,16 +45305,16 @@ var TransactionsModule = /*#__PURE__*/function () {
               });
               input.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
-                  _this19.cancelInlineEdit(cell);
+                  _this18.cancelInlineEdit(cell);
                 } else if (e.key === 'Enter') {
                   e.preventDefault();
-                  _this19.saveTagsFromEditor(cell, selectedTags, transaction.id);
+                  _this18.saveTagsFromEditor(cell, selectedTags, transaction.id);
                 }
               });
               input.addEventListener('blur', function () {
                 setTimeout(function () {
                   if (cell.classList.contains('editing')) {
-                    _this19.saveTagsFromEditor(cell, selectedTags, transaction.id);
+                    _this18.saveTagsFromEditor(cell, selectedTags, transaction.id);
                   }
                 }, 200);
               });
@@ -45370,7 +45330,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               console.error('Failed to load tag sets:', _t25);
               cell.innerHTML = '<span style="color: var(--color-error); font-size: 11px;">Error loading tags</span>';
               setTimeout(function () {
-                return _this19.cancelInlineEdit(cell);
+                return _this18.cancelInlineEdit(cell);
               }, 1500);
             case 6:
               return _context27.a(2);
@@ -45483,20 +45443,20 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "setupEditorEvents",
     value: function setupEditorEvents(input, cell, field) {
-      var _this20 = this;
+      var _this19 = this;
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this20.cancelInlineEdit(cell);
+          _this19.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           if (field === 'amount') {
             var raw = parseFloat(input.value) || 0;
             var type = raw < 0 ? 'debit' : 'credit';
-            _this20.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
+            _this19.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
               type: type
             });
           } else {
-            _this20.saveInlineEdit(cell, field, input.value);
+            _this19.saveInlineEdit(cell, field, input.value);
           }
         }
       });
@@ -45506,11 +45466,11 @@ var TransactionsModule = /*#__PURE__*/function () {
             if (field === 'amount') {
               var raw = parseFloat(input.value) || 0;
               var type = raw < 0 ? 'debit' : 'credit';
-              _this20.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
+              _this19.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
                 type: type
               });
             } else {
-              _this20.saveInlineEdit(cell, field, input.value);
+              _this19.saveInlineEdit(cell, field, input.value);
             }
           }
         }, 100);
@@ -45650,10 +45610,10 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "closeAllInlineEditors",
     value: function closeAllInlineEditors() {
-      var _this21 = this;
+      var _this20 = this;
       var editingCells = document.querySelectorAll('.editable-cell.editing');
       editingCells.forEach(function (cell) {
-        _this21.cancelInlineEdit(cell);
+        _this20.cancelInlineEdit(cell);
       });
     }
 
@@ -45741,6 +45701,11 @@ var TransfersModule = /*#__PURE__*/function () {
     key: "categories",
     get: function get() {
       return this.app.categories;
+    }
+  }, {
+    key: "categoryTree",
+    get: function get() {
+      return this.app.categoryTree;
     }
   }, {
     key: "settings",
@@ -46062,11 +46027,10 @@ var TransfersModule = /*#__PURE__*/function () {
         return "\n                                        <option value=\"".concat(account.id, "\" ").concat(isEdit && transfer.accountId === account.id ? 'selected' : '', ">\n                                            ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(account.name), "\n                                        </option>\n                                    ");
       }).join(''), "\n                                </select>\n                            </div>\n                            <div class=\"form-group\">\n                                <label for=\"recurring-transfer-to-account\">To Account *</label>\n                                <select id=\"recurring-transfer-to-account\" class=\"form-control\" required>\n                                    <option value=\"\">Select account...</option>\n                                    ").concat(this.accounts.map(function (account) {
         return "\n                                        <option value=\"".concat(account.id, "\" ").concat(isEdit && transfer.destinationAccountId === account.id ? 'selected' : '', ">\n                                            ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(account.name), "\n                                        </option>\n                                    ");
-      }).join(''), "\n                                </select>\n                            </div>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-due-day\">Day of Month (1-31)</label>\n                            <input type=\"number\" id=\"transfer-due-day\" class=\"form-control\"\n                                   min=\"1\" max=\"31\" placeholder=\"e.g., 15\"\n                                   value=\"").concat(isEdit && transfer.dueDay ? transfer.dueDay : '', "\">\n                            <small class=\"form-hint\">Leave empty for weekly transfers</small>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-description-pattern\">Transaction Description Pattern (Optional)</label>\n                            <input type=\"text\" id=\"transfer-description-pattern\" class=\"form-control\"\n                                   placeholder=\"e.g., Savings Transfer\"\n                                   value=\"").concat(isEdit && transfer.transferDescriptionPattern ? _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(transfer.transferDescriptionPattern) : '', "\">\n                            <small class=\"form-hint\">Used to match imported transactions</small>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-category\">Category</label>\n                            <select id=\"transfer-category\" class=\"form-control\">\n                                <option value=\"\">No category</option>\n                                ").concat(this.categories.filter(function (c) {
-        return c.type === 'expense';
-      }).map(function (cat) {
-        return "\n                                        <option value=\"".concat(cat.id, "\" ").concat(isEdit && transfer.categoryId === cat.id ? 'selected' : '', ">\n                                            ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(cat.name), "\n                                        </option>\n                                    ");
-      }).join(''), "\n                            </select>\n                            <small class=\"form-hint\">Category for created transactions (optional)</small>\n                        </div>\n\n                        <div id=\"transfer-tags-container\"></div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-notes\">Notes</label>\n                            <textarea id=\"transfer-notes\" class=\"form-control\" rows=\"3\"\n                                      placeholder=\"Optional notes...\">").concat(isEdit && transfer.notes ? _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(transfer.notes) : '', "</textarea>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label class=\"checkbox-label\">\n                                <input type=\"checkbox\" id=\"transfer-create-transaction\"\n                                       ").concat(isEdit ? '' : '', ">\n                                <span>Also create transactions now</span>\n                            </label>\n                            <small class=\"form-hint\">Creates paired debit/credit transactions immediately</small>\n                        </div>\n\n                        <div class=\"form-group\" id=\"transfer-transaction-date-group\" style=\"display: none;\">\n                            <label for=\"transfer-transaction-date\">Transaction Date</label>\n                            <input type=\"date\" id=\"transfer-transaction-date\" class=\"form-control\">\n                            <small class=\"form-hint\">Leave empty to use next due date</small>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label class=\"checkbox-label\">\n                                <input type=\"checkbox\" id=\"transfer-auto-pay\"\n                                       ").concat(isEdit && transfer.autoPayEnabled ? 'checked' : '', ">\n                                <span>Enable auto-pay (automatically create transactions when due)</span>\n                            </label>\n                        </div>\n\n                        <div class=\"budget-modal-footer\">\n                            <button type=\"button\" class=\"button secondary\" id=\"cancel-transfer\">Cancel</button>\n                            <button type=\"submit\" class=\"button primary\">\n                                ").concat(isEdit ? 'Update Transfer' : 'Add Transfer', "\n                            </button>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        ");
+      }).join(''), "\n                                </select>\n                            </div>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-due-day\">Day of Month (1-31)</label>\n                            <input type=\"number\" id=\"transfer-due-day\" class=\"form-control\"\n                                   min=\"1\" max=\"31\" placeholder=\"e.g., 15\"\n                                   value=\"").concat(isEdit && transfer.dueDay ? transfer.dueDay : '', "\">\n                            <small class=\"form-hint\">Leave empty for weekly transfers</small>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-description-pattern\">Transaction Description Pattern (Optional)</label>\n                            <input type=\"text\" id=\"transfer-description-pattern\" class=\"form-control\"\n                                   placeholder=\"e.g., Savings Transfer\"\n                                   value=\"").concat(isEdit && transfer.transferDescriptionPattern ? _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(transfer.transferDescriptionPattern) : '', "\">\n                            <small class=\"form-hint\">Used to match imported transactions</small>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-category\">Category</label>\n                            <select id=\"transfer-category\" class=\"form-control\">\n                                <option value=\"\">No category</option>\n                                ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.buildCategoryOptionsHtml(this.categoryTree || this.categories, {
+        typeFilter: 'expense',
+        selectedId: isEdit ? transfer.categoryId : null
+      }), "\n                            </select>\n                            <small class=\"form-hint\">Category for created transactions (optional)</small>\n                        </div>\n\n                        <div id=\"transfer-tags-container\"></div>\n\n                        <div class=\"form-group\">\n                            <label for=\"transfer-notes\">Notes</label>\n                            <textarea id=\"transfer-notes\" class=\"form-control\" rows=\"3\"\n                                      placeholder=\"Optional notes...\">").concat(isEdit && transfer.notes ? _utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(transfer.notes) : '', "</textarea>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label class=\"checkbox-label\">\n                                <input type=\"checkbox\" id=\"transfer-create-transaction\"\n                                       ").concat(isEdit ? '' : '', ">\n                                <span>Also create transactions now</span>\n                            </label>\n                            <small class=\"form-hint\">Creates paired debit/credit transactions immediately</small>\n                        </div>\n\n                        <div class=\"form-group\" id=\"transfer-transaction-date-group\" style=\"display: none;\">\n                            <label for=\"transfer-transaction-date\">Transaction Date</label>\n                            <input type=\"date\" id=\"transfer-transaction-date\" class=\"form-control\">\n                            <small class=\"form-hint\">Leave empty to use next due date</small>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label class=\"checkbox-label\">\n                                <input type=\"checkbox\" id=\"transfer-auto-pay\"\n                                       ").concat(isEdit && transfer.autoPayEnabled ? 'checked' : '', ">\n                                <span>Enable auto-pay (automatically create transactions when due)</span>\n                            </label>\n                        </div>\n\n                        <div class=\"budget-modal-footer\">\n                            <button type=\"button\" class=\"button secondary\" id=\"cancel-transfer\">Cancel</button>\n                            <button type=\"submit\" class=\"button primary\">\n                                ").concat(isEdit ? 'Update Transfer' : 'Add Transfer', "\n                            </button>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        ");
 
       // Remove existing modal if any
       var existingModal = document.querySelector('.budget-modal-overlay');
@@ -47025,8 +46989,10 @@ function destroyAllDatePickers() {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   buildCategoryOptionsHtml: () => (/* binding */ buildCategoryOptionsHtml),
 /* harmony export */   closeModal: () => (/* binding */ closeModal),
-/* harmony export */   escapeHtml: () => (/* binding */ escapeHtml)
+/* harmony export */   escapeHtml: () => (/* binding */ escapeHtml),
+/* harmony export */   populateCategorySelect: () => (/* binding */ populateCategorySelect)
 /* harmony export */ });
 /**
  * DOM manipulation and HTML utilities
@@ -47051,6 +47017,75 @@ function closeModal(modal) {
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
   }
+}
+
+/**
+ * Populate a <select> element with hierarchical category options.
+ * Renders the category tree recursively with indentation using non-breaking spaces.
+ *
+ * @param {HTMLSelectElement} selectElement - The select element to populate (existing options are preserved)
+ * @param {Array} categoryTree - Hierarchical category array (each item may have .children)
+ * @param {Object} [options] - Optional filters
+ * @param {string} [options.typeFilter] - Only include categories matching this type (e.g. 'expense', 'income')
+ * @param {number} [options.excludeId] - Exclude this category ID (and skip rendering it, but still recurse children)
+ * @param {number|string} [options.selectedId] - Pre-select this category ID
+ * @param {number} [level=0] - Current nesting depth (used internally for recursion)
+ */
+function populateCategorySelect(selectElement, categoryTree) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  var level = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  if (!selectElement || !Array.isArray(categoryTree)) return;
+  var typeFilter = options.typeFilter,
+    excludeId = options.excludeId,
+    selectedId = options.selectedId;
+  categoryTree.forEach(function (category) {
+    var matchesType = !typeFilter || category.type === typeFilter;
+    var isExcluded = excludeId != null && category.id === excludeId;
+    if (matchesType && !isExcluded) {
+      var option = document.createElement('option');
+      option.value = category.id;
+      option.textContent = "\xA0\xA0".repeat(level) + category.name;
+      if (selectedId != null && category.id == selectedId) {
+        option.selected = true;
+      }
+      selectElement.appendChild(option);
+    }
+    if (category.children && category.children.length > 0) {
+      populateCategorySelect(selectElement, category.children, options, matchesType ? level + 1 : level);
+    }
+  });
+}
+
+/**
+ * Build an HTML string of <option> elements from a hierarchical category tree.
+ * Useful for template-literal-based rendering where DOM manipulation isn't available.
+ *
+ * @param {Array} categoryTree - Hierarchical category array (each item may have .children)
+ * @param {Object} [options] - Optional filters
+ * @param {string} [options.typeFilter] - Only include categories matching this type
+ * @param {number|string} [options.selectedId] - Pre-select this category ID
+ * @param {number} [level=0] - Current nesting depth (used internally for recursion)
+ * @returns {string} HTML string of <option> elements
+ */
+function buildCategoryOptionsHtml(categoryTree) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var level = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  if (!Array.isArray(categoryTree)) return '';
+  var typeFilter = options.typeFilter,
+    selectedId = options.selectedId;
+  var html = '';
+  categoryTree.forEach(function (category) {
+    var matchesType = !typeFilter || category.type === typeFilter;
+    if (matchesType) {
+      var indent = "\xA0\xA0".repeat(level);
+      var selected = selectedId != null && category.id == selectedId ? ' selected' : '';
+      html += "<option value=\"".concat(category.id, "\"").concat(selected, ">").concat(indent).concat(escapeHtml(category.name), "</option>");
+    }
+    if (category.children && category.children.length > 0) {
+      html += buildCategoryOptionsHtml(category.children, options, matchesType ? level + 1 : level);
+    }
+  });
+  return html;
 }
 
 /***/ }),

@@ -2,6 +2,7 @@
  * Categories Module - Category management, budgets, and tree visualization
  */
 import * as formatters from '../../utils/formatters.js';
+import * as dom from '../../utils/dom.js';
 import { showSuccess, showError, showWarning } from '../../utils/notifications.js';
 import Chart from 'chart.js/auto';
 
@@ -1005,20 +1006,11 @@ export default class CategoriesModule {
 
         parentSelect.innerHTML = '<option value="">None (Top Level)</option>';
 
-        const addOptions = (categories, prefix = '') => {
-            categories.forEach(cat => {
-                // Only show categories of the same type, and exclude the current category and its children
-                if (cat.type === currentType && cat.id !== excludeId) {
-                    parentSelect.innerHTML += `<option value="${cat.id}">${prefix}${this.escapeHtml(cat.name)}</option>`;
-                }
-                if (cat.children && cat.children.length > 0) {
-                    addOptions(cat.children, prefix + '  ');
-                }
-            });
-        };
-
         if (this.allCategories) {
-            addOptions(this.allCategories);
+            dom.populateCategorySelect(parentSelect, this.allCategories, {
+                typeFilter: currentType,
+                excludeId: excludeId ? parseInt(excludeId) : null,
+            });
         }
     }
 

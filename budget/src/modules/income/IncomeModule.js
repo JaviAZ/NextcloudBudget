@@ -19,6 +19,7 @@ export default class IncomeModule {
     set recurringIncome(value) { this.app.recurringIncome = value; }
     get accounts() { return this.app.accounts; }
     get categories() { return this.app.categories; }
+    get categoryTree() { return this.app.categoryTree; }
     get settings() { return this.app.settings; }
 
     async loadIncomeView() {
@@ -377,11 +378,7 @@ export default class IncomeModule {
         if (categorySelect && this.categories) {
             const currentValue = categorySelect.value;
             categorySelect.innerHTML = '<option value="">No category</option>';
-            this.categories
-                .filter(c => c.type === 'income')
-                .forEach(cat => {
-                    categorySelect.innerHTML += `<option value="${cat.id}">${dom.escapeHtml(cat.name)}</option>`;
-                });
+            dom.populateCategorySelect(categorySelect, this.categoryTree || this.categories, { typeFilter: 'income' });
             if (currentValue) categorySelect.value = currentValue;
         }
 

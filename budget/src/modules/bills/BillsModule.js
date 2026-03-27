@@ -20,6 +20,7 @@ export default class BillsModule {
     set bills(value) { this.app.bills = value; }
     get accounts() { return this.app.accounts; }
     get categories() { return this.app.categories; }
+    get categoryTree() { return this.app.categoryTree; }
     get settings() { return this.app.settings; }
 
     async loadBillsView() {
@@ -477,11 +478,7 @@ export default class BillsModule {
         if (categorySelect && this.categories) {
             const currentValue = categorySelect.value;
             categorySelect.innerHTML = '<option value="">No category</option>';
-            this.categories
-                .filter(c => c.type === 'expense')
-                .forEach(cat => {
-                    categorySelect.innerHTML += `<option value="${cat.id}">${dom.escapeHtml(cat.name)}</option>`;
-                });
+            dom.populateCategorySelect(categorySelect, this.categoryTree || this.categories, { typeFilter: 'expense' });
             if (currentValue) categorySelect.value = currentValue;
         }
 

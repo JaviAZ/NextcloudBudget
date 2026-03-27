@@ -16,6 +16,7 @@ export default class TransfersModule {
     // Getters for app state
     get accounts() { return this.app.accounts; }
     get categories() { return this.app.categories; }
+    get categoryTree() { return this.app.categoryTree; }
     get settings() { return this.app.settings; }
 
     async init() {
@@ -451,13 +452,7 @@ export default class TransfersModule {
                             <label for="transfer-category">Category</label>
                             <select id="transfer-category" class="form-control">
                                 <option value="">No category</option>
-                                ${this.categories
-                                    .filter(c => c.type === 'expense')
-                                    .map(cat => `
-                                        <option value="${cat.id}" ${isEdit && transfer.categoryId === cat.id ? 'selected' : ''}>
-                                            ${dom.escapeHtml(cat.name)}
-                                        </option>
-                                    `).join('')}
+                                ${dom.buildCategoryOptionsHtml(this.categoryTree || this.categories, { typeFilter: 'expense', selectedId: isEdit ? transfer.categoryId : null })}
                             </select>
                             <small class="form-hint">Category for created transactions (optional)</small>
                         </div>

@@ -498,6 +498,7 @@ export default class RulesModule {
         // Create new ActionBuilder instance with app data
         this.actionBuilder = new ActionBuilder(container, initialActions, {
             categories: this.categories,
+            categoryTree: this.app.categoryTree,
             accounts: this.accounts,
             tagSets: this.tagSets
         });

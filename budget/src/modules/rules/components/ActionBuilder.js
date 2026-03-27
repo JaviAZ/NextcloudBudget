@@ -1,4 +1,5 @@
 import './ActionBuilder.css';
+import { buildCategoryOptionsHtml } from '../../../utils/dom.js';
 
 /**
  * ActionBuilder - Visual configuration for rule actions
@@ -165,15 +166,13 @@ export class ActionBuilder {
 	}
 
 	renderCategoryAction(action, index) {
-		const categories = this.options.categories || [];
+		const categoryTree = this.options.categoryTree || this.options.categories || [];
 		return `
 			<div class="form-row">
 				<label>Category:</label>
 				<select class="action-value" data-index="${index}" data-field="value">
 					<option value="">-- Select Category --</option>
-					${categories.map(cat => `
-						<option value="${cat.id}" ${action.value == cat.id ? 'selected' : ''}>${this.escapeHtml(cat.name)}</option>
-					`).join('')}
+					${buildCategoryOptionsHtml(categoryTree, { selectedId: action.value })}
 				</select>
 			</div>
 			<div class="form-row">

@@ -328,9 +328,7 @@ export default class TransactionsModule {
         const categoryFilter = document.getElementById('filter-category');
         if (categoryFilter && this.categories) {
             categoryFilter.innerHTML = '<option value="">All Categories</option><option value="uncategorized">Uncategorized</option>';
-            this.categories.forEach(category => {
-                categoryFilter.innerHTML += `<option value="${category.id}">${category.name}</option>`;
-            });
+            dom.populateCategorySelect(categoryFilter, this.categoryTree || this.categories);
         }
 
         // Populate reconcile account select
@@ -817,12 +815,7 @@ export default class TransactionsModule {
         // Populate category dropdown
         if (categorySelect && this.categories) {
             categorySelect.innerHTML = '<option value="">Don\'t change</option>';
-            this.categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat.id;
-                option.textContent = cat.name;
-                categorySelect.appendChild(option);
-            });
+            dom.populateCategorySelect(categorySelect, this.categoryTree || this.categories);
         }
 
         // Reset form
@@ -1199,30 +1192,13 @@ export default class TransactionsModule {
 
             // Clear and rebuild options
             categorySelect.innerHTML = '<option value="">No category</option>';
-
-            // Use hierarchical tree for recursive rendering with indentation
-            const categoriesList = this.categoryTree || this.categories;
-            this.renderCategoryOptions(categorySelect, categoriesList);
+            dom.populateCategorySelect(categorySelect, this.categoryTree || this.categories);
 
             // Restore previous value if it exists
             if (currentValue) {
                 categorySelect.value = currentValue;
             }
         }
-    }
-
-    renderCategoryOptions(selectElement, categories, level = 0) {
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = '  '.repeat(level) + category.name;
-            selectElement.appendChild(option);
-
-            // Recursively add child categories
-            if (category.children && category.children.length > 0) {
-                this.renderCategoryOptions(selectElement, category.children, level + 1);
-            }
-        });
     }
 
     showTransactionModal(transaction = null, preSelectedAccountId = null) {
