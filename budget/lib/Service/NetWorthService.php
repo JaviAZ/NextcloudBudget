@@ -10,6 +10,7 @@ use OCA\Budget\Db\NetWorthSnapshotMapper;
 use OCA\Budget\Db\TransactionMapper;
 use OCA\Budget\Enum\AccountType;
 use OCA\Budget\Service\AssetService;
+use OCA\Budget\Service\PensionService;
 
 class NetWorthService {
     /**
@@ -23,19 +24,22 @@ class NetWorthService {
     private TransactionMapper $transactionMapper;
     private CurrencyConversionService $conversionService;
     private AssetService $assetService;
+    private PensionService $pensionService;
 
     public function __construct(
         NetWorthSnapshotMapper $snapshotMapper,
         AccountMapper $accountMapper,
         TransactionMapper $transactionMapper,
         CurrencyConversionService $conversionService,
-        AssetService $assetService
+        AssetService $assetService,
+        PensionService $pensionService
     ) {
         $this->snapshotMapper = $snapshotMapper;
         $this->accountMapper = $accountMapper;
         $this->transactionMapper = $transactionMapper;
         $this->conversionService = $conversionService;
         $this->assetService = $assetService;
+        $this->pensionService = $pensionService;
     }
 
     /**
@@ -101,6 +105,15 @@ class NetWorthService {
             $totalAssets = MoneyCalculator::add($totalAssets, $assetWorth);
         } catch (\Exception $e) {
             // Graceful fallback if assets table doesn't exist yet
+        }
+
+        // Include pension worth in total assets
+        try {
+            $pensionSummary = $this->pensionService->getSummary($userId);
+            $pensionWorth = (string)($pensionSummary['totalPensionWorth'] ?? 0);
+            $totalAssets = MoneyCalculator::add($totalAssets, $pensionWorth);
+        } catch (\Exception $e) {
+            // Graceful fallback if pensions table doesn't exist yet
         }
 
         $netWorth = MoneyCalculator::subtract($totalAssets, $totalLiabilities);

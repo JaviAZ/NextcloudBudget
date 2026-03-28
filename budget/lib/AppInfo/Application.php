@@ -520,7 +520,8 @@ class Application extends App implements IBootstrap {
                 $c->get(\OCA\Budget\Db\AccountMapper::class),
                 $c->get(\OCA\Budget\Db\TransactionMapper::class),
                 $c->get(\OCA\Budget\Service\CurrencyConversionService::class),
-                $c->get(\OCA\Budget\Service\AssetService::class)
+                $c->get(\OCA\Budget\Service\AssetService::class),
+                $c->get(\OCA\Budget\Service\PensionService::class)
             );
         });
         $context->registerServiceAlias('NetWorthService', \OCA\Budget\Service\NetWorthService::class);

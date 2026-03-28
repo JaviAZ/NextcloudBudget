@@ -171,7 +171,7 @@ export default class DashboardModule {
             const assetValueHistory = assetHistoryResponse.ok ? await assetHistoryResponse.json() : null;
 
             // Update Hero Section (current month data)
-            this.updateDashboardHero(summary);
+            this.updateDashboardHero(summary, pensionSummary, assetSummary);
 
             // Update Account Widget (current balances from current month summary)
             this.updateAccountsWidget(summary.accounts || []);
@@ -273,17 +273,19 @@ export default class DashboardModule {
     // Hero Tile Updates
     // ===========================
 
-    updateDashboardHero(summary) {
+    updateDashboardHero(summary, pensionSummary = {}, assetSummary = {}) {
         const totals = summary.totals || {};
         const currency = summary.baseCurrency || this.getPrimaryCurrency();
 
         // Show conversion indicator if multi-currency conversion was applied
         this.updateConversionIndicator(summary);
 
-        // Net Worth (total balance across all accounts)
+        // Net Worth (accounts + pensions + assets)
         const netWorthEl = document.getElementById('hero-net-worth-value');
         if (netWorthEl) {
-            const netWorth = totals.currentBalance || 0;
+            const netWorth = (totals.currentBalance || 0)
+                + (pensionSummary.totalPensionWorth || 0)
+                + (assetSummary.totalAssetWorth || 0);
             netWorthEl.textContent = this.formatCurrency(netWorth, currency);
             netWorthEl.className = `hero-value ${netWorth >= 0 ? '' : 'expenses'}`;
         }
