@@ -208,9 +208,11 @@ class ImportRuleApplicator {
                     break;
 
                 case 'set_type':
-                    if (in_array($value, ['income', 'expense'], true)
+                    // Map user-facing terms to internal DB values: income->credit, expense->debit
+                    $typeMap = ['income' => 'credit', 'expense' => 'debit'];
+                    if (isset($typeMap[$value])
                         && $this->shouldApply($behavior, $transaction['type'] ?? null)) {
-                        $transaction['type'] = $value;
+                        $transaction['type'] = $typeMap[$value];
                     }
                     break;
 

@@ -262,12 +262,14 @@ class RuleActionApplicator {
 
 			case 'set_type':
 				if ($this->shouldApply($type, $behavior, $transaction->getType(), $appliedActions)) {
-					// Validate type is 'income' or 'expense'
-					if (in_array($value, ['income', 'expense'], true)) {
+					// Map user-facing terms to internal DB values: income->credit, expense->debit
+					$typeMap = ['income' => 'credit', 'expense' => 'debit'];
+					if (isset($typeMap[$value])) {
+						$dbValue = $typeMap[$value];
 						$oldValue = $transaction->getType();
-						$transaction->setType($value);
+						$transaction->setType($dbValue);
 						$appliedActions[$type] = ['priority' => $priority, 'value' => $value];
-						$changes['type'] = ['old' => $oldValue, 'new' => $value];
+						$changes['type'] = ['old' => $oldValue, 'new' => $dbValue];
 					} else {
 						$this->logger->warning('Invalid transaction type in rule action', ['type' => $value]);
 					}
