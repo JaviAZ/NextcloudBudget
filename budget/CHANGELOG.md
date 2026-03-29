@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.7] - 2026-03-29
+
+### Fixed
+- **Parent category dropdown not working when editing subcategories**: The parent dropdown failed to show or pre-select the current parent when editing subcategories ([#111](https://github.com/otherworld-dev/budget/issues/111))
+- **Map income/expense to credit/debit in rule type actions**: Import rules with "set type" action stored income/expense instead of the internal credit/debit values, causing the type to appear empty on affected transactions ([#110](https://github.com/otherworld-dev/budget/issues/110))
+
 ## [2.8.6] - 2026-03-29
 
 ### Fixed
