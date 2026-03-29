@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.6] - 2026-03-29
+
+### Fixed
+- **Hide Transfer option when editing transactions**: Transfer type is no longer shown in the type dropdown when editing existing transactions ([#108](https://github.com/otherworld-dev/budget/issues/108))
+- **Use server-side data for categories view**: Categories view now fetches fresh data from the server instead of using stale client-side transactions ([#106](https://github.com/otherworld-dev/budget/issues/106))
+- **Include pensions and assets in Net Worth calculation**: Net Worth dashboard widget now correctly includes pension and asset values ([#107](https://github.com/otherworld-dev/budget/issues/107))
+
 ## [2.8.5] - 2026-03-27
 
 ### Added
