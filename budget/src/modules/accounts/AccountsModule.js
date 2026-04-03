@@ -675,8 +675,18 @@ export default class AccountsModule {
             const isScheduled = transaction.status === 'scheduled';
             const scheduledBadge = isScheduled ? '<span class="scheduled-badge">Scheduled</span>' : '';
 
+            // Transfer badge
+            const isLinked = transaction.linkedTransactionId != null;
+            const linkedAccountName = transaction.linkedAccountName || this.app.accounts?.find(a => a.id === transaction.linkedAccountId)?.name || '';
+            const linkedDirection = transaction.type === 'debit' ? '→' : '←';
+            const linkedLabel = linkedAccountName ? `Transfer ${linkedDirection} ${dom.escapeHtml(linkedAccountName)}` : 'Transfer';
+            const linkedTitle = linkedAccountName ? `Click to view linked transaction in ${dom.escapeHtml(linkedAccountName)}` : 'Linked transfer';
+            const linkedBadge = isLinked
+                ? `<span class="linked-indicator" data-transaction-id="${transaction.id}" data-linked-id="${transaction.linkedTransactionId}" data-linked-account-id="${transaction.linkedAccountId || ''}" title="${linkedTitle}">&#x1F517; ${linkedLabel}</span>`
+                : '';
+
             return `
-                <tr class="transaction-row${isScheduled ? ' scheduled-transaction' : ''}" data-transaction-id="${transaction.id}">
+                <tr class="transaction-row${isScheduled ? ' scheduled-transaction' : ''}${isLinked ? ' is-linked' : ''}" data-transaction-id="${transaction.id}">
                     <td class="date-column">
                         <span class="transaction-date">${this.formatDate(transaction.date)}</span>${scheduledBadge}
                     </td>
@@ -684,6 +694,7 @@ export default class AccountsModule {
                         <div class="transaction-description">
                             <span class="description-main">${transaction.description || 'No description'}</span>
                             ${transaction.vendor ? `<span class="vendor-name">${transaction.vendor}</span>` : ''}
+                            ${linkedBadge}
                         </div>
                     </td>
                     <td class="category-column">
@@ -739,6 +750,16 @@ export default class AccountsModule {
                 e.stopPropagation();
                 const transactionId = parseInt(e.target.dataset.transactionId);
                 this.deleteTransaction(transactionId);
+            });
+        });
+
+        // Linked transfer badge - navigate to linked transaction
+        document.querySelectorAll('#account-transactions-body .linked-indicator').forEach(badge => {
+            badge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const linkedId = parseInt(e.target.getAttribute('data-linked-id'));
+                const linkedAccountId = parseInt(e.target.getAttribute('data-linked-account-id'));
+                this.app.navigateToLinkedTransaction(linkedId, linkedAccountId);
             });
         });
     }

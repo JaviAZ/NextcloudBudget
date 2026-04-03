@@ -9736,6 +9736,16 @@ button.danger:hover {
     background: var(--color-primary-element-lighter, rgba(0, 130, 201, 0.15));
 }
 
+/* Highlight flash animation for navigating to linked transactions */
+@keyframes highlight-flash {
+    0% { background-color: var(--color-primary-element); }
+    100% { background-color: transparent; }
+}
+
+.transaction-row.highlight-flash {
+    animation: highlight-flash 2s ease-out;
+}
+
 /* Scheduled transaction styling */
 .scheduled-transaction {
     opacity: 0.65;

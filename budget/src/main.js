@@ -416,8 +416,9 @@ class BudgetApp {
                 const transactionId = parseInt(button.getAttribute('data-transaction-id'));
                 this.handleUnlinkTransaction(transactionId);
             } else if (e.target.classList.contains('linked-indicator')) {
-                const transactionId = parseInt(e.target.getAttribute('data-transaction-id'));
-                this.handleUnlinkTransaction(transactionId);
+                const linkedId = parseInt(e.target.getAttribute('data-linked-id'));
+                const linkedAccountId = parseInt(e.target.getAttribute('data-linked-account-id'));
+                this.navigateToLinkedTransaction(linkedId, linkedAccountId);
             } else if (e.target.classList.contains('link-match-btn')) {
                 const sourceId = parseInt(e.target.getAttribute('data-source-id'));
                 const targetId = parseInt(e.target.getAttribute('data-target-id'));
@@ -958,8 +959,12 @@ class BudgetApp {
             const formattedAmount = this.formatCurrency(transaction.amount, currency);
 
             const isLinked = transaction.linkedTransactionId != null;
+            const linkedAccountName = transaction.linkedAccountName || this.accounts?.find(a => a.id === transaction.linkedAccountId)?.name || '';
+            const linkedDirection = transaction.type === 'debit' ? '→' : '←';
+            const linkedLabel = linkedAccountName ? `Transfer ${linkedDirection} ${this.escapeHtml(linkedAccountName)}` : 'Transfer';
+            const linkedTitle = linkedAccountName ? `Click to view linked transaction in ${this.escapeHtml(linkedAccountName)}` : 'Linked transfer';
             const linkedBadge = isLinked
-                ? `<span class="linked-indicator" data-transaction-id="${transaction.id}" data-linked-id="${transaction.linkedTransactionId}" title="Linked transfer - click to unlink">&#x1F517; Transfer</span>`
+                ? `<span class="linked-indicator" data-transaction-id="${transaction.id}" data-linked-id="${transaction.linkedTransactionId}" data-linked-account-id="${transaction.linkedAccountId || ''}" title="${linkedTitle}">&#x1F517; ${linkedLabel}</span>`
                 : '';
             const isSplit = transaction.isSplit || transaction.is_split;
             const splitBadge = isSplit
@@ -2757,8 +2762,70 @@ class BudgetApp {
     }
 
     /**
-     * Handle unlinking a transaction
+     * Navigate to a linked transfer transaction - scroll to it or switch account view
      */
+    async navigateToLinkedTransaction(linkedTransactionId, linkedAccountId) {
+        if (!linkedTransactionId || isNaN(linkedTransactionId)) return;
+        if (isNaN(linkedAccountId)) linkedAccountId = null;
+
+        // Check if the linked transaction is already visible on this page
+        const existingRow = document.querySelector(`.transaction-row[data-transaction-id="${linkedTransactionId}"]`);
+        if (existingRow) {
+            this.highlightTransactionRow(existingRow);
+            return;
+        }
+
+        if (!linkedAccountId) {
+            showWarning('Could not navigate to linked transaction');
+            return;
+        }
+
+        // In account details view - switch to the linked account
+        const accountDetailsView = document.getElementById('account-details-view');
+        if (accountDetailsView && accountDetailsView.style.display === 'block') {
+            this.pendingHighlightTransactionId = linkedTransactionId;
+            await this.accountsModule.showAccountDetails(linkedAccountId);
+            this.applyPendingHighlight();
+            return;
+        }
+
+        // In global transactions view but linked transaction is on a different page
+        // Filter to the linked account to make the transaction visible
+        this.pendingHighlightTransactionId = linkedTransactionId;
+        this.transactionFilters = { ...this.transactionFilters, account: linkedAccountId };
+        this.currentPage = 1;
+        await this.loadTransactions();
+        this.applyPendingHighlight();
+    }
+
+    /**
+     * Highlight a transaction row with a flash animation and scroll to it
+     */
+    highlightTransactionRow(row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.add('highlight-flash');
+        row.addEventListener('animationend', () => {
+            row.classList.remove('highlight-flash');
+        }, { once: true });
+    }
+
+    /**
+     * Apply a pending transaction highlight after a view change
+     */
+    applyPendingHighlight() {
+        if (!this.pendingHighlightTransactionId) return;
+        const targetId = this.pendingHighlightTransactionId;
+        this.pendingHighlightTransactionId = null;
+
+        // Small delay to ensure DOM has rendered
+        requestAnimationFrame(() => {
+            const row = document.querySelector(`.transaction-row[data-transaction-id="${targetId}"]`);
+            if (row) {
+                this.highlightTransactionRow(row);
+            }
+        });
+    }
+
     async handleUnlinkTransaction(transactionId) {
         if (!confirm('Are you sure you want to unlink this transaction from its transfer pair?')) {
             return;

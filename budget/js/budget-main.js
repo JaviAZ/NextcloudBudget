@@ -19399,7 +19399,7 @@ var AccountsModule = /*#__PURE__*/function () {
       }
       var today = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getTodayDateString();
       tbody.innerHTML = this.accountTransactions.map(function (transaction) {
-        var _this4$currentAccount, _this4$categories;
+        var _this4$currentAccount, _this4$categories, _this4$app$accounts;
         var amount = parseFloat(transaction.amount) || 0;
         var currency = ((_this4$currentAccount = _this4.currentAccount) === null || _this4$currentAccount === void 0 ? void 0 : _this4$currentAccount.currency) || _this4.getPrimaryCurrency();
         var category = (_this4$categories = _this4.categories) === null || _this4$categories === void 0 ? void 0 : _this4$categories.find(function (c) {
@@ -19407,7 +19407,17 @@ var AccountsModule = /*#__PURE__*/function () {
         });
         var isScheduled = transaction.status === 'scheduled';
         var scheduledBadge = isScheduled ? '<span class="scheduled-badge">Scheduled</span>' : '';
-        return "\n                <tr class=\"transaction-row".concat(isScheduled ? ' scheduled-transaction' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"date-column\">\n                        <span class=\"transaction-date\">").concat(_this4.formatDate(transaction.date), "</span>").concat(scheduledBadge, "\n                    </td>\n                    <td class=\"description-column\">\n                        <div class=\"transaction-description\">\n                            <span class=\"description-main\">").concat(transaction.description || 'No description', "</span>\n                            ").concat(transaction.vendor ? "<span class=\"vendor-name\">".concat(transaction.vendor, "</span>") : '', "\n                        </div>\n                    </td>\n                    <td class=\"category-column\">\n                        <span class=\"category-name ").concat(category ? '' : 'uncategorized', "\">\n                            ").concat(category ? category.name : 'Uncategorized', "\n                        </span>\n                        <div class=\"transaction-tags-display\" data-transaction-id=\"").concat(transaction.id, "\" style=\"margin-top: 4px;\"></div>\n                    </td>\n                    <td class=\"amount-column\">\n                        <span class=\"transaction-amount ").concat(transaction.type, "\">\n                            ").concat(transaction.type === 'credit' ? '+' : '-').concat(_this4.formatCurrency(Math.abs(amount), currency), "\n                        </span>\n                    </td>\n                    <td class=\"balance-column\">\n                        ").concat(balanceMap !== null && balanceMap[transaction.id] !== undefined ? "<span class=\"transaction-balance ".concat(balanceMap[transaction.id] >= 0 ? 'positive' : 'negative', "\">").concat(_this4.formatCurrency(balanceMap[transaction.id], currency), "</span>") : '', "\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"icon-rename edit-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Edit transaction\"></button>\n                            <button class=\"icon-delete delete-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Delete transaction\"></button>\n                        </div>\n                    </td>\n                </tr>\n            ");
+
+        // Transfer badge
+        var isLinked = transaction.linkedTransactionId != null;
+        var linkedAccountName = transaction.linkedAccountName || ((_this4$app$accounts = _this4.app.accounts) === null || _this4$app$accounts === void 0 || (_this4$app$accounts = _this4$app$accounts.find(function (a) {
+          return a.id === transaction.linkedAccountId;
+        })) === null || _this4$app$accounts === void 0 ? void 0 : _this4$app$accounts.name) || '';
+        var linkedDirection = transaction.type === 'debit' ? '→' : '←';
+        var linkedLabel = linkedAccountName ? "Transfer ".concat(linkedDirection, " ").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(linkedAccountName)) : 'Transfer';
+        var linkedTitle = linkedAccountName ? "Click to view linked transaction in ".concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_1__.escapeHtml(linkedAccountName)) : 'Linked transfer';
+        var linkedBadge = isLinked ? "<span class=\"linked-indicator\" data-transaction-id=\"".concat(transaction.id, "\" data-linked-id=\"").concat(transaction.linkedTransactionId, "\" data-linked-account-id=\"").concat(transaction.linkedAccountId || '', "\" title=\"").concat(linkedTitle, "\">&#x1F517; ").concat(linkedLabel, "</span>") : '';
+        return "\n                <tr class=\"transaction-row".concat(isScheduled ? ' scheduled-transaction' : '').concat(isLinked ? ' is-linked' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"date-column\">\n                        <span class=\"transaction-date\">").concat(_this4.formatDate(transaction.date), "</span>").concat(scheduledBadge, "\n                    </td>\n                    <td class=\"description-column\">\n                        <div class=\"transaction-description\">\n                            <span class=\"description-main\">").concat(transaction.description || 'No description', "</span>\n                            ").concat(transaction.vendor ? "<span class=\"vendor-name\">".concat(transaction.vendor, "</span>") : '', "\n                            ").concat(linkedBadge, "\n                        </div>\n                    </td>\n                    <td class=\"category-column\">\n                        <span class=\"category-name ").concat(category ? '' : 'uncategorized', "\">\n                            ").concat(category ? category.name : 'Uncategorized', "\n                        </span>\n                        <div class=\"transaction-tags-display\" data-transaction-id=\"").concat(transaction.id, "\" style=\"margin-top: 4px;\"></div>\n                    </td>\n                    <td class=\"amount-column\">\n                        <span class=\"transaction-amount ").concat(transaction.type, "\">\n                            ").concat(transaction.type === 'credit' ? '+' : '-').concat(_this4.formatCurrency(Math.abs(amount), currency), "\n                        </span>\n                    </td>\n                    <td class=\"balance-column\">\n                        ").concat(balanceMap !== null && balanceMap[transaction.id] !== undefined ? "<span class=\"transaction-balance ".concat(balanceMap[transaction.id] >= 0 ? 'positive' : 'negative', "\">").concat(_this4.formatCurrency(balanceMap[transaction.id], currency), "</span>") : '', "\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"icon-rename edit-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Edit transaction\"></button>\n                            <button class=\"icon-delete delete-transaction-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"Delete transaction\"></button>\n                        </div>\n                    </td>\n                </tr>\n            ");
       }).join('');
 
       // Add event listeners for transaction actions
@@ -19435,6 +19445,16 @@ var AccountsModule = /*#__PURE__*/function () {
           e.stopPropagation();
           var transactionId = parseInt(e.target.dataset.transactionId);
           _this5.deleteTransaction(transactionId);
+        });
+      });
+
+      // Linked transfer badge - navigate to linked transaction
+      document.querySelectorAll('#account-transactions-body .linked-indicator').forEach(function (badge) {
+        badge.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var linkedId = parseInt(e.target.getAttribute('data-linked-id'));
+          var linkedAccountId = parseInt(e.target.getAttribute('data-linked-account-id'));
+          _this5.app.navigateToLinkedTransaction(linkedId, linkedAccountId);
         });
       });
     }
@@ -48651,19 +48671,20 @@ var BudgetApp = /*#__PURE__*/function () {
           var _transactionId5 = parseInt(_button8.getAttribute('data-transaction-id'));
           _this.handleUnlinkTransaction(_transactionId5);
         } else if (e.target.classList.contains('linked-indicator')) {
-          var _transactionId6 = parseInt(e.target.getAttribute('data-transaction-id'));
-          _this.handleUnlinkTransaction(_transactionId6);
+          var linkedId = parseInt(e.target.getAttribute('data-linked-id'));
+          var linkedAccountId = parseInt(e.target.getAttribute('data-linked-account-id'));
+          _this.navigateToLinkedTransaction(linkedId, linkedAccountId);
         } else if (e.target.classList.contains('link-match-btn')) {
           var sourceId = parseInt(e.target.getAttribute('data-source-id'));
           var targetId = parseInt(e.target.getAttribute('data-target-id'));
           _this.handleLinkMatch(sourceId, targetId);
         } else if (e.target.classList.contains('undo-match-btn')) {
-          var _transactionId7 = parseInt(e.target.getAttribute('data-tx-id'));
-          _this.handleBulkMatchUndo(_transactionId7);
+          var _transactionId6 = parseInt(e.target.getAttribute('data-tx-id'));
+          _this.handleBulkMatchUndo(_transactionId6);
         } else if (e.target.classList.contains('link-selected-btn')) {
-          var _transactionId8 = parseInt(e.target.getAttribute('data-tx-id'));
+          var _transactionId7 = parseInt(e.target.getAttribute('data-tx-id'));
           var index = parseInt(e.target.getAttribute('data-index'));
-          _this.handleBulkMatchLink(_transactionId8, index);
+          _this.handleBulkMatchLink(_transactionId7, index);
         } else if (e.target.id === 'start-scan-btn') {
           _this.startBulkMatchScan();
         } else if (e.target.id === 'confirm-selected-btn') {
@@ -49491,7 +49512,7 @@ var BudgetApp = /*#__PURE__*/function () {
         }
       }
       tbody.innerHTML = this.transactions.map(function (transaction) {
-        var _this4$accounts, _this4$categories, _this4$transactionsMo;
+        var _this4$accounts, _this4$categories, _this4$accounts2, _this4$transactionsMo;
         var account = (_this4$accounts = _this4.accounts) === null || _this4$accounts === void 0 ? void 0 : _this4$accounts.find(function (a) {
           return a.id === transaction.accountId;
         });
@@ -49502,7 +49523,13 @@ var BudgetApp = /*#__PURE__*/function () {
         var typeClass = transaction.type === 'credit' ? 'positive' : 'negative';
         var formattedAmount = _this4.formatCurrency(transaction.amount, currency);
         var isLinked = transaction.linkedTransactionId != null;
-        var linkedBadge = isLinked ? "<span class=\"linked-indicator\" data-transaction-id=\"".concat(transaction.id, "\" data-linked-id=\"").concat(transaction.linkedTransactionId, "\" title=\"Linked transfer - click to unlink\">&#x1F517; Transfer</span>") : '';
+        var linkedAccountName = transaction.linkedAccountName || ((_this4$accounts2 = _this4.accounts) === null || _this4$accounts2 === void 0 || (_this4$accounts2 = _this4$accounts2.find(function (a) {
+          return a.id === transaction.linkedAccountId;
+        })) === null || _this4$accounts2 === void 0 ? void 0 : _this4$accounts2.name) || '';
+        var linkedDirection = transaction.type === 'debit' ? '→' : '←';
+        var linkedLabel = linkedAccountName ? "Transfer ".concat(linkedDirection, " ").concat(_this4.escapeHtml(linkedAccountName)) : 'Transfer';
+        var linkedTitle = linkedAccountName ? "Click to view linked transaction in ".concat(_this4.escapeHtml(linkedAccountName)) : 'Linked transfer';
+        var linkedBadge = isLinked ? "<span class=\"linked-indicator\" data-transaction-id=\"".concat(transaction.id, "\" data-linked-id=\"").concat(transaction.linkedTransactionId, "\" data-linked-account-id=\"").concat(transaction.linkedAccountId || '', "\" title=\"").concat(linkedTitle, "\">&#x1F517; ").concat(linkedLabel, "</span>") : '';
         var isSplit = transaction.isSplit || transaction.is_split;
         var splitBadge = isSplit ? "<span class=\"split-indicator\" title=\"Split transaction\">Split</span>" : '';
         var matchOption = !isLinked ? "<option value=\"match\">Match Transfer</option>" : "<option value=\"unlink\">Unlink Transfer</option>";
@@ -51885,43 +51912,147 @@ var BudgetApp = /*#__PURE__*/function () {
       return handleLinkMatch;
     }()
     /**
-     * Handle unlinking a transaction
+     * Navigate to a linked transfer transaction - scroll to it or switch account view
      */
     )
   }, {
-    key: "handleUnlinkTransaction",
+    key: "navigateToLinkedTransaction",
     value: (function () {
-      var _handleUnlinkTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee65(transactionId) {
-        var _t19;
+      var _navigateToLinkedTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee65(linkedTransactionId, linkedAccountId) {
+        var existingRow, accountDetailsView;
         return _regenerator().w(function (_context65) {
-          while (1) switch (_context65.p = _context65.n) {
+          while (1) switch (_context65.n) {
             case 0:
-              if (confirm('Are you sure you want to unlink this transaction from its transfer pair?')) {
+              if (!(!linkedTransactionId || isNaN(linkedTransactionId))) {
                 _context65.n = 1;
                 break;
               }
               return _context65.a(2);
             case 1:
-              _context65.p = 1;
-              _context65.n = 2;
+              if (isNaN(linkedAccountId)) linkedAccountId = null;
+
+              // Check if the linked transaction is already visible on this page
+              existingRow = document.querySelector(".transaction-row[data-transaction-id=\"".concat(linkedTransactionId, "\"]"));
+              if (!existingRow) {
+                _context65.n = 2;
+                break;
+              }
+              this.highlightTransactionRow(existingRow);
+              return _context65.a(2);
+            case 2:
+              if (linkedAccountId) {
+                _context65.n = 3;
+                break;
+              }
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showWarning)('Could not navigate to linked transaction');
+              return _context65.a(2);
+            case 3:
+              // In account details view - switch to the linked account
+              accountDetailsView = document.getElementById('account-details-view');
+              if (!(accountDetailsView && accountDetailsView.style.display === 'block')) {
+                _context65.n = 5;
+                break;
+              }
+              this.pendingHighlightTransactionId = linkedTransactionId;
+              _context65.n = 4;
+              return this.accountsModule.showAccountDetails(linkedAccountId);
+            case 4:
+              this.applyPendingHighlight();
+              return _context65.a(2);
+            case 5:
+              // In global transactions view but linked transaction is on a different page
+              // Filter to the linked account to make the transaction visible
+              this.pendingHighlightTransactionId = linkedTransactionId;
+              this.transactionFilters = _objectSpread(_objectSpread({}, this.transactionFilters), {}, {
+                account: linkedAccountId
+              });
+              this.currentPage = 1;
+              _context65.n = 6;
+              return this.loadTransactions();
+            case 6:
+              this.applyPendingHighlight();
+            case 7:
+              return _context65.a(2);
+          }
+        }, _callee65, this);
+      }));
+      function navigateToLinkedTransaction(_x31, _x32) {
+        return _navigateToLinkedTransaction.apply(this, arguments);
+      }
+      return navigateToLinkedTransaction;
+    }()
+    /**
+     * Highlight a transaction row with a flash animation and scroll to it
+     */
+    )
+  }, {
+    key: "highlightTransactionRow",
+    value: function highlightTransactionRow(row) {
+      row.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+      row.classList.add('highlight-flash');
+      row.addEventListener('animationend', function () {
+        row.classList.remove('highlight-flash');
+      }, {
+        once: true
+      });
+    }
+
+    /**
+     * Apply a pending transaction highlight after a view change
+     */
+  }, {
+    key: "applyPendingHighlight",
+    value: function applyPendingHighlight() {
+      var _this19 = this;
+      if (!this.pendingHighlightTransactionId) return;
+      var targetId = this.pendingHighlightTransactionId;
+      this.pendingHighlightTransactionId = null;
+
+      // Small delay to ensure DOM has rendered
+      requestAnimationFrame(function () {
+        var row = document.querySelector(".transaction-row[data-transaction-id=\"".concat(targetId, "\"]"));
+        if (row) {
+          _this19.highlightTransactionRow(row);
+        }
+      });
+    }
+  }, {
+    key: "handleUnlinkTransaction",
+    value: function () {
+      var _handleUnlinkTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee66(transactionId) {
+        var _t19;
+        return _regenerator().w(function (_context66) {
+          while (1) switch (_context66.p = _context66.n) {
+            case 0:
+              if (confirm('Are you sure you want to unlink this transaction from its transfer pair?')) {
+                _context66.n = 1;
+                break;
+              }
+              return _context66.a(2);
+            case 1:
+              _context66.p = 1;
+              _context66.n = 2;
               return this.unlinkTransaction(transactionId);
             case 2:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showSuccess)('Transaction unlinked');
-              _context65.n = 3;
+              _context66.n = 3;
               return this.loadTransactions();
             case 3:
-              _context65.n = 5;
+              _context66.n = 5;
               break;
             case 4:
-              _context65.p = 4;
-              _t19 = _context65.v;
+              _context66.p = 4;
+              _t19 = _context66.v;
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showError)(_t19.message || 'Failed to unlink transaction');
             case 5:
-              return _context65.a(2);
+              return _context66.a(2);
           }
-        }, _callee65, this, [[1, 4]]);
+        }, _callee66, this, [[1, 4]]);
       }));
-      function handleUnlinkTransaction(_x31) {
+      function handleUnlinkTransaction(_x33) {
         return _handleUnlinkTransaction.apply(this, arguments);
       }
       return handleUnlinkTransaction;
@@ -51929,35 +52060,34 @@ var BudgetApp = /*#__PURE__*/function () {
     /**
      * Show the split modal for a transaction
      */
-    )
   }, {
     key: "showSplitModal",
     value: function () {
-      var _showSplitModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee66(transactionId) {
+      var _showSplitModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee67(transactionId) {
         var _this$transactions5,
           _this$accounts2,
-          _this19 = this;
+          _this20 = this;
         var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, unsplitBtn, _t20;
-        return _regenerator().w(function (_context66) {
-          while (1) switch (_context66.p = _context66.n) {
+        return _regenerator().w(function (_context67) {
+          while (1) switch (_context67.p = _context67.n) {
             case 0:
               transaction = (_this$transactions5 = this.transactions) === null || _this$transactions5 === void 0 ? void 0 : _this$transactions5.find(function (t) {
                 return t.id === transactionId;
               });
               if (transaction) {
-                _context66.n = 1;
+                _context67.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showWarning)('Transaction not found');
-              return _context66.a(2);
+              return _context67.a(2);
             case 1:
               modal = document.getElementById('split-modal');
               if (modal) {
-                _context66.n = 2;
+                _context67.n = 2;
                 break;
               }
               console.error('Split modal not found');
-              return _context66.a(2);
+              return _context67.a(2);
             case 2:
               isSplit = transaction.isSplit || transaction.is_split;
               titleEl = document.getElementById('split-modal-title');
@@ -51980,28 +52110,28 @@ var BudgetApp = /*#__PURE__*/function () {
               // Clear and set up splits container
               splitsContainer.innerHTML = '';
               if (!isSplit) {
-                _context66.n = 7;
+                _context67.n = 7;
                 break;
               }
-              _context66.p = 3;
-              _context66.n = 4;
+              _context67.p = 3;
+              _context67.n = 4;
               return this.getTransactionSplits(transactionId);
             case 4:
-              splits = _context66.v;
+              splits = _context67.v;
               splits.forEach(function (split, index) {
-                _this19.addSplitRow(splitsContainer, split, index === 0);
+                _this20.addSplitRow(splitsContainer, split, index === 0);
               });
-              _context66.n = 6;
+              _context67.n = 6;
               break;
             case 5:
-              _context66.p = 5;
-              _t20 = _context66.v;
+              _context67.p = 5;
+              _t20 = _context67.v;
               console.error('Failed to load splits:', _t20);
               // Add two empty rows as fallback
               this.addSplitRow(splitsContainer, null, true);
               this.addSplitRow(splitsContainer, null, false);
             case 6:
-              _context66.n = 8;
+              _context67.n = 8;
               break;
             case 7:
               // Start with two empty split rows
@@ -52013,17 +52143,17 @@ var BudgetApp = /*#__PURE__*/function () {
               if (unsplitBtn) {
                 unsplitBtn.style.display = isSplit ? '' : 'none';
                 unsplitBtn.onclick = function () {
-                  return _this19.unsplitTransaction();
+                  return _this20.unsplitTransaction();
                 };
               }
               this.updateSplitRemaining();
               modal.style.display = 'flex';
             case 9:
-              return _context66.a(2);
+              return _context67.a(2);
           }
-        }, _callee66, this, [[3, 5]]);
+        }, _callee67, this, [[3, 5]]);
       }));
-      function showSplitModal(_x32) {
+      function showSplitModal(_x34) {
         return _showSplitModal.apply(this, arguments);
       }
       return showSplitModal;
@@ -52031,7 +52161,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "getCategoryOptions",
     value: function getCategoryOptions() {
-      var _this20 = this;
+      var _this21 = this;
       var selectedId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var transactionType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       if (!this.categories) return '';
@@ -52042,7 +52172,7 @@ var BudgetApp = /*#__PURE__*/function () {
       return this.categories.filter(function (c) {
         return c.type === categoryType;
       }).map(function (c) {
-        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this20.escapeHtml(c.name), "</option>");
+        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this21.escapeHtml(c.name), "</option>");
       }).join('');
     }
 
@@ -52104,10 +52234,10 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "saveSplits",
     value: (function () {
-      var _saveSplits = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee67() {
+      var _saveSplits = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee68() {
         var modal, transactionId, totalAmount, splits, splitTotal, response, error, _t21;
-        return _regenerator().w(function (_context67) {
-          while (1) switch (_context67.p = _context67.n) {
+        return _regenerator().w(function (_context68) {
+          while (1) switch (_context68.p = _context68.n) {
             case 0:
               modal = document.getElementById('split-modal');
               transactionId = parseInt(modal === null || modal === void 0 ? void 0 : modal.dataset.transactionId);
@@ -52122,24 +52252,24 @@ var BudgetApp = /*#__PURE__*/function () {
                 return split.amount > 0;
               }); // Validate
               if (!(splits.length < 2)) {
-                _context67.n = 1;
+                _context68.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showWarning)('A split transaction must have at least 2 parts');
-              return _context67.a(2);
+              return _context68.a(2);
             case 1:
               splitTotal = splits.reduce(function (sum, s) {
                 return sum + s.amount;
               }, 0);
               if (!(Math.abs(splitTotal - totalAmount) > 0.01)) {
-                _context67.n = 2;
+                _context68.n = 2;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showWarning)("Split amounts (".concat(splitTotal.toFixed(2), ") must equal transaction amount (").concat(totalAmount.toFixed(2), ")"));
-              return _context67.a(2);
+              return _context68.a(2);
             case 2:
-              _context67.p = 2;
-              _context67.n = 3;
+              _context68.p = 2;
+              _context68.n = 3;
               return fetch(OC.generateUrl("/apps/budget/api/transactions/".concat(transactionId, "/splits")), {
                 method: 'POST',
                 headers: {
@@ -52151,33 +52281,33 @@ var BudgetApp = /*#__PURE__*/function () {
                 })
               });
             case 3:
-              response = _context67.v;
+              response = _context68.v;
               if (response.ok) {
-                _context67.n = 5;
+                _context68.n = 5;
                 break;
               }
-              _context67.n = 4;
+              _context68.n = 4;
               return response.json();
             case 4:
-              error = _context67.v;
+              error = _context68.v;
               throw new Error(error.error || "HTTP ".concat(response.status));
             case 5:
               this.hideSplitModal();
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showSuccess)('Transaction split successfully');
-              _context67.n = 6;
+              _context68.n = 6;
               return this.loadTransactions();
             case 6:
-              _context67.n = 8;
+              _context68.n = 8;
               break;
             case 7:
-              _context67.p = 7;
-              _t21 = _context67.v;
+              _context68.p = 7;
+              _t21 = _context68.v;
               console.error('Failed to save splits:', _t21);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showError)(_t21.message || 'Failed to save splits');
             case 8:
-              return _context67.a(2);
+              return _context68.a(2);
           }
-        }, _callee67, this, [[2, 7]]);
+        }, _callee68, this, [[2, 7]]);
       }));
       function saveSplits() {
         return _saveSplits.apply(this, arguments);
@@ -52191,21 +52321,21 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "unsplitTransaction",
     value: (function () {
-      var _unsplitTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee68() {
+      var _unsplitTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee69() {
         var modal, transactionId, response, error, _t22;
-        return _regenerator().w(function (_context68) {
-          while (1) switch (_context68.p = _context68.n) {
+        return _regenerator().w(function (_context69) {
+          while (1) switch (_context69.p = _context69.n) {
             case 0:
               modal = document.getElementById('split-modal');
               transactionId = parseInt(modal === null || modal === void 0 ? void 0 : modal.dataset.transactionId);
               if (confirm('Are you sure you want to remove the split and revert to a single transaction?')) {
-                _context68.n = 1;
+                _context69.n = 1;
                 break;
               }
-              return _context68.a(2);
+              return _context69.a(2);
             case 1:
-              _context68.p = 1;
-              _context68.n = 2;
+              _context69.p = 1;
+              _context69.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/transactions/".concat(transactionId, "/splits")), {
                 method: 'DELETE',
                 headers: {
@@ -52213,33 +52343,33 @@ var BudgetApp = /*#__PURE__*/function () {
                 }
               });
             case 2:
-              response = _context68.v;
+              response = _context69.v;
               if (response.ok) {
-                _context68.n = 4;
+                _context69.n = 4;
                 break;
               }
-              _context68.n = 3;
+              _context69.n = 3;
               return response.json();
             case 3:
-              error = _context68.v;
+              error = _context69.v;
               throw new Error(error.error || "HTTP ".concat(response.status));
             case 4:
               this.hideSplitModal();
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showSuccess)('Transaction unsplit successfully');
-              _context68.n = 5;
+              _context69.n = 5;
               return this.loadTransactions();
             case 5:
-              _context68.n = 7;
+              _context69.n = 7;
               break;
             case 6:
-              _context68.p = 6;
-              _t22 = _context68.v;
+              _context69.p = 6;
+              _t22 = _context69.v;
               console.error('Failed to unsplit transaction:', _t22);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showError)(_t22.message || 'Failed to unsplit transaction');
             case 7:
-              return _context68.a(2);
+              return _context69.a(2);
           }
-        }, _callee68, this, [[1, 6]]);
+        }, _callee69, this, [[1, 6]]);
       }));
       function unsplitTransaction() {
         return _unsplitTransaction.apply(this, arguments);
@@ -52281,13 +52411,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensionsView",
     value: function () {
-      var _loadPensionsView = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee69() {
-        return _regenerator().w(function (_context69) {
-          while (1) switch (_context69.n) {
+      var _loadPensionsView = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee70() {
+        return _regenerator().w(function (_context70) {
+          while (1) switch (_context70.n) {
             case 0:
-              return _context69.a(2, this.pensionsModule.loadPensionsView());
+              return _context70.a(2, this.pensionsModule.loadPensionsView());
           }
-        }, _callee69, this);
+        }, _callee70, this);
       }));
       function loadPensionsView() {
         return _loadPensionsView.apply(this, arguments);
@@ -52297,13 +52427,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensions",
     value: function () {
-      var _loadPensions = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee70() {
-        return _regenerator().w(function (_context70) {
-          while (1) switch (_context70.n) {
+      var _loadPensions = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee71() {
+        return _regenerator().w(function (_context71) {
+          while (1) switch (_context71.n) {
             case 0:
-              return _context70.a(2, this.pensionsModule.loadPensions());
+              return _context71.a(2, this.pensionsModule.loadPensions());
           }
-        }, _callee70, this);
+        }, _callee71, this);
       }));
       function loadPensions() {
         return _loadPensions.apply(this, arguments);
@@ -52313,13 +52443,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensionSummary",
     value: function () {
-      var _loadPensionSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee71() {
-        return _regenerator().w(function (_context71) {
-          while (1) switch (_context71.n) {
+      var _loadPensionSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee72() {
+        return _regenerator().w(function (_context72) {
+          while (1) switch (_context72.n) {
             case 0:
-              return _context71.a(2, this.pensionsModule.loadPensionSummary());
+              return _context72.a(2, this.pensionsModule.loadPensionSummary());
           }
-        }, _callee71, this);
+        }, _callee72, this);
       }));
       function loadPensionSummary() {
         return _loadPensionSummary.apply(this, arguments);
@@ -52329,13 +52459,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensionProjection",
     value: function () {
-      var _loadPensionProjection = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee72() {
-        return _regenerator().w(function (_context72) {
-          while (1) switch (_context72.n) {
+      var _loadPensionProjection = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee73() {
+        return _regenerator().w(function (_context73) {
+          while (1) switch (_context73.n) {
             case 0:
-              return _context72.a(2, this.pensionsModule.loadPensionProjection());
+              return _context73.a(2, this.pensionsModule.loadPensionProjection());
           }
-        }, _callee72, this);
+        }, _callee73, this);
       }));
       function loadPensionProjection() {
         return _loadPensionProjection.apply(this, arguments);
@@ -52386,13 +52516,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "savePension",
     value: function () {
-      var _savePension = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee73() {
-        return _regenerator().w(function (_context73) {
-          while (1) switch (_context73.n) {
+      var _savePension = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee74() {
+        return _regenerator().w(function (_context74) {
+          while (1) switch (_context74.n) {
             case 0:
-              return _context73.a(2, this.pensionsModule.savePension());
+              return _context74.a(2, this.pensionsModule.savePension());
           }
-        }, _callee73, this);
+        }, _callee74, this);
       }));
       function savePension() {
         return _savePension.apply(this, arguments);
@@ -52402,15 +52532,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "deletePension",
     value: function () {
-      var _deletePension = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee74(pensionId) {
-        return _regenerator().w(function (_context74) {
-          while (1) switch (_context74.n) {
+      var _deletePension = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee75(pensionId) {
+        return _regenerator().w(function (_context75) {
+          while (1) switch (_context75.n) {
             case 0:
-              return _context74.a(2, this.pensionsModule.deletePension(pensionId));
+              return _context75.a(2, this.pensionsModule.deletePension(pensionId));
           }
-        }, _callee74, this);
+        }, _callee75, this);
       }));
-      function deletePension(_x33) {
+      function deletePension(_x35) {
         return _deletePension.apply(this, arguments);
       }
       return deletePension;
@@ -52418,15 +52548,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "showPensionDetails",
     value: function () {
-      var _showPensionDetails = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee75(pensionId) {
-        return _regenerator().w(function (_context75) {
-          while (1) switch (_context75.n) {
+      var _showPensionDetails = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee76(pensionId) {
+        return _regenerator().w(function (_context76) {
+          while (1) switch (_context76.n) {
             case 0:
-              return _context75.a(2, this.pensionsModule.showPensionDetails(pensionId));
+              return _context76.a(2, this.pensionsModule.showPensionDetails(pensionId));
           }
-        }, _callee75, this);
+        }, _callee76, this);
       }));
-      function showPensionDetails(_x34) {
+      function showPensionDetails(_x36) {
         return _showPensionDetails.apply(this, arguments);
       }
       return showPensionDetails;
@@ -52439,15 +52569,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensionBalanceChart",
     value: function () {
-      var _loadPensionBalanceChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee76(pensionId) {
-        return _regenerator().w(function (_context76) {
-          while (1) switch (_context76.n) {
+      var _loadPensionBalanceChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee77(pensionId) {
+        return _regenerator().w(function (_context77) {
+          while (1) switch (_context77.n) {
             case 0:
-              return _context76.a(2, this.pensionsModule.loadPensionBalanceChart(pensionId));
+              return _context77.a(2, this.pensionsModule.loadPensionBalanceChart(pensionId));
           }
-        }, _callee76, this);
+        }, _callee77, this);
       }));
-      function loadPensionBalanceChart(_x35) {
+      function loadPensionBalanceChart(_x37) {
         return _loadPensionBalanceChart.apply(this, arguments);
       }
       return loadPensionBalanceChart;
@@ -52455,15 +52585,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensionProjectionChart",
     value: function () {
-      var _loadPensionProjectionChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee77(pensionId) {
-        return _regenerator().w(function (_context77) {
-          while (1) switch (_context77.n) {
+      var _loadPensionProjectionChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee78(pensionId) {
+        return _regenerator().w(function (_context78) {
+          while (1) switch (_context78.n) {
             case 0:
-              return _context77.a(2, this.pensionsModule.loadPensionProjectionChart(pensionId));
+              return _context78.a(2, this.pensionsModule.loadPensionProjectionChart(pensionId));
           }
-        }, _callee77, this);
+        }, _callee78, this);
       }));
-      function loadPensionProjectionChart(_x36) {
+      function loadPensionProjectionChart(_x38) {
         return _loadPensionProjectionChart.apply(this, arguments);
       }
       return loadPensionProjectionChart;
@@ -52471,15 +52601,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadPensionActivity",
     value: function () {
-      var _loadPensionActivity = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee78(pensionId) {
-        return _regenerator().w(function (_context78) {
-          while (1) switch (_context78.n) {
+      var _loadPensionActivity = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee79(pensionId) {
+        return _regenerator().w(function (_context79) {
+          while (1) switch (_context79.n) {
             case 0:
-              return _context78.a(2, this.pensionsModule.loadPensionActivity(pensionId));
+              return _context79.a(2, this.pensionsModule.loadPensionActivity(pensionId));
           }
-        }, _callee78, this);
+        }, _callee79, this);
       }));
-      function loadPensionActivity(_x37) {
+      function loadPensionActivity(_x39) {
         return _loadPensionActivity.apply(this, arguments);
       }
       return loadPensionActivity;
@@ -52497,13 +52627,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "saveSnapshot",
     value: function () {
-      var _saveSnapshot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee79() {
-        return _regenerator().w(function (_context79) {
-          while (1) switch (_context79.n) {
+      var _saveSnapshot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee80() {
+        return _regenerator().w(function (_context80) {
+          while (1) switch (_context80.n) {
             case 0:
-              return _context79.a(2, this.pensionsModule.saveSnapshot());
+              return _context80.a(2, this.pensionsModule.saveSnapshot());
           }
-        }, _callee79, this);
+        }, _callee80, this);
       }));
       function saveSnapshot() {
         return _saveSnapshot.apply(this, arguments);
@@ -52523,13 +52653,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "saveContribution",
     value: function () {
-      var _saveContribution = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee80() {
-        return _regenerator().w(function (_context80) {
-          while (1) switch (_context80.n) {
+      var _saveContribution = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee81() {
+        return _regenerator().w(function (_context81) {
+          while (1) switch (_context81.n) {
             case 0:
-              return _context80.a(2, this.pensionsModule.saveContribution());
+              return _context81.a(2, this.pensionsModule.saveContribution());
           }
-        }, _callee80, this);
+        }, _callee81, this);
       }));
       function saveContribution() {
         return _saveContribution.apply(this, arguments);
@@ -52539,13 +52669,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadDashboardPensionSummary",
     value: function () {
-      var _loadDashboardPensionSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee81() {
-        return _regenerator().w(function (_context81) {
-          while (1) switch (_context81.n) {
+      var _loadDashboardPensionSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee82() {
+        return _regenerator().w(function (_context82) {
+          while (1) switch (_context82.n) {
             case 0:
-              return _context81.a(2, this.pensionsModule.loadDashboardPensionSummary());
+              return _context82.a(2, this.pensionsModule.loadDashboardPensionSummary());
           }
-        }, _callee81, this);
+        }, _callee82, this);
       }));
       function loadDashboardPensionSummary() {
         return _loadDashboardPensionSummary.apply(this, arguments);
@@ -52557,13 +52687,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAssetsView",
     value: function () {
-      var _loadAssetsView = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee82() {
-        return _regenerator().w(function (_context82) {
-          while (1) switch (_context82.n) {
+      var _loadAssetsView = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee83() {
+        return _regenerator().w(function (_context83) {
+          while (1) switch (_context83.n) {
             case 0:
-              return _context82.a(2, this.assetsModule.loadAssetsView());
+              return _context83.a(2, this.assetsModule.loadAssetsView());
           }
-        }, _callee82, this);
+        }, _callee83, this);
       }));
       function loadAssetsView() {
         return _loadAssetsView.apply(this, arguments);
@@ -52573,13 +52703,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAssets",
     value: function () {
-      var _loadAssets = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee83() {
-        return _regenerator().w(function (_context83) {
-          while (1) switch (_context83.n) {
+      var _loadAssets = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee84() {
+        return _regenerator().w(function (_context84) {
+          while (1) switch (_context84.n) {
             case 0:
-              return _context83.a(2, this.assetsModule.loadAssets());
+              return _context84.a(2, this.assetsModule.loadAssets());
           }
-        }, _callee83, this);
+        }, _callee84, this);
       }));
       function loadAssets() {
         return _loadAssets.apply(this, arguments);
@@ -52589,13 +52719,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAssetSummary",
     value: function () {
-      var _loadAssetSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee84() {
-        return _regenerator().w(function (_context84) {
-          while (1) switch (_context84.n) {
+      var _loadAssetSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee85() {
+        return _regenerator().w(function (_context85) {
+          while (1) switch (_context85.n) {
             case 0:
-              return _context84.a(2, this.assetsModule.loadAssetSummary());
+              return _context85.a(2, this.assetsModule.loadAssetSummary());
           }
-        }, _callee84, this);
+        }, _callee85, this);
       }));
       function loadAssetSummary() {
         return _loadAssetSummary.apply(this, arguments);
@@ -52605,13 +52735,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAssetProjection",
     value: function () {
-      var _loadAssetProjection = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee85() {
-        return _regenerator().w(function (_context85) {
-          while (1) switch (_context85.n) {
+      var _loadAssetProjection = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee86() {
+        return _regenerator().w(function (_context86) {
+          while (1) switch (_context86.n) {
             case 0:
-              return _context85.a(2, this.assetsModule.loadAssetProjection());
+              return _context86.a(2, this.assetsModule.loadAssetProjection());
           }
-        }, _callee85, this);
+        }, _callee86, this);
       }));
       function loadAssetProjection() {
         return _loadAssetProjection.apply(this, arguments);
@@ -52657,13 +52787,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "saveAsset",
     value: function () {
-      var _saveAsset = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee86() {
-        return _regenerator().w(function (_context86) {
-          while (1) switch (_context86.n) {
+      var _saveAsset = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee87() {
+        return _regenerator().w(function (_context87) {
+          while (1) switch (_context87.n) {
             case 0:
-              return _context86.a(2, this.assetsModule.saveAsset());
+              return _context87.a(2, this.assetsModule.saveAsset());
           }
-        }, _callee86, this);
+        }, _callee87, this);
       }));
       function saveAsset() {
         return _saveAsset.apply(this, arguments);
@@ -52673,15 +52803,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "deleteAsset",
     value: function () {
-      var _deleteAsset = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee87(assetId) {
-        return _regenerator().w(function (_context87) {
-          while (1) switch (_context87.n) {
+      var _deleteAsset = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee88(assetId) {
+        return _regenerator().w(function (_context88) {
+          while (1) switch (_context88.n) {
             case 0:
-              return _context87.a(2, this.assetsModule.deleteAsset(assetId));
+              return _context88.a(2, this.assetsModule.deleteAsset(assetId));
           }
-        }, _callee87, this);
+        }, _callee88, this);
       }));
-      function deleteAsset(_x38) {
+      function deleteAsset(_x40) {
         return _deleteAsset.apply(this, arguments);
       }
       return deleteAsset;
@@ -52689,15 +52819,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "showAssetDetails",
     value: function () {
-      var _showAssetDetails = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee88(assetId) {
-        return _regenerator().w(function (_context88) {
-          while (1) switch (_context88.n) {
+      var _showAssetDetails = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee89(assetId) {
+        return _regenerator().w(function (_context89) {
+          while (1) switch (_context89.n) {
             case 0:
-              return _context88.a(2, this.assetsModule.showAssetDetails(assetId));
+              return _context89.a(2, this.assetsModule.showAssetDetails(assetId));
           }
-        }, _callee88, this);
+        }, _callee89, this);
       }));
-      function showAssetDetails(_x39) {
+      function showAssetDetails(_x41) {
         return _showAssetDetails.apply(this, arguments);
       }
       return showAssetDetails;
@@ -52710,15 +52840,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAssetValueChart",
     value: function () {
-      var _loadAssetValueChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee89(assetId) {
-        return _regenerator().w(function (_context89) {
-          while (1) switch (_context89.n) {
+      var _loadAssetValueChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee90(assetId) {
+        return _regenerator().w(function (_context90) {
+          while (1) switch (_context90.n) {
             case 0:
-              return _context89.a(2, this.assetsModule.loadAssetValueChart(assetId));
+              return _context90.a(2, this.assetsModule.loadAssetValueChart(assetId));
           }
-        }, _callee89, this);
+        }, _callee90, this);
       }));
-      function loadAssetValueChart(_x40) {
+      function loadAssetValueChart(_x42) {
         return _loadAssetValueChart.apply(this, arguments);
       }
       return loadAssetValueChart;
@@ -52726,15 +52856,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAssetProjectionChart",
     value: function () {
-      var _loadAssetProjectionChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee90(assetId) {
-        return _regenerator().w(function (_context90) {
-          while (1) switch (_context90.n) {
+      var _loadAssetProjectionChart = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee91(assetId) {
+        return _regenerator().w(function (_context91) {
+          while (1) switch (_context91.n) {
             case 0:
-              return _context90.a(2, this.assetsModule.loadAssetProjectionChart(assetId));
+              return _context91.a(2, this.assetsModule.loadAssetProjectionChart(assetId));
           }
-        }, _callee90, this);
+        }, _callee91, this);
       }));
-      function loadAssetProjectionChart(_x41) {
+      function loadAssetProjectionChart(_x43) {
         return _loadAssetProjectionChart.apply(this, arguments);
       }
       return loadAssetProjectionChart;
@@ -52752,13 +52882,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "saveValueUpdate",
     value: function () {
-      var _saveValueUpdate = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee91() {
-        return _regenerator().w(function (_context91) {
-          while (1) switch (_context91.n) {
+      var _saveValueUpdate = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee92() {
+        return _regenerator().w(function (_context92) {
+          while (1) switch (_context92.n) {
             case 0:
-              return _context91.a(2, this.assetsModule.saveValueUpdate());
+              return _context92.a(2, this.assetsModule.saveValueUpdate());
           }
-        }, _callee91, this);
+        }, _callee92, this);
       }));
       function saveValueUpdate() {
         return _saveValueUpdate.apply(this, arguments);
@@ -52768,13 +52898,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadDashboardAssetSummary",
     value: function () {
-      var _loadDashboardAssetSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee92() {
-        return _regenerator().w(function (_context92) {
-          while (1) switch (_context92.n) {
+      var _loadDashboardAssetSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee93() {
+        return _regenerator().w(function (_context93) {
+          while (1) switch (_context93.n) {
             case 0:
-              return _context92.a(2, this.assetsModule.loadDashboardAssetSummary());
+              return _context93.a(2, this.assetsModule.loadDashboardAssetSummary());
           }
-        }, _callee92, this);
+        }, _callee93, this);
       }));
       function loadDashboardAssetSummary() {
         return _loadDashboardAssetSummary.apply(this, arguments);
@@ -52806,7 +52936,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "applyColumnVisibility",
     value: function applyColumnVisibility() {
-      var _this21 = this;
+      var _this22 = this;
       var table = document.getElementById('transactions-table');
       if (!table) return;
       var columnMap = {
@@ -52827,7 +52957,7 @@ var BudgetApp = /*#__PURE__*/function () {
 
         // Balance column auto-hides when data isn't available
         var isVisible = visible;
-        if (key === 'balance' && (_this21.balanceBeforePage === null || _this21.balanceBeforePage === undefined)) {
+        if (key === 'balance' && (_this22.balanceBeforePage === null || _this22.balanceBeforePage === undefined)) {
           isVisible = false;
         }
 
@@ -52841,22 +52971,22 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "toggleColumnVisibility",
     value: function () {
-      var _toggleColumnVisibility = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee93(columnKey, visible) {
+      var _toggleColumnVisibility = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee94(columnKey, visible) {
         var visibleCount, settings, response, _t23;
-        return _regenerator().w(function (_context93) {
-          while (1) switch (_context93.p = _context93.n) {
+        return _regenerator().w(function (_context94) {
+          while (1) switch (_context94.p = _context94.n) {
             case 0:
               // Prevent hiding all columns (enforce minimum 1 visible)
               visibleCount = Object.values(this.columnVisibility).filter(function (v) {
                 return v;
               }).length;
               if (!(!visible && visibleCount <= 1)) {
-                _context93.n = 1;
+                _context94.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showWarning)('At least one column must remain visible');
               document.getElementById("col-toggle-".concat(columnKey)).checked = true;
-              return _context93.a(2);
+              return _context94.a(2);
             case 1:
               // Update local state
               this.columnVisibility[columnKey] = visible;
@@ -52865,11 +52995,11 @@ var BudgetApp = /*#__PURE__*/function () {
               this.applyColumnVisibility();
 
               // Persist to backend
-              _context93.p = 2;
+              _context94.p = 2;
               settings = {
                 transaction_columns_visible: JSON.stringify(this.columnVisibility)
               };
-              _context93.n = 3;
+              _context94.n = 3;
               return fetch(OC.generateUrl('/apps/budget/api/settings'), {
                 method: 'PUT',
                 headers: {
@@ -52879,19 +53009,19 @@ var BudgetApp = /*#__PURE__*/function () {
                 body: JSON.stringify(settings)
               });
             case 3:
-              response = _context93.v;
+              response = _context94.v;
               if (response.ok) {
-                _context93.n = 4;
+                _context94.n = 4;
                 break;
               }
               throw new Error('Failed to save column visibility');
             case 4:
               this.settings.transaction_columns_visible = JSON.stringify(this.columnVisibility);
-              _context93.n = 6;
+              _context94.n = 6;
               break;
             case 5:
-              _context93.p = 5;
-              _t23 = _context93.v;
+              _context94.p = 5;
+              _t23 = _context94.v;
               console.error('Failed to save column visibility:', _t23);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_6__.showError)('Failed to save column preferences');
 
@@ -52900,11 +53030,11 @@ var BudgetApp = /*#__PURE__*/function () {
               this.applyColumnVisibility();
               document.getElementById("col-toggle-".concat(columnKey)).checked = !visible;
             case 6:
-              return _context93.a(2);
+              return _context94.a(2);
           }
-        }, _callee93, this, [[2, 5]]);
+        }, _callee94, this, [[2, 5]]);
       }));
-      function toggleColumnVisibility(_x42, _x43) {
+      function toggleColumnVisibility(_x44, _x45) {
         return _toggleColumnVisibility.apply(this, arguments);
       }
       return toggleColumnVisibility;
@@ -52931,15 +53061,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadTagSetsForCategory",
     value: function () {
-      var _loadTagSetsForCategory = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee94(categoryId) {
-        return _regenerator().w(function (_context94) {
-          while (1) switch (_context94.n) {
+      var _loadTagSetsForCategory = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee95(categoryId) {
+        return _regenerator().w(function (_context95) {
+          while (1) switch (_context95.n) {
             case 0:
-              return _context94.a(2, this.tagSetsModule.loadTagSetsForCategory(categoryId));
+              return _context95.a(2, this.tagSetsModule.loadTagSetsForCategory(categoryId));
           }
-        }, _callee94, this);
+        }, _callee95, this);
       }));
-      function loadTagSetsForCategory(_x44) {
+      function loadTagSetsForCategory(_x46) {
         return _loadTagSetsForCategory.apply(this, arguments);
       }
       return loadTagSetsForCategory;
@@ -52947,15 +53077,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadTransactionTags",
     value: function () {
-      var _loadTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee95(transactionId) {
-        return _regenerator().w(function (_context95) {
-          while (1) switch (_context95.n) {
+      var _loadTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee96(transactionId) {
+        return _regenerator().w(function (_context96) {
+          while (1) switch (_context96.n) {
             case 0:
-              return _context95.a(2, this.tagSetsModule.loadTransactionTags(transactionId));
+              return _context96.a(2, this.tagSetsModule.loadTransactionTags(transactionId));
           }
-        }, _callee95, this);
+        }, _callee96, this);
       }));
-      function loadTransactionTags(_x45) {
+      function loadTransactionTags(_x47) {
         return _loadTransactionTags.apply(this, arguments);
       }
       return loadTransactionTags;
@@ -52963,15 +53093,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "saveTransactionTags",
     value: function () {
-      var _saveTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee96(transactionId, tagIds) {
-        return _regenerator().w(function (_context96) {
-          while (1) switch (_context96.n) {
+      var _saveTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee97(transactionId, tagIds) {
+        return _regenerator().w(function (_context97) {
+          while (1) switch (_context97.n) {
             case 0:
-              return _context96.a(2, this.tagSetsModule.saveTransactionTags(transactionId, tagIds));
+              return _context97.a(2, this.tagSetsModule.saveTransactionTags(transactionId, tagIds));
           }
-        }, _callee96, this);
+        }, _callee97, this);
       }));
-      function saveTransactionTags(_x46, _x47) {
+      function saveTransactionTags(_x48, _x49) {
         return _saveTransactionTags.apply(this, arguments);
       }
       return saveTransactionTags;
@@ -52984,15 +53114,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "renderCategoryTagSetsUI",
     value: function () {
-      var _renderCategoryTagSetsUI = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee97(categoryId) {
-        return _regenerator().w(function (_context97) {
-          while (1) switch (_context97.n) {
+      var _renderCategoryTagSetsUI = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee98(categoryId) {
+        return _regenerator().w(function (_context98) {
+          while (1) switch (_context98.n) {
             case 0:
-              return _context97.a(2, this.tagSetsModule.renderCategoryTagSetsUI(categoryId));
+              return _context98.a(2, this.tagSetsModule.renderCategoryTagSetsUI(categoryId));
           }
-        }, _callee97, this);
+        }, _callee98, this);
       }));
-      function renderCategoryTagSetsUI(_x48) {
+      function renderCategoryTagSetsUI(_x50) {
         return _renderCategoryTagSetsUI.apply(this, arguments);
       }
       return renderCategoryTagSetsUI;
@@ -53000,15 +53130,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "renderTransactionTagSelectors",
     value: function () {
-      var _renderTransactionTagSelectors = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee98(categoryId, transactionId) {
-        return _regenerator().w(function (_context98) {
-          while (1) switch (_context98.n) {
+      var _renderTransactionTagSelectors = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee99(categoryId, transactionId) {
+        return _regenerator().w(function (_context99) {
+          while (1) switch (_context99.n) {
             case 0:
-              return _context98.a(2, this.tagSetsModule.renderTransactionTagSelectors(categoryId, transactionId));
+              return _context99.a(2, this.tagSetsModule.renderTransactionTagSelectors(categoryId, transactionId));
           }
-        }, _callee98, this);
+        }, _callee99, this);
       }));
-      function renderTransactionTagSelectors(_x49, _x50) {
+      function renderTransactionTagSelectors(_x51, _x52) {
         return _renderTransactionTagSelectors.apply(this, arguments);
       }
       return renderTransactionTagSelectors;
@@ -53016,13 +53146,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAndDisplayTransactionTags",
     value: function () {
-      var _loadAndDisplayTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee99() {
-        return _regenerator().w(function (_context99) {
-          while (1) switch (_context99.n) {
+      var _loadAndDisplayTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee100() {
+        return _regenerator().w(function (_context100) {
+          while (1) switch (_context100.n) {
             case 0:
-              return _context99.a(2, this.tagSetsModule.loadAndDisplayTransactionTags());
+              return _context100.a(2, this.tagSetsModule.loadAndDisplayTransactionTags());
           }
-        }, _callee99, this);
+        }, _callee100, this);
       }));
       function loadAndDisplayTransactionTags() {
         return _loadAndDisplayTransactionTags.apply(this, arguments);
@@ -53032,15 +53162,15 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "renderCategoryTagSetsList",
     value: function () {
-      var _renderCategoryTagSetsList = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee100(categoryId) {
-        return _regenerator().w(function (_context100) {
-          while (1) switch (_context100.n) {
+      var _renderCategoryTagSetsList = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee101(categoryId) {
+        return _regenerator().w(function (_context101) {
+          while (1) switch (_context101.n) {
             case 0:
-              return _context100.a(2, this.tagSetsModule.renderCategoryTagSetsList(categoryId));
+              return _context101.a(2, this.tagSetsModule.renderCategoryTagSetsList(categoryId));
           }
-        }, _callee100, this);
+        }, _callee101, this);
       }));
-      function renderCategoryTagSetsList(_x51) {
+      function renderCategoryTagSetsList(_x53) {
         return _renderCategoryTagSetsList.apply(this, arguments);
       }
       return renderCategoryTagSetsList;
@@ -53048,13 +53178,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "loadAllTransactionTags",
     value: function () {
-      var _loadAllTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee101() {
-        return _regenerator().w(function (_context101) {
-          while (1) switch (_context101.n) {
+      var _loadAllTransactionTags = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee102() {
+        return _regenerator().w(function (_context102) {
+          while (1) switch (_context102.n) {
             case 0:
-              return _context101.a(2, this.tagSetsModule.loadAllTransactionTags());
+              return _context102.a(2, this.tagSetsModule.loadAllTransactionTags());
           }
-        }, _callee101, this);
+        }, _callee102, this);
       }));
       function loadAllTransactionTags() {
         return _loadAllTransactionTags.apply(this, arguments);
@@ -53115,12 +53245,12 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "flattenCategories",
     value: function flattenCategories(categories) {
-      var _this22 = this;
+      var _this23 = this;
       var result = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       categories.forEach(function (cat) {
         result.push(cat);
         if (cat.children && cat.children.length > 0) {
-          _this22.flattenCategories(cat.children, result);
+          _this23.flattenCategories(cat.children, result);
         }
       });
       return result;
@@ -53128,7 +53258,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "populateCurrencyDropdowns",
     value: function populateCurrencyDropdowns() {
-      var _this23 = this;
+      var _this24 = this;
       // Populate all currency dropdowns with options from backend
       if (!this.options.currencies || !Array.isArray(this.options.currencies)) {
         return;
@@ -53142,7 +53272,7 @@ var BudgetApp = /*#__PURE__*/function () {
         select.innerHTML = '';
 
         // Add all currency options
-        _this23.options.currencies.forEach(function (currency) {
+        _this24.options.currencies.forEach(function (currency) {
           var option = document.createElement('option');
           option.value = currency.code;
           option.textContent = "".concat(currency.code, " - ").concat(currency.name, " (").concat(currency.symbol, ")");

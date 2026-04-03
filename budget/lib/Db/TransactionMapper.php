@@ -307,6 +307,11 @@ class TransactionMapper extends QBMapper {
         $qb->leftJoin('t', 'budget_categories', 'c', $qb->expr()->eq('t.category_id', 'c.id'));
         $qb->addSelect('c.name as category_name');
 
+        // Join linked transaction's account for transfer display
+        $qb->leftJoin('t', $this->getTableName(), 'lt', $qb->expr()->eq('t.linked_transaction_id', 'lt.id'));
+        $qb->leftJoin('lt', 'budget_accounts', 'la', $qb->expr()->eq('lt.account_id', 'la.id'));
+        $qb->addSelect('la.id as linked_account_id', 'la.name as linked_account_name');
+
         $result = $qb->executeQuery();
         $rows = $result->fetchAll();
         $result->closeCursor();
@@ -335,6 +340,8 @@ class TransactionMapper extends QBMapper {
                 'accountName' => $row['account_name'],
                 'accountCurrency' => $row['account_currency'] ?? 'USD',
                 'categoryName' => $row['category_name'],
+                'linkedAccountId' => ($row['linked_account_id'] ?? null) ? (int)$row['linked_account_id'] : null,
+                'linkedAccountName' => $row['linked_account_name'] ?? null,
             ];
         }, $rows);
 
