@@ -572,18 +572,56 @@ class MigrationService {
             $rule = new ImportRule();
             $rule->setUserId($userId);
             $rule->setName($ruleData['name']);
-            $rule->setPattern($ruleData['pattern']);
+            $rule->setPattern($ruleData['pattern'] ?? '');
             $rule->setField($ruleData['field'] ?? 'description');
             $rule->setMatchType($ruleData['matchType'] ?? 'contains');
             $rule->setVendorName($ruleData['vendorName'] ?? null);
             $rule->setPriority($ruleData['priority'] ?? 0);
             $rule->setActive($ruleData['active'] ?? true);
             $rule->setCreatedAt($ruleData['createdAt'] ?? date('Y-m-d H:i:s'));
+            $rule->setUpdatedAt($ruleData['updatedAt'] ?? null);
+            $rule->setSchemaVersion($ruleData['schemaVersion'] ?? 1);
+            $rule->setApplyOnImport($ruleData['applyOnImport'] ?? true);
+            $rule->setStopProcessing($ruleData['stopProcessing'] ?? true);
 
-            // Remap category ID
+            // Remap legacy category ID
             $oldCategoryId = $ruleData['categoryId'] ?? null;
             if ($oldCategoryId !== null && isset($idMaps['categories'][$oldCategoryId])) {
                 $rule->setCategoryId($idMaps['categories'][$oldCategoryId]);
+            }
+
+            // Import actions with ID remapping
+            if (isset($ruleData['actions']) && is_array($ruleData['actions'])) {
+                $actions = $ruleData['actions'];
+
+                // Legacy v1 flat format: {categoryId: 5, vendor: "X"}
+                if (isset($actions['categoryId']) && isset($idMaps['categories'][$actions['categoryId']])) {
+                    $actions['categoryId'] = $idMaps['categories'][$actions['categoryId']];
+                }
+
+                // v2 nested format: {version: 2, actions: [{type, value}, ...]}
+                if (isset($actions['actions']) && is_array($actions['actions'])) {
+                    foreach ($actions['actions'] as &$action) {
+                        $type = $action['type'] ?? null;
+                        $value = $action['value'] ?? null;
+                        if ($value === null) {
+                            continue;
+                        }
+                        if ($type === 'set_category' && isset($idMaps['categories'][$value])) {
+                            $action['value'] = $idMaps['categories'][$value];
+                        } elseif ($type === 'set_account' && isset($idMaps['accounts'][$value])) {
+                            $action['value'] = $idMaps['accounts'][$value];
+                        }
+                    }
+                    unset($action);
+                }
+
+                $rule->setActionsFromArray($actions);
+            }
+
+            // Import criteria (matching conditions, no ID remapping needed)
+            if (isset($ruleData['criteria']) && is_array($ruleData['criteria'])) {
+                $rule->setCriteriaFromArray($ruleData['criteria']);
             }
 
             $this->importRuleMapper->insert($rule);
