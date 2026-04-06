@@ -861,6 +861,23 @@ class TransactionMapper extends QBMapper {
         return $this->findEntities($qb);
     }
 
+    public function getNetChangeAll(int $accountId): float {
+        $qb = $this->db->getQueryBuilder();
+
+        $qb->selectAlias(
+                $qb->createFunction('COALESCE(SUM(CASE WHEN t.type = \'credit\' THEN t.amount ELSE -t.amount END), 0)'),
+                'net_change'
+            )
+            ->from($this->getTableName(), 't')
+            ->where($qb->expr()->eq('t.account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)));
+
+        $result = $qb->executeQuery();
+        $netChange = (float)$result->fetchOne();
+        $result->closeCursor();
+
+        return $netChange;
+    }
+
     public function getNetChangeAfterDate(int $accountId, string $afterDate): float {
         $qb = $this->db->getQueryBuilder();
 

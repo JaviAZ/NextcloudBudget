@@ -87,7 +87,7 @@ class AccountService extends AbstractCrudService {
 
         if (isset($updates['openingBalance'])) {
             $openingBalance = (string) ($account->getOpeningBalance() ?? 0);
-            $transactionNet = (string) $this->transactionMapper->getNetChangeAfterDate($id, '0000-01-01');
+            $transactionNet = (string) $this->transactionMapper->getNetChangeAll($id);
             $newBalance = MoneyCalculator::add($openingBalance, $transactionNet);
 
             $this->mapper->updateBalance($id, $newBalance, $userId);
@@ -265,7 +265,7 @@ class AccountService extends AbstractCrudService {
             $openingBalance = (string) ($account->getOpeningBalance() ?? 0);
 
             // Sum all transactions for this account
-            $transactionNet = (string) $this->transactionMapper->getNetChangeAfterDate($accountId, '0000-01-01');
+            $transactionNet = (string) $this->transactionMapper->getNetChangeAll($accountId);
 
             // new_balance = opening_balance + net transaction effect
             $newBalance = MoneyCalculator::add($openingBalance, $transactionNet);

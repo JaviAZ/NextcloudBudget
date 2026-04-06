@@ -591,6 +591,28 @@ class TransactionMapperTest extends TestCase {
         $this->assertEquals(0, $data[0]['average']);
     }
 
+    // ===== getNetChangeAll =====
+
+    public function testGetNetChangeAllReturnsFloat(): void {
+        $this->result->method('fetchOne')->willReturn('500.25');
+        $this->result->method('closeCursor');
+        $this->qb->method('executeQuery')->willReturn($this->result);
+
+        $netChange = $this->mapper->getNetChangeAll(10);
+
+        $this->assertEquals(500.25, $netChange);
+    }
+
+    public function testGetNetChangeAllReturnsZeroWhenNoTransactions(): void {
+        $this->result->method('fetchOne')->willReturn('0');
+        $this->result->method('closeCursor');
+        $this->qb->method('executeQuery')->willReturn($this->result);
+
+        $netChange = $this->mapper->getNetChangeAll(10);
+
+        $this->assertEquals(0.0, $netChange);
+    }
+
     // ===== getNetChangeAfterDate =====
 
     public function testGetNetChangeAfterDateReturnsFloat(): void {
