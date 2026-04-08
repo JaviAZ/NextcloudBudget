@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OCA\Budget\BackgroundJob;
 
+use OCA\Budget\Db\AccountMapper;
 use OCA\Budget\Db\TransactionMapper;
+use OCA\Budget\Service\MoneyCalculator;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\Server;
@@ -29,6 +31,7 @@ class ScheduledTransactionJob extends TimedJob {
 
     protected function run($argument): void {
         $mapper = Server::get(TransactionMapper::class);
+        $accountMapper = Server::get(AccountMapper::class);
         $logger = Server::get(LoggerInterface::class);
 
         try {
@@ -41,6 +44,18 @@ class ScheduledTransactionJob extends TimedJob {
                     $transaction->setStatus('cleared');
                     $transaction->setUpdatedAt($now);
                     $mapper->update($transaction);
+
+                    // Update account balance: scheduled transactions don't affect
+                    // balance, so transitioning to cleared must apply the effect now
+                    $account = $accountMapper->findById($transaction->getAccountId());
+                    $currentBalance = (string) $account->getBalance();
+                    $amount = (string) $transaction->getAmount();
+                    $newBalance = $transaction->getType() === 'credit'
+                        ? MoneyCalculator::add($currentBalance, $amount)
+                        : MoneyCalculator::subtract($currentBalance, $amount);
+                    $accountMapper->updateBalance($account->getId(), $newBalance, $account->getUserId());
+
+
                     $count++;
                 } catch (\Exception $e) {
                     $logger->warning('Failed to transition scheduled transaction {id}: {error}', [

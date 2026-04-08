@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OCA\Budget\Tests\Unit\BackgroundJob;
 
 use OCA\Budget\BackgroundJob\ScheduledTransactionJob;
+use OCA\Budget\Db\Account;
+use OCA\Budget\Db\AccountMapper;
 use OCA\Budget\Db\Transaction;
 use OCA\Budget\Db\TransactionMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
@@ -17,16 +19,27 @@ class ScheduledTransactionJobTest extends TestCase {
 	private ScheduledTransactionJob $job;
 	private ITimeFactory $timeFactory;
 	private TransactionMapper $mapper;
+	private AccountMapper $accountMapper;
 	private LoggerInterface $logger;
 
 	protected function setUp(): void {
 		$this->timeFactory = $this->createMock(ITimeFactory::class);
 		$this->mapper = $this->createMock(TransactionMapper::class);
+		$this->accountMapper = $this->createMock(AccountMapper::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
+
+		// Mock account lookup for balance updates
+		$account = new Account();
+		$account->setId(1);
+		$account->setUserId('user1');
+		$account->setBalance(1000.00);
+		$this->accountMapper->method('findById')->willReturn($account);
+		$this->accountMapper->method('updateBalance')->willReturn($account);
 
 		$container = $this->createMock(ContainerInterface::class);
 		$container->method('get')->willReturnMap([
 			[TransactionMapper::class, $this->mapper],
+			[AccountMapper::class, $this->accountMapper],
 			[LoggerInterface::class, $this->logger],
 		]);
 		\OC::$server = $container;

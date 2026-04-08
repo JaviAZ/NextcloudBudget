@@ -38,6 +38,22 @@ class AccountMapper extends QBMapper {
     }
 
     /**
+     * Find an account by ID without user scoping.
+     * Only for trusted system-level operations (e.g. background jobs).
+     *
+     * @throws DoesNotExistException
+     */
+    public function findById(int $id): Account {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+
+        $account = $this->findEntity($qb);
+        return $this->decryptEntity($account);
+    }
+
+    /**
      * @return Account[]
      */
     public function findAll(string $userId): array {

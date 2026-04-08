@@ -97,10 +97,12 @@ class TransactionService {
         $transaction->setUpdatedAt(date('Y-m-d H:i:s'));
 
         $transaction = $this->mapper->insert($transaction);
-        
-        // Update account balance
-        $this->updateAccountBalance($account, $amount, $type, $userId);
-        
+
+        // Update account balance (scheduled transactions don't affect balance until cleared)
+        if (($status ?? 'cleared') !== 'scheduled') {
+            $this->updateAccountBalance($account, $amount, $type, $userId);
+        }
+
         return $transaction;
     }
 
@@ -299,6 +301,7 @@ class TransactionService {
         $oldAmount = $transaction->getAmount();
         $oldType = $transaction->getType();
         $oldAccountId = $transaction->getAccountId();
+        $oldStatus = $transaction->getStatus() ?? 'cleared';
 
         // If changing account, verify new account belongs to user
         $accountChanging = isset($updates['accountId']) && $updates['accountId'] !== $oldAccountId;
@@ -320,17 +323,35 @@ class TransactionService {
 
         $newAmount = $updates['amount'] ?? $oldAmount;
         $newType = $updates['type'] ?? $oldType;
+        $newStatus = $updates['status'] ?? $oldStatus;
+
+        // Scheduled transactions don't affect balance — only apply balance changes
+        // when the transaction is or becomes cleared
+        $wasAffectingBalance = ($oldStatus !== 'scheduled');
+        $nowAffectsBalance = ($newStatus !== 'scheduled');
 
         if ($accountChanging) {
-            // Moving to a different account: reverse on old, apply on new
-            $oldAccount = $this->accountMapper->find($oldAccountId, $userId);
+            // Moving to a different account: reverse on old (if it was affecting balance), apply on new (if it now affects balance)
+            if ($wasAffectingBalance) {
+                $oldAccount = $this->accountMapper->find($oldAccountId, $userId);
+                $reverseType = $oldType === 'credit' ? 'debit' : 'credit';
+                $this->updateAccountBalance($oldAccount, $oldAmount, $reverseType, $userId);
+            }
+            if ($nowAffectsBalance) {
+                $newAccount = $this->accountMapper->find($updates['accountId'], $userId);
+                $this->updateAccountBalance($newAccount, $newAmount, $newType, $userId);
+            }
+        } elseif (!$wasAffectingBalance && $nowAffectsBalance) {
+            // Status changed from scheduled → cleared: apply full balance effect
+            $account = $this->accountMapper->find($transaction->getAccountId(), $userId);
+            $this->updateAccountBalance($account, $newAmount, $newType, $userId);
+        } elseif ($wasAffectingBalance && !$nowAffectsBalance) {
+            // Status changed from cleared → scheduled: reverse the balance effect
+            $account = $this->accountMapper->find($transaction->getAccountId(), $userId);
             $reverseType = $oldType === 'credit' ? 'debit' : 'credit';
-            $this->updateAccountBalance($oldAccount, $oldAmount, $reverseType, $userId);
-
-            $newAccount = $this->accountMapper->find($updates['accountId'], $userId);
-            $this->updateAccountBalance($newAccount, $newAmount, $newType, $userId);
-        } elseif ($newAmount != $oldAmount || $newType != $oldType) {
-            // Same account, but amount or type changed
+            $this->updateAccountBalance($account, $oldAmount, $reverseType, $userId);
+        } elseif ($wasAffectingBalance && $nowAffectsBalance && ($newAmount != $oldAmount || $newType != $oldType)) {
+            // Both cleared, but amount or type changed — adjust the difference
             $account = $this->accountMapper->find($transaction->getAccountId(), $userId);
             $currentBalance = (string) $account->getBalance();
 
@@ -349,6 +370,7 @@ class TransactionService {
 
             $this->accountMapper->updateBalance($account->getId(), $newBalance, $userId);
         }
+        // If both scheduled (wasAffectingBalance=false, nowAffectsBalance=false): no balance changes
 
         return $transaction;
     }
@@ -357,9 +379,12 @@ class TransactionService {
         $transaction = $this->find($id, $userId);
         $account = $this->accountMapper->find($transaction->getAccountId(), $userId);
 
-        // Reverse transaction effect on balance
-        $reverseType = $transaction->getType() === 'credit' ? 'debit' : 'credit';
-        $this->updateAccountBalance($account, $transaction->getAmount(), $reverseType, $userId);
+        // Reverse transaction effect on balance (scheduled transactions never affected balance)
+        $status = $transaction->getStatus() ?? 'cleared';
+        if ($status !== 'scheduled') {
+            $reverseType = $transaction->getType() === 'credit' ? 'debit' : 'credit';
+            $this->updateAccountBalance($account, $transaction->getAmount(), $reverseType, $userId);
+        }
 
         // Cascade delete: Delete transaction tags first
         $this->transactionTagMapper->deleteByTransaction($id);

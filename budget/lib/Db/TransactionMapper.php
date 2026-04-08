@@ -869,7 +869,13 @@ class TransactionMapper extends QBMapper {
                 'net_change'
             )
             ->from($this->getTableName(), 't')
-            ->where($qb->expr()->eq('t.account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)));
+            ->where($qb->expr()->eq('t.account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->neq('t.status', $qb->createNamedParameter('scheduled')),
+                    $qb->expr()->isNull('t.status')
+                )
+            );
 
         $result = $qb->executeQuery();
         $netChange = (float)$result->fetchOne();
@@ -887,7 +893,13 @@ class TransactionMapper extends QBMapper {
             )
             ->from($this->getTableName(), 't')
             ->where($qb->expr()->eq('t.account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->gt('t.date', $qb->createNamedParameter($afterDate)));
+            ->andWhere($qb->expr()->gt('t.date', $qb->createNamedParameter($afterDate)))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->neq('t.status', $qb->createNamedParameter('scheduled')),
+                    $qb->expr()->isNull('t.status')
+                )
+            );
 
         $result = $qb->executeQuery();
         $netChange = (float)$result->fetchOne();
@@ -925,6 +937,12 @@ class TransactionMapper extends QBMapper {
                         $qb->expr()->lt('t.id', $qb->createNamedParameter($boundaryId, IQueryBuilder::PARAM_INT))
                     )
                 )
+            )
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->neq('t.status', $qb->createNamedParameter('scheduled')),
+                    $qb->expr()->isNull('t.status')
+                )
             );
 
         $result = $qb->executeQuery();
@@ -954,6 +972,12 @@ class TransactionMapper extends QBMapper {
             ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
             ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)))
             ->andWhere($qb->expr()->gt('t.date', $qb->createNamedParameter($afterDate)))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->neq('t.status', $qb->createNamedParameter('scheduled')),
+                    $qb->expr()->isNull('t.status')
+                )
+            )
             ->groupBy('t.account_id');
 
         $result = $qb->executeQuery();
