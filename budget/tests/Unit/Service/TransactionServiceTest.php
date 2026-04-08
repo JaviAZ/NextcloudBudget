@@ -376,7 +376,8 @@ class TransactionServiceTest extends TestCase {
         $result = $this->service->createFromBill('user1', $bill);
 
         $this->assertEquals(1, $insertCount);
-        $this->assertEquals('Rent', $result->getDescription());
+        $this->assertEquals('Bill payment', $result->getDescription());
+        $this->assertEquals('Rent', $result->getVendor());
         $this->assertEquals('debit', $result->getType());
         $this->assertEquals(500.00, $result->getAmount());
     }
@@ -516,7 +517,8 @@ class TransactionServiceTest extends TestCase {
         $this->mapper->expects($this->once())
             ->method('insert')
             ->willReturnCallback(function (Transaction $tx) {
-                $this->assertEquals('Salary', $tx->getDescription());
+                $this->assertEquals('Income payment', $tx->getDescription());
+                $this->assertEquals('Salary', $tx->getVendor());
                 $this->assertEquals('credit', $tx->getType());
                 $this->assertEquals(3000.00, $tx->getAmount());
                 $this->assertEquals(10, $tx->getAccountId());
