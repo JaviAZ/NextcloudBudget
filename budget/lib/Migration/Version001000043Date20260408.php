@@ -32,7 +32,7 @@ class Version001000043Date20260408 extends SimpleMigrationStep {
 			->from('budget_accounts');
 		$result = $qb->executeQuery();
 		$accounts = $result->fetchAll();
-		$result->free();
+		$result->closeCursor();
 
 		$updated = 0;
 		foreach ($accounts as $account) {
@@ -57,7 +57,7 @@ class Version001000043Date20260408 extends SimpleMigrationStep {
 				);
 			$netResult = $qb2->executeQuery();
 			$netChange = (string) ($netResult->fetchOne() ?: '0');
-			$netResult->free();
+			$netResult->closeCursor();
 
 			$newBalance = bcadd($openingBalance, $netChange, 2);
 

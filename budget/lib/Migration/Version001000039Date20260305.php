@@ -42,7 +42,7 @@ class Version001000039Date20260305 extends SimpleMigrationStep {
 			->from('budget_manual_exchange_rates');
 		$result = $qb->executeQuery();
 		$this->rowsToMigrate = $result->fetchAll();
-		$result->free();
+		$result->closeCursor();
 	}
 
 	/**
