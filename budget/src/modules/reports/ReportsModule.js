@@ -1097,6 +1097,7 @@ export default class ReportsModule {
         const year = document.getElementById('bills-calendar-year')?.value || new Date().getFullYear();
         const billStatus = document.getElementById('bills-calendar-status')?.value || 'active';
         const includeTransfers = document.getElementById('bills-calendar-include-transfers')?.checked || false;
+        const accountId = document.getElementById('bills-calendar-account')?.value || '';
 
         return fetch(OC.generateUrl('/apps/budget/api/bills/export-calendar'), {
             method: 'POST',
@@ -1108,7 +1109,8 @@ export default class ReportsModule {
                 format,
                 year: parseInt(year),
                 billStatus,
-                includeTransfers: includeTransfers.toString()
+                includeTransfers: includeTransfers.toString(),
+                ...(accountId && { accountId: parseInt(accountId) })
             })
         });
     }
@@ -1130,17 +1132,50 @@ export default class ReportsModule {
         // Populate year dropdown
         this.populateBillsCalendarYears();
 
+        // Populate account dropdown
+        this.populateBillsCalendarAccountDropdown();
+
         // Auto-generate on first load (like other reports)
         this.generateBillsCalendar();
+    }
+
+    populateBillsCalendarAccountDropdown() {
+        const dropdown = document.getElementById('bills-calendar-account');
+        if (!dropdown) return;
+
+        dropdown.innerHTML = '';
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.textContent = 'All Accounts';
+        dropdown.appendChild(allOption);
+
+        if (Array.isArray(this.accounts)) {
+            this.accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = account.name;
+                dropdown.appendChild(option);
+            });
+        }
     }
 
     setupBillsCalendarControls() {
         const generateBtn = document.getElementById('generate-bills-calendar-btn');
         const viewSelect = document.getElementById('bills-calendar-view');
+        const accountSelect = document.getElementById('bills-calendar-account');
+        const yearSelect = document.getElementById('bills-calendar-year');
+        const statusSelect = document.getElementById('bills-calendar-status');
+        const transfersCheckbox = document.getElementById('bills-calendar-include-transfers');
 
         if (generateBtn) {
             generateBtn.addEventListener('click', () => this.generateBillsCalendar());
         }
+
+        // Auto-regenerate when any filter changes
+        if (accountSelect) accountSelect.addEventListener('change', () => this.generateBillsCalendar());
+        if (yearSelect) yearSelect.addEventListener('change', () => this.generateBillsCalendar());
+        if (statusSelect) statusSelect.addEventListener('change', () => this.generateBillsCalendar());
+        if (transfersCheckbox) transfersCheckbox.addEventListener('change', () => this.generateBillsCalendar());
 
         if (viewSelect) {
             viewSelect.addEventListener('change', (e) => {
@@ -1179,6 +1214,7 @@ export default class ReportsModule {
         const year = document.getElementById('bills-calendar-year')?.value || new Date().getFullYear();
         const billStatus = document.getElementById('bills-calendar-status')?.value || 'active';
         const includeTransfers = document.getElementById('bills-calendar-include-transfers')?.checked || false;
+        const accountId = document.getElementById('bills-calendar-account')?.value || '';
 
         // Show loading
         const loadingEl = document.getElementById('report-loading');
@@ -1188,7 +1224,8 @@ export default class ReportsModule {
             const params = new URLSearchParams({
                 year: year.toString(),
                 billStatus,
-                includeTransfers: includeTransfers.toString()
+                includeTransfers: includeTransfers.toString(),
+                ...(accountId && { accountId })
             });
 
             const response = await fetch(

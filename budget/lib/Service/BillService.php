@@ -558,9 +558,10 @@ class BillService {
      * @param int $year Year to generate overview for
      * @param bool $includeTransfers Include transfer bills
      * @param string $billStatus 'active', 'inactive', or 'all'
+     * @param int|null $accountId Filter by account ID (source or destination)
      * @return array Bills with monthly occurrences and totals
      */
-    public function getAnnualOverview(string $userId, int $year, bool $includeTransfers = false, string $billStatus = 'active'): array {
+    public function getAnnualOverview(string $userId, int $year, bool $includeTransfers = false, string $billStatus = 'active', ?int $accountId = null): array {
         // Determine which bills to fetch based on status
         $bills = [];
         if ($billStatus === 'active') {
@@ -576,6 +577,14 @@ class BillService {
             $bills = $this->mapper->findByType($userId, null, $isActive);
         } else {
             $bills = $this->mapper->findByType($userId, false, $isActive);
+        }
+
+        // Filter by account if specified (match source or destination account)
+        if ($accountId !== null) {
+            $bills = array_filter($bills, function ($bill) use ($accountId) {
+                return $bill->getAccountId() === $accountId
+                    || $bill->getDestinationAccountId() === $accountId;
+            });
         }
 
         // Calculate monthly occurrences for each bill

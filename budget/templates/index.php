@@ -1347,6 +1347,16 @@ style('budget', 'budget-main');
                         </div>
 
                         <div class="filter-group">
+                            <label for="filter-created-from">Created From</label>
+                            <input type="date" id="filter-created-from">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter-created-to">Created To</label>
+                            <input type="date" id="filter-created-to">
+                        </div>
+
+                        <div class="filter-group">
                             <label for="filter-amount-min">Min Amount</label>
                             <input type="number" id="filter-amount-min" step="0.01" placeholder="0.00">
                         </div>
@@ -3112,6 +3122,12 @@ style('budget', 'budget-main');
                                 <input type="checkbox" id="bills-calendar-include-transfers" checked>
                                 <span>Include Recurring Transfers</span>
                             </label>
+                        </div>
+                        <div class="control-group">
+                            <label for="bills-calendar-account">Account</label>
+                            <select id="bills-calendar-account" class="report-select">
+                                <option value="">All Accounts</option>
+                            </select>
                         </div>
                         <div class="control-group">
                             <label for="bills-calendar-view">View</label>

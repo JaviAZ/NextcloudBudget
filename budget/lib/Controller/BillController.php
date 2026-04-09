@@ -616,7 +616,7 @@ class BillController extends Controller {
      * Get annual overview of bills
      * @NoAdminRequired
      */
-    public function annualOverview(?int $year = null, $includeTransfers = 'false', ?string $billStatus = 'active'): DataResponse {
+    public function annualOverview(?int $year = null, $includeTransfers = 'false', ?string $billStatus = 'active', ?int $accountId = null): DataResponse {
         try {
             // Default to current year if not specified
             $year = $year ?? (int) date('Y');
@@ -635,7 +635,7 @@ class BillController extends Controller {
                 $billStatus = 'active';
             }
 
-            $overview = $this->service->getAnnualOverview($this->userId, $year, $includeTransfersBool, $billStatus);
+            $overview = $this->service->getAnnualOverview($this->userId, $year, $includeTransfersBool, $billStatus, $accountId);
             return new DataResponse($overview);
         } catch (\Exception $e) {
             return $this->handleError($e, 'Failed to generate annual overview');
@@ -650,7 +650,8 @@ class BillController extends Controller {
         string $format = 'csv',
         ?int $year = null,
         $includeTransfers = 'false',
-        ?string $billStatus = 'active'
+        ?string $billStatus = 'active',
+        ?int $accountId = null
     ): DataDownloadResponse|DataResponse {
         try {
             $year = $year ?? (int) date('Y');
@@ -664,7 +665,7 @@ class BillController extends Controller {
                 $billStatus = 'active';
             }
 
-            $data = $this->service->getAnnualOverview($this->userId, $year, $includeTransfersBool, $billStatus);
+            $data = $this->service->getAnnualOverview($this->userId, $year, $includeTransfersBool, $billStatus, $accountId);
 
             if ($format === 'pdf') {
                 $result = $this->exportCalendarToPdf($data);
