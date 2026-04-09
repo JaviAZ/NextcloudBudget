@@ -836,4 +836,15 @@ class TransactionService {
             ]
         ];
     }
+
+    /**
+     * Find groups of suspected duplicate transactions.
+     *
+     * @param string $userId User ID
+     * @param int $dateWindowDays Date window for matching (default 3 days)
+     * @return array[] Groups of suspected duplicates
+     */
+    public function findDuplicates(string $userId, int $dateWindowDays = 3): array {
+        return $this->mapper->findDuplicates($userId, $dateWindowDays);
+    }
 }

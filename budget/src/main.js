@@ -3186,7 +3186,8 @@ class BudgetApp {
             'asset-modal',
             'asset-value-modal',
             'manual-rate-modal',
-            'global-tag-modal'
+            'global-tag-modal',
+            'duplicates-modal'
         ];
 
         modalIds.forEach(modalId => {
@@ -3196,6 +3197,15 @@ class BudgetApp {
                 modal.setAttribute('aria-hidden', 'true');
             }
         });
+
+        // Duplicates modal uses remove() — if it was dirty, refresh data
+        if (this.transactionsModule?._duplicatesDirty) {
+            this.transactionsModule._duplicatesDirty = false;
+            const dupModal = document.getElementById('duplicates-modal');
+            if (dupModal) dupModal.remove();
+            this.loadTransactions();
+            this.loadAccounts();
+        }
     }
 
     // =====================

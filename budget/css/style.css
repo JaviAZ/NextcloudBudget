@@ -15717,3 +15717,146 @@ span.flatpickr-weekday {
 input.flatpickr-input[type="hidden"] + .flatpickr-input {
     cursor: pointer;
 }
+
+/* ==========================================
+   Duplicate Detection Modal
+   ========================================== */
+
+#duplicates-modal .budget-modal {
+    max-width: 800px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#duplicates-modal .budget-modal-body {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.duplicates-summary {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--color-background-hover);
+    border-radius: 8px;
+}
+
+.duplicates-summary p {
+    margin: 0 0 12px 0;
+}
+
+.duplicates-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.duplicate-group {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.duplicate-group-header {
+    padding: 10px 14px;
+    background: var(--color-background-hover);
+    font-size: 13px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.duplicate-group-items {
+    padding: 4px 0;
+}
+
+.duplicate-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    cursor: pointer;
+    gap: 10px;
+    transition: background 0.1s;
+}
+
+.duplicate-item:hover {
+    background: var(--color-background-hover);
+}
+
+.duplicate-item.pre-selected {
+    background: var(--color-warning-hover, rgba(255, 165, 0, 0.08));
+}
+
+.duplicate-item-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    font-size: 13px;
+}
+
+.duplicate-date {
+    min-width: 90px;
+    color: var(--color-text-maxcontrast);
+}
+
+.duplicate-vendor {
+    min-width: 120px;
+}
+
+.duplicate-category {
+    min-width: 100px;
+    color: var(--color-text-maxcontrast);
+}
+
+.duplicate-amount {
+    min-width: 80px;
+    text-align: right;
+    font-weight: 500;
+}
+
+#duplicates-modal .keep-badge,
+#duplicates-modal .bill-badge,
+#duplicates-modal .scheduled-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+#duplicates-modal .keep-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+#duplicates-modal .bill-badge {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+#duplicates-modal .scheduled-badge {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+#duplicates-modal .empty-message {
+    text-align: center;
+    padding: 32px;
+    color: var(--color-text-maxcontrast);
+}
+
+@media (max-width: 768px) {
+    #duplicates-modal .budget-modal {
+        max-width: 95%;
+    }
+
+    .duplicate-item-details {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .duplicate-date,
+    .duplicate-vendor,
+    .duplicate-category,
+    .duplicate-amount {
+        min-width: auto;
+    }
+}

@@ -194,6 +194,14 @@ export default class TransactionsModule {
             });
         }
 
+        // Find Duplicates
+        const findDuplicatesBtn = document.getElementById('find-duplicates-btn');
+        if (findDuplicatesBtn) {
+            findDuplicatesBtn.addEventListener('click', () => {
+                this.showDuplicatesModal();
+            });
+        }
+
         // Bulk Match All
         const bulkMatchBtn = document.getElementById('bulk-match-btn');
         if (bulkMatchBtn) {
@@ -704,7 +712,15 @@ export default class TransactionsModule {
             return;
         }
 
-        if (!confirm(`Are you sure you want to delete ${this.selectedTransactions.size} transactions? This action cannot be undone.`)) {
+        const selected = this.transactions.filter(t => this.selectedTransactions.has(t.id));
+        const billCount = selected.filter(t => t.billId).length;
+        let message = `Are you sure you want to delete ${this.selectedTransactions.size} transactions? This action cannot be undone.`;
+
+        if (billCount > 0) {
+            message += `\n\n${billCount} of these were auto-generated from bill payments. Deleting real payments will cause your balance to diverge from your bank statement.`;
+        }
+
+        if (!confirm(message)) {
             return;
         }
 
@@ -1518,7 +1534,27 @@ export default class TransactionsModule {
     }
 
     async deleteTransaction(id) {
-        if (!confirm('Are you sure you want to delete this transaction?')) {
+        const transaction = this.transactions.find(t => t.id === id);
+        let message = 'Are you sure you want to delete this transaction?';
+
+        if (transaction) {
+            const amount = formatters.formatCurrency(
+                transaction.amount,
+                this.accounts.find(a => a.id === transaction.accountId)?.currency,
+                this.settings
+            );
+            const balanceEffect = transaction.type === 'credit'
+                ? `This will decrease the account balance by ${amount}.`
+                : `This will increase the account balance by ${amount}.`;
+
+            if (transaction.billId) {
+                message = `This transaction was auto-generated from a bill payment.\n\n${balanceEffect}\n\nIf this is a real payment, deleting it will cause your balance to diverge from your bank statement. Are you sure?`;
+            } else {
+                message = `Are you sure you want to delete this transaction?\n\n${balanceEffect}`;
+            }
+        }
+
+        if (!confirm(message)) {
             return;
         }
 
@@ -1542,6 +1578,9 @@ export default class TransactionsModule {
                 if (window.location.hash === '' || window.location.hash === '#/dashboard') {
                     await this.app.loadDashboard();
                 }
+            } else {
+                const error = await response.json().catch(() => ({}));
+                showError(error.error || 'Failed to delete transaction');
             }
         } catch (error) {
             console.error('Failed to delete transaction:', error);
@@ -3146,5 +3185,246 @@ export default class TransactionsModule {
         }
 
         return result;
+    }
+
+    // ===== Duplicate Detection =====
+
+    async showDuplicatesModal() {
+        // Remove any existing modal
+        const existing = document.getElementById('duplicates-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'duplicates-modal';
+        modal.className = 'budget-modal-overlay';
+        modal.innerHTML = `
+            <div class="budget-modal">
+                <div class="budget-modal-header">
+                    <h2>Find Duplicate Transactions</h2>
+                    <button class="close-btn" title="Close">&times;</button>
+                </div>
+                <div class="budget-modal-body">
+                    <div id="duplicates-loading" class="loading-indicator">
+                        <span class="icon-loading"></span>
+                        <p>Scanning for duplicates...</p>
+                    </div>
+                    <div id="duplicates-content" style="display: none;"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close handlers
+        modal.querySelector('.close-btn').addEventListener('click', () => {
+            modal.remove();
+            if (this._duplicatesDirty) {
+                this.app.loadTransactions();
+                this.app.loadAccounts();
+            }
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                if (this._duplicatesDirty) {
+                    this.app.loadTransactions();
+                    this.app.loadAccounts();
+                }
+            }
+        });
+
+        this._duplicatesDirty = false;
+
+        try {
+            const response = await fetch(
+                OC.generateUrl('/apps/budget/api/transactions/duplicates'),
+                { headers: { 'requesttoken': OC.requestToken } }
+            );
+            if (!response.ok) throw new Error('Failed to fetch duplicates');
+            const data = await response.json();
+
+            document.getElementById('duplicates-loading').style.display = 'none';
+            const content = document.getElementById('duplicates-content');
+            content.style.display = 'block';
+
+            if (!data.groups || data.groups.length === 0) {
+                content.innerHTML = '<p class="empty-message">No duplicate transactions found.</p>';
+                return;
+            }
+
+            this.renderDuplicateGroups(content, data.groups);
+        } catch (error) {
+            console.error('Failed to find duplicates:', error);
+            document.getElementById('duplicates-loading').style.display = 'none';
+            const content = document.getElementById('duplicates-content');
+            content.style.display = 'block';
+            content.innerHTML = '<p class="error-message">Failed to scan for duplicates. Please try again.</p>';
+        }
+    }
+
+    renderDuplicateGroups(container, groups) {
+        const totalDuplicates = groups.reduce((sum, g) => sum + g.length - 1, 0);
+
+        let html = `
+            <div class="duplicates-summary">
+                <p>Found <strong>${groups.length} group(s)</strong> with <strong>${totalDuplicates} suspected duplicate(s)</strong>.
+                The oldest transaction in each group is kept by default. Review and adjust the selection, then delete the checked items.</p>
+                <div class="duplicates-actions">
+                    <button id="duplicates-delete-btn" class="budget-btn primary">
+                        Delete Selected (<span id="duplicates-selected-count">${totalDuplicates}</span>)
+                    </button>
+                    <button id="duplicates-select-none-btn" class="budget-btn secondary">Deselect All</button>
+                </div>
+            </div>
+            <div class="duplicates-groups">
+        `;
+
+        groups.forEach((group, groupIdx) => {
+            const first = group[0];
+            const amount = formatters.formatCurrency(first.amount, first.currency, this.settings);
+
+            html += `
+                <div class="duplicate-group">
+                    <div class="duplicate-group-header">
+                        <strong>${this.escapeHtml(first.description) || '(no description)'}</strong>
+                        &mdash; ${amount} (${this.escapeHtml(first.type)})
+                        &mdash; ${this.escapeHtml(first.accountName)}
+                    </div>
+                    <div class="duplicate-group-items">
+            `;
+
+            group.forEach((tx, txIdx) => {
+                // Pre-select all except the first (oldest) in the group
+                const isExtra = txIdx > 0;
+                const checked = isExtra ? 'checked' : '';
+                const keepLabel = !isExtra ? '<span class="keep-badge">keep</span>' : '';
+                const billLabel = tx.billId ? '<span class="bill-badge">bill</span>' : '';
+                const statusLabel = tx.status === 'scheduled' ? '<span class="scheduled-badge">scheduled</span>' : '';
+
+                html += `
+                    <label class="duplicate-item ${isExtra ? 'pre-selected' : 'keep-item'}">
+                        <input type="checkbox" class="duplicate-checkbox"
+                            data-group="${groupIdx}" data-tx-id="${tx.id}" ${checked}>
+                        <span class="duplicate-item-details">
+                            <span class="duplicate-date">${this.escapeHtml(tx.date)}</span>
+                            <span class="duplicate-vendor">${this.escapeHtml(tx.vendor) || '-'}</span>
+                            <span class="duplicate-category">${this.escapeHtml(tx.categoryName) || '-'}</span>
+                            <span class="duplicate-amount">${formatters.formatCurrency(tx.amount, tx.currency, this.settings)}</span>
+                            ${keepLabel}${billLabel}${statusLabel}
+                        </span>
+                    </label>
+                `;
+            });
+
+            html += '</div></div>';
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Update selected count on checkbox changes
+        container.addEventListener('change', (e) => {
+            if (e.target.classList.contains('duplicate-checkbox')) {
+                this.updateDuplicatesSelectedCount();
+            }
+        });
+
+        // Delete selected
+        document.getElementById('duplicates-delete-btn').addEventListener('click', () => {
+            this.deleteDuplicates();
+        });
+
+        // Deselect all
+        document.getElementById('duplicates-select-none-btn').addEventListener('click', () => {
+            container.querySelectorAll('.duplicate-checkbox').forEach(cb => cb.checked = false);
+            this.updateDuplicatesSelectedCount();
+        });
+    }
+
+    updateDuplicatesSelectedCount() {
+        const checked = document.querySelectorAll('.duplicate-checkbox:checked');
+        const countEl = document.getElementById('duplicates-selected-count');
+        const deleteBtn = document.getElementById('duplicates-delete-btn');
+        if (countEl) countEl.textContent = checked.length;
+        if (deleteBtn) deleteBtn.disabled = checked.length === 0;
+    }
+
+    async deleteDuplicates() {
+        const checked = document.querySelectorAll('.duplicate-checkbox:checked');
+        const ids = Array.from(checked).map(cb => parseInt(cb.dataset.txId));
+
+        if (ids.length === 0) return;
+
+        const billCount = Array.from(checked).filter(cb => {
+            const item = cb.closest('.duplicate-item');
+            return item && item.querySelector('.bill-badge');
+        }).length;
+
+        let message = `Delete ${ids.length} suspected duplicate transaction(s)? This cannot be undone.`;
+        if (billCount > 0) {
+            message += `\n\n${billCount} of these were generated from bill payments. Make sure they are truly duplicates before deleting.`;
+        }
+
+        if (!confirm(message)) return;
+
+        const deleteBtn = document.getElementById('duplicates-delete-btn');
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Deleting...';
+
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/transactions/bulk-delete'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({ ids })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success > 0) {
+                showSuccess(`Deleted ${result.success} duplicate transaction(s)`);
+                this._duplicatesDirty = true;
+
+                // Remove deleted items from the UI
+                checked.forEach(cb => {
+                    const item = cb.closest('.duplicate-item');
+                    if (item) item.remove();
+                });
+
+                // Remove groups that now have only one item
+                document.querySelectorAll('.duplicate-group').forEach(group => {
+                    const remaining = group.querySelectorAll('.duplicate-item');
+                    if (remaining.length <= 1) {
+                        group.remove();
+                    }
+                });
+
+                this.updateDuplicatesSelectedCount();
+
+                // Check if all groups are resolved
+                const remainingGroups = document.querySelectorAll('.duplicate-group');
+                if (remainingGroups.length === 0) {
+                    const content = document.getElementById('duplicates-content');
+                    content.innerHTML = '<p class="empty-message">All duplicates have been resolved.</p>';
+                }
+            }
+
+            if (result.failed > 0) {
+                showError(`Failed to delete ${result.failed} transaction(s)`);
+            }
+        } catch (error) {
+            console.error('Failed to delete duplicates:', error);
+            showError('Failed to delete duplicates');
+        } finally {
+            if (deleteBtn && document.body.contains(deleteBtn)) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = `Delete Selected (${document.querySelectorAll('.duplicate-checkbox:checked').length})`;
+            }
+        }
     }
 }

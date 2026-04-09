@@ -2027,4 +2027,104 @@ class TransactionMapper extends QBMapper {
             'total' => (float)$row['total']
         ], $data);
     }
+
+    /**
+     * Find groups of suspected duplicate transactions.
+     *
+     * Duplicates are transactions on the same account with matching amount, type,
+     * and description within a configurable date window.
+     *
+     * @param string $userId User ID
+     * @param int $dateWindowDays Number of days within which matching transactions are considered duplicates
+     * @return array[] Groups of duplicate transactions, each group is an array of transaction arrays
+     */
+    public function findDuplicates(string $userId, int $dateWindowDays = 3): array {
+        // Find (account_id, amount, type, description) combinations that appear more than once
+        // within the date window. We use a self-join approach.
+        $qb = $this->db->getQueryBuilder();
+
+        // First, get all transactions for this user, ordered for grouping
+        $qb->select('t.*')
+            ->selectAlias('a.name', 'account_name')
+            ->selectAlias('a.currency', 'account_currency')
+            ->selectAlias('c.name', 'category_name')
+            ->from($this->getTableName(), 't')
+            ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
+            ->leftJoin('t', 'budget_categories', 'c', $qb->expr()->eq('t.category_id', 'c.id'))
+            ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->neq('t.status', $qb->createNamedParameter('scheduled')),
+                    $qb->expr()->isNull('t.status')
+                )
+            )
+            ->orderBy('t.account_id')
+            ->addOrderBy('t.amount')
+            ->addOrderBy('t.type')
+            ->addOrderBy('t.description')
+            ->addOrderBy('t.date');
+
+        $result = $qb->executeQuery();
+        $allTransactions = $result->fetchAll();
+        $result->closeCursor();
+
+        // Group in PHP: same account_id, amount, type, description, and dates within window
+        $groups = [];
+        $currentGroup = [];
+
+        foreach ($allTransactions as $tx) {
+            if (empty($currentGroup)) {
+                $currentGroup[] = $tx;
+                continue;
+            }
+
+            $prev = $currentGroup[0];
+            $sameKey = (int) $tx['account_id'] === (int) $prev['account_id']
+                && (float) $tx['amount'] === (float) $prev['amount']
+                && $tx['type'] === $prev['type']
+                && $tx['description'] === $prev['description'];
+
+            if ($sameKey) {
+                // Check if this transaction's date is within the window of any transaction in the group
+                $lastInGroup = end($currentGroup);
+                $daysDiff = abs((strtotime($tx['date']) - strtotime($lastInGroup['date'])) / 86400);
+
+                if ($daysDiff <= $dateWindowDays) {
+                    $currentGroup[] = $tx;
+                    continue;
+                }
+            }
+
+            // Flush the current group if it has duplicates
+            if (count($currentGroup) > 1) {
+                $groups[] = $currentGroup;
+            }
+            $currentGroup = [$tx];
+        }
+
+        // Don't forget the last group
+        if (count($currentGroup) > 1) {
+            $groups[] = $currentGroup;
+        }
+
+        // Format the output
+        return array_map(function (array $group) {
+            return array_map(function (array $tx) {
+                return [
+                    'id' => (int) $tx['id'],
+                    'accountId' => (int) $tx['account_id'],
+                    'accountName' => $tx['account_name'],
+                    'currency' => $tx['account_currency'],
+                    'date' => $tx['date'],
+                    'description' => $tx['description'],
+                    'vendor' => $tx['vendor'] ?? null,
+                    'amount' => (float) $tx['amount'],
+                    'type' => $tx['type'],
+                    'categoryName' => $tx['category_name'] ?? null,
+                    'status' => $tx['status'] ?? 'cleared',
+                    'billId' => isset($tx['bill_id']) ? (int) $tx['bill_id'] : null,
+                ];
+            }, $group);
+        }, array_values($groups));
+    }
 }

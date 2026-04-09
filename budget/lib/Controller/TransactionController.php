@@ -693,4 +693,22 @@ class TransactionController extends Controller {
         }
     }
 
+    /**
+     * Find suspected duplicate transactions
+     *
+     * @NoAdminRequired
+     */
+    #[UserRateLimit(limit: 5, period: 60)]
+    public function duplicates(): DataResponse {
+        try {
+            $groups = $this->service->findDuplicates($this->userId);
+            return new DataResponse([
+                'groups' => $groups,
+                'totalGroups' => count($groups),
+            ]);
+        } catch (\Exception $e) {
+            return $this->handleError($e, 'Failed to find duplicates');
+        }
+    }
+
 }

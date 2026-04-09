@@ -42598,6 +42598,14 @@ var TransactionsModule = /*#__PURE__*/function () {
         });
       }
 
+      // Find Duplicates
+      var findDuplicatesBtn = document.getElementById('find-duplicates-btn');
+      if (findDuplicatesBtn) {
+        findDuplicatesBtn.addEventListener('click', function () {
+          _this.showDuplicatesModal();
+        });
+      }
+
       // Bulk Match All
       var bulkMatchBtn = document.getElementById('bulk-match-btn');
       if (bulkMatchBtn) {
@@ -43126,7 +43134,8 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "bulkDeleteTransactions",
     value: function () {
       var _bulkDeleteTransactions = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var response, result, _t2;
+        var _this6 = this;
+        var selected, billCount, message, response, result, _t2;
         return _regenerator().w(function (_context2) {
           while (1) switch (_context2.p = _context2.n) {
             case 0:
@@ -43136,7 +43145,17 @@ var TransactionsModule = /*#__PURE__*/function () {
               }
               return _context2.a(2);
             case 1:
-              if (confirm("Are you sure you want to delete ".concat(this.selectedTransactions.size, " transactions? This action cannot be undone."))) {
+              selected = this.transactions.filter(function (t) {
+                return _this6.selectedTransactions.has(t.id);
+              });
+              billCount = selected.filter(function (t) {
+                return t.billId;
+              }).length;
+              message = "Are you sure you want to delete ".concat(this.selectedTransactions.size, " transactions? This action cannot be undone.");
+              if (billCount > 0) {
+                message += "\n\n".concat(billCount, " of these were auto-generated from bill payments. Deleting real payments will cause your balance to diverge from your bank statement.");
+              }
+              if (confirm(message)) {
                 _context2.n = 2;
                 break;
               }
@@ -43549,7 +43568,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "showReconcileInfo",
     value: function showReconcileInfo(reconcileData) {
-      var _this6 = this;
+      var _this7 = this;
       // Create floating reconcile info panel
       var existingInfo = document.getElementById('reconcile-info-float');
       if (existingInfo) {
@@ -43567,16 +43586,16 @@ var TransactionsModule = /*#__PURE__*/function () {
 
       // Add event listeners
       document.getElementById('finish-reconcile-btn').addEventListener('click', function () {
-        _this6.finishReconciliation();
+        _this7.finishReconciliation();
       });
       var adjustBtn = document.getElementById('adjust-reconcile-btn');
       if (adjustBtn) {
         adjustBtn.addEventListener('click', function () {
-          _this6.createReconciliationAdjustment(reconcileData, adjustmentType, absDifference);
+          _this7.createReconciliationAdjustment(reconcileData, adjustmentType, absDifference);
         });
       }
       document.getElementById('cancel-reconcile-info-btn').addEventListener('click', function () {
-        _this6.cancelReconciliation();
+        _this7.cancelReconciliation();
       });
     }
   }, {
@@ -43713,9 +43732,9 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "renderTransactionsList",
     value: function renderTransactionsList(transactions) {
-      var _this7 = this;
+      var _this8 = this;
       return transactions.map(function (t) {
-        return "\n            <div class=\"transaction-item\">\n                <span class=\"transaction-date\">".concat(_this7.formatDate(t.date), "</span>\n                <span class=\"transaction-description\">").concat(t.description, "</span>\n                <span class=\"amount ").concat(t.type, "\">").concat(_this7.formatCurrency(t.amount, t.accountCurrency), "</span>\n            </div>\n        ");
+        return "\n            <div class=\"transaction-item\">\n                <span class=\"transaction-date\">".concat(_this8.formatDate(t.date), "</span>\n                <span class=\"transaction-description\">").concat(t.description, "</span>\n                <span class=\"amount ").concat(t.type, "\">").concat(_this8.formatCurrency(t.amount, t.accountCurrency), "</span>\n            </div>\n        ");
       }).join('');
     }
   }, {
@@ -43782,7 +43801,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "showTransactionModal",
     value: function showTransactionModal() {
-      var _this8 = this;
+      var _this9 = this;
       var transaction = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var preSelectedAccountId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var modal = document.getElementById('transaction-modal');
@@ -43837,7 +43856,7 @@ var TransactionsModule = /*#__PURE__*/function () {
           categorySelect.onchange = function () {
             if (oldListener) oldListener();
             var transactionId = document.getElementById('transaction-id').value;
-            _this8.app.renderTransactionTagSelectors(categorySelect.value || null, transactionId || null);
+            _this9.app.renderTransactionTagSelectors(categorySelect.value || null, transactionId || null);
           };
         }
 
@@ -44181,11 +44200,26 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "deleteTransaction",
     value: function () {
       var _deleteTransaction = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(id) {
-        var response, _t10;
+        var transaction, message, _this$accounts$find, amount, balanceEffect, response, error, _t10;
         return _regenerator().w(function (_context1) {
           while (1) switch (_context1.p = _context1.n) {
             case 0:
-              if (confirm('Are you sure you want to delete this transaction?')) {
+              transaction = this.transactions.find(function (t) {
+                return t.id === id;
+              });
+              message = 'Are you sure you want to delete this transaction?';
+              if (transaction) {
+                amount = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatCurrency(transaction.amount, (_this$accounts$find = this.accounts.find(function (a) {
+                  return a.id === transaction.accountId;
+                })) === null || _this$accounts$find === void 0 ? void 0 : _this$accounts$find.currency, this.settings);
+                balanceEffect = transaction.type === 'credit' ? "This will decrease the account balance by ".concat(amount, ".") : "This will increase the account balance by ".concat(amount, ".");
+                if (transaction.billId) {
+                  message = "This transaction was auto-generated from a bill payment.\n\n".concat(balanceEffect, "\n\nIf this is a real payment, deleting it will cause your balance to diverge from your bank statement. Are you sure?");
+                } else {
+                  message = "Are you sure you want to delete this transaction?\n\n".concat(balanceEffect);
+                }
+              }
+              if (confirm(message)) {
                 _context1.n = 1;
                 break;
               }
@@ -44202,7 +44236,7 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 2:
               response = _context1.v;
               if (!response.ok) {
-                _context1.n = 6;
+                _context1.n = 7;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)('Transaction deleted');
@@ -44222,17 +44256,28 @@ var TransactionsModule = /*#__PURE__*/function () {
               _context1.n = 6;
               return this.app.loadDashboard();
             case 6:
-              _context1.n = 8;
+              _context1.n = 9;
               break;
             case 7:
-              _context1.p = 7;
+              _context1.n = 8;
+              return response.json()["catch"](function () {
+                return {};
+              });
+            case 8:
+              error = _context1.v;
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)(error.error || 'Failed to delete transaction');
+            case 9:
+              _context1.n = 11;
+              break;
+            case 10:
+              _context1.p = 10;
               _t10 = _context1.v;
               console.error('Failed to delete transaction:', _t10);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to delete transaction');
-            case 8:
+            case 11:
               return _context1.a(2);
           }
-        }, _callee1, this, [[1, 7]]);
+        }, _callee1, this, [[1, 10]]);
       }));
       function deleteTransaction(_x7) {
         return _deleteTransaction.apply(this, arguments);
@@ -44381,7 +44426,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var _showMatchingModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(transactionId) {
         var _this$transactions,
           _this$accounts2,
-          _this9 = this;
+          _this0 = this;
         var transaction, modal, sourceDetails, loadingEl, emptyEl, listEl, account, currency, typeClass, result, _t14;
         return _regenerator().w(function (_context13) {
           while (1) switch (_context13.p = _context13.n) {
@@ -44432,13 +44477,13 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 4:
               // Render matches
               listEl.innerHTML = result.matches.map(function (match) {
-                var _this9$accounts;
-                var matchAccount = (_this9$accounts = _this9.accounts) === null || _this9$accounts === void 0 ? void 0 : _this9$accounts.find(function (a) {
+                var _this0$accounts;
+                var matchAccount = (_this0$accounts = _this0.accounts) === null || _this0$accounts === void 0 ? void 0 : _this0$accounts.find(function (a) {
                   return a.id === match.accountId;
                 });
-                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this9.getPrimaryCurrency();
+                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this0.getPrimaryCurrency();
                 var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this9.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this9.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this9.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || 'Unknown', "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            Link as Transfer\n                        </button>\n                    </div>\n                ");
+                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this0.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this0.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this0.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || 'Unknown', "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            Link as Transfer\n                        </button>\n                    </div>\n                ");
               }).join('');
               _context13.n = 6;
               break;
@@ -44537,7 +44582,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       var _showSplitModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16(transactionId) {
         var _this$transactions2,
           _this$accounts3,
-          _this0 = this;
+          _this1 = this;
         var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, unsplitBtn, _t17;
         return _regenerator().w(function (_context16) {
           while (1) switch (_context16.p = _context16.n) {
@@ -44590,7 +44635,7 @@ var TransactionsModule = /*#__PURE__*/function () {
             case 4:
               splits = _context16.v;
               splits.forEach(function (split, index) {
-                _this0.addSplitRow(splitsContainer, split, index === 0);
+                _this1.addSplitRow(splitsContainer, split, index === 0);
               });
               _context16.n = 6;
               break;
@@ -44614,7 +44659,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (unsplitBtn) {
                 unsplitBtn.style.display = isSplit ? '' : 'none';
                 unsplitBtn.onclick = function () {
-                  return _this0.unsplitTransaction();
+                  return _this1.unsplitTransaction();
                 };
               }
               this.updateSplitRemaining();
@@ -44633,7 +44678,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "addSplitRow",
     value: function addSplitRow(container) {
       var _this$transactions3,
-        _this1 = this;
+        _this10 = this;
       var split = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var modal = document.getElementById('split-modal');
@@ -44653,12 +44698,12 @@ var TransactionsModule = /*#__PURE__*/function () {
 
       // Add event listeners
       row.querySelector('.split-amount').addEventListener('input', function () {
-        return _this1.updateSplitRemaining();
+        return _this10.updateSplitRemaining();
       });
       row.querySelector('.split-remove-btn').addEventListener('click', function (e) {
         if (!e.currentTarget.classList.contains('disabled')) {
           row.remove();
-          _this1.updateSplitRemaining();
+          _this10.updateSplitRemaining();
         }
       });
       container.appendChild(row);
@@ -44666,7 +44711,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "getCategoryOptions",
     value: function getCategoryOptions() {
-      var _this10 = this;
+      var _this11 = this;
       var selectedId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var transactionType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       if (!this.categories) return '';
@@ -44677,7 +44722,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       return this.categories.filter(function (c) {
         return c.type === categoryType;
       }).map(function (c) {
-        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this10.escapeHtml(c.name), "</option>");
+        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this11.escapeHtml(c.name), "</option>");
       }).join('');
     }
   }, {
@@ -45076,7 +45121,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "handleAutoMode",
     value: function () {
       var _handleAutoMode = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee23(scanResult) {
-        var _this11 = this;
+        var _this12 = this;
         var loadingEl, resultsEl, autoMatchedSection, needsReviewSection, autoMatchedList, needsReviewList, singleMatches, multiMatches, autoLinkedCount, pairs, linkResult, _t21;
         return _regenerator().w(function (_context23) {
           while (1) switch (_context23.p = _context23.n) {
@@ -45134,7 +45179,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (autoLinkedCount > 0) {
                 autoMatchedSection.style.display = 'block';
                 autoMatchedList.innerHTML = singleMatches.map(function (c) {
-                  return _this11.renderAutoMatchedPair({
+                  return _this12.renderAutoMatchedPair({
                     transaction: c.transaction,
                     linkedTo: c.matches[0]
                   });
@@ -45145,7 +45190,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               if (multiMatches.length > 0) {
                 needsReviewSection.style.display = 'block';
                 needsReviewList.innerHTML = multiMatches.map(function (item, index) {
-                  return _this11.renderNeedsReviewItem(item, index);
+                  return _this12.renderNeedsReviewItem(item, index);
                 }).join('');
               }
               if (autoLinkedCount === 0 && multiMatches.length === 0) {
@@ -45164,7 +45209,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "handleReviewMode",
     value: function handleReviewMode(scanResult) {
-      var _this12 = this;
+      var _this13 = this;
       var resultsEl = document.getElementById('bulk-match-results');
       var autoMatchedSection = document.getElementById('auto-matched-section');
       var needsReviewSection = document.getElementById('needs-review-section');
@@ -45189,7 +45234,7 @@ var TransactionsModule = /*#__PURE__*/function () {
         autoMatchedSection.querySelector('h4').textContent = 'Exact Matches';
         autoMatchedSection.querySelector('.section-hint').textContent = 'These transactions have exactly one match. Uncheck any you don\'t want to link.';
         autoMatchedList.innerHTML = singleMatches.map(function (c, index) {
-          return _this12.renderReviewSingleMatch(c, index);
+          return _this13.renderReviewSingleMatch(c, index);
         }).join('');
       }
 
@@ -45197,7 +45242,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       if (multiMatches.length > 0) {
         needsReviewSection.style.display = 'block';
         needsReviewList.innerHTML = multiMatches.map(function (item, index) {
-          return _this12.renderNeedsReviewItem(item, index);
+          return _this13.renderNeedsReviewItem(item, index);
         }).join('');
       }
 
@@ -45231,14 +45276,14 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "renderNeedsReviewItem",
     value: function renderNeedsReviewItem(item, index) {
-      var _this13 = this;
+      var _this14 = this;
       var tx = item.transaction;
       var txCurrency = tx.account_currency || this.getPrimaryCurrency();
       var txTypeClass = tx.type === 'credit' ? 'positive' : 'negative';
       var matchesHtml = item.matches.map(function (match) {
-        var matchCurrency = match.accountCurrency || _this13.getPrimaryCurrency();
+        var matchCurrency = match.accountCurrency || _this14.getPrimaryCurrency();
         var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-        return "\n                <label class=\"review-match-option\">\n                    <input type=\"radio\" name=\"review-match-".concat(index, "\" value=\"").concat(match.id, "\">\n                    <div class=\"match-info\">\n                        <div class=\"match-info-main\">\n                            <span class=\"match-date\">").concat(_this13.formatDate(match.date), "</span>\n                            <span class=\"match-description\">").concat(_this13.escapeHtml(match.description), "</span>\n                        </div>\n                        <span class=\"pair-amount ").concat(matchTypeClass, "\">").concat(_this13.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"pair-account\">").concat(_this13.escapeHtml(match.accountName), "</span>\n                    </div>\n                </label>\n            ");
+        return "\n                <label class=\"review-match-option\">\n                    <input type=\"radio\" name=\"review-match-".concat(index, "\" value=\"").concat(match.id, "\">\n                    <div class=\"match-info\">\n                        <div class=\"match-info-main\">\n                            <span class=\"match-date\">").concat(_this14.formatDate(match.date), "</span>\n                            <span class=\"match-description\">").concat(_this14.escapeHtml(match.description), "</span>\n                        </div>\n                        <span class=\"pair-amount ").concat(matchTypeClass, "\">").concat(_this14.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"pair-account\">").concat(_this14.escapeHtml(match.accountName), "</span>\n                    </div>\n                </label>\n            ");
       }).join('');
       return "\n            <div class=\"bulk-review-item\" data-tx-id=\"".concat(tx.id, "\" data-index=\"").concat(index, "\">\n                <div class=\"review-source\">\n                    <div class=\"review-source-info\">\n                        <span class=\"review-source-date\">").concat(this.formatDate(tx.date), "</span>\n                        <span class=\"review-source-description\">").concat(this.escapeHtml(tx.description), "</span>\n                        <div class=\"review-source-details\">\n                            <span class=\"pair-amount ").concat(txTypeClass, "\">").concat(this.formatCurrency(tx.amount, txCurrency), "</span>\n                            <span class=\"pair-account\">").concat(this.escapeHtml(tx.account_name), "</span>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"review-matches-label\">Select a match (").concat(item.matchCount, " options):</div>\n                <div class=\"review-matches\">\n                    ").concat(matchesHtml, "\n                </div>\n                <button class=\"link-selected-btn\" data-tx-id=\"").concat(tx.id, "\" data-index=\"").concat(index, "\" disabled>Link Selected</button>\n            </div>\n        ");
     }
@@ -45456,7 +45501,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "setupInlineEditingListeners",
     value: function setupInlineEditingListeners() {
-      var _this14 = this;
+      var _this15 = this;
       var transactionsTable = document.getElementById('transactions-table');
       if (!transactionsTable) {
         return;
@@ -45468,14 +45513,14 @@ var TransactionsModule = /*#__PURE__*/function () {
         if (cell && !cell.classList.contains('editing')) {
           // Don't trigger if clicking on checkbox
           if (e.target.type === 'checkbox') return;
-          _this14.startInlineEdit(cell);
+          _this15.startInlineEdit(cell);
         }
       });
 
       // Close any open inline editors when clicking outside
       document.addEventListener('click', function (e) {
         if (!e.target.closest('.editable-cell') && !e.target.closest('.category-autocomplete-dropdown')) {
-          _this14.closeAllInlineEditors();
+          _this15.closeAllInlineEditors();
         }
       });
     }
@@ -45523,7 +45568,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createDateEditor",
     value: function createDateEditor(cell, value) {
       var _this$app$settings,
-        _this15 = this;
+        _this16 = this;
       var input = document.createElement('input');
       input.type = 'text';
       input.className = 'inline-edit-input';
@@ -45545,12 +45590,12 @@ var TransactionsModule = /*#__PURE__*/function () {
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
           fp.destroy();
-          _this15.cancelInlineEdit(cell);
+          _this16.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           var isoDate = getIsoDate();
           fp.destroy();
-          _this15.saveInlineEdit(cell, 'date', isoDate);
+          _this16.saveInlineEdit(cell, 'date', isoDate);
         }
       });
       input.addEventListener('blur', function () {
@@ -45558,7 +45603,7 @@ var TransactionsModule = /*#__PURE__*/function () {
           if (cell.classList.contains('editing') && !fp.isOpen) {
             var isoDate = getIsoDate();
             fp.destroy();
-            _this15.saveInlineEdit(cell, 'date', isoDate);
+            _this16.saveInlineEdit(cell, 'date', isoDate);
           }
         }, 200);
       });
@@ -45596,7 +45641,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "createCategoryEditor",
     value: function createCategoryEditor(cell, currentCategoryId) {
-      var _this16 = this;
+      var _this17 = this;
       var container = document.createElement('div');
       container.className = 'category-autocomplete';
       var input = document.createElement('input');
@@ -45663,19 +45708,19 @@ var TransactionsModule = /*#__PURE__*/function () {
           input.dataset.categoryId = item.dataset.categoryId;
           input.value = item.dataset.categoryName;
           dropdown.style.display = 'none';
-          _this16.saveInlineEdit(cell, 'categoryId', item.dataset.categoryId);
+          _this17.saveInlineEdit(cell, 'categoryId', item.dataset.categoryId);
         }
       });
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this16.cancelInlineEdit(cell);
+          _this17.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           dropdown.style.display = 'none';
-          _this16.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
+          _this17.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
           e.preventDefault();
-          _this16.navigateCategoryDropdown(dropdown, e.key === 'ArrowDown' ? 1 : -1, input);
+          _this17.navigateCategoryDropdown(dropdown, e.key === 'ArrowDown' ? 1 : -1, input);
         }
       });
       input.addEventListener('blur', function () {
@@ -45683,9 +45728,9 @@ var TransactionsModule = /*#__PURE__*/function () {
           if (!container.contains(document.activeElement)) {
             dropdown.style.display = 'none';
             if (input.dataset.categoryId !== (currentCategoryId || '')) {
-              _this16.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
+              _this17.saveInlineEdit(cell, 'categoryId', input.dataset.categoryId);
             } else {
-              _this16.cancelInlineEdit(cell);
+              _this17.cancelInlineEdit(cell);
             }
           }
         }, 200);
@@ -45722,7 +45767,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createAccountEditor",
     value: function createAccountEditor(cell, currentAccountId) {
       var _this$accounts4,
-        _this17 = this;
+        _this18 = this;
       var select = document.createElement('select');
       select.className = 'inline-edit-select';
       (_this$accounts4 = this.accounts) === null || _this$accounts4 === void 0 || _this$accounts4.forEach(function (account) {
@@ -45734,19 +45779,19 @@ var TransactionsModule = /*#__PURE__*/function () {
       });
       select.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this17.cancelInlineEdit(cell);
+          _this18.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          _this17.saveInlineEdit(cell, 'accountId', select.value);
+          _this18.saveInlineEdit(cell, 'accountId', select.value);
         }
       });
       select.addEventListener('change', function () {
-        _this17.saveInlineEdit(cell, 'accountId', select.value);
+        _this18.saveInlineEdit(cell, 'accountId', select.value);
       });
       select.addEventListener('blur', function () {
         setTimeout(function () {
           if (cell.classList.contains('editing')) {
-            _this17.cancelInlineEdit(cell);
+            _this18.cancelInlineEdit(cell);
           }
         }, 100);
       });
@@ -45758,7 +45803,7 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createTagsEditor",
     value: function () {
       var _createTagsEditor = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee27(cell, transaction) {
-        var _this18 = this;
+        var _this19 = this;
         var categoryId, _yield$Promise$all3, _yield$Promise$all4, globalTagsResponse, tagSets, globalTags, currentTagIds, selectedTags, container, input, dropdown, allTags, renderDropdown, _t25;
         return _regenerator().w(function (_context27) {
           while (1) switch (_context27.p = _context27.n) {
@@ -45788,7 +45833,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               }
               cell.innerHTML = '<span style="color: var(--color-text-maxcontrast); font-size: 11px; font-style: italic;">No tags</span>';
               setTimeout(function () {
-                return _this18.cancelInlineEdit(cell);
+                return _this19.cancelInlineEdit(cell);
               }, 1500);
               return _context27.a(2);
             case 3:
@@ -45847,10 +45892,10 @@ var TransactionsModule = /*#__PURE__*/function () {
                 });
                 var html = '';
                 Object.values(grouped).forEach(function (group) {
-                  html += "<div class=\"tags-group-header\">".concat(_this18.escapeHtml(group.name), "</div>");
+                  html += "<div class=\"tags-group-header\">".concat(_this19.escapeHtml(group.name), "</div>");
                   group.tags.forEach(function (tag) {
                     var isSelected = selectedTags.has(tag.id);
-                    html += "\n                            <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                                 data-tag-id=\"").concat(tag.id, "\">\n                                <span class=\"tag-chip\"\n                                      style=\"display: inline-flex; align-items: center; background-color: ").concat(_this18.escapeHtml(tag.color), "; color: white;\n                                             padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                    ").concat(_this18.escapeHtml(tag.name), "\n                                </span>\n                                <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                            </div>\n                        ");
+                    html += "\n                            <div class=\"tags-autocomplete-item ".concat(isSelected ? 'selected' : '', "\"\n                                 data-tag-id=\"").concat(tag.id, "\">\n                                <span class=\"tag-chip\"\n                                      style=\"display: inline-flex; align-items: center; background-color: ").concat(_this19.escapeHtml(tag.color), "; color: white;\n                                             padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin-right: 4px;\">\n                                    ").concat(_this19.escapeHtml(tag.name), "\n                                </span>\n                                <span class=\"tag-check\">").concat(isSelected ? '✓' : '', "</span>\n                            </div>\n                        ");
                   });
                 });
                 dropdown.innerHTML = html || '<div class="tags-autocomplete-empty">No tags found</div>';
@@ -45896,16 +45941,16 @@ var TransactionsModule = /*#__PURE__*/function () {
               });
               input.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
-                  _this18.cancelInlineEdit(cell);
+                  _this19.cancelInlineEdit(cell);
                 } else if (e.key === 'Enter') {
                   e.preventDefault();
-                  _this18.saveTagsFromEditor(cell, selectedTags, transaction.id);
+                  _this19.saveTagsFromEditor(cell, selectedTags, transaction.id);
                 }
               });
               input.addEventListener('blur', function () {
                 setTimeout(function () {
                   if (cell.classList.contains('editing')) {
-                    _this18.saveTagsFromEditor(cell, selectedTags, transaction.id);
+                    _this19.saveTagsFromEditor(cell, selectedTags, transaction.id);
                   }
                 }, 200);
               });
@@ -45921,7 +45966,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               console.error('Failed to load tag sets:', _t25);
               cell.innerHTML = '<span style="color: var(--color-error); font-size: 11px;">Error loading tags</span>';
               setTimeout(function () {
-                return _this18.cancelInlineEdit(cell);
+                return _this19.cancelInlineEdit(cell);
               }, 1500);
             case 5:
               return _context27.a(2);
@@ -46034,20 +46079,20 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "setupEditorEvents",
     value: function setupEditorEvents(input, cell, field) {
-      var _this19 = this;
+      var _this20 = this;
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          _this19.cancelInlineEdit(cell);
+          _this20.cancelInlineEdit(cell);
         } else if (e.key === 'Enter') {
           e.preventDefault();
           if (field === 'amount') {
             var raw = parseFloat(input.value) || 0;
             var type = raw < 0 ? 'debit' : 'credit';
-            _this19.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
+            _this20.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
               type: type
             });
           } else {
-            _this19.saveInlineEdit(cell, field, input.value);
+            _this20.saveInlineEdit(cell, field, input.value);
           }
         }
       });
@@ -46057,11 +46102,11 @@ var TransactionsModule = /*#__PURE__*/function () {
             if (field === 'amount') {
               var raw = parseFloat(input.value) || 0;
               var type = raw < 0 ? 'debit' : 'credit';
-              _this19.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
+              _this20.saveInlineEdit(cell, field, Math.abs(raw).toString(), {
                 type: type
               });
             } else {
-              _this19.saveInlineEdit(cell, field, input.value);
+              _this20.saveInlineEdit(cell, field, input.value);
             }
           }
         }, 100);
@@ -46201,10 +46246,10 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "closeAllInlineEditors",
     value: function closeAllInlineEditors() {
-      var _this20 = this;
+      var _this21 = this;
       var editingCells = document.querySelectorAll('.editable-cell.editing');
       editingCells.forEach(function (cell) {
-        _this20.cancelInlineEdit(cell);
+        _this21.cancelInlineEdit(cell);
       });
     }
 
@@ -46237,6 +46282,261 @@ var TransactionsModule = /*#__PURE__*/function () {
       }
       return result;
     }
+
+    // ===== Duplicate Detection =====
+  }, {
+    key: "showDuplicatesModal",
+    value: function () {
+      var _showDuplicatesModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee31() {
+        var _this22 = this;
+        var existing, modal, response, data, content, _content, _t29;
+        return _regenerator().w(function (_context31) {
+          while (1) switch (_context31.p = _context31.n) {
+            case 0:
+              // Remove any existing modal
+              existing = document.getElementById('duplicates-modal');
+              if (existing) existing.remove();
+              modal = document.createElement('div');
+              modal.id = 'duplicates-modal';
+              modal.className = 'budget-modal-overlay';
+              modal.innerHTML = "\n            <div class=\"budget-modal\">\n                <div class=\"budget-modal-header\">\n                    <h2>Find Duplicate Transactions</h2>\n                    <button class=\"close-btn\" title=\"Close\">&times;</button>\n                </div>\n                <div class=\"budget-modal-body\">\n                    <div id=\"duplicates-loading\" class=\"loading-indicator\">\n                        <span class=\"icon-loading\"></span>\n                        <p>Scanning for duplicates...</p>\n                    </div>\n                    <div id=\"duplicates-content\" style=\"display: none;\"></div>\n                </div>\n            </div>\n        ";
+              document.body.appendChild(modal);
+
+              // Close handlers
+              modal.querySelector('.close-btn').addEventListener('click', function () {
+                modal.remove();
+                if (_this22._duplicatesDirty) {
+                  _this22.app.loadTransactions();
+                  _this22.app.loadAccounts();
+                }
+              });
+              modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                  modal.remove();
+                  if (_this22._duplicatesDirty) {
+                    _this22.app.loadTransactions();
+                    _this22.app.loadAccounts();
+                  }
+                }
+              });
+              this._duplicatesDirty = false;
+              _context31.p = 1;
+              _context31.n = 2;
+              return fetch(OC.generateUrl('/apps/budget/api/transactions/duplicates'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 2:
+              response = _context31.v;
+              if (response.ok) {
+                _context31.n = 3;
+                break;
+              }
+              throw new Error('Failed to fetch duplicates');
+            case 3:
+              _context31.n = 4;
+              return response.json();
+            case 4:
+              data = _context31.v;
+              document.getElementById('duplicates-loading').style.display = 'none';
+              content = document.getElementById('duplicates-content');
+              content.style.display = 'block';
+              if (!(!data.groups || data.groups.length === 0)) {
+                _context31.n = 5;
+                break;
+              }
+              content.innerHTML = '<p class="empty-message">No duplicate transactions found.</p>';
+              return _context31.a(2);
+            case 5:
+              this.renderDuplicateGroups(content, data.groups);
+              _context31.n = 7;
+              break;
+            case 6:
+              _context31.p = 6;
+              _t29 = _context31.v;
+              console.error('Failed to find duplicates:', _t29);
+              document.getElementById('duplicates-loading').style.display = 'none';
+              _content = document.getElementById('duplicates-content');
+              _content.style.display = 'block';
+              _content.innerHTML = '<p class="error-message">Failed to scan for duplicates. Please try again.</p>';
+            case 7:
+              return _context31.a(2);
+          }
+        }, _callee31, this, [[1, 6]]);
+      }));
+      function showDuplicatesModal() {
+        return _showDuplicatesModal.apply(this, arguments);
+      }
+      return showDuplicatesModal;
+    }()
+  }, {
+    key: "renderDuplicateGroups",
+    value: function renderDuplicateGroups(container, groups) {
+      var _this23 = this;
+      var totalDuplicates = groups.reduce(function (sum, g) {
+        return sum + g.length - 1;
+      }, 0);
+      var html = "\n            <div class=\"duplicates-summary\">\n                <p>Found <strong>".concat(groups.length, " group(s)</strong> with <strong>").concat(totalDuplicates, " suspected duplicate(s)</strong>.\n                The oldest transaction in each group is kept by default. Review and adjust the selection, then delete the checked items.</p>\n                <div class=\"duplicates-actions\">\n                    <button id=\"duplicates-delete-btn\" class=\"budget-btn primary\">\n                        Delete Selected (<span id=\"duplicates-selected-count\">").concat(totalDuplicates, "</span>)\n                    </button>\n                    <button id=\"duplicates-select-none-btn\" class=\"budget-btn secondary\">Deselect All</button>\n                </div>\n            </div>\n            <div class=\"duplicates-groups\">\n        ");
+      groups.forEach(function (group, groupIdx) {
+        var first = group[0];
+        var amount = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatCurrency(first.amount, first.currency, _this23.settings);
+        html += "\n                <div class=\"duplicate-group\">\n                    <div class=\"duplicate-group-header\">\n                        <strong>".concat(_this23.escapeHtml(first.description) || '(no description)', "</strong>\n                        &mdash; ").concat(amount, " (").concat(_this23.escapeHtml(first.type), ")\n                        &mdash; ").concat(_this23.escapeHtml(first.accountName), "\n                    </div>\n                    <div class=\"duplicate-group-items\">\n            ");
+        group.forEach(function (tx, txIdx) {
+          // Pre-select all except the first (oldest) in the group
+          var isExtra = txIdx > 0;
+          var checked = isExtra ? 'checked' : '';
+          var keepLabel = !isExtra ? '<span class="keep-badge">keep</span>' : '';
+          var billLabel = tx.billId ? '<span class="bill-badge">bill</span>' : '';
+          var statusLabel = tx.status === 'scheduled' ? '<span class="scheduled-badge">scheduled</span>' : '';
+          html += "\n                    <label class=\"duplicate-item ".concat(isExtra ? 'pre-selected' : 'keep-item', "\">\n                        <input type=\"checkbox\" class=\"duplicate-checkbox\"\n                            data-group=\"").concat(groupIdx, "\" data-tx-id=\"").concat(tx.id, "\" ").concat(checked, ">\n                        <span class=\"duplicate-item-details\">\n                            <span class=\"duplicate-date\">").concat(_this23.escapeHtml(tx.date), "</span>\n                            <span class=\"duplicate-vendor\">").concat(_this23.escapeHtml(tx.vendor) || '-', "</span>\n                            <span class=\"duplicate-category\">").concat(_this23.escapeHtml(tx.categoryName) || '-', "</span>\n                            <span class=\"duplicate-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatCurrency(tx.amount, tx.currency, _this23.settings), "</span>\n                            ").concat(keepLabel).concat(billLabel).concat(statusLabel, "\n                        </span>\n                    </label>\n                ");
+        });
+        html += '</div></div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
+
+      // Update selected count on checkbox changes
+      container.addEventListener('change', function (e) {
+        if (e.target.classList.contains('duplicate-checkbox')) {
+          _this23.updateDuplicatesSelectedCount();
+        }
+      });
+
+      // Delete selected
+      document.getElementById('duplicates-delete-btn').addEventListener('click', function () {
+        _this23.deleteDuplicates();
+      });
+
+      // Deselect all
+      document.getElementById('duplicates-select-none-btn').addEventListener('click', function () {
+        container.querySelectorAll('.duplicate-checkbox').forEach(function (cb) {
+          return cb.checked = false;
+        });
+        _this23.updateDuplicatesSelectedCount();
+      });
+    }
+  }, {
+    key: "updateDuplicatesSelectedCount",
+    value: function updateDuplicatesSelectedCount() {
+      var checked = document.querySelectorAll('.duplicate-checkbox:checked');
+      var countEl = document.getElementById('duplicates-selected-count');
+      var deleteBtn = document.getElementById('duplicates-delete-btn');
+      if (countEl) countEl.textContent = checked.length;
+      if (deleteBtn) deleteBtn.disabled = checked.length === 0;
+    }
+  }, {
+    key: "deleteDuplicates",
+    value: function () {
+      var _deleteDuplicates = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee32() {
+        var checked, ids, billCount, message, deleteBtn, response, result, remainingGroups, content, _t30;
+        return _regenerator().w(function (_context32) {
+          while (1) switch (_context32.p = _context32.n) {
+            case 0:
+              checked = document.querySelectorAll('.duplicate-checkbox:checked');
+              ids = Array.from(checked).map(function (cb) {
+                return parseInt(cb.dataset.txId);
+              });
+              if (!(ids.length === 0)) {
+                _context32.n = 1;
+                break;
+              }
+              return _context32.a(2);
+            case 1:
+              billCount = Array.from(checked).filter(function (cb) {
+                var item = cb.closest('.duplicate-item');
+                return item && item.querySelector('.bill-badge');
+              }).length;
+              message = "Delete ".concat(ids.length, " suspected duplicate transaction(s)? This cannot be undone.");
+              if (billCount > 0) {
+                message += "\n\n".concat(billCount, " of these were generated from bill payments. Make sure they are truly duplicates before deleting.");
+              }
+              if (confirm(message)) {
+                _context32.n = 2;
+                break;
+              }
+              return _context32.a(2);
+            case 2:
+              deleteBtn = document.getElementById('duplicates-delete-btn');
+              deleteBtn.disabled = true;
+              deleteBtn.textContent = 'Deleting...';
+              _context32.p = 3;
+              _context32.n = 4;
+              return fetch(OC.generateUrl('/apps/budget/api/transactions/bulk-delete'), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({
+                  ids: ids
+                })
+              });
+            case 4:
+              response = _context32.v;
+              if (response.ok) {
+                _context32.n = 5;
+                break;
+              }
+              throw new Error("HTTP ".concat(response.status));
+            case 5:
+              _context32.n = 6;
+              return response.json();
+            case 6:
+              result = _context32.v;
+              if (result.success > 0) {
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showSuccess)("Deleted ".concat(result.success, " duplicate transaction(s)"));
+                this._duplicatesDirty = true;
+
+                // Remove deleted items from the UI
+                checked.forEach(function (cb) {
+                  var item = cb.closest('.duplicate-item');
+                  if (item) item.remove();
+                });
+
+                // Remove groups that now have only one item
+                document.querySelectorAll('.duplicate-group').forEach(function (group) {
+                  var remaining = group.querySelectorAll('.duplicate-item');
+                  if (remaining.length <= 1) {
+                    group.remove();
+                  }
+                });
+                this.updateDuplicatesSelectedCount();
+
+                // Check if all groups are resolved
+                remainingGroups = document.querySelectorAll('.duplicate-group');
+                if (remainingGroups.length === 0) {
+                  content = document.getElementById('duplicates-content');
+                  content.innerHTML = '<p class="empty-message">All duplicates have been resolved.</p>';
+                }
+              }
+              if (result.failed > 0) {
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)("Failed to delete ".concat(result.failed, " transaction(s)"));
+              }
+              _context32.n = 8;
+              break;
+            case 7:
+              _context32.p = 7;
+              _t30 = _context32.v;
+              console.error('Failed to delete duplicates:', _t30);
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_2__.showError)('Failed to delete duplicates');
+            case 8:
+              _context32.p = 8;
+              if (deleteBtn && document.body.contains(deleteBtn)) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = "Delete Selected (".concat(document.querySelectorAll('.duplicate-checkbox:checked').length, ")");
+              }
+              return _context32.f(8);
+            case 9:
+              return _context32.a(2);
+          }
+        }, _callee32, this, [[3, 7, 8, 9]]);
+      }));
+      function deleteDuplicates() {
+        return _deleteDuplicates.apply(this, arguments);
+      }
+      return deleteDuplicates;
+    }()
   }]);
 }();
 
@@ -53094,7 +53394,8 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "hideModals",
     value: function hideModals() {
-      var modalIds = ['transaction-modal', 'account-modal', 'category-modal', 'split-modal', 'matching-modal', 'bulk-match-modal', 'add-tag-set-modal', 'add-tag-modal', 'edit-tag-modal', 'edit-tag-set-modal', 'factory-reset-modal', 'rule-modal', 'apply-rules-modal', 'goal-modal', 'add-to-goal-modal', 'pension-modal', 'pension-balance-modal', 'pension-contribution-modal', 'asset-modal', 'asset-value-modal', 'manual-rate-modal', 'global-tag-modal'];
+      var _this$transactionsMod2;
+      var modalIds = ['transaction-modal', 'account-modal', 'category-modal', 'split-modal', 'matching-modal', 'bulk-match-modal', 'add-tag-set-modal', 'add-tag-modal', 'edit-tag-modal', 'edit-tag-set-modal', 'factory-reset-modal', 'rule-modal', 'apply-rules-modal', 'goal-modal', 'add-to-goal-modal', 'pension-modal', 'pension-balance-modal', 'pension-contribution-modal', 'asset-modal', 'asset-value-modal', 'manual-rate-modal', 'global-tag-modal', 'duplicates-modal'];
       modalIds.forEach(function (modalId) {
         var modal = document.getElementById(modalId);
         if (modal) {
@@ -53102,6 +53403,15 @@ var BudgetApp = /*#__PURE__*/function () {
           modal.setAttribute('aria-hidden', 'true');
         }
       });
+
+      // Duplicates modal uses remove() — if it was dirty, refresh data
+      if ((_this$transactionsMod2 = this.transactionsModule) !== null && _this$transactionsMod2 !== void 0 && _this$transactionsMod2._duplicatesDirty) {
+        this.transactionsModule._duplicatesDirty = false;
+        var dupModal = document.getElementById('duplicates-modal');
+        if (dupModal) dupModal.remove();
+        this.loadTransactions();
+        this.loadAccounts();
+      }
     }
 
     // =====================

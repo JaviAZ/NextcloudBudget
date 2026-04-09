@@ -1282,6 +1282,10 @@ style('budget', 'budget-main');
                         <span class="icon-history" aria-hidden="true"></span>
                         Reconcile
                     </button>
+                    <button id="find-duplicates-btn" class="secondary" title="Find suspected duplicate transactions">
+                        <span class="icon-search" aria-hidden="true"></span>
+                        Find Duplicates
+                    </button>
                     <button id="bulk-match-btn" class="secondary" title="Auto-match transfer transactions">
                         <span class="icon-link" aria-hidden="true"></span>
                         Match All
