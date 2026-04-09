@@ -18917,7 +18917,7 @@ var AccountsModule = /*#__PURE__*/function () {
       var displayBalance = isLiability ? Math.abs(accountBalance) : accountBalance;
       var balanceClass = accountBalance >= 0 ? 'positive' : 'negative';
       var balanceLabel = isLiability ? accountBalance < 0 ? 'Owed' : accountBalance > 0 ? 'Credit' : 'Balance' : 'Balance';
-      return "\n            <div class=\"account-card\" data-type=\"".concat(accountType, "\" data-account-id=\"").concat(accountId, "\">\n                <div class=\"account-card-header\">\n                    <div class=\"account-icon\" style=\"background-color: ").concat(typeInfo.color, ";\">\n                        <span class=\"").concat(typeInfo.icon, "\" aria-hidden=\"true\"></span>\n                    </div>\n                    <div class=\"account-details\">\n                        <h3 class=\"account-name\">").concat(accountName, "</h3>\n                        <div class=\"account-meta\">\n                            <span class=\"account-type-badge\">").concat(typeInfo.label, "</span>\n                            ").concat(institution ? "<span class=\"account-institution\">".concat(institution, "</span>") : '', "\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"account-card-balance\">\n                    <div class=\"balance-info\">\n                        <span class=\"balance-label\">").concat(balanceLabel, "</span>\n                        <span class=\"balance-amount ").concat(balanceClass, "\">\n                            ").concat(this.formatCurrency(displayBalance, accountCurrency), "\n                        </span>\n                    </div>\n                    <div class=\"account-sparkline\" data-account-id=\"").concat(accountId, "\">\n                        <svg viewBox=\"0 0 80 32\" preserveAspectRatio=\"none\">\n                            <path class=\"sparkline-path neutral\" d=\"M0,16 L80,16\"></path>\n                        </svg>\n                    </div>\n                </div>\n\n                <div class=\"account-card-footer\">\n                    <div class=\"account-status\">\n                        <span class=\"account-status-dot ").concat(healthStatus["class"], "\"></span>\n                        <span>").concat(healthStatus.tooltip, "</span>\n                    </div>\n                    <div class=\"account-actions\">\n                        <button class=\"account-action-btn edit-btn edit-account-btn\" data-account-id=\"").concat(accountId, "\" title=\"Edit Account\">\n                            <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                        </button>\n                        <button class=\"account-action-btn delete-btn delete-account-btn\" data-account-id=\"").concat(accountId, "\" title=\"Delete Account\">\n                            <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                        </button>\n                    </div>\n                </div>\n            </div>\n        ");
+      return "\n            <div class=\"account-card\" data-type=\"".concat(accountType, "\" data-account-id=\"").concat(accountId, "\">\n                <div class=\"account-card-header\">\n                    <div class=\"account-icon\" style=\"background-color: ").concat(typeInfo.color, ";\">\n                        <span class=\"").concat(typeInfo.icon, "\" aria-hidden=\"true\"></span>\n                    </div>\n                    <div class=\"account-details\">\n                        <h3 class=\"account-name\">").concat(accountName, "</h3>\n                        <div class=\"account-meta\">\n                            <span class=\"account-type-badge\">").concat(typeInfo.label, "</span>\n                            ").concat(institution ? "<span class=\"account-institution\">".concat(institution, "</span>") : '', "\n                        </div>\n                    </div>\n                </div>\n\n                <div class=\"account-card-balance\">\n                    <div class=\"balance-info\">\n                        <span class=\"balance-label\">").concat(balanceLabel, "</span>\n                        <span class=\"balance-amount ").concat(balanceClass, "\">\n                            ").concat(this.formatCurrency(displayBalance, accountCurrency), "\n                        </span>\n                        ").concat(account.convertedBalance != null ? "<span class=\"balance-converted\">\u2248 ".concat(this.formatCurrency(isLiability ? Math.abs(account.convertedBalance) : account.convertedBalance, account.baseCurrency), "</span>") : '', "\n                    </div>\n                    <div class=\"account-sparkline\" data-account-id=\"").concat(accountId, "\">\n                        <svg viewBox=\"0 0 80 32\" preserveAspectRatio=\"none\">\n                            <path class=\"sparkline-path neutral\" d=\"M0,16 L80,16\"></path>\n                        </svg>\n                    </div>\n                </div>\n\n                <div class=\"account-card-footer\">\n                    <div class=\"account-status\">\n                        <span class=\"account-status-dot ").concat(healthStatus["class"], "\"></span>\n                        <span>").concat(healthStatus.tooltip, "</span>\n                    </div>\n                    <div class=\"account-actions\">\n                        <button class=\"account-action-btn edit-btn edit-account-btn\" data-account-id=\"").concat(accountId, "\" title=\"Edit Account\">\n                            <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                        </button>\n                        <button class=\"account-action-btn delete-btn delete-account-btn\" data-account-id=\"").concat(accountId, "\" title=\"Delete Account\">\n                            <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                        </button>\n                    </div>\n                </div>\n            </div>\n        ");
     }
   }, {
     key: "loadAccountSparklines",
@@ -27055,7 +27055,7 @@ var DashboardModule = /*#__PURE__*/function () {
         var balance = parseFloat(account.balance) || 0;
         var currency = account.currency || _this2.getPrimaryCurrency();
         var icon = accountTypeIcons[type] || accountTypeIcons.checking;
-        return "\n                <div class=\"account-widget-item\" data-account-id=\"".concat(account.id, "\">\n                    <div class=\"account-widget-info\">\n                        <div class=\"account-widget-icon\">").concat(icon, "</div>\n                        <div>\n                            <div class=\"account-widget-name\">").concat(_this2.escapeHtml(account.name), "</div>\n                            <div class=\"account-widget-type\">").concat(type.replace('_', ' '), "</div>\n                        </div>\n                    </div>\n                    <div class=\"account-widget-balance\">\n                        <div class=\"account-widget-amount ").concat(balance >= 0 ? 'positive' : 'negative', "\">\n                            ").concat(_this2.formatCurrency(balance, currency), "\n                        </div>\n                    </div>\n                </div>\n            ");
+        return "\n                <div class=\"account-widget-item\" data-account-id=\"".concat(account.id, "\">\n                    <div class=\"account-widget-info\">\n                        <div class=\"account-widget-icon\">").concat(icon, "</div>\n                        <div>\n                            <div class=\"account-widget-name\">").concat(_this2.escapeHtml(account.name), "</div>\n                            <div class=\"account-widget-type\">").concat(type.replace('_', ' '), "</div>\n                        </div>\n                    </div>\n                    <div class=\"account-widget-balance\">\n                        <div class=\"account-widget-amount ").concat(balance >= 0 ? 'positive' : 'negative', "\">\n                            ").concat(_this2.formatCurrency(balance, currency), "\n                        </div>\n                        ").concat(account.convertedBalance != null ? "<div class=\"account-widget-converted\">\u2248 ".concat(_this2.formatCurrency(account.convertedBalance, account.baseCurrency), "</div>") : '', "\n                    </div>\n                </div>\n            ");
       }).join('');
     }
   }, {
@@ -35216,26 +35216,29 @@ var ReportsModule = /*#__PURE__*/function () {
     key: "exportBillsCalendarReport",
     value: function () {
       var _exportBillsCalendarReport = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(format) {
-        var _document$getElementB20, _document$getElementB21, _document$getElementB22;
-        var year, billStatus, includeTransfers;
+        var _document$getElementB20, _document$getElementB21, _document$getElementB22, _document$getElementB23;
+        var year, billStatus, includeTransfers, accountId;
         return _regenerator().w(function (_context1) {
           while (1) switch (_context1.n) {
             case 0:
               year = ((_document$getElementB20 = document.getElementById('bills-calendar-year')) === null || _document$getElementB20 === void 0 ? void 0 : _document$getElementB20.value) || new Date().getFullYear();
               billStatus = ((_document$getElementB21 = document.getElementById('bills-calendar-status')) === null || _document$getElementB21 === void 0 ? void 0 : _document$getElementB21.value) || 'active';
               includeTransfers = ((_document$getElementB22 = document.getElementById('bills-calendar-include-transfers')) === null || _document$getElementB22 === void 0 ? void 0 : _document$getElementB22.checked) || false;
+              accountId = ((_document$getElementB23 = document.getElementById('bills-calendar-account')) === null || _document$getElementB23 === void 0 ? void 0 : _document$getElementB23.value) || '';
               return _context1.a(2, fetch(OC.generateUrl('/apps/budget/api/bills/export-calendar'), {
                 method: 'POST',
                 headers: {
                   'requesttoken': OC.requestToken,
                   'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
+                body: JSON.stringify(_objectSpread({
                   format: format,
                   year: parseInt(year),
                   billStatus: billStatus,
                   includeTransfers: includeTransfers.toString()
-                })
+                }, accountId && {
+                  accountId: parseInt(accountId)
+                }))
               }));
           }
         }, _callee1);
@@ -35262,8 +35265,30 @@ var ReportsModule = /*#__PURE__*/function () {
       // Populate year dropdown
       this.populateBillsCalendarYears();
 
+      // Populate account dropdown
+      this.populateBillsCalendarAccountDropdown();
+
       // Auto-generate on first load (like other reports)
       this.generateBillsCalendar();
+    }
+  }, {
+    key: "populateBillsCalendarAccountDropdown",
+    value: function populateBillsCalendarAccountDropdown() {
+      var dropdown = document.getElementById('bills-calendar-account');
+      if (!dropdown) return;
+      dropdown.innerHTML = '';
+      var allOption = document.createElement('option');
+      allOption.value = '';
+      allOption.textContent = 'All Accounts';
+      dropdown.appendChild(allOption);
+      if (Array.isArray(this.accounts)) {
+        this.accounts.forEach(function (account) {
+          var option = document.createElement('option');
+          option.value = account.id;
+          option.textContent = account.name;
+          dropdown.appendChild(option);
+        });
+      }
     }
   }, {
     key: "setupBillsCalendarControls",
@@ -35271,11 +35296,29 @@ var ReportsModule = /*#__PURE__*/function () {
       var _this13 = this;
       var generateBtn = document.getElementById('generate-bills-calendar-btn');
       var viewSelect = document.getElementById('bills-calendar-view');
+      var accountSelect = document.getElementById('bills-calendar-account');
+      var yearSelect = document.getElementById('bills-calendar-year');
+      var statusSelect = document.getElementById('bills-calendar-status');
+      var transfersCheckbox = document.getElementById('bills-calendar-include-transfers');
       if (generateBtn) {
         generateBtn.addEventListener('click', function () {
           return _this13.generateBillsCalendar();
         });
       }
+
+      // Auto-regenerate when any filter changes
+      if (accountSelect) accountSelect.addEventListener('change', function () {
+        return _this13.generateBillsCalendar();
+      });
+      if (yearSelect) yearSelect.addEventListener('change', function () {
+        return _this13.generateBillsCalendar();
+      });
+      if (statusSelect) statusSelect.addEventListener('change', function () {
+        return _this13.generateBillsCalendar();
+      });
+      if (transfersCheckbox) transfersCheckbox.addEventListener('change', function () {
+        return _this13.generateBillsCalendar();
+      });
       if (viewSelect) {
         viewSelect.addEventListener('change', function (e) {
           var tableContainer = document.getElementById('bills-calendar-table-container');
@@ -35311,22 +35354,25 @@ var ReportsModule = /*#__PURE__*/function () {
     key: "generateBillsCalendar",
     value: function () {
       var _generateBillsCalendar = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
-        var _document$getElementB23, _document$getElementB24, _document$getElementB25;
-        var year, billStatus, includeTransfers, loadingEl, _document$getElementB26, params, response, data, view, _t7;
+        var _document$getElementB24, _document$getElementB25, _document$getElementB26, _document$getElementB27;
+        var year, billStatus, includeTransfers, accountId, loadingEl, _document$getElementB28, params, response, data, view, _t7;
         return _regenerator().w(function (_context10) {
           while (1) switch (_context10.p = _context10.n) {
             case 0:
-              year = ((_document$getElementB23 = document.getElementById('bills-calendar-year')) === null || _document$getElementB23 === void 0 ? void 0 : _document$getElementB23.value) || new Date().getFullYear();
-              billStatus = ((_document$getElementB24 = document.getElementById('bills-calendar-status')) === null || _document$getElementB24 === void 0 ? void 0 : _document$getElementB24.value) || 'active';
-              includeTransfers = ((_document$getElementB25 = document.getElementById('bills-calendar-include-transfers')) === null || _document$getElementB25 === void 0 ? void 0 : _document$getElementB25.checked) || false; // Show loading
+              year = ((_document$getElementB24 = document.getElementById('bills-calendar-year')) === null || _document$getElementB24 === void 0 ? void 0 : _document$getElementB24.value) || new Date().getFullYear();
+              billStatus = ((_document$getElementB25 = document.getElementById('bills-calendar-status')) === null || _document$getElementB25 === void 0 ? void 0 : _document$getElementB25.value) || 'active';
+              includeTransfers = ((_document$getElementB26 = document.getElementById('bills-calendar-include-transfers')) === null || _document$getElementB26 === void 0 ? void 0 : _document$getElementB26.checked) || false;
+              accountId = ((_document$getElementB27 = document.getElementById('bills-calendar-account')) === null || _document$getElementB27 === void 0 ? void 0 : _document$getElementB27.value) || ''; // Show loading
               loadingEl = document.getElementById('report-loading');
               if (loadingEl) loadingEl.style.display = 'flex';
               _context10.p = 1;
-              params = new URLSearchParams({
+              params = new URLSearchParams(_objectSpread({
                 year: year.toString(),
                 billStatus: billStatus,
                 includeTransfers: includeTransfers.toString()
-              });
+              }, accountId && {
+                accountId: accountId
+              }));
               _context10.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/bills/annual-overview?".concat(params)), {
                 headers: {
@@ -35349,7 +35395,7 @@ var ReportsModule = /*#__PURE__*/function () {
               this.renderBillsCalendarChart(data.monthlyTotals);
 
               // Get current view
-              view = ((_document$getElementB26 = document.getElementById('bills-calendar-view')) === null || _document$getElementB26 === void 0 ? void 0 : _document$getElementB26.value) || 'table';
+              view = ((_document$getElementB28 = document.getElementById('bills-calendar-view')) === null || _document$getElementB28 === void 0 ? void 0 : _document$getElementB28.value) || 'table';
               if (view === 'table') {
                 this.renderBillsCalendarTable(data.bills, data.monthlyTotals);
               } else {
@@ -42507,7 +42553,7 @@ var TransactionsModule = /*#__PURE__*/function () {
       }
 
       // Filter controls
-      var filterControls = ['filter-account', 'filter-category', 'filter-type', 'filter-status', 'filter-date-from', 'filter-date-to', 'filter-amount-min', 'filter-amount-max', 'filter-search'];
+      var filterControls = ['filter-account', 'filter-category', 'filter-type', 'filter-status', 'filter-date-from', 'filter-date-to', 'filter-created-from', 'filter-created-to', 'filter-amount-min', 'filter-amount-max', 'filter-search'];
       filterControls.forEach(function (controlId) {
         var control = document.getElementById(controlId);
         if (control) {
@@ -42970,7 +43016,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "updateFilters",
     value: function updateFilters() {
-      var _document$getElementB, _document$getElementB2, _document$getElementB3, _document$getElementB4, _document$getElementB5, _document$getElementB6, _document$getElementB7, _document$getElementB8, _document$getElementB9;
+      var _document$getElementB, _document$getElementB2, _document$getElementB3, _document$getElementB4, _document$getElementB5, _document$getElementB6, _document$getElementB7, _document$getElementB8, _document$getElementB9, _document$getElementB0, _document$getElementB1;
       this.app.transactionFilters = {
         account: ((_document$getElementB = document.getElementById('filter-account')) === null || _document$getElementB === void 0 ? void 0 : _document$getElementB.value) || '',
         category: ((_document$getElementB2 = document.getElementById('filter-category')) === null || _document$getElementB2 === void 0 ? void 0 : _document$getElementB2.value) || '',
@@ -42978,9 +43024,11 @@ var TransactionsModule = /*#__PURE__*/function () {
         status: ((_document$getElementB4 = document.getElementById('filter-status')) === null || _document$getElementB4 === void 0 ? void 0 : _document$getElementB4.value) || '',
         dateFrom: ((_document$getElementB5 = document.getElementById('filter-date-from')) === null || _document$getElementB5 === void 0 ? void 0 : _document$getElementB5.value) || '',
         dateTo: ((_document$getElementB6 = document.getElementById('filter-date-to')) === null || _document$getElementB6 === void 0 ? void 0 : _document$getElementB6.value) || '',
-        amountMin: ((_document$getElementB7 = document.getElementById('filter-amount-min')) === null || _document$getElementB7 === void 0 ? void 0 : _document$getElementB7.value) || '',
-        amountMax: ((_document$getElementB8 = document.getElementById('filter-amount-max')) === null || _document$getElementB8 === void 0 ? void 0 : _document$getElementB8.value) || '',
-        search: ((_document$getElementB9 = document.getElementById('filter-search')) === null || _document$getElementB9 === void 0 ? void 0 : _document$getElementB9.value) || '',
+        createdAtFrom: ((_document$getElementB7 = document.getElementById('filter-created-from')) === null || _document$getElementB7 === void 0 ? void 0 : _document$getElementB7.value) || '',
+        createdAtTo: ((_document$getElementB8 = document.getElementById('filter-created-to')) === null || _document$getElementB8 === void 0 ? void 0 : _document$getElementB8.value) || '',
+        amountMin: ((_document$getElementB9 = document.getElementById('filter-amount-min')) === null || _document$getElementB9 === void 0 ? void 0 : _document$getElementB9.value) || '',
+        amountMax: ((_document$getElementB0 = document.getElementById('filter-amount-max')) === null || _document$getElementB0 === void 0 ? void 0 : _document$getElementB0.value) || '',
+        search: ((_document$getElementB1 = document.getElementById('filter-search')) === null || _document$getElementB1 === void 0 ? void 0 : _document$getElementB1.value) || '',
         tagIds: Array.from(this.selectedFilterTags)
       };
 
@@ -42991,7 +43039,7 @@ var TransactionsModule = /*#__PURE__*/function () {
   }, {
     key: "clearFilters",
     value: function clearFilters() {
-      var filterInputs = ['filter-account', 'filter-category', 'filter-type', 'filter-status', 'filter-date-from', 'filter-date-to', 'filter-amount-min', 'filter-amount-max', 'filter-search'];
+      var filterInputs = ['filter-account', 'filter-category', 'filter-type', 'filter-status', 'filter-date-from', 'filter-date-to', 'filter-created-from', 'filter-created-to', 'filter-amount-min', 'filter-amount-max', 'filter-search'];
       filterInputs.forEach(function (inputId) {
         var input = document.getElementById(inputId);
         if (input) {
@@ -43631,12 +43679,12 @@ var TransactionsModule = /*#__PURE__*/function () {
     key: "createReconciliationAdjustment",
     value: function () {
       var _createReconciliationAdjustment = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(reconcileData, type, amount) {
-        var _document$getElementB0, _document$getElementB1;
-        var accountId, today, _document$getElementB10, response, error, _t8;
+        var _document$getElementB10, _document$getElementB11;
+        var accountId, today, _document$getElementB12, response, error, _t8;
         return _regenerator().w(function (_context7) {
           while (1) switch (_context7.p = _context7.n) {
             case 0:
-              accountId = ((_document$getElementB0 = document.getElementById('filter-account')) === null || _document$getElementB0 === void 0 ? void 0 : _document$getElementB0.value) || ((_document$getElementB1 = document.getElementById('reconcile-account')) === null || _document$getElementB1 === void 0 ? void 0 : _document$getElementB1.value);
+              accountId = ((_document$getElementB10 = document.getElementById('filter-account')) === null || _document$getElementB10 === void 0 ? void 0 : _document$getElementB10.value) || ((_document$getElementB11 = document.getElementById('reconcile-account')) === null || _document$getElementB11 === void 0 ? void 0 : _document$getElementB11.value);
               if (accountId) {
                 _context7.n = 1;
                 break;
@@ -43687,7 +43735,7 @@ var TransactionsModule = /*#__PURE__*/function () {
               this.cancelReconciliation();
               document.getElementById('reconcile-account').value = accountId;
               document.getElementById('reconcile-statement-balance').value = reconcileData.statementBalance;
-              document.getElementById('reconcile-statement-date').value = ((_document$getElementB10 = document.getElementById('reconcile-statement-date')) === null || _document$getElementB10 === void 0 ? void 0 : _document$getElementB10.value) || today;
+              document.getElementById('reconcile-statement-date').value = ((_document$getElementB12 = document.getElementById('reconcile-statement-date')) === null || _document$getElementB12 === void 0 ? void 0 : _document$getElementB12.value) || today;
               document.getElementById('reconcile-panel').style.display = 'block';
               _context7.n = 8;
               return this.startReconciliation();
@@ -50833,6 +50881,8 @@ var BudgetApp = /*#__PURE__*/function () {
           _this$transactionFilt8,
           _this$transactionFilt9,
           _this$transactionFilt0,
+          _this$transactionFilt1,
+          _this$transactionFilt10,
           _result$balanceBefore,
           url,
           params,
@@ -50876,22 +50926,28 @@ var BudgetApp = /*#__PURE__*/function () {
               if ((_this$transactionFilt4 = this.transactionFilters) !== null && _this$transactionFilt4 !== void 0 && _this$transactionFilt4.dateTo) {
                 params.append('dateTo', this.transactionFilters.dateTo);
               }
-              if ((_this$transactionFilt5 = this.transactionFilters) !== null && _this$transactionFilt5 !== void 0 && _this$transactionFilt5.category) {
+              if ((_this$transactionFilt5 = this.transactionFilters) !== null && _this$transactionFilt5 !== void 0 && _this$transactionFilt5.createdAtFrom) {
+                params.append('createdAtFrom', this.transactionFilters.createdAtFrom);
+              }
+              if ((_this$transactionFilt6 = this.transactionFilters) !== null && _this$transactionFilt6 !== void 0 && _this$transactionFilt6.createdAtTo) {
+                params.append('createdAtTo', this.transactionFilters.createdAtTo);
+              }
+              if ((_this$transactionFilt7 = this.transactionFilters) !== null && _this$transactionFilt7 !== void 0 && _this$transactionFilt7.category) {
                 params.append('category', this.transactionFilters.category);
               }
-              if ((_this$transactionFilt6 = this.transactionFilters) !== null && _this$transactionFilt6 !== void 0 && _this$transactionFilt6.type) {
+              if ((_this$transactionFilt8 = this.transactionFilters) !== null && _this$transactionFilt8 !== void 0 && _this$transactionFilt8.type) {
                 params.append('type', this.transactionFilters.type);
               }
-              if ((_this$transactionFilt7 = this.transactionFilters) !== null && _this$transactionFilt7 !== void 0 && _this$transactionFilt7.amountMin) {
+              if ((_this$transactionFilt9 = this.transactionFilters) !== null && _this$transactionFilt9 !== void 0 && _this$transactionFilt9.amountMin) {
                 params.append('amountMin', this.transactionFilters.amountMin);
               }
-              if ((_this$transactionFilt8 = this.transactionFilters) !== null && _this$transactionFilt8 !== void 0 && _this$transactionFilt8.amountMax) {
+              if ((_this$transactionFilt0 = this.transactionFilters) !== null && _this$transactionFilt0 !== void 0 && _this$transactionFilt0.amountMax) {
                 params.append('amountMax', this.transactionFilters.amountMax);
               }
-              if ((_this$transactionFilt9 = this.transactionFilters) !== null && _this$transactionFilt9 !== void 0 && _this$transactionFilt9.status) {
+              if ((_this$transactionFilt1 = this.transactionFilters) !== null && _this$transactionFilt1 !== void 0 && _this$transactionFilt1.status) {
                 params.append('status', this.transactionFilters.status);
               }
-              if ((_this$transactionFilt0 = this.transactionFilters) !== null && _this$transactionFilt0 !== void 0 && _this$transactionFilt0.tagIds && this.transactionFilters.tagIds.length > 0) {
+              if ((_this$transactionFilt10 = this.transactionFilters) !== null && _this$transactionFilt10 !== void 0 && _this$transactionFilt10.tagIds && this.transactionFilters.tagIds.length > 0) {
                 this.transactionFilters.tagIds.forEach(function (tagId) {
                   params.append('tagIds[]', tagId);
                 });
