@@ -291,7 +291,8 @@ class Application extends App implements IBootstrap {
         $context->registerService(\OCA\Budget\Service\AccountService::class, function($c) {
             return new \OCA\Budget\Service\AccountService(
                 $c->get(\OCA\Budget\Db\AccountMapper::class),
-                $c->get(\OCA\Budget\Db\TransactionMapper::class)
+                $c->get(\OCA\Budget\Db\TransactionMapper::class),
+                $c->get(\OCA\Budget\Service\CurrencyConversionService::class)
             );
         });
         $context->registerServiceAlias('AccountService', \OCA\Budget\Service\AccountService::class);

@@ -14,13 +14,16 @@ use OCP\AppFramework\Db\Entity;
  */
 class AccountService extends AbstractCrudService {
     private TransactionMapper $transactionMapper;
+    private CurrencyConversionService $conversionService;
 
     public function __construct(
         AccountMapper $mapper,
-        TransactionMapper $transactionMapper
+        TransactionMapper $transactionMapper,
+        CurrencyConversionService $conversionService
     ) {
         $this->mapper = $mapper;
         $this->transactionMapper = $transactionMapper;
+        $this->conversionService = $conversionService;
     }
 
     public function create(
@@ -117,6 +120,10 @@ class AccountService extends AbstractCrudService {
         $accountData = $account->toArrayMasked();
         $accountData['balance'] = MoneyCalculator::toFloat($balance);
 
+        // Add fiat equivalent for non-base-currency accounts
+        $baseCurrency = $this->conversionService->getBaseCurrency($userId);
+        $this->addConvertedBalance($accountData, MoneyCalculator::toFloat($balance), $account->getCurrency(), $baseCurrency, $userId);
+
         return $accountData;
     }
 
@@ -133,6 +140,8 @@ class AccountService extends AbstractCrudService {
         $today = date('Y-m-d');
         $futureChanges = $this->transactionMapper->getNetChangeAfterDateBatch($userId, $today);
 
+        $baseCurrency = $this->conversionService->getBaseCurrency($userId);
+
         $result = [];
         foreach ($accounts as $account) {
             // Calculate balance as of today (stored balance minus future transactions)
@@ -142,11 +151,35 @@ class AccountService extends AbstractCrudService {
 
             // Convert account to array and override balance with adjusted value
             $accountData = $account->toArrayMasked();
-            $accountData['balance'] = MoneyCalculator::toFloat($balance);
+            $balanceFloat = MoneyCalculator::toFloat($balance);
+            $accountData['balance'] = $balanceFloat;
+
+            // Add fiat equivalent for non-base-currency accounts
+            $this->addConvertedBalance($accountData, $balanceFloat, $account->getCurrency(), $baseCurrency, $userId);
+
             $result[] = $accountData;
         }
 
         return $result;
+    }
+
+    /**
+     * Add convertedBalance and baseCurrency to an account data array
+     * when the account's currency differs from the user's base currency.
+     */
+    private function addConvertedBalance(array &$accountData, float $balance, ?string $currency, string $baseCurrency, string $userId): void {
+        $currency = $currency ?: 'USD';
+
+        if (strtoupper($currency) === strtoupper($baseCurrency)) {
+            return;
+        }
+
+        if (!$this->conversionService->canConvert($currency, $userId)) {
+            return;
+        }
+
+        $accountData['convertedBalance'] = $this->conversionService->convertToBaseFloat($balance, $currency, $userId);
+        $accountData['baseCurrency'] = $baseCurrency;
     }
 
     public function getSummary(string $userId): array {

@@ -288,6 +288,7 @@ export default class AccountsModule {
                         <span class="balance-amount ${balanceClass}">
                             ${this.formatCurrency(displayBalance, accountCurrency)}
                         </span>
+                        ${account.convertedBalance != null ? `<span class="balance-converted">\u2248 ${this.formatCurrency(isLiability ? Math.abs(account.convertedBalance) : account.convertedBalance, account.baseCurrency)}</span>` : ''}
                     </div>
                     <div class="account-sparkline" data-account-id="${accountId}">
                         <svg viewBox="0 0 80 32" preserveAspectRatio="none">

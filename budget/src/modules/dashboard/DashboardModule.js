@@ -635,6 +635,7 @@ export default class DashboardModule {
                         <div class="account-widget-amount ${balance >= 0 ? 'positive' : 'negative'}">
                             ${this.formatCurrency(balance, currency)}
                         </div>
+                        ${account.convertedBalance != null ? `<div class="account-widget-converted">\u2248 ${this.formatCurrency(account.convertedBalance, account.baseCurrency)}</div>` : ''}
                     </div>
                 </div>
             `;

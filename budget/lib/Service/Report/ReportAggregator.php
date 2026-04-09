@@ -118,7 +118,7 @@ class ReportAggregator {
             $futureChange = $futureChanges[$currentAccountId] ?? 0;
             $currentBalance = $storedBalance - $futureChange;
 
-            $summary['accounts'][] = [
+            $accountEntry = [
                 'id' => $currentAccountId,
                 'name' => $account->getName(),
                 'balance' => $currentBalance,
@@ -136,14 +136,21 @@ class ReportAggregator {
                     // Check if conversion is possible before attempting it
                     if (!$this->conversionService->canConvert($accountCurrency, $userId)) {
                         $unconvertedCurrencies[] = $accountCurrency;
+                        $summary['accounts'][] = $accountEntry;
                         continue;
                     }
 
                     $currentBalance = $this->conversionService->convertToBaseFloat($currentBalance, $accountCurrency, $userId);
                     $accountIncome = $this->conversionService->convertToBaseFloat($accountIncome, $accountCurrency, $userId);
                     $accountExpenses = $this->conversionService->convertToBaseFloat($accountExpenses, $accountCurrency, $userId);
+
+                    // Include fiat equivalent for frontend display
+                    $accountEntry['convertedBalance'] = $currentBalance;
+                    $accountEntry['baseCurrency'] = $baseCurrency;
                 }
             }
+
+            $summary['accounts'][] = $accountEntry;
 
             $summary['totals']['currentBalance'] += $currentBalance;
             if (in_array($account->getType(), $liabilityTypes, true)) {

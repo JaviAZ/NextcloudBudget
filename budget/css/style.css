@@ -878,6 +878,12 @@
     color: #c62828;
 }
 
+.account-widget-converted {
+    font-size: 11px;
+    color: var(--color-text-maxcontrast);
+    font-variant-numeric: tabular-nums;
+}
+
 .account-widget-sparkline {
     height: 20px;
     margin-top: 4px;
@@ -4178,6 +4184,15 @@ button.danger:hover {
 
 .balance-amount.positive {
     color: #46ba61;
+}
+
+.balance-converted {
+    display: block;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-maxcontrast);
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
 }
 
 .balance-secondary {
