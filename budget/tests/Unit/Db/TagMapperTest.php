@@ -32,7 +32,7 @@ class TagMapperTest extends TestCase {
         $this->qb->method('createNamedParameter')->willReturn(':param');
 
         foreach (['select', 'from', 'where', 'andWhere', 'orderBy',
-                   'addOrderBy', 'innerJoin', 'delete'] as $method) {
+                   'addOrderBy', 'innerJoin', 'leftJoin', 'delete'] as $method) {
             $this->qb->method($method)->willReturnSelf();
         }
 

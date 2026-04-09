@@ -114,7 +114,7 @@ class ImportRuleApplicatorTest extends TestCase {
 
 		$result = $this->applicator->applyRules('user1', ['description' => 'Refund']);
 
-		$this->assertSame('income', $result['type']);
+		$this->assertSame('credit', $result['type']);
 	}
 
 	public function testApplyRulesSetTypeRejectsInvalid(): void {

@@ -272,7 +272,7 @@ class RuleActionApplicatorTest extends TestCase {
 		$changes = $this->applicator->applyRules($transaction, [$rule], 'user123');
 
 		$this->assertArrayHasKey('type', $changes);
-		$this->assertEquals('income', $transaction->getType());
+		$this->assertEquals('credit', $transaction->getType());
 	}
 
 	public function testSetReference(): void {

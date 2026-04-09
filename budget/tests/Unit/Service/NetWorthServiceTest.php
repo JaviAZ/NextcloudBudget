@@ -11,6 +11,7 @@ use OCA\Budget\Db\TransactionMapper;
 use OCA\Budget\Service\AssetService;
 use OCA\Budget\Service\CurrencyConversionService;
 use OCA\Budget\Service\NetWorthService;
+use OCA\Budget\Service\PensionService;
 use PHPUnit\Framework\TestCase;
 
 class NetWorthServiceTest extends TestCase {
@@ -20,6 +21,7 @@ class NetWorthServiceTest extends TestCase {
 	private TransactionMapper $transactionMapper;
 	private CurrencyConversionService $conversionService;
 	private AssetService $assetService;
+	private PensionService $pensionService;
 
 	protected function setUp(): void {
 		$this->snapshotMapper = $this->createMock(NetWorthSnapshotMapper::class);
@@ -28,13 +30,16 @@ class NetWorthServiceTest extends TestCase {
 		$this->conversionService = $this->createMock(CurrencyConversionService::class);
 		$this->assetService = $this->createMock(AssetService::class);
 		$this->assetService->method('getSummary')->willReturn(['totalAssetWorth' => 0]);
+		$this->pensionService = $this->createMock(PensionService::class);
+		$this->pensionService->method('getSummary')->willReturn(['totalPensionWorth' => 0]);
 
 		$this->service = new NetWorthService(
 			$this->snapshotMapper,
 			$this->accountMapper,
 			$this->transactionMapper,
 			$this->conversionService,
-			$this->assetService
+			$this->assetService,
+			$this->pensionService
 		);
 	}
 

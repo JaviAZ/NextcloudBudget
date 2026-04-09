@@ -174,7 +174,7 @@ class CategoryControllerTest extends TestCase {
 		$response = $this->controller->create('Groceries', 'expense');
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertSame('Failed to create category', $response->getData()['error']);
+		$this->assertSame('duplicate', $response->getData()['error']);
 	}
 
 	public function testCreateSanitizesName(): void {

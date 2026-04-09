@@ -20,6 +20,7 @@ use OCA\Budget\Db\RecurringIncomeMapper;
 use OCA\Budget\Db\SavingsGoalMapper;
 use OCA\Budget\Db\SettingMapper;
 use OCA\Budget\Db\SettlementMapper;
+use OCA\Budget\Db\TagMapper;
 use OCA\Budget\Db\TransactionMapper;
 use OCA\Budget\Db\TransactionSplitMapper;
 use OCA\Budget\Service\FactoryResetService;
@@ -49,6 +50,7 @@ class FactoryResetServiceTest extends TestCase {
     private NetWorthSnapshotMapper $netWorthSnapshotMapper;
     private $assetMapper;
     private $assetSnapshotMapper;
+    private TagMapper $tagMapper;
 
     protected function setUp(): void {
         $this->db = $this->createMock(IDBConnection::class);
@@ -70,6 +72,7 @@ class FactoryResetServiceTest extends TestCase {
         $this->netWorthSnapshotMapper = $this->createMock(NetWorthSnapshotMapper::class);
         $this->assetMapper = $this->createMock(AssetMapper::class);
         $this->assetSnapshotMapper = $this->createMock(AssetSnapshotMapper::class);
+        $this->tagMapper = $this->createMock(TagMapper::class);
 
         $this->service = new FactoryResetService(
             $this->accountMapper,
@@ -90,6 +93,7 @@ class FactoryResetServiceTest extends TestCase {
             $this->netWorthSnapshotMapper,
             $this->assetMapper,
             $this->assetSnapshotMapper,
+            $this->tagMapper,
             $this->db
         );
     }
