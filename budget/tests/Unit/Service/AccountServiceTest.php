@@ -8,6 +8,7 @@ use OCA\Budget\Db\Account;
 use OCA\Budget\Db\AccountMapper;
 use OCA\Budget\Db\TransactionMapper;
 use OCA\Budget\Service\AccountService;
+use OCA\Budget\Service\CurrencyConversionService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use PHPUnit\Framework\TestCase;
 
@@ -15,14 +16,17 @@ class AccountServiceTest extends TestCase {
     private AccountService $service;
     private AccountMapper $accountMapper;
     private TransactionMapper $transactionMapper;
+    private CurrencyConversionService $conversionService;
 
     protected function setUp(): void {
         $this->accountMapper = $this->createMock(AccountMapper::class);
         $this->transactionMapper = $this->createMock(TransactionMapper::class);
+        $this->conversionService = $this->createMock(CurrencyConversionService::class);
 
         $this->service = new AccountService(
             $this->accountMapper,
-            $this->transactionMapper
+            $this->transactionMapper,
+            $this->conversionService
         );
     }
 
