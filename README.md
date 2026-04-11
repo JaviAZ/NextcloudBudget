@@ -319,6 +319,24 @@ The app provides a REST API for all functionality:
 - Check browser console for JavaScript errors
 - Try refreshing browser cache (Ctrl+F5 / Cmd+Shift+R)
 
+## Translating
+
+The app is fully prepared for translation with 2,177 translatable strings. Help translate Nextcloud Budget into your language!
+
+### Translate via Weblate (Recommended)
+
+Visit our [Weblate project](https://hosted.weblate.org/projects/nextcloud-budget/) to translate directly in your browser — no development setup needed.
+
+[![Translation status](https://hosted.weblate.org/widget/nextcloud-budget/budget/svg-badge.svg)](https://hosted.weblate.org/engage/nextcloud-budget/)
+
+### Translate via Pull Request
+
+1. Copy `budget/translationfiles/templates/budget.pot` to `budget/translationfiles/<lang>/budget.po`
+2. Translate the strings using [Poedit](https://poedit.net/) or any `.po` editor
+3. Submit a pull request
+
+See the [translation guide](budget/translationfiles/README.md) for detailed instructions.
+
 ## Contributing
 
 Contributions are welcome! Please:
