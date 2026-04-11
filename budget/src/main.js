@@ -1081,8 +1081,10 @@ class BudgetApp {
 
         return tags.map(tag => `
             <span class="tag-chip"
-                  style="display: inline-flex; align-items: center; background-color: ${this.escapeHtml(tag.color)}; color: white;
-                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin: 0 2px 2px 0;">
+                  style="display: inline-block; background-color: ${this.escapeHtml(tag.color)}; color: white;
+                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin: 0 2px 2px 0;
+                         vertical-align: middle;"
+                  title="${this.escapeHtml(tag.name)}">
                 ${this.escapeHtml(tag.name)}
             </span>
         `).join('');

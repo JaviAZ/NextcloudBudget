@@ -3269,8 +3269,15 @@ button.danger:hover {
 }
 
 .tags-column {
-    width: 80px;
+    width: 100px;
     text-align: center;
+}
+
+.tags-column .tag-chip {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .actions-column {
