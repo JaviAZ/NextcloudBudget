@@ -66,7 +66,7 @@ export default class BillsModule {
             // Update summary cards
             document.getElementById('bills-due-count').textContent = summary.dueThisMonth || 0;
             document.getElementById('bills-overdue-count').textContent = summary.overdue || 0;
-            document.getElementById('bills-monthly-total').textContent = formatters.formatCurrency(summary.monthlyTotal || 0, null, this.settings);
+            document.getElementById('bills-monthly-total').textContent = formatters.formatCurrency(summary.monthlyTotal || 0, summary.baseCurrency || null, this.settings);
             document.getElementById('bills-paid-count').textContent = summary.paidThisMonth || 0;
         } catch (error) {
             console.error('Failed to load bills summary:', error);
@@ -123,6 +123,7 @@ export default class BillsModule {
             const autoPayFailed = bill.autoPayFailed ?? bill.auto_pay_failed ?? false;
             const remainingPayments = bill.remainingPayments ?? bill.remaining_payments ?? null;
             const endDate = bill.endDate ?? bill.end_date ?? null;
+            const hasSplits = Array.isArray(bill.splitTemplate) && bill.splitTemplate.length >= 2;
 
             return `
                 <div class="bill-card ${statusClass}" data-bill-id="${bill.id}" data-status="${statusClass}">
@@ -131,7 +132,7 @@ export default class BillsModule {
                             <h4 class="bill-name">${dom.escapeHtml(bill.name)}</h4>
                             <span class="bill-frequency">${frequencyLabel}</span>
                         </div>
-                        <div class="bill-amount">${formatters.formatCurrency(bill.amount, null, this.settings)}</div>
+                        <div class="bill-amount">${formatters.formatCurrency(bill.amount, bill.currency || null, this.settings)}</div>
                     </div>
                     <div class="bill-details">
                         <div class="bill-due-date">
@@ -140,6 +141,7 @@ export default class BillsModule {
                         </div>
                         <div class="bill-status ${statusClass}">
                             <span class="status-badge">${statusText}</span>
+                            ${hasSplits ? `<span class="status-badge" title="${t('budget', 'Split across categories')}" style="background: #6f42c1; margin-left: 5px;">${t('budget', 'Split')}</span>` : ''}
                             ${autoPayEnabled ? `<span class="status-badge auto-pay" title="${t('budget', 'Auto-pay enabled')}" style="background: #007bff; margin-left: 5px;"><span class="icon-checkmark"></span> ${t('budget', 'Auto-pay')}</span>` : ''}
                             ${autoPayFailed ? `<span class="status-badge auto-pay-failed" title="${t('budget', 'Auto-pay failed - disabled')}" style="background: #ffc107; color: #856404; margin-left: 5px;"><span class="icon-error"></span> ${t('budget', 'Auto-pay Failed')}</span>` : ''}
                             ${remainingPayments !== null ? `<span class="status-badge" title="${t('budget', 'Remaining payments')}" style="background: #6c757d; margin-left: 5px;">${t('budget', '{count} left', { count: remainingPayments })}</span>` : ''}
@@ -268,7 +270,7 @@ export default class BillsModule {
             });
         }
 
-        // Account dropdown change (enable/disable auto-pay checkbox)
+        // Account dropdown change (enable/disable auto-pay checkbox + show currency)
         const billAccount = document.getElementById('bill-account');
         const autoPayCheckbox = document.getElementById('bill-auto-pay');
         if (billAccount && autoPayCheckbox) {
@@ -279,6 +281,7 @@ export default class BillsModule {
                 } else {
                     autoPayCheckbox.disabled = false;
                 }
+                this.updateBillAmountCurrency();
             });
 
             // Set initial state
@@ -316,6 +319,48 @@ export default class BillsModule {
         const addSelectedBillsBtn = document.getElementById('add-selected-bills-btn');
         if (addSelectedBillsBtn) {
             addSelectedBillsBtn.addEventListener('click', () => this.addSelectedDetectedBills());
+        }
+
+        // Split template toggle
+        const splitEnabled = document.getElementById('bill-split-enabled');
+        if (splitEnabled) {
+            splitEnabled.addEventListener('change', (e) => {
+                const container = document.getElementById('bill-split-container');
+                const categoryGroup = document.getElementById('bill-category').closest('.form-group');
+                if (e.target.checked) {
+                    container.style.display = 'block';
+                    categoryGroup.style.display = 'none';
+                    // Add initial rows if empty
+                    const rows = document.getElementById('bill-split-rows');
+                    if (!rows.children.length) {
+                        this.addBillSplitRow();
+                        this.addBillSplitRow();
+                    }
+                    this.updateBillSplitRemaining();
+                } else {
+                    container.style.display = 'none';
+                    categoryGroup.style.display = '';
+                }
+            });
+        }
+
+        // Add split row button
+        const addSplitBtn = document.getElementById('bill-add-split-btn');
+        if (addSplitBtn) {
+            addSplitBtn.addEventListener('click', () => {
+                this.addBillSplitRow();
+                this.updateBillSplitRemaining();
+            });
+        }
+
+        // Bill amount change updates split remaining
+        const billAmount = document.getElementById('bill-amount');
+        if (billAmount) {
+            billAmount.addEventListener('input', () => {
+                if (document.getElementById('bill-split-enabled')?.checked) {
+                    this.updateBillSplitRemaining();
+                }
+            });
         }
 
         // Delegated event handlers for bill actions
@@ -392,6 +437,25 @@ export default class BillsModule {
                 const tagsContainer = document.getElementById('bill-tags-container');
                 if (tagsContainer) tagsContainer.innerHTML = '';
             }
+
+            // Populate split template
+            const splitTemplate = bill.splitTemplate || bill.split_template || [];
+            const splitCheckbox = document.getElementById('bill-split-enabled');
+            const splitContainer = document.getElementById('bill-split-container');
+            const splitRows = document.getElementById('bill-split-rows');
+            const categoryGroup = document.getElementById('bill-category').closest('.form-group');
+            splitRows.innerHTML = '';
+            if (splitTemplate.length >= 2) {
+                splitCheckbox.checked = true;
+                splitContainer.style.display = 'block';
+                categoryGroup.style.display = 'none';
+                splitTemplate.forEach(split => this.addBillSplitRow(split));
+                this.updateBillSplitRemaining();
+            } else {
+                splitCheckbox.checked = false;
+                splitContainer.style.display = 'none';
+                categoryGroup.style.display = '';
+            }
         } else {
             title.textContent = t('budget', 'Add Bill');
             // Clear all month checkboxes for new bill
@@ -413,9 +477,20 @@ export default class BillsModule {
             // Clear tag sets
             const tagsContainer = document.getElementById('bill-tags-container');
             if (tagsContainer) tagsContainer.innerHTML = '';
+
+            // Reset split template
+            const splitCheckbox = document.getElementById('bill-split-enabled');
+            if (splitCheckbox) splitCheckbox.checked = false;
+            const splitContainer = document.getElementById('bill-split-container');
+            if (splitContainer) splitContainer.style.display = 'none';
+            const splitRows = document.getElementById('bill-split-rows');
+            if (splitRows) splitRows.innerHTML = '';
+            const categoryGroup = document.getElementById('bill-category').closest('.form-group');
+            if (categoryGroup) categoryGroup.style.display = '';
         }
 
         this.updateBillFormFields();
+        this.updateBillAmountCurrency();
         modal.style.display = 'flex';
         modal.setAttribute('aria-hidden', 'false');
     }
@@ -483,16 +558,138 @@ export default class BillsModule {
             if (currentValue) categorySelect.value = currentValue;
         }
 
-        // Populate account dropdown
+        // Populate account dropdown (show currency in label)
         const accountSelect = document.getElementById('bill-account');
         if (accountSelect && this.accounts) {
             const currentValue = accountSelect.value;
             accountSelect.innerHTML = `<option value="">${t('budget', 'No specific account')}</option>`;
             this.accounts.forEach(acc => {
-                accountSelect.innerHTML += `<option value="${acc.id}">${dom.escapeHtml(acc.name)}</option>`;
+                const currencyLabel = acc.currency ? ` (${acc.currency})` : '';
+                accountSelect.innerHTML += `<option value="${acc.id}">${dom.escapeHtml(acc.name)}${currencyLabel}</option>`;
             });
             if (currentValue) accountSelect.value = currentValue;
         }
+    }
+
+    /**
+     * Show/hide currency indicator next to the amount field based on selected account.
+     */
+    updateBillAmountCurrency() {
+        const accountSelect = document.getElementById('bill-account');
+        const amountInput = document.getElementById('bill-amount');
+        if (!amountInput) return;
+
+        // Remove existing currency indicator
+        const existing = amountInput.parentElement.querySelector('.bill-currency-indicator');
+        if (existing) existing.remove();
+
+        if (accountSelect && accountSelect.value) {
+            const account = this.accounts.find(a => a.id === parseInt(accountSelect.value));
+            if (account && account.currency) {
+                const indicator = document.createElement('span');
+                indicator.className = 'bill-currency-indicator';
+                indicator.textContent = account.currency;
+                indicator.style.cssText = 'margin-left: 8px; color: var(--color-text-maxcontrast); font-size: 0.9em; font-weight: 500;';
+                amountInput.parentElement.appendChild(indicator);
+            }
+        }
+    }
+
+    addBillSplitRow(split = null) {
+        const container = document.getElementById('bill-split-rows');
+        const row = document.createElement('div');
+        row.className = 'bill-split-row';
+        row.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 6px;';
+
+        // Amount input
+        const amountInput = document.createElement('input');
+        amountInput.type = 'number';
+        amountInput.step = '0.01';
+        amountInput.min = '0';
+        amountInput.placeholder = t('budget', 'Amount');
+        amountInput.className = 'bill-split-amount';
+        amountInput.style.cssText = 'width: 100px; flex-shrink: 0;';
+        amountInput.value = split?.amount || '';
+        amountInput.addEventListener('input', () => this.updateBillSplitRemaining());
+
+        // Category select
+        const categorySelect = document.createElement('select');
+        categorySelect.className = 'bill-split-category';
+        categorySelect.style.cssText = 'flex: 1;';
+        categorySelect.innerHTML = `<option value="">${t('budget', 'No category')}</option>`;
+        dom.populateCategorySelect(categorySelect, this.categoryTree || this.categories, { typeFilter: 'expense' });
+        if (split?.categoryId) categorySelect.value = split.categoryId;
+
+        // Description input
+        const descInput = document.createElement('input');
+        descInput.type = 'text';
+        descInput.placeholder = t('budget', 'Description (optional)');
+        descInput.className = 'bill-split-description';
+        descInput.style.cssText = 'flex: 1;';
+        descInput.value = split?.description || '';
+
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'bill-split-remove';
+        removeBtn.textContent = '\u00d7';
+        removeBtn.title = t('budget', 'Remove split');
+        removeBtn.style.cssText = 'width: 28px; height: 28px; padding: 0; border: none; background: var(--color-error); color: white; border-radius: 50%; cursor: pointer; font-size: 16px; flex-shrink: 0;';
+        removeBtn.addEventListener('click', () => {
+            row.remove();
+            this.updateBillSplitRemaining();
+        });
+
+        row.appendChild(amountInput);
+        row.appendChild(categorySelect);
+        row.appendChild(descInput);
+        row.appendChild(removeBtn);
+        container.appendChild(row);
+    }
+
+    updateBillSplitRemaining() {
+        const totalAmount = parseFloat(document.getElementById('bill-amount')?.value) || 0;
+        const rows = document.querySelectorAll('.bill-split-row');
+        let allocated = 0;
+        rows.forEach(row => {
+            allocated += parseFloat(row.querySelector('.bill-split-amount')?.value) || 0;
+        });
+        const remaining = totalAmount - allocated;
+        const el = document.getElementById('bill-split-remaining');
+        if (el) {
+            const absRemaining = Math.abs(remaining);
+            if (absRemaining < 0.01) {
+                el.textContent = t('budget', 'Balanced');
+                el.style.color = 'var(--color-success)';
+            } else if (remaining > 0) {
+                el.textContent = t('budget', '{amount} remaining', { amount: formatters.formatCurrency(remaining, null, this.settings) });
+                el.style.color = 'var(--color-warning)';
+            } else {
+                el.textContent = t('budget', '{amount} over', { amount: formatters.formatCurrency(absRemaining, null, this.settings) });
+                el.style.color = 'var(--color-error)';
+            }
+        }
+    }
+
+    getBillSplitTemplate() {
+        if (!document.getElementById('bill-split-enabled')?.checked) {
+            return null;
+        }
+        const rows = document.querySelectorAll('.bill-split-row');
+        if (rows.length < 2) return null;
+
+        const splits = [];
+        rows.forEach(row => {
+            const amount = parseFloat(row.querySelector('.bill-split-amount')?.value) || 0;
+            if (amount > 0) {
+                splits.push({
+                    categoryId: row.querySelector('.bill-split-category')?.value ? parseInt(row.querySelector('.bill-split-category').value) : null,
+                    amount: amount,
+                    description: row.querySelector('.bill-split-description')?.value || null,
+                });
+            }
+        });
+        return splits.length >= 2 ? splits : null;
     }
 
     async saveBill() {
@@ -518,8 +715,14 @@ export default class BillsModule {
             autoPayEnabled: document.getElementById('bill-auto-pay')?.checked || false,
             tagIds: this.getSelectedBillTagIds(),
             endDate: document.getElementById('bill-end-date').value || null,
-            remainingPayments: document.getElementById('bill-remaining-payments').value ? parseInt(document.getElementById('bill-remaining-payments').value) : null
+            remainingPayments: document.getElementById('bill-remaining-payments').value ? parseInt(document.getElementById('bill-remaining-payments').value) : null,
+            splitTemplate: this.getBillSplitTemplate()
         };
+
+        // When splits are defined, clear categoryId (splits define their own)
+        if (billData.splitTemplate) {
+            billData.categoryId = null;
+        }
 
         // Add custom recurrence pattern if frequency is custom
         if (frequency === 'custom') {

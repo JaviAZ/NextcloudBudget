@@ -390,7 +390,10 @@ class Application extends App implements IBootstrap {
                 $c->get(\OCA\Budget\Service\Bill\FrequencyCalculator::class),
                 $c->get(\OCA\Budget\Service\Bill\RecurringBillDetector::class),
                 $c->get(\OCA\Budget\Service\TransactionService::class),
-                $c->get(\OCP\IL10N::class)
+                $c->get(\OCP\IL10N::class),
+                $c->get(\OCA\Budget\Db\AccountMapper::class),
+                $c->get(\OCA\Budget\Service\CurrencyConversionService::class),
+                $c->get(\OCA\Budget\Service\TransactionSplitService::class)
             );
         });
         $context->registerServiceAlias('BillService', \OCA\Budget\Service\BillService::class);

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace OCA\Budget\Service;
 
+use OCA\Budget\Db\AccountMapper;
 use OCA\Budget\Db\Bill;
 use OCA\Budget\Db\BillMapper;
 use OCA\Budget\Service\Bill\FrequencyCalculator;
 use OCA\Budget\Service\Bill\RecurringBillDetector;
+use OCA\Budget\Service\CurrencyConversionService;
 use OCA\Budget\Service\TransactionService;
+use OCA\Budget\Service\TransactionSplitService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IL10N;
 
@@ -21,19 +24,28 @@ class BillService {
     private RecurringBillDetector $recurringDetector;
     private TransactionService $transactionService;
     private IL10N $l;
+    private AccountMapper $accountMapper;
+    private CurrencyConversionService $currencyConversion;
+    private TransactionSplitService $splitService;
 
     public function __construct(
         BillMapper $mapper,
         FrequencyCalculator $frequencyCalculator,
         RecurringBillDetector $recurringDetector,
         TransactionService $transactionService,
-        IL10N $l
+        IL10N $l,
+        AccountMapper $accountMapper,
+        CurrencyConversionService $currencyConversion,
+        TransactionSplitService $splitService
     ) {
         $this->mapper = $mapper;
         $this->frequencyCalculator = $frequencyCalculator;
         $this->recurringDetector = $recurringDetector;
         $this->transactionService = $transactionService;
         $this->l = $l;
+        $this->accountMapper = $accountMapper;
+        $this->currencyConversion = $currencyConversion;
+        $this->splitService = $splitService;
     }
 
     /**
@@ -49,6 +61,36 @@ class BillService {
 
     public function findActive(string $userId): array {
         return $this->mapper->findActive($userId);
+    }
+
+    /**
+     * Build a map of accountId => currency for the user's accounts.
+     */
+    private function buildCurrencyMap(string $userId): array {
+        $accounts = $this->accountMapper->findAll($userId);
+        $map = [];
+        foreach ($accounts as $account) {
+            $map[$account->getId()] = $account->getCurrency() ?: null;
+        }
+        return $map;
+    }
+
+    /**
+     * Set the non-persisted currency property on each bill from its linked account.
+     *
+     * @param Bill[] $bills
+     * @return Bill[]
+     */
+    public function enrichBillsWithCurrency(array $bills, string $userId): array {
+        $currencyMap = $this->buildCurrencyMap($userId);
+        $baseCurrency = $this->currencyConversion->getBaseCurrency($userId);
+        foreach ($bills as $bill) {
+            $accountId = $bill->getAccountId();
+            $bill->setCurrency($accountId !== null && isset($currencyMap[$accountId])
+                ? $currencyMap[$accountId]
+                : $baseCurrency);
+        }
+        return $bills;
     }
 
     public function findByType(string $userId, ?bool $isTransfer = null, ?bool $isActive = null): array {
@@ -121,7 +163,8 @@ class BillService {
         ?string $transferDescriptionPattern = null,
         array $tagIds = [],
         ?string $endDate = null,
-        ?int $remainingPayments = null
+        ?int $remainingPayments = null,
+        ?array $splitTemplate = null
     ): Bill {
         // Validate auto-pay requires account
         if ($autoPayEnabled && $accountId === null) {
@@ -160,6 +203,11 @@ class BillService {
         $bill->setTagIdsArray($tagIds);
         $bill->setEndDate($endDate);
         $bill->setRemainingPayments($remainingPayments);
+        if ($splitTemplate !== null) {
+            $bill->setSplitTemplateArray($splitTemplate);
+            // When splits define the categories, clear the bill-level category
+            $bill->setCategoryId(null);
+        }
         $bill->setCreatedAt(date('Y-m-d H:i:s'));
 
         $nextDue = $this->frequencyCalculator->calculateNextDueDate($frequency, $dueDay, $dueMonth, null, $customRecurrencePattern);
@@ -170,11 +218,12 @@ class BillService {
         // Create future transaction if requested and bill has account
         if ($createTransaction && $accountId !== null) {
             try {
-                $this->transactionService->createFromBill(
+                $transaction = $this->transactionService->createFromBill(
                     $userId,
                     $bill,
                     $transactionDate
                 );
+                $this->applySplitTemplate($bill, $transaction, $userId);
             } catch (\Exception $e) {
                 // Log error but don't fail bill creation
                 error_log("Failed to create transaction for bill {$bill->getId()}: {$e->getMessage()}");
@@ -276,10 +325,13 @@ class BillService {
         if ($createNextTransaction && $bill->getAccountId() !== null) {
             try {
                 // Clear pre-existing scheduled transaction(s), or create new cleared one
-                $cleared = $this->transactionService->clearScheduledBillTransaction($userId, $bill->getId(), $paidDate);
-                if (!$cleared) {
-                    $this->transactionService->createFromBill($userId, $bill, $paidDate, 'cleared');
+                $transaction = $this->transactionService->clearScheduledBillTransaction($userId, $bill->getId(), $paidDate);
+                if (!$transaction) {
+                    $transaction = $this->transactionService->createFromBill($userId, $bill, $paidDate, 'cleared');
                 }
+
+                // Apply split template if defined
+                $this->applySplitTemplate($bill, $transaction, $userId);
             } catch (\Exception $e) {
                 error_log("Failed to create transaction for bill {$id}: {$e->getMessage()}");
             }
@@ -324,7 +376,8 @@ class BillService {
         // Skip for deactivated bills (one-time, end date reached, remaining payments exhausted)
         if ($createNextTransaction && $bill->getIsActive() && $bill->getAccountId() !== null) {
             try {
-                $this->transactionService->createFromBill($userId, $bill, null);
+                $nextTransaction = $this->transactionService->createFromBill($userId, $bill, null);
+                $this->applySplitTemplate($bill, $nextTransaction, $userId);
             } catch (\Exception $e) {
                 error_log("Failed to create next transaction for bill {$id}: {$e->getMessage()}");
             }
@@ -338,6 +391,8 @@ class BillService {
      */
     public function getMonthlySummary(string $userId): array {
         $bills = $this->findActive($userId);
+        $currencyMap = $this->buildCurrencyMap($userId);
+        $baseCurrency = $this->currencyConversion->getBaseCurrency($userId);
 
         $total = 0.0;
         $dueThisMonth = 0;
@@ -360,18 +415,26 @@ class BillService {
 
         foreach ($bills as $bill) {
             $monthlyAmount = $this->frequencyCalculator->getMonthlyEquivalent($bill);
-            $total += $monthlyAmount;
+
+            // Convert to base currency if the bill's account uses a different currency
+            $billCurrency = ($bill->getAccountId() !== null && isset($currencyMap[$bill->getAccountId()]))
+                ? $currencyMap[$bill->getAccountId()]
+                : $baseCurrency;
+            $convertedMonthly = $this->convertToBase($monthlyAmount, $billCurrency, $baseCurrency, $userId);
+            $convertedAmount = $this->convertToBase($bill->getAmount(), $billCurrency, $baseCurrency, $userId);
+
+            $total += $convertedMonthly;
 
             $freq = $bill->getFrequency();
             if (isset($byFrequency[$freq])) {
-                $byFrequency[$freq] += $bill->getAmount();
+                $byFrequency[$freq] += $convertedAmount;
             }
 
             $catId = $bill->getCategoryId() ?? 0;
             if (!isset($byCategory[$catId])) {
                 $byCategory[$catId] = 0.0;
             }
-            $byCategory[$catId] += $monthlyAmount;
+            $byCategory[$catId] += $convertedMonthly;
 
             // Check if due this month
             $nextDue = $bill->getNextDueDate();
@@ -403,7 +466,42 @@ class BillService {
             'paidThisMonth' => $paidThisMonth,
             'byCategory' => $byCategory,
             'byFrequency' => $byFrequency,
+            'baseCurrency' => $baseCurrency,
         ];
+    }
+
+    /**
+     * Apply a bill's split template to a newly created transaction.
+     */
+    private function applySplitTemplate(Bill $bill, $transaction, string $userId): void {
+        $splits = $bill->getSplitTemplateArray();
+        if (empty($splits) || $transaction === null) {
+            return;
+        }
+
+        try {
+            $splitData = array_map(function ($split) {
+                return [
+                    'categoryId' => isset($split['categoryId']) ? (int) $split['categoryId'] : null,
+                    'amount' => (float) $split['amount'],
+                    'description' => $split['description'] ?? null,
+                ];
+            }, $splits);
+
+            $this->splitService->splitTransaction($transaction->getId(), $userId, $splitData);
+        } catch (\Exception $e) {
+            error_log("Failed to apply split template to transaction {$transaction->getId()}: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Convert an amount to base currency if needed. Returns unchanged if already base.
+     */
+    private function convertToBase(float $amount, ?string $fromCurrency, string $baseCurrency, string $userId): float {
+        if ($fromCurrency === null || $fromCurrency === $baseCurrency) {
+            return $amount;
+        }
+        return $this->currencyConversion->convertToBaseFloat($amount, $fromCurrency, $userId);
     }
 
     /**
@@ -591,6 +689,10 @@ class BillService {
             });
         }
 
+        // Build currency map for conversion
+        $currencyMap = $this->buildCurrencyMap($userId);
+        $baseCurrency = $this->currencyConversion->getBaseCurrency($userId);
+
         // Calculate monthly occurrences for each bill
         $billsData = [];
         $monthlyTotals = array_fill(1, 12, 0.0);
@@ -598,10 +700,15 @@ class BillService {
         foreach ($bills as $bill) {
             $occurrences = $this->calculateMonthlyOccurrences($bill, $year);
 
+            $billCurrency = ($bill->getAccountId() !== null && isset($currencyMap[$bill->getAccountId()]))
+                ? $currencyMap[$bill->getAccountId()]
+                : $baseCurrency;
+
             $billData = [
                 'id' => $bill->getId(),
                 'name' => $bill->getName(),
                 'amount' => $bill->getAmount(),
+                'currency' => $billCurrency,
                 'frequency' => $bill->getFrequency(),
                 'categoryId' => $bill->getCategoryId(),
                 'accountId' => $bill->getAccountId(),
@@ -611,10 +718,11 @@ class BillService {
                 'occurrences' => $occurrences, // Array with month numbers as keys
             ];
 
-            // Add amounts to monthly totals
+            // Add converted amounts to monthly totals
+            $convertedAmount = $this->convertToBase($bill->getAmount(), $billCurrency, $baseCurrency, $userId);
             foreach ($occurrences as $month => $occurs) {
                 if ($occurs) {
-                    $monthlyTotals[$month] += $bill->getAmount();
+                    $monthlyTotals[$month] += $convertedAmount;
                 }
             }
 
@@ -625,6 +733,7 @@ class BillService {
             'year' => $year,
             'bills' => $billsData,
             'monthlyTotals' => $monthlyTotals,
+            'baseCurrency' => $baseCurrency,
         ];
     }
 

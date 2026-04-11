@@ -60,6 +60,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setEndDate(?string $endDate)
  * @method int|null getRemainingPayments()
  * @method void setRemainingPayments(?int $remainingPayments)
+ * @method string|null getSplitTemplate()
+ * @method void setSplitTemplate(?string $splitTemplate)
  */
 class Bill extends Entity implements JsonSerializable {
     protected $userId;
@@ -87,6 +89,10 @@ class Bill extends Entity implements JsonSerializable {
     protected $tagIds;                     // JSON array of tag IDs to apply to created transactions
     protected $endDate;                    // Optional end date for auto-deactivation
     protected $remainingPayments;          // Optional countdown of payments before auto-deactivation
+    protected $splitTemplate;              // JSON array of split definitions for auto-splitting transactions
+
+    // Non-persisted: set by BillService when enriching API responses
+    protected ?string $currency = null;
 
     public function __construct() {
         $this->addType('id', 'integer');
@@ -102,6 +108,14 @@ class Bill extends Entity implements JsonSerializable {
         $this->addType('isTransfer', 'boolean');
         $this->addType('destinationAccountId', 'integer');
         $this->addType('remainingPayments', 'integer');
+    }
+
+    public function getCurrency(): ?string {
+        return $this->currency;
+    }
+
+    public function setCurrency(?string $currency): void {
+        $this->currency = $currency;
     }
 
     /**
@@ -123,6 +137,27 @@ class Bill extends Entity implements JsonSerializable {
      */
     public function setTagIdsArray(array $tagIds): void {
         $this->setTagIds(empty($tagIds) ? null : json_encode(array_values(array_map('intval', $tagIds))));
+    }
+
+    /**
+     * Get split template as an array (decoded from JSON).
+     * @return array[] Array of {categoryId, amount, description}
+     */
+    public function getSplitTemplateArray(): array {
+        $raw = $this->getSplitTemplate();
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Set split template from an array (encodes to JSON).
+     * @param array[]|null $splits Array of {categoryId, amount, description}
+     */
+    public function setSplitTemplateArray(?array $splits): void {
+        $this->setSplitTemplate(empty($splits) ? null : json_encode(array_values($splits)));
     }
 
     public function jsonSerialize(): array {
@@ -153,6 +188,8 @@ class Bill extends Entity implements JsonSerializable {
             'tagIds' => $this->getTagIdsArray(),
             'endDate' => $this->getEndDate(),
             'remainingPayments' => $this->getRemainingPayments(),
+            'splitTemplate' => $this->getSplitTemplateArray(),
+            'currency' => $this->getCurrency(),
         ];
     }
 }

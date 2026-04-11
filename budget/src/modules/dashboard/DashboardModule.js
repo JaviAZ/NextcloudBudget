@@ -815,7 +815,7 @@ export default class DashboardModule {
                         <div class="bill-widget-name">${this.escapeHtml(bill.name)}</div>
                         <div class="bill-widget-due ${statusClass}">${dueText}</div>
                     </div>
-                    <div class="bill-widget-amount">${this.formatCurrency(bill.amount)}</div>
+                    <div class="bill-widget-amount">${this.formatCurrency(bill.amount, bill.currency)}</div>
                 </div>
             `;
         }).join('');

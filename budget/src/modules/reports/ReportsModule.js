@@ -1333,7 +1333,7 @@ export default class ReportsModule {
             const months = [];
             for (let month = 1; month <= 12; month++) {
                 const occurs = bill.occurrences[month];
-                const amount = occurs ? this.formatCurrency(bill.amount, currency) : '';
+                const amount = occurs ? this.formatCurrency(bill.amount, bill.currency || currency) : '';
                 months.push(`<td class="month-cell ${occurs ? 'has-bill' : 'no-bill'}">${amount}</td>`);
             }
 

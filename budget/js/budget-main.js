@@ -25215,7 +25215,7 @@ var BillsModule = /*#__PURE__*/function () {
               // Update summary cards
               document.getElementById('bills-due-count').textContent = summary.dueThisMonth || 0;
               document.getElementById('bills-overdue-count').textContent = summary.overdue || 0;
-              document.getElementById('bills-monthly-total').textContent = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(summary.monthlyTotal || 0, null, this.settings);
+              document.getElementById('bills-monthly-total').textContent = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(summary.monthlyTotal || 0, summary.baseCurrency || null, this.settings);
               document.getElementById('bills-paid-count').textContent = summary.paidThisMonth || 0;
               _context2.n = 5;
               break;
@@ -25281,7 +25281,8 @@ var BillsModule = /*#__PURE__*/function () {
         var autoPayFailed = (_ref2 = (_bill$autoPayFailed = bill.autoPayFailed) !== null && _bill$autoPayFailed !== void 0 ? _bill$autoPayFailed : bill.auto_pay_failed) !== null && _ref2 !== void 0 ? _ref2 : false;
         var remainingPayments = (_ref3 = (_bill$remainingPaymen = bill.remainingPayments) !== null && _bill$remainingPaymen !== void 0 ? _bill$remainingPaymen : bill.remaining_payments) !== null && _ref3 !== void 0 ? _ref3 : null;
         var endDate = (_ref4 = (_bill$endDate = bill.endDate) !== null && _bill$endDate !== void 0 ? _bill$endDate : bill.end_date) !== null && _ref4 !== void 0 ? _ref4 : null;
-        return "\n                <div class=\"bill-card ".concat(statusClass, "\" data-bill-id=\"").concat(bill.id, "\" data-status=\"").concat(statusClass, "\">\n                    <div class=\"bill-header\">\n                        <div class=\"bill-info\">\n                            <h4 class=\"bill-name\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(bill.name), "</h4>\n                            <span class=\"bill-frequency\">").concat(frequencyLabel, "</span>\n                        </div>\n                        <div class=\"bill-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(bill.amount, null, _this.settings), "</div>\n                    </div>\n                    <div class=\"bill-details\">\n                        <div class=\"bill-due-date\">\n                            <span class=\"icon-calendar\" aria-hidden=\"true\"></span>\n                            ").concat(dueDate ? _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatDate(dueDate, _this.settings) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'No due date'), "\n                        </div>\n                        <div class=\"bill-status ").concat(statusClass, "\">\n                            <span class=\"status-badge\">").concat(statusText, "</span>\n                            ").concat(autoPayEnabled ? "<span class=\"status-badge auto-pay\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay enabled'), "\" style=\"background: #007bff; margin-left: 5px;\"><span class=\"icon-checkmark\"></span> ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay'), "</span>") : '', "\n                            ").concat(autoPayFailed ? "<span class=\"status-badge auto-pay-failed\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay failed - disabled'), "\" style=\"background: #ffc107; color: #856404; margin-left: 5px;\"><span class=\"icon-error\"></span> ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay Failed'), "</span>") : '', "\n                            ").concat(remainingPayments !== null ? "<span class=\"status-badge\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Remaining payments'), "\" style=\"background: #6c757d; margin-left: 5px;\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{count} left', {
+        var hasSplits = Array.isArray(bill.splitTemplate) && bill.splitTemplate.length >= 2;
+        return "\n                <div class=\"bill-card ".concat(statusClass, "\" data-bill-id=\"").concat(bill.id, "\" data-status=\"").concat(statusClass, "\">\n                    <div class=\"bill-header\">\n                        <div class=\"bill-info\">\n                            <h4 class=\"bill-name\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(bill.name), "</h4>\n                            <span class=\"bill-frequency\">").concat(frequencyLabel, "</span>\n                        </div>\n                        <div class=\"bill-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(bill.amount, bill.currency || null, _this.settings), "</div>\n                    </div>\n                    <div class=\"bill-details\">\n                        <div class=\"bill-due-date\">\n                            <span class=\"icon-calendar\" aria-hidden=\"true\"></span>\n                            ").concat(dueDate ? _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatDate(dueDate, _this.settings) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'No due date'), "\n                        </div>\n                        <div class=\"bill-status ").concat(statusClass, "\">\n                            <span class=\"status-badge\">").concat(statusText, "</span>\n                            ").concat(hasSplits ? "<span class=\"status-badge\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Split across categories'), "\" style=\"background: #6f42c1; margin-left: 5px;\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Split'), "</span>") : '', "\n                            ").concat(autoPayEnabled ? "<span class=\"status-badge auto-pay\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay enabled'), "\" style=\"background: #007bff; margin-left: 5px;\"><span class=\"icon-checkmark\"></span> ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay'), "</span>") : '', "\n                            ").concat(autoPayFailed ? "<span class=\"status-badge auto-pay-failed\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay failed - disabled'), "\" style=\"background: #ffc107; color: #856404; margin-left: 5px;\"><span class=\"icon-error\"></span> ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Auto-pay Failed'), "</span>") : '', "\n                            ").concat(remainingPayments !== null ? "<span class=\"status-badge\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Remaining payments'), "\" style=\"background: #6c757d; margin-left: 5px;\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{count} left', {
           count: remainingPayments
         }), "</span>") : '', "\n                            ").concat(endDate ? "<span class=\"status-badge\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Ends {date}', {
           date: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatDate(endDate, _this.settings)
@@ -25406,7 +25407,7 @@ var BillsModule = /*#__PURE__*/function () {
         });
       }
 
-      // Account dropdown change (enable/disable auto-pay checkbox)
+      // Account dropdown change (enable/disable auto-pay checkbox + show currency)
       var billAccount = document.getElementById('bill-account');
       var autoPayCheckbox = document.getElementById('bill-auto-pay');
       if (billAccount && autoPayCheckbox) {
@@ -25417,6 +25418,7 @@ var BillsModule = /*#__PURE__*/function () {
           } else {
             autoPayCheckbox.disabled = false;
           }
+          _this2.updateBillAmountCurrency();
         });
 
         // Set initial state
@@ -25460,6 +25462,49 @@ var BillsModule = /*#__PURE__*/function () {
         });
       }
 
+      // Split template toggle
+      var splitEnabled = document.getElementById('bill-split-enabled');
+      if (splitEnabled) {
+        splitEnabled.addEventListener('change', function (e) {
+          var container = document.getElementById('bill-split-container');
+          var categoryGroup = document.getElementById('bill-category').closest('.form-group');
+          if (e.target.checked) {
+            container.style.display = 'block';
+            categoryGroup.style.display = 'none';
+            // Add initial rows if empty
+            var rows = document.getElementById('bill-split-rows');
+            if (!rows.children.length) {
+              _this2.addBillSplitRow();
+              _this2.addBillSplitRow();
+            }
+            _this2.updateBillSplitRemaining();
+          } else {
+            container.style.display = 'none';
+            categoryGroup.style.display = '';
+          }
+        });
+      }
+
+      // Add split row button
+      var addSplitBtn = document.getElementById('bill-add-split-btn');
+      if (addSplitBtn) {
+        addSplitBtn.addEventListener('click', function () {
+          _this2.addBillSplitRow();
+          _this2.updateBillSplitRemaining();
+        });
+      }
+
+      // Bill amount change updates split remaining
+      var billAmount = document.getElementById('bill-amount');
+      if (billAmount) {
+        billAmount.addEventListener('input', function () {
+          var _document$getElementB;
+          if ((_document$getElementB = document.getElementById('bill-split-enabled')) !== null && _document$getElementB !== void 0 && _document$getElementB.checked) {
+            _this2.updateBillSplitRemaining();
+          }
+        });
+      }
+
       // Delegated event handlers for bill actions
       document.addEventListener('click', function (e) {
         if (e.target.classList.contains('bill-edit-btn') || e.target.closest('.bill-edit-btn')) {
@@ -25480,6 +25525,7 @@ var BillsModule = /*#__PURE__*/function () {
   }, {
     key: "showBillModal",
     value: function showBillModal() {
+      var _this3 = this;
       var bill = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var modal = document.getElementById('bill-modal');
       var title = document.getElementById('bill-modal-title');
@@ -25537,6 +25583,27 @@ var BillsModule = /*#__PURE__*/function () {
           var tagsContainer = document.getElementById('bill-tags-container');
           if (tagsContainer) tagsContainer.innerHTML = '';
         }
+
+        // Populate split template
+        var splitTemplate = bill.splitTemplate || bill.split_template || [];
+        var splitCheckbox = document.getElementById('bill-split-enabled');
+        var splitContainer = document.getElementById('bill-split-container');
+        var splitRows = document.getElementById('bill-split-rows');
+        var categoryGroup = document.getElementById('bill-category').closest('.form-group');
+        splitRows.innerHTML = '';
+        if (splitTemplate.length >= 2) {
+          splitCheckbox.checked = true;
+          splitContainer.style.display = 'block';
+          categoryGroup.style.display = 'none';
+          splitTemplate.forEach(function (split) {
+            return _this3.addBillSplitRow(split);
+          });
+          this.updateBillSplitRemaining();
+        } else {
+          splitCheckbox.checked = false;
+          splitContainer.style.display = 'none';
+          categoryGroup.style.display = '';
+        }
       } else {
         title.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Add Bill');
         // Clear all month checkboxes for new bill
@@ -25560,8 +25627,19 @@ var BillsModule = /*#__PURE__*/function () {
         // Clear tag sets
         var _tagsContainer = document.getElementById('bill-tags-container');
         if (_tagsContainer) _tagsContainer.innerHTML = '';
+
+        // Reset split template
+        var _splitCheckbox = document.getElementById('bill-split-enabled');
+        if (_splitCheckbox) _splitCheckbox.checked = false;
+        var _splitContainer = document.getElementById('bill-split-container');
+        if (_splitContainer) _splitContainer.style.display = 'none';
+        var _splitRows = document.getElementById('bill-split-rows');
+        if (_splitRows) _splitRows.innerHTML = '';
+        var _categoryGroup = document.getElementById('bill-category').closest('.form-group');
+        if (_categoryGroup) _categoryGroup.style.display = '';
       }
       this.updateBillFormFields();
+      this.updateBillAmountCurrency();
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden', 'false');
     }
@@ -25633,22 +25711,163 @@ var BillsModule = /*#__PURE__*/function () {
         if (currentValue) categorySelect.value = currentValue;
       }
 
-      // Populate account dropdown
+      // Populate account dropdown (show currency in label)
       var accountSelect = document.getElementById('bill-account');
       if (accountSelect && this.accounts) {
         var _currentValue = accountSelect.value;
         accountSelect.innerHTML = "<option value=\"\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'No specific account'), "</option>");
         this.accounts.forEach(function (acc) {
-          accountSelect.innerHTML += "<option value=\"".concat(acc.id, "\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(acc.name), "</option>");
+          var currencyLabel = acc.currency ? " (".concat(acc.currency, ")") : '';
+          accountSelect.innerHTML += "<option value=\"".concat(acc.id, "\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(acc.name)).concat(currencyLabel, "</option>");
         });
         if (_currentValue) accountSelect.value = _currentValue;
       }
+    }
+
+    /**
+     * Show/hide currency indicator next to the amount field based on selected account.
+     */
+  }, {
+    key: "updateBillAmountCurrency",
+    value: function updateBillAmountCurrency() {
+      var accountSelect = document.getElementById('bill-account');
+      var amountInput = document.getElementById('bill-amount');
+      if (!amountInput) return;
+
+      // Remove existing currency indicator
+      var existing = amountInput.parentElement.querySelector('.bill-currency-indicator');
+      if (existing) existing.remove();
+      if (accountSelect && accountSelect.value) {
+        var account = this.accounts.find(function (a) {
+          return a.id === parseInt(accountSelect.value);
+        });
+        if (account && account.currency) {
+          var indicator = document.createElement('span');
+          indicator.className = 'bill-currency-indicator';
+          indicator.textContent = account.currency;
+          indicator.style.cssText = 'margin-left: 8px; color: var(--color-text-maxcontrast); font-size: 0.9em; font-weight: 500;';
+          amountInput.parentElement.appendChild(indicator);
+        }
+      }
+    }
+  }, {
+    key: "addBillSplitRow",
+    value: function addBillSplitRow() {
+      var _this4 = this;
+      var split = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var container = document.getElementById('bill-split-rows');
+      var row = document.createElement('div');
+      row.className = 'bill-split-row';
+      row.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 6px;';
+
+      // Amount input
+      var amountInput = document.createElement('input');
+      amountInput.type = 'number';
+      amountInput.step = '0.01';
+      amountInput.min = '0';
+      amountInput.placeholder = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Amount');
+      amountInput.className = 'bill-split-amount';
+      amountInput.style.cssText = 'width: 100px; flex-shrink: 0;';
+      amountInput.value = (split === null || split === void 0 ? void 0 : split.amount) || '';
+      amountInput.addEventListener('input', function () {
+        return _this4.updateBillSplitRemaining();
+      });
+
+      // Category select
+      var categorySelect = document.createElement('select');
+      categorySelect.className = 'bill-split-category';
+      categorySelect.style.cssText = 'flex: 1;';
+      categorySelect.innerHTML = "<option value=\"\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'No category'), "</option>");
+      _utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.populateCategorySelect(categorySelect, this.categoryTree || this.categories, {
+        typeFilter: 'expense'
+      });
+      if (split !== null && split !== void 0 && split.categoryId) categorySelect.value = split.categoryId;
+
+      // Description input
+      var descInput = document.createElement('input');
+      descInput.type = 'text';
+      descInput.placeholder = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Description (optional)');
+      descInput.className = 'bill-split-description';
+      descInput.style.cssText = 'flex: 1;';
+      descInput.value = (split === null || split === void 0 ? void 0 : split.description) || '';
+
+      // Remove button
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'bill-split-remove';
+      removeBtn.textContent = "\xD7";
+      removeBtn.title = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Remove split');
+      removeBtn.style.cssText = 'width: 28px; height: 28px; padding: 0; border: none; background: var(--color-error); color: white; border-radius: 50%; cursor: pointer; font-size: 16px; flex-shrink: 0;';
+      removeBtn.addEventListener('click', function () {
+        row.remove();
+        _this4.updateBillSplitRemaining();
+      });
+      row.appendChild(amountInput);
+      row.appendChild(categorySelect);
+      row.appendChild(descInput);
+      row.appendChild(removeBtn);
+      container.appendChild(row);
+    }
+  }, {
+    key: "updateBillSplitRemaining",
+    value: function updateBillSplitRemaining() {
+      var _document$getElementB2;
+      var totalAmount = parseFloat((_document$getElementB2 = document.getElementById('bill-amount')) === null || _document$getElementB2 === void 0 ? void 0 : _document$getElementB2.value) || 0;
+      var rows = document.querySelectorAll('.bill-split-row');
+      var allocated = 0;
+      rows.forEach(function (row) {
+        var _row$querySelector;
+        allocated += parseFloat((_row$querySelector = row.querySelector('.bill-split-amount')) === null || _row$querySelector === void 0 ? void 0 : _row$querySelector.value) || 0;
+      });
+      var remaining = totalAmount - allocated;
+      var el = document.getElementById('bill-split-remaining');
+      if (el) {
+        var absRemaining = Math.abs(remaining);
+        if (absRemaining < 0.01) {
+          el.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Balanced');
+          el.style.color = 'var(--color-success)';
+        } else if (remaining > 0) {
+          el.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{amount} remaining', {
+            amount: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(remaining, null, this.settings)
+          });
+          el.style.color = 'var(--color-warning)';
+        } else {
+          el.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{amount} over', {
+            amount: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(absRemaining, null, this.settings)
+          });
+          el.style.color = 'var(--color-error)';
+        }
+      }
+    }
+  }, {
+    key: "getBillSplitTemplate",
+    value: function getBillSplitTemplate() {
+      var _document$getElementB3;
+      if (!((_document$getElementB3 = document.getElementById('bill-split-enabled')) !== null && _document$getElementB3 !== void 0 && _document$getElementB3.checked)) {
+        return null;
+      }
+      var rows = document.querySelectorAll('.bill-split-row');
+      if (rows.length < 2) return null;
+      var splits = [];
+      rows.forEach(function (row) {
+        var _row$querySelector2;
+        var amount = parseFloat((_row$querySelector2 = row.querySelector('.bill-split-amount')) === null || _row$querySelector2 === void 0 ? void 0 : _row$querySelector2.value) || 0;
+        if (amount > 0) {
+          var _row$querySelector3, _row$querySelector4;
+          splits.push({
+            categoryId: (_row$querySelector3 = row.querySelector('.bill-split-category')) !== null && _row$querySelector3 !== void 0 && _row$querySelector3.value ? parseInt(row.querySelector('.bill-split-category').value) : null,
+            amount: amount,
+            description: ((_row$querySelector4 = row.querySelector('.bill-split-description')) === null || _row$querySelector4 === void 0 ? void 0 : _row$querySelector4.value) || null
+          });
+        }
+      });
+      return splits.length >= 2 ? splits : null;
     }
   }, {
     key: "saveBill",
     value: function () {
       var _saveBill = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-        var _document$getElementB, _document$getElementB2, _document$getElementB3;
+        var _document$getElementB4, _document$getElementB5, _document$getElementB6;
         var billId, isNew, reminderValue, frequency, billData, customPattern, url, response, error, errorMessage, _t3;
         return _regenerator().w(function (_context3) {
           while (1) switch (_context3.p = _context3.n) {
@@ -25668,13 +25887,19 @@ var BillsModule = /*#__PURE__*/function () {
                 autoDetectPattern: document.getElementById('bill-auto-pattern').value || null,
                 notes: document.getElementById('bill-notes').value || null,
                 reminderDays: reminderValue !== '' ? parseInt(reminderValue) : null,
-                createTransaction: ((_document$getElementB = document.getElementById('bill-create-transaction')) === null || _document$getElementB === void 0 ? void 0 : _document$getElementB.checked) || false,
-                transactionDate: ((_document$getElementB2 = document.getElementById('bill-transaction-date')) === null || _document$getElementB2 === void 0 ? void 0 : _document$getElementB2.value) || null,
-                autoPayEnabled: ((_document$getElementB3 = document.getElementById('bill-auto-pay')) === null || _document$getElementB3 === void 0 ? void 0 : _document$getElementB3.checked) || false,
+                createTransaction: ((_document$getElementB4 = document.getElementById('bill-create-transaction')) === null || _document$getElementB4 === void 0 ? void 0 : _document$getElementB4.checked) || false,
+                transactionDate: ((_document$getElementB5 = document.getElementById('bill-transaction-date')) === null || _document$getElementB5 === void 0 ? void 0 : _document$getElementB5.value) || null,
+                autoPayEnabled: ((_document$getElementB6 = document.getElementById('bill-auto-pay')) === null || _document$getElementB6 === void 0 ? void 0 : _document$getElementB6.checked) || false,
                 tagIds: this.getSelectedBillTagIds(),
                 endDate: document.getElementById('bill-end-date').value || null,
-                remainingPayments: document.getElementById('bill-remaining-payments').value ? parseInt(document.getElementById('bill-remaining-payments').value) : null
-              }; // Add custom recurrence pattern if frequency is custom
+                remainingPayments: document.getElementById('bill-remaining-payments').value ? parseInt(document.getElementById('bill-remaining-payments').value) : null,
+                splitTemplate: this.getBillSplitTemplate()
+              }; // When splits are defined, clear categoryId (splits define their own)
+              if (billData.splitTemplate) {
+                billData.categoryId = null;
+              }
+
+              // Add custom recurrence pattern if frequency is custom
               if (!(frequency === 'custom')) {
                 _context3.n = 2;
                 break;
@@ -25842,7 +26067,7 @@ var BillsModule = /*#__PURE__*/function () {
     key: "markBillPaid",
     value: function () {
       var _markBillPaid = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(billId) {
-        var _this3 = this;
+        var _this5 = this;
         var bill, previousPaidDate, response, isOneTime, message, _t6;
         return _regenerator().w(function (_context6) {
           while (1) switch (_context6.p = _context6.n) {
@@ -25892,11 +26117,11 @@ var BillsModule = /*#__PURE__*/function () {
               isOneTime = bill.frequency === 'one-time';
               message = isOneTime ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Bill marked as paid. Transaction created.') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Bill marked as paid. Future transaction created.');
               this.showUndoNotification(message, function () {
-                return _this3.undoMarkBillPaid();
+                return _this5.undoMarkBillPaid();
               });
               this._undoTimer = setTimeout(function () {
-                _this3._undoData = null;
-                _this3._undoTimer = null;
+                _this5._undoData = null;
+                _this5._undoTimer = null;
               }, 5000);
               _context6.n = 6;
               break;
@@ -26095,12 +26320,12 @@ var BillsModule = /*#__PURE__*/function () {
   }, {
     key: "renderDetectedBills",
     value: function renderDetectedBills(detected) {
-      var _this4 = this;
+      var _this6 = this;
       var list = document.getElementById('detected-bills-list');
       list.innerHTML = detected.map(function (item, index) {
         var confidenceClass = item.confidence >= 0.8 ? 'high' : item.confidence >= 0.5 ? 'medium' : 'low';
         var confidencePercent = Math.round(item.confidence * 100);
-        return "\n                <div class=\"detected-bill-item\" data-index=\"".concat(index, "\">\n                    <div class=\"detected-bill-select\">\n                        <input type=\"checkbox\" id=\"detected-").concat(index, "\" ").concat(item.confidence >= 0.7 ? 'checked' : '', ">\n                    </div>\n                    <div class=\"detected-bill-info\">\n                        <label for=\"detected-").concat(index, "\" class=\"detected-bill-name\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(item.description || item.name), "</label>\n                        <div class=\"detected-bill-meta\">\n                            <span class=\"detected-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(item.avgAmount || item.amount, null, _this4.settings), "</span>\n                            <span class=\"detected-frequency\">").concat(item.frequency, "</span>\n                            <span class=\"detected-confidence ").concat(confidenceClass, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{percent}% confidence', {
+        return "\n                <div class=\"detected-bill-item\" data-index=\"".concat(index, "\">\n                    <div class=\"detected-bill-select\">\n                        <input type=\"checkbox\" id=\"detected-").concat(index, "\" ").concat(item.confidence >= 0.7 ? 'checked' : '', ">\n                    </div>\n                    <div class=\"detected-bill-info\">\n                        <label for=\"detected-").concat(index, "\" class=\"detected-bill-name\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(item.description || item.name), "</label>\n                        <div class=\"detected-bill-meta\">\n                            <span class=\"detected-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(item.avgAmount || item.amount, null, _this6.settings), "</span>\n                            <span class=\"detected-frequency\">").concat(item.frequency, "</span>\n                            <span class=\"detected-confidence ").concat(confidenceClass, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{percent}% confidence', {
           percent: confidencePercent
         }), "</span>\n                        </div>\n                    </div>\n                </div>\n            ");
       }).join('');
@@ -26112,7 +26337,7 @@ var BillsModule = /*#__PURE__*/function () {
     key: "addSelectedDetectedBills",
     value: function () {
       var _addSelectedDetectedBills = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var _this5 = this;
+        var _this7 = this;
         var checkboxes, selectedIndices, billsToAdd, response, result, _t9;
         return _regenerator().w(function (_context9) {
           while (1) switch (_context9.p = _context9.n) {
@@ -26129,7 +26354,7 @@ var BillsModule = /*#__PURE__*/function () {
               return _context9.a(2);
             case 1:
               billsToAdd = selectedIndices.map(function (i) {
-                return _this5._detectedBills[i];
+                return _this7._detectedBills[i];
               });
               _context9.p = 2;
               _context9.n = 3;
@@ -29446,7 +29671,7 @@ var DashboardModule = /*#__PURE__*/function () {
             })
           });
         }
-        return "\n                <div class=\"bill-widget-item ".concat(statusClass, "\">\n                    <div class=\"bill-widget-info\">\n                        <div class=\"bill-widget-name\">").concat(_this5.escapeHtml(bill.name), "</div>\n                        <div class=\"bill-widget-due ").concat(statusClass, "\">").concat(dueText, "</div>\n                    </div>\n                    <div class=\"bill-widget-amount\">").concat(_this5.formatCurrency(bill.amount), "</div>\n                </div>\n            ");
+        return "\n                <div class=\"bill-widget-item ".concat(statusClass, "\">\n                    <div class=\"bill-widget-info\">\n                        <div class=\"bill-widget-name\">").concat(_this5.escapeHtml(bill.name), "</div>\n                        <div class=\"bill-widget-due ").concat(statusClass, "\">").concat(dueText, "</div>\n                    </div>\n                    <div class=\"bill-widget-amount\">").concat(_this5.formatCurrency(bill.amount, bill.currency), "</div>\n                </div>\n            ");
       }).join('');
     }
   }, {
@@ -37858,7 +38083,7 @@ var ReportsModule = /*#__PURE__*/function () {
         var months = [];
         for (var month = 1; month <= 12; month++) {
           var occurs = bill.occurrences[month];
-          var amount = occurs ? _this15.formatCurrency(bill.amount, currency) : '';
+          var amount = occurs ? _this15.formatCurrency(bill.amount, bill.currency || currency) : '';
           months.push("<td class=\"month-cell ".concat(occurs ? 'has-bill' : 'no-bill', "\">").concat(amount, "</td>"));
         }
         var transferBadge = bill.isTransfer ? " <span class=\"transfer-badge\" style=\"background: #0082c9; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translate)('budget', 'Transfer'), "</span>") : '';

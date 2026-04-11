@@ -4899,6 +4899,23 @@ style('budget', 'budget-main');
 
             <div id="bill-tags-container"></div>
 
+            <!-- Split Template Section -->
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="bill-split-enabled" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span><?php p($l->t('Split across categories')); ?></span>
+                </label>
+                <small class="form-text"><?php p($l->t('Define how this bill should be split across categories when paid')); ?></small>
+            </div>
+
+            <div id="bill-split-container" style="display: none;">
+                <div id="bill-split-rows"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0;">
+                    <button type="button" id="bill-add-split-btn" class="secondary" style="font-size: 0.85em;">+ <?php p($l->t('Add Split')); ?></button>
+                    <span id="bill-split-remaining" class="form-text" style="font-weight: 500;"></span>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="bill-account"><?php p($l->t('Pay From Account')); ?></label>
                 <select id="bill-account" aria-describedby="bill-account-help">

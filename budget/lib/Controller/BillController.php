@@ -66,6 +66,7 @@ class BillController extends Controller {
             } else {
                 $bills = $this->service->findAll($this->userId);
             }
+            $bills = $this->service->enrichBillsWithCurrency($bills, $this->userId);
             return new DataResponse($bills);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve bills'));
@@ -89,6 +90,7 @@ class BillController extends Controller {
     public function show(int $id): DataResponse {
         try {
             $bill = $this->service->find($id, $this->userId);
+            $this->service->enrichBillsWithCurrency([$bill], $this->userId);
             return new DataResponse($bill);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Bill'), ['billId' => $id]);
@@ -132,6 +134,15 @@ class BillController extends Controller {
             $tagIds = isset($data['tagIds']) && is_array($data['tagIds']) ? array_map('intval', $data['tagIds']) : [];
             $endDate = $data['endDate'] ?? null;
             $remainingPayments = isset($data['remainingPayments']) ? (int) $data['remainingPayments'] : null;
+            $splitTemplate = isset($data['splitTemplate']) && is_array($data['splitTemplate']) ? $data['splitTemplate'] : null;
+
+            // Validate split template if provided
+            if ($splitTemplate !== null) {
+                $splitValidation = $this->validateSplitTemplate($splitTemplate, $amount);
+                if (!$splitValidation['valid']) {
+                    return new DataResponse(['error' => $splitValidation['error']], Http::STATUS_BAD_REQUEST);
+                }
+            }
 
             // Validate auto-pay requires account
             if ($autoPayEnabled && $accountId === null) {
@@ -256,7 +267,8 @@ class BillController extends Controller {
                 $transferDescriptionPattern,
                 $tagIds,
                 $endDate,
-                $remainingPayments
+                $remainingPayments,
+                $splitTemplate
             );
 
             return new DataResponse($bill, Http::STATUS_CREATED);
@@ -426,6 +438,25 @@ class BillController extends Controller {
                 }
             }
 
+            // Handle split template
+            if (array_key_exists('splitTemplate', $data)) {
+                if (!empty($data['splitTemplate']) && is_array($data['splitTemplate'])) {
+                    $billAmount = $updates['amount'] ?? null;
+                    if ($billAmount === null) {
+                        // Get existing bill amount for validation
+                        $existingBill = $this->service->find($id, $this->userId);
+                        $billAmount = $existingBill->getAmount();
+                    }
+                    $splitValidation = $this->validateSplitTemplate($data['splitTemplate'], $billAmount);
+                    if (!$splitValidation['valid']) {
+                        return new DataResponse(['error' => $splitValidation['error']], Http::STATUS_BAD_REQUEST);
+                    }
+                    $updates['splitTemplate'] = json_encode(array_values($data['splitTemplate']));
+                } else {
+                    $updates['splitTemplate'] = null;
+                }
+            }
+
             // Validate transfer constraints if being updated
             if (isset($updates['isTransfer']) && $updates['isTransfer']) {
                 $destinationId = $updates['destinationAccountId'] ?? null;
@@ -523,6 +554,7 @@ class BillController extends Controller {
     public function upcoming(int $days = 30): DataResponse {
         try {
             $bills = $this->service->findUpcoming($this->userId, $days);
+            $bills = $this->service->enrichBillsWithCurrency($bills, $this->userId);
             return new DataResponse($bills);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve upcoming bills'));
@@ -536,6 +568,7 @@ class BillController extends Controller {
     public function dueThisMonth(): DataResponse {
         try {
             $bills = $this->service->findDueThisMonth($this->userId);
+            $bills = $this->service->enrichBillsWithCurrency($bills, $this->userId);
             return new DataResponse($bills);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve bills due this month'));
@@ -549,6 +582,7 @@ class BillController extends Controller {
     public function overdue(): DataResponse {
         try {
             $bills = $this->service->findOverdue($this->userId);
+            $bills = $this->service->enrichBillsWithCurrency($bills, $this->userId);
             return new DataResponse($bills);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve overdue bills'));
@@ -820,6 +854,29 @@ class BillController extends Controller {
      * @param string $pattern JSON pattern string
      * @return array ['valid' => bool, 'error' => string|null]
      */
+    /**
+     * Validate a split template array against the bill amount.
+     */
+    private function validateSplitTemplate(array $splits, float $billAmount): array {
+        if (count($splits) < 2) {
+            return ['valid' => false, 'error' => $this->l->t('Split template must have at least 2 splits')];
+        }
+
+        $total = 0.0;
+        foreach ($splits as $split) {
+            if (!isset($split['amount']) || !is_numeric($split['amount']) || (float) $split['amount'] <= 0) {
+                return ['valid' => false, 'error' => $this->l->t('Each split must have a positive amount')];
+            }
+            $total += (float) $split['amount'];
+        }
+
+        if (abs($total - $billAmount) > 0.01) {
+            return ['valid' => false, 'error' => $this->l->t('Split amounts must equal the bill amount')];
+        }
+
+        return ['valid' => true, 'error' => null];
+    }
+
     private function validateCustomPattern(string $pattern): array {
         $decoded = json_decode($pattern, true);
 
