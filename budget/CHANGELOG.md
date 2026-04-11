@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-04-11
+
+### Added
+- **Full internationalization (i18n) support**: All user-facing strings are now translatable, enabling multilingual translations via Weblate
+- **Multi-currency bill display and split templates**: Bills now show amounts in their native currency with base-currency equivalents, and split templates support multi-currency accounts ([#126](https://github.com/otherworld-dev/budget/issues/126), [#121](https://github.com/otherworld-dev/budget/issues/121))
+
+### Fixed
+- **Stale event listeners breaking tag filter in reports**: Prevented duplicate event listeners from accumulating and causing tag filters to malfunction ([#128](https://github.com/otherworld-dev/budget/issues/128))
+- **Long tag names cut off in transaction list**: Tag names are no longer truncated in the transaction list display
+
 ## [2.9.0] - 2026-04-10
 
 ### Added
