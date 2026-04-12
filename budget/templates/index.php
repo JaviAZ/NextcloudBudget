@@ -251,7 +251,8 @@ style('budget', 'budget-main');
 </div>
 
 <div id="app-content" class="app-content">
-    <div id="app-navigation-toggle" class="icon-menu" style="display: none;"></div>
+    <div id="app-navigation-toggle" class="icon-menu"></div>
+    <div id="app-navigation-backdrop"></div>
     <div id="app-content-wrapper">
         <!-- Dashboard View -->
         <div id="dashboard-view" class="view active">

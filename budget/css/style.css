@@ -257,6 +257,37 @@
     width: 100%;
 }
 
+/* Mobile Navigation Toggle - Nextcloud standard (1024px breakpoint)
+ * Nextcloud's mobile.css hides #app-navigation:not(.vue) with translateX(-300px).
+ * No JS is provided for non-Vue apps, so we handle the toggle ourselves.
+ * We must match the :not(.vue) specificity to override the framework. */
+@media (max-width: 1024px) {
+    #app-navigation:not(.vue) {
+        transition: transform 250ms ease-in-out;
+    }
+
+    #app-navigation:not(.vue).open {
+        transform: translateX(0) !important;
+        z-index: 1800;
+    }
+
+    /* Backdrop overlay when nav is open */
+    #app-navigation-backdrop {
+        display: none;
+        position: fixed;
+        top: var(--header-height, 50px);
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - var(--header-height, 50px));
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1700;
+    }
+
+    #app-navigation-backdrop.open {
+        display: block;
+    }
+}
+
 .view-header {
     display: flex;
     justify-content: space-between;

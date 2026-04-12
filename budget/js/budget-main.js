@@ -20564,8 +20564,46 @@ var Router = /*#__PURE__*/function () {
             return entry.classList.remove('active');
           });
           link.parentElement.classList.add('active');
+
+          // Close mobile navigation after selecting a view
+          _this.closeMobileNavigation();
         });
       });
+      this.setupMobileNavigationToggle();
+    }
+  }, {
+    key: "setupMobileNavigationToggle",
+    value: function setupMobileNavigationToggle() {
+      var _this2 = this;
+      var toggle = document.getElementById('app-navigation-toggle');
+      var nav = document.getElementById('app-navigation');
+      var backdrop = document.getElementById('app-navigation-backdrop');
+      if (!toggle || !nav) {
+        return;
+      }
+      toggle.addEventListener('click', function () {
+        var isOpen = nav.classList.toggle('open');
+        if (backdrop) {
+          backdrop.classList.toggle('open', isOpen);
+        }
+      });
+      if (backdrop) {
+        backdrop.addEventListener('click', function () {
+          _this2.closeMobileNavigation();
+        });
+      }
+    }
+  }, {
+    key: "closeMobileNavigation",
+    value: function closeMobileNavigation() {
+      var nav = document.getElementById('app-navigation');
+      var backdrop = document.getElementById('app-navigation-backdrop');
+      if (nav) {
+        nav.classList.remove('open');
+      }
+      if (backdrop) {
+        backdrop.classList.remove('open');
+      }
     }
   }, {
     key: "showView",

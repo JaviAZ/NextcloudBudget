@@ -18,8 +18,47 @@ export default class Router {
                     entry.classList.remove('active')
                 );
                 link.parentElement.classList.add('active');
+
+                // Close mobile navigation after selecting a view
+                this.closeMobileNavigation();
             });
         });
+
+        this.setupMobileNavigationToggle();
+    }
+
+    setupMobileNavigationToggle() {
+        const toggle = document.getElementById('app-navigation-toggle');
+        const nav = document.getElementById('app-navigation');
+        const backdrop = document.getElementById('app-navigation-backdrop');
+
+        if (!toggle || !nav) {
+            return;
+        }
+
+        toggle.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('open');
+            if (backdrop) {
+                backdrop.classList.toggle('open', isOpen);
+            }
+        });
+
+        if (backdrop) {
+            backdrop.addEventListener('click', () => {
+                this.closeMobileNavigation();
+            });
+        }
+    }
+
+    closeMobileNavigation() {
+        const nav = document.getElementById('app-navigation');
+        const backdrop = document.getElementById('app-navigation-backdrop');
+        if (nav) {
+            nav.classList.remove('open');
+        }
+        if (backdrop) {
+            backdrop.classList.remove('open');
+        }
     }
 
     showView(viewName) {
