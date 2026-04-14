@@ -548,6 +548,43 @@ class BillController extends Controller {
     }
 
     /**
+     * Skip a bill payment, advancing to the next due date
+     * @NoAdminRequired
+     */
+    #[UserRateLimit(limit: 30, period: 60)]
+    public function skipPayment(int $id): DataResponse {
+        try {
+            $result = $this->service->skipPayment($id, $this->userId);
+            return new DataResponse($result);
+        } catch (\InvalidArgumentException $e) {
+            return $this->handleError($e, $e->getMessage(), Http::STATUS_BAD_REQUEST, ['billId' => $id]);
+        } catch (\Exception $e) {
+            return $this->handleError($e, $this->l->t('Failed to skip bill payment'), Http::STATUS_BAD_REQUEST, ['billId' => $id]);
+        }
+    }
+
+    /**
+     * Undo a skipped bill payment
+     * @NoAdminRequired
+     */
+    #[UserRateLimit(limit: 30, period: 60)]
+    public function undoSkip(int $id): DataResponse {
+        try {
+            $params = $this->request->getParams();
+            $previousNextDueDate = $params['previousNextDueDate'] ?? null;
+
+            if ($previousNextDueDate === null) {
+                return new DataResponse(['error' => $this->l->t('Missing previous due date')], Http::STATUS_BAD_REQUEST);
+            }
+
+            $bill = $this->service->undoSkip($id, $this->userId, $previousNextDueDate);
+            return new DataResponse($bill);
+        } catch (\Exception $e) {
+            return $this->handleError($e, $this->l->t('Failed to undo skip'), Http::STATUS_BAD_REQUEST, ['billId' => $id]);
+        }
+    }
+
+    /**
      * Get upcoming bills (next 30 days, sorted by due date)
      * @NoAdminRequired
      */

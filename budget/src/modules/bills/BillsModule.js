@@ -155,6 +155,12 @@ export default class BillsModule {
                                 ${t('budget', 'Mark Paid')}
                             </button>
                         ` : ''}
+                        ${!isPaid && frequency !== 'one-time' ? `
+                            <button class="bill-action-btn bill-skip-btn" data-bill-id="${bill.id}" title="${t('budget', 'Skip this payment')}">
+                                <span aria-hidden="true">&#x23ED;</span>
+                                ${t('budget', 'Skip')}
+                            </button>
+                        ` : ''}
                         <button class="bill-action-btn bill-edit-btn" data-bill-id="${bill.id}" title="${t('budget', 'Edit bill')}">
                             <span class="icon-rename" aria-hidden="true"></span>
                         </button>
@@ -377,6 +383,10 @@ export default class BillsModule {
                 const button = e.target.classList.contains('bill-paid-btn') ? e.target : e.target.closest('.bill-paid-btn');
                 const billId = parseInt(button.dataset.billId);
                 this.markBillPaid(billId);
+            } else if (e.target.classList.contains('bill-skip-btn') || e.target.closest('.bill-skip-btn')) {
+                const button = e.target.classList.contains('bill-skip-btn') ? e.target : e.target.closest('.bill-skip-btn');
+                const billId = parseInt(button.dataset.billId);
+                this.skipBillPayment(billId);
             }
         });
     }
@@ -888,6 +898,95 @@ export default class BillsModule {
             showSuccess(t('budget', 'Action undone'));
         } catch (error) {
             console.error('Failed to undo mark paid:', error);
+            showError(t('budget', 'Failed to undo action: {message}', { message: error.message }));
+        }
+    }
+
+    async skipBillPayment(billId) {
+        try {
+            const bill = this.bills.find(b => b.id === billId);
+            if (!bill) {
+                throw new Error('Bill not found');
+            }
+
+            if (!confirm(t('budget', 'Skip this payment and advance to the next due date?'))) {
+                return;
+            }
+
+            const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}/skip`), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'requesttoken': OC.requestToken
+                }
+            });
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const result = await response.json();
+            const previousNextDueDate = result.previousNextDueDate ?? null;
+
+            this._undoData = {
+                billId: billId,
+                previousNextDueDate: previousNextDueDate,
+                action: 'skip'
+            };
+
+            await this.loadBillsView();
+
+            if (this._undoTimer) {
+                clearTimeout(this._undoTimer);
+            }
+
+            this.showUndoNotification(
+                t('budget', 'Payment skipped. Advanced to next due date.'),
+                () => this.undoSkipPayment()
+            );
+
+            this._undoTimer = setTimeout(() => {
+                this._undoData = null;
+                this._undoTimer = null;
+            }, 5000);
+
+        } catch (error) {
+            console.error('Failed to skip bill payment:', error);
+            showError(t('budget', 'Failed to skip bill payment'));
+        }
+    }
+
+    async undoSkipPayment() {
+        if (!this._undoData || this._undoData.action !== 'skip') {
+            return;
+        }
+
+        try {
+            const { billId, previousNextDueDate } = this._undoData;
+
+            if (this._undoTimer) {
+                clearTimeout(this._undoTimer);
+                this._undoTimer = null;
+            }
+
+            const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}/undo-skip`), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({ previousNextDueDate: previousNextDueDate })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `HTTP ${response.status}`);
+            }
+
+            this._undoData = null;
+            await this.loadBillsView();
+
+            showSuccess(t('budget', 'Action undone'));
+        } catch (error) {
+            console.error('Failed to undo skip:', error);
             showError(t('budget', 'Failed to undo action: {message}', { message: error.message }));
         }
     }

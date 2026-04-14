@@ -387,6 +387,98 @@ class BillService {
     }
 
     /**
+     * Skip a bill payment, advancing to the next due date without creating a transaction.
+     *
+     * @param int $id Bill ID
+     * @param string $userId User ID
+     * @return Bill Updated bill
+     */
+    public function skipPayment(int $id, string $userId): array {
+        $bill = $this->find($id, $userId);
+
+        if ($bill->getFrequency() === 'one-time') {
+            throw new \InvalidArgumentException($this->l->t('Cannot skip a one-time bill'));
+        }
+
+        if (!$bill->getIsActive()) {
+            throw new \InvalidArgumentException($this->l->t('Cannot skip an inactive bill'));
+        }
+
+        $previousNextDueDate = $bill->getNextDueDate();
+
+        // Delete any pre-existing scheduled transaction for the skipped occurrence
+        $this->transactionService->deleteScheduledBillTransactions($id);
+
+        $nextDue = $this->frequencyCalculator->calculateNextDueDate(
+            $bill->getFrequency(),
+            $bill->getDueDay(),
+            $bill->getDueMonth(),
+            $bill->getNextDueDate(),
+            $bill->getCustomRecurrencePattern()
+        );
+        $bill->setNextDueDate($nextDue);
+
+        // Deactivate if next due date exceeds end date
+        $endDate = $bill->getEndDate();
+        if ($endDate !== null && $bill->getNextDueDate() !== null && $bill->getNextDueDate() > $endDate) {
+            $bill->setIsActive(false);
+            $bill->setNextDueDate(null);
+        }
+
+        $bill = $this->mapper->update($bill);
+
+        // Create scheduled transaction for the new next occurrence
+        if ($bill->getIsActive() && $bill->getAccountId() !== null) {
+            try {
+                $nextTransaction = $this->transactionService->createFromBill($userId, $bill, null);
+                $this->applySplitTemplate($bill, $nextTransaction, $userId);
+            } catch (\Exception $e) {
+                error_log("Failed to create next transaction after skipping bill {$id}: {$e->getMessage()}");
+            }
+        }
+
+        return [
+            'bill' => $bill,
+            'previousNextDueDate' => $previousNextDueDate,
+        ];
+    }
+
+    /**
+     * Undo a skipped bill payment, reverting to the previous due date.
+     *
+     * @param int $id Bill ID
+     * @param string $userId User ID
+     * @param string $previousNextDueDate The due date to restore
+     * @return Bill Updated bill
+     */
+    public function undoSkip(int $id, string $userId, string $previousNextDueDate): Bill {
+        $bill = $this->find($id, $userId);
+
+        // Delete scheduled transaction for the advanced (wrong) date
+        $this->transactionService->deleteScheduledBillTransactions($id);
+
+        // Restore previous due date and reactivate if needed
+        $bill->setNextDueDate($previousNextDueDate);
+        if (!$bill->getIsActive() && $bill->getFrequency() !== 'one-time') {
+            $bill->setIsActive(true);
+        }
+
+        $bill = $this->mapper->update($bill);
+
+        // Recreate scheduled transaction for the restored date
+        if ($bill->getIsActive() && $bill->getAccountId() !== null) {
+            try {
+                $nextTransaction = $this->transactionService->createFromBill($userId, $bill, null);
+                $this->applySplitTemplate($bill, $nextTransaction, $userId);
+            } catch (\Exception $e) {
+                error_log("Failed to recreate transaction after undoing skip for bill {$id}: {$e->getMessage()}");
+            }
+        }
+
+        return $bill;
+    }
+
+    /**
      * Get monthly summary of bills.
      */
     public function getMonthlySummary(string $userId): array {

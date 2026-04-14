@@ -25331,7 +25331,7 @@ var BillsModule = /*#__PURE__*/function () {
           date: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatDate(endDate, _this.settings)
         }), "\" style=\"background: #6c757d; margin-left: 5px;\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Ends {date}', {
           date: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatDate(endDate, _this.settings)
-        }), "</span>") : '', "\n                        </div>\n                    </div>\n                    <div class=\"bill-actions\">\n                        ").concat(!isPaid ? "\n                            <button class=\"bill-action-btn bill-paid-btn\" data-bill-id=\"".concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Mark as paid'), "\">\n                                <span class=\"icon-checkmark\" aria-hidden=\"true\"></span>\n                                ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Mark Paid'), "\n                            </button>\n                        ") : '', "\n                        <button class=\"bill-action-btn bill-edit-btn\" data-bill-id=\"").concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Edit bill'), "\">\n                            <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                        </button>\n                        <button class=\"bill-action-btn bill-delete-btn\" data-bill-id=\"").concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Delete bill'), "\">\n                            <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                        </button>\n                    </div>\n                </div>\n            ");
+        }), "</span>") : '', "\n                        </div>\n                    </div>\n                    <div class=\"bill-actions\">\n                        ").concat(!isPaid ? "\n                            <button class=\"bill-action-btn bill-paid-btn\" data-bill-id=\"".concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Mark as paid'), "\">\n                                <span class=\"icon-checkmark\" aria-hidden=\"true\"></span>\n                                ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Mark Paid'), "\n                            </button>\n                        ") : '', "\n                        ").concat(!isPaid && frequency !== 'one-time' ? "\n                            <button class=\"bill-action-btn bill-skip-btn\" data-bill-id=\"".concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Skip this payment'), "\">\n                                <span aria-hidden=\"true\">&#x23ED;</span>\n                                ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Skip'), "\n                            </button>\n                        ") : '', "\n                        <button class=\"bill-action-btn bill-edit-btn\" data-bill-id=\"").concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Edit bill'), "\">\n                            <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                        </button>\n                        <button class=\"bill-action-btn bill-delete-btn\" data-bill-id=\"").concat(bill.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Delete bill'), "\">\n                            <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                        </button>\n                    </div>\n                </div>\n            ");
       }).join('');
     }
   }, {
@@ -25562,6 +25562,10 @@ var BillsModule = /*#__PURE__*/function () {
           var _button2 = e.target.classList.contains('bill-paid-btn') ? e.target : e.target.closest('.bill-paid-btn');
           var _billId2 = parseInt(_button2.dataset.billId);
           _this2.markBillPaid(_billId2);
+        } else if (e.target.classList.contains('bill-skip-btn') || e.target.closest('.bill-skip-btn')) {
+          var _button3 = e.target.classList.contains('bill-skip-btn') ? e.target : e.target.closest('.bill-skip-btn');
+          var _billId3 = parseInt(_button3.dataset.billId);
+          _this2.skipBillPayment(_billId3);
         }
       });
     }
@@ -26253,6 +26257,156 @@ var BillsModule = /*#__PURE__*/function () {
       return undoMarkBillPaid;
     }()
   }, {
+    key: "skipBillPayment",
+    value: function () {
+      var _skipBillPayment = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(billId) {
+        var _this6 = this;
+        var _result$previousNextD, bill, response, result, previousNextDueDate, _t8;
+        return _regenerator().w(function (_context8) {
+          while (1) switch (_context8.p = _context8.n) {
+            case 0:
+              _context8.p = 0;
+              bill = this.bills.find(function (b) {
+                return b.id === billId;
+              });
+              if (bill) {
+                _context8.n = 1;
+                break;
+              }
+              throw new Error('Bill not found');
+            case 1:
+              if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Skip this payment and advance to the next due date?'))) {
+                _context8.n = 2;
+                break;
+              }
+              return _context8.a(2);
+            case 2:
+              _context8.n = 3;
+              return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId, "/skip")), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 3:
+              response = _context8.v;
+              if (response.ok) {
+                _context8.n = 4;
+                break;
+              }
+              throw new Error("HTTP ".concat(response.status));
+            case 4:
+              _context8.n = 5;
+              return response.json();
+            case 5:
+              result = _context8.v;
+              previousNextDueDate = (_result$previousNextD = result.previousNextDueDate) !== null && _result$previousNextD !== void 0 ? _result$previousNextD : null;
+              this._undoData = {
+                billId: billId,
+                previousNextDueDate: previousNextDueDate,
+                action: 'skip'
+              };
+              _context8.n = 6;
+              return this.loadBillsView();
+            case 6:
+              if (this._undoTimer) {
+                clearTimeout(this._undoTimer);
+              }
+              this.showUndoNotification((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Payment skipped. Advanced to next due date.'), function () {
+                return _this6.undoSkipPayment();
+              });
+              this._undoTimer = setTimeout(function () {
+                _this6._undoData = null;
+                _this6._undoTimer = null;
+              }, 5000);
+              _context8.n = 8;
+              break;
+            case 7:
+              _context8.p = 7;
+              _t8 = _context8.v;
+              console.error('Failed to skip bill payment:', _t8);
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to skip bill payment'));
+            case 8:
+              return _context8.a(2);
+          }
+        }, _callee8, this, [[0, 7]]);
+      }));
+      function skipBillPayment(_x4) {
+        return _skipBillPayment.apply(this, arguments);
+      }
+      return skipBillPayment;
+    }()
+  }, {
+    key: "undoSkipPayment",
+    value: function () {
+      var _undoSkipPayment = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+        var _this$_undoData2, billId, previousNextDueDate, response, errorData, _t9;
+        return _regenerator().w(function (_context9) {
+          while (1) switch (_context9.p = _context9.n) {
+            case 0:
+              if (!(!this._undoData || this._undoData.action !== 'skip')) {
+                _context9.n = 1;
+                break;
+              }
+              return _context9.a(2);
+            case 1:
+              _context9.p = 1;
+              _this$_undoData2 = this._undoData, billId = _this$_undoData2.billId, previousNextDueDate = _this$_undoData2.previousNextDueDate;
+              if (this._undoTimer) {
+                clearTimeout(this._undoTimer);
+                this._undoTimer = null;
+              }
+              _context9.n = 2;
+              return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId, "/undo-skip")), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({
+                  previousNextDueDate: previousNextDueDate
+                })
+              });
+            case 2:
+              response = _context9.v;
+              if (response.ok) {
+                _context9.n = 4;
+                break;
+              }
+              _context9.n = 3;
+              return response.json()["catch"](function () {
+                return {};
+              });
+            case 3:
+              errorData = _context9.v;
+              throw new Error(errorData.error || "HTTP ".concat(response.status));
+            case 4:
+              this._undoData = null;
+              _context9.n = 5;
+              return this.loadBillsView();
+            case 5:
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Action undone'));
+              _context9.n = 7;
+              break;
+            case 6:
+              _context9.p = 6;
+              _t9 = _context9.v;
+              console.error('Failed to undo skip:', _t9);
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to undo action: {message}', {
+                message: _t9.message
+              }));
+            case 7:
+              return _context9.a(2);
+          }
+        }, _callee9, this, [[1, 6]]);
+      }));
+      function undoSkipPayment() {
+        return _undoSkipPayment.apply(this, arguments);
+      }
+      return undoSkipPayment;
+    }()
+  }, {
     key: "showUndoNotification",
     value: function showUndoNotification(message, undoCallback) {
       var notification = document.createElement('div');
@@ -26302,58 +26456,58 @@ var BillsModule = /*#__PURE__*/function () {
   }, {
     key: "detectBills",
     value: function () {
-      var _detectBills = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
-        var detectBtn, response, detected, _t8;
-        return _regenerator().w(function (_context8) {
-          while (1) switch (_context8.p = _context8.n) {
+      var _detectBills = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
+        var detectBtn, response, detected, _t0;
+        return _regenerator().w(function (_context0) {
+          while (1) switch (_context0.p = _context0.n) {
             case 0:
               detectBtn = document.getElementById('detect-bills-btn');
               detectBtn.disabled = true;
               detectBtn.innerHTML = "<span class=\"icon-loading-small\" aria-hidden=\"true\"></span> ".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Detecting...'));
-              _context8.p = 1;
-              _context8.n = 2;
+              _context0.p = 1;
+              _context0.n = 2;
               return fetch(OC.generateUrl('/apps/budget/api/bills/detect?months=6'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context8.v;
+              response = _context0.v;
               if (response.ok) {
-                _context8.n = 3;
+                _context0.n = 3;
                 break;
               }
               throw new Error("HTTP ".concat(response.status));
             case 3:
-              _context8.n = 4;
+              _context0.n = 4;
               return response.json();
             case 4:
-              detected = _context8.v;
+              detected = _context0.v;
               if (!(!detected || detected.length === 0)) {
-                _context8.n = 5;
+                _context0.n = 5;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showInfo)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'No recurring transactions detected'));
-              return _context8.a(2);
+              return _context0.a(2);
             case 5:
               this.renderDetectedBills(detected);
               document.getElementById('detected-bills-panel').style.display = 'flex';
-              _context8.n = 7;
+              _context0.n = 7;
               break;
             case 6:
-              _context8.p = 6;
-              _t8 = _context8.v;
-              console.error('Failed to detect bills:', _t8);
+              _context0.p = 6;
+              _t0 = _context0.v;
+              console.error('Failed to detect bills:', _t0);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to detect recurring bills'));
             case 7:
-              _context8.p = 7;
+              _context0.p = 7;
               detectBtn.disabled = false;
               detectBtn.innerHTML = "<span class=\"icon-search\" aria-hidden=\"true\"></span> ".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Detect Bills'));
-              return _context8.f(7);
+              return _context0.f(7);
             case 8:
-              return _context8.a(2);
+              return _context0.a(2);
           }
-        }, _callee8, this, [[1, 6, 7, 8]]);
+        }, _callee0, this, [[1, 6, 7, 8]]);
       }));
       function detectBills() {
         return _detectBills.apply(this, arguments);
@@ -26363,12 +26517,12 @@ var BillsModule = /*#__PURE__*/function () {
   }, {
     key: "renderDetectedBills",
     value: function renderDetectedBills(detected) {
-      var _this6 = this;
+      var _this7 = this;
       var list = document.getElementById('detected-bills-list');
       list.innerHTML = detected.map(function (item, index) {
         var confidenceClass = item.confidence >= 0.8 ? 'high' : item.confidence >= 0.5 ? 'medium' : 'low';
         var confidencePercent = Math.round(item.confidence * 100);
-        return "\n                <div class=\"detected-bill-item\" data-index=\"".concat(index, "\">\n                    <div class=\"detected-bill-select\">\n                        <input type=\"checkbox\" id=\"detected-").concat(index, "\" ").concat(item.confidence >= 0.7 ? 'checked' : '', ">\n                    </div>\n                    <div class=\"detected-bill-info\">\n                        <label for=\"detected-").concat(index, "\" class=\"detected-bill-name\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(item.description || item.name), "</label>\n                        <div class=\"detected-bill-meta\">\n                            <span class=\"detected-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(item.avgAmount || item.amount, null, _this6.settings), "</span>\n                            <span class=\"detected-frequency\">").concat(item.frequency, "</span>\n                            <span class=\"detected-confidence ").concat(confidenceClass, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{percent}% confidence', {
+        return "\n                <div class=\"detected-bill-item\" data-index=\"".concat(index, "\">\n                    <div class=\"detected-bill-select\">\n                        <input type=\"checkbox\" id=\"detected-").concat(index, "\" ").concat(item.confidence >= 0.7 ? 'checked' : '', ">\n                    </div>\n                    <div class=\"detected-bill-info\">\n                        <label for=\"detected-").concat(index, "\" class=\"detected-bill-name\">").concat(_utils_dom_js__WEBPACK_IMPORTED_MODULE_2__.escapeHtml(item.description || item.name), "</label>\n                        <div class=\"detected-bill-meta\">\n                            <span class=\"detected-amount\">").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.formatCurrency(item.avgAmount || item.amount, null, _this7.settings), "</span>\n                            <span class=\"detected-frequency\">").concat(item.frequency, "</span>\n                            <span class=\"detected-confidence ").concat(confidenceClass, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '{percent}% confidence', {
           percent: confidencePercent
         }), "</span>\n                        </div>\n                    </div>\n                </div>\n            ");
       }).join('');
@@ -26379,28 +26533,28 @@ var BillsModule = /*#__PURE__*/function () {
   }, {
     key: "addSelectedDetectedBills",
     value: function () {
-      var _addSelectedDetectedBills = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var _this7 = this;
-        var checkboxes, selectedIndices, billsToAdd, response, result, _t9;
-        return _regenerator().w(function (_context9) {
-          while (1) switch (_context9.p = _context9.n) {
+      var _addSelectedDetectedBills = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
+        var _this8 = this;
+        var checkboxes, selectedIndices, billsToAdd, response, result, _t1;
+        return _regenerator().w(function (_context1) {
+          while (1) switch (_context1.p = _context1.n) {
             case 0:
               checkboxes = document.querySelectorAll('#detected-bills-list input[type="checkbox"]:checked');
               selectedIndices = Array.from(checkboxes).map(function (cb) {
                 return parseInt(cb.id.replace('detected-', ''));
               });
               if (!(selectedIndices.length === 0)) {
-                _context9.n = 1;
+                _context1.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Please select at least one bill to add'));
-              return _context9.a(2);
+              return _context1.a(2);
             case 1:
               billsToAdd = selectedIndices.map(function (i) {
-                return _this7._detectedBills[i];
+                return _this8._detectedBills[i];
               });
-              _context9.p = 2;
-              _context9.n = 3;
+              _context1.p = 2;
+              _context1.n = 3;
               return fetch(OC.generateUrl('/apps/budget/api/bills/create-from-detected'), {
                 method: 'POST',
                 headers: {
@@ -26412,33 +26566,33 @@ var BillsModule = /*#__PURE__*/function () {
                 })
               });
             case 3:
-              response = _context9.v;
+              response = _context1.v;
               if (response.ok) {
-                _context9.n = 4;
+                _context1.n = 4;
                 break;
               }
               throw new Error("HTTP ".concat(response.status));
             case 4:
-              _context9.n = 5;
+              _context1.n = 5;
               return response.json();
             case 5:
-              result = _context9.v;
+              result = _context1.v;
               document.getElementById('detected-bills-panel').style.display = 'none';
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translatePlural)('budget', '%n bill added successfully', '%n bills added successfully', result.created));
-              _context9.n = 6;
+              _context1.n = 6;
               return this.loadBillsView();
             case 6:
-              _context9.n = 8;
+              _context1.n = 8;
               break;
             case 7:
-              _context9.p = 7;
-              _t9 = _context9.v;
-              console.error('Failed to add bills:', _t9);
+              _context1.p = 7;
+              _t1 = _context1.v;
+              console.error('Failed to add bills:', _t1);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to add selected bills'));
             case 8:
-              return _context9.a(2);
+              return _context1.a(2);
           }
-        }, _callee9, this, [[2, 7]]);
+        }, _callee1, this, [[2, 7]]);
       }));
       function addSelectedDetectedBills() {
         return _addSelectedDetectedBills.apply(this, arguments);
@@ -26476,7 +26630,7 @@ var BillsModule = /*#__PURE__*/function () {
   }, {
     key: "loadBillTagSets",
     value: (function () {
-      var _loadBillTagSets = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(categoryId) {
+      var _loadBillTagSets = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(categoryId) {
         var existingBill,
           container,
           _yield$Promise$all,
@@ -26487,21 +26641,21 @@ var BillsModule = /*#__PURE__*/function () {
           tagSets,
           existingTagIds,
           html,
-          _args0 = arguments,
-          _t0;
-        return _regenerator().w(function (_context0) {
-          while (1) switch (_context0.p = _context0.n) {
+          _args10 = arguments,
+          _t10;
+        return _regenerator().w(function (_context10) {
+          while (1) switch (_context10.p = _context10.n) {
             case 0:
-              existingBill = _args0.length > 1 && _args0[1] !== undefined ? _args0[1] : null;
+              existingBill = _args10.length > 1 && _args10[1] !== undefined ? _args10[1] : null;
               container = document.getElementById('bill-tags-container');
               if (container) {
-                _context0.n = 1;
+                _context10.n = 1;
                 break;
               }
-              return _context0.a(2);
+              return _context10.a(2);
             case 1:
-              _context0.p = 1;
-              _context0.n = 2;
+              _context10.p = 1;
+              _context10.n = 2;
               return Promise.all([fetch(OC.generateUrl('/apps/budget/api/tags/global'), {
                 headers: {
                   'requesttoken': OC.requestToken
@@ -26520,18 +26674,18 @@ var BillsModule = /*#__PURE__*/function () {
                 return [];
               }) : Promise.resolve([])]);
             case 2:
-              _yield$Promise$all = _context0.v;
+              _yield$Promise$all = _context10.v;
               _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 2);
               globalTagsResponse = _yield$Promise$all2[0];
               categoryTagSets = _yield$Promise$all2[1];
               globalTags = globalTagsResponse || [];
               tagSets = categoryTagSets || [];
               if (!(globalTags.length === 0 && tagSets.length === 0)) {
-                _context0.n = 3;
+                _context10.n = 3;
                 break;
               }
               container.innerHTML = '';
-              return _context0.a(2);
+              return _context10.a(2);
             case 3:
               // Get existing tag IDs if editing
               existingTagIds = (existingBill === null || existingBill === void 0 ? void 0 : existingBill.tagIds) || [];
@@ -26567,19 +26721,19 @@ var BillsModule = /*#__PURE__*/function () {
                   e.target.closest('.tag-option').querySelector('.tag-badge').style.opacity = e.target.checked ? '1' : '0.5';
                 });
               });
-              _context0.n = 5;
+              _context10.n = 5;
               break;
             case 4:
-              _context0.p = 4;
-              _t0 = _context0.v;
-              console.error('Failed to load tag sets:', _t0);
+              _context10.p = 4;
+              _t10 = _context10.v;
+              console.error('Failed to load tag sets:', _t10);
               container.innerHTML = '';
             case 5:
-              return _context0.a(2);
+              return _context10.a(2);
           }
-        }, _callee0, null, [[1, 4]]);
+        }, _callee10, null, [[1, 4]]);
       }));
-      function loadBillTagSets(_x4) {
+      function loadBillTagSets(_x5) {
         return _loadBillTagSets.apply(this, arguments);
       }
       return loadBillTagSets;

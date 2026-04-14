@@ -134,6 +134,8 @@ return [
         ['name' => 'bill#update', 'url' => '/api/bills/{id}', 'verb' => 'PUT'],
         ['name' => 'bill#destroy', 'url' => '/api/bills/{id}', 'verb' => 'DELETE'],
         ['name' => 'bill#markPaid', 'url' => '/api/bills/{id}/paid', 'verb' => 'POST'],
+        ['name' => 'bill#skipPayment', 'url' => '/api/bills/{id}/skip', 'verb' => 'POST'],
+        ['name' => 'bill#undoSkip', 'url' => '/api/bills/{id}/undo-skip', 'verb' => 'POST'],
 
         // Goals routes (Savings Goals)
         ['name' => 'goals#index', 'url' => '/api/goals', 'verb' => 'GET'],
