@@ -4001,63 +4001,33 @@ style('budget', 'budget-main');
                 </div>
             </div>
 
-            <!-- Balance Summary Cards -->
-            <div class="split-summary-header">
-                <div class="summary-card summary-card-owed">
-                    <div class="summary-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17V16H9V14H13V13H10A1,1 0 0,1 9,12V9A1,1 0 0,1 10,8H11V7H13V8H15V10H11V11H14A1,1 0 0,1 15,12V15A1,1 0 0,1 14,16H13V17H11Z"/>
-                        </svg>
-                    </div>
-                    <div class="summary-content">
-                        <span class="summary-label"><?php p($l->t('Others Owe You')); ?></span>
-                        <span id="split-total-owed" class="summary-value">£0.00</span>
-                    </div>
+            <!-- Compact Balance Bar -->
+            <div class="split-balance-bar">
+                <div class="split-balance-item">
+                    <span class="split-balance-label"><?php p($l->t('Owed to you')); ?></span>
+                    <span id="split-total-owed" class="split-balance-value positive">£0.00</span>
                 </div>
-                <div class="summary-card summary-card-owing">
-                    <div class="summary-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17V16H9V14H13V13H10A1,1 0 0,1 9,12V9A1,1 0 0,1 10,8H11V7H13V8H15V10H11V11H14A1,1 0 0,1 15,12V15A1,1 0 0,1 14,16H13V17H11Z"/>
-                        </svg>
-                    </div>
-                    <div class="summary-content">
-                        <span class="summary-label"><?php p($l->t('You Owe Others')); ?></span>
-                        <span id="split-total-owing" class="summary-value">£0.00</span>
-                    </div>
+                <div class="split-balance-divider"></div>
+                <div class="split-balance-item">
+                    <span class="split-balance-label"><?php p($l->t('You owe')); ?></span>
+                    <span id="split-total-owing" class="split-balance-value negative">£0.00</span>
                 </div>
-                <div class="summary-card summary-card-net">
-                    <div class="summary-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17V16H9V14H13V13H10A1,1 0 0,1 9,12V9A1,1 0 0,1 10,8H11V7H13V8H15V10H11V11H14A1,1 0 0,1 15,12V15A1,1 0 0,1 14,16H13V17H11Z"/>
-                        </svg>
-                    </div>
-                    <div class="summary-content">
-                        <span class="summary-label"><?php p($l->t('Net Balance')); ?></span>
-                        <span id="split-net-balance" class="summary-value">£0.00</span>
-                    </div>
+                <div class="split-balance-divider"></div>
+                <div class="split-balance-item">
+                    <span class="split-balance-label"><?php p($l->t('Net')); ?></span>
+                    <span id="split-net-balance" class="split-balance-value">£0.00</span>
                 </div>
             </div>
 
-            <!-- Contact Balances List -->
-            <div class="contacts-section">
-                <h3><?php p($l->t('Contacts')); ?></h3>
-                <div id="contacts-list" class="contacts-list">
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
-                                <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
-                            </svg>
-                        </div>
-                        <p><?php p($l->t('Add contacts to start splitting expenses')); ?></p>
+            <!-- Contact Grid -->
+            <div id="contacts-list" class="contacts-grid">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
+                            <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                        </svg>
                     </div>
-                </div>
-            </div>
-
-            <!-- Recent Shared Expenses -->
-            <div class="recent-shares-section">
-                <h3><?php p($l->t('Recent Shared Expenses')); ?></h3>
-                <div id="recent-shares-list" class="recent-shares-list">
-                    <div class="empty-state-small"><?php p($l->t('No shared expenses yet')); ?></div>
+                    <p><?php p($l->t('Add contacts to start splitting expenses')); ?></p>
                 </div>
             </div>
         </div>

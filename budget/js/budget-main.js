@@ -42500,7 +42500,7 @@ var SharedExpensesModule = /*#__PURE__*/function () {
     key: "loadBalanceSummary",
     value: function () {
       var _loadBalanceSummary = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var response, data, netBalance, netEl, _t;
+        var response, data, owedEl, owingEl, netBalance, netEl, _t;
         return _regenerator().w(function (_context2) {
           while (1) switch (_context2.p = _context2.n) {
             case 0:
@@ -42523,16 +42523,23 @@ var SharedExpensesModule = /*#__PURE__*/function () {
               return response.json();
             case 3:
               data = _context2.v;
-              document.getElementById('split-total-owed').textContent = this.formatCurrency(data.totalOwed);
-              document.getElementById('split-total-owing').textContent = this.formatCurrency(data.totalOwing);
+              owedEl = document.getElementById('split-total-owed');
+              if (owedEl) owedEl.textContent = this.formatCurrency(data.totalOwed);
+              owingEl = document.getElementById('split-total-owing');
+              if (owingEl) owingEl.textContent = this.formatCurrency(data.totalOwing);
               netBalance = data.netBalance;
               netEl = document.getElementById('split-net-balance');
-              netEl.textContent = this.formatCurrency(Math.abs(netBalance));
-              netEl.className = 'summary-value ' + (netBalance >= 0 ? 'positive' : 'negative');
-              if (netBalance > 0) {
-                netEl.textContent = '+' + netEl.textContent;
-              } else if (netBalance < 0) {
-                netEl.textContent = '-' + this.formatCurrency(Math.abs(netBalance));
+              if (netEl) {
+                if (netBalance > 0) {
+                  netEl.textContent = '+' + this.formatCurrency(netBalance);
+                  netEl.className = 'split-balance-value positive';
+                } else if (netBalance < 0) {
+                  netEl.textContent = '-' + this.formatCurrency(Math.abs(netBalance));
+                  netEl.className = 'split-balance-value negative';
+                } else {
+                  netEl.textContent = this.formatCurrency(0);
+                  netEl.className = 'split-balance-value';
+                }
               }
               this.splitContacts = data.contacts;
               this.renderContactsList(data.contacts);
@@ -42614,16 +42621,8 @@ var SharedExpensesModule = /*#__PURE__*/function () {
         }) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'You owe {amount}', {
           amount: _this.formatCurrency(Math.abs(balance))
         });
-        return "\n                <div class=\"contact-card\" data-contact-id=\"".concat(item.contact.id, "\">\n                    <div class=\"contact-card-main\">\n                        <div class=\"contact-avatar\">\n                            ").concat(item.contact.name.charAt(0).toUpperCase(), "\n                        </div>\n                        <div class=\"contact-info\">\n                            <span class=\"contact-name\">").concat(_this.escapeHtml(item.contact.name), "</span>\n                            ").concat(item.contact.email ? "<span class=\"contact-email\">".concat(_this.escapeHtml(item.contact.email), "</span>") : '', "\n                        </div>\n                        <div class=\"contact-balance ").concat(balanceClass, "\">\n                            ").concat(balanceText, "\n                        </div>\n                    </div>\n                    <div class=\"contact-actions\">\n                        <button class=\"action-btn view-contact-btn\" data-id=\"").concat(item.contact.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'View details'), "\">\n                            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\">\n                                <path d=\"M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z\"/>\n                            </svg>\n                        </button>\n                        <button class=\"action-btn edit-contact-btn\" data-id=\"").concat(item.contact.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Edit'), "\">\n                            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\">\n                                <path d=\"M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z\"/>\n                            </svg>\n                        </button>\n                        <button class=\"action-btn delete-contact-btn\" data-id=\"").concat(item.contact.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Delete'), "\">\n                            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\">\n                                <path d=\"M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z\"/>\n                            </svg>\n                        </button>\n                    </div>\n                </div>\n            ");
+        return "\n                <div class=\"contact-card\" data-contact-id=\"".concat(item.contact.id, "\">\n                    <div class=\"contact-card-main\">\n                        <div class=\"contact-avatar\">\n                            ").concat(item.contact.name.charAt(0).toUpperCase(), "\n                        </div>\n                        <div class=\"contact-info\">\n                            <span class=\"contact-name\">").concat(_this.escapeHtml(item.contact.name), "</span>\n                            ").concat(item.contact.email ? "<span class=\"contact-email\">".concat(_this.escapeHtml(item.contact.email), "</span>") : '', "\n                        </div>\n                        <div class=\"contact-balance ").concat(balanceClass, "\">\n                            ").concat(balanceText, "\n                        </div>\n                    </div>\n                    <div class=\"contact-actions-hover\">\n                        <button class=\"action-btn edit-contact-btn\" data-id=\"").concat(item.contact.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Edit'), "\">\n                            <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z\"/></svg>\n                        </button>\n                        <button class=\"action-btn delete-contact-btn\" data-id=\"").concat(item.contact.id, "\" title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Delete'), "\">\n                            <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z\"/></svg>\n                        </button>\n                    </div>\n                </div>\n            ");
       }).join('');
-
-      // Add click handlers
-      container.querySelectorAll('.view-contact-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          _this.showContactDetails(parseInt(btn.dataset.id));
-        });
-      });
       container.querySelectorAll('.edit-contact-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();

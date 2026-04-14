@@ -41,17 +41,25 @@ export default class SharedExpensesModule {
             if (!response.ok) throw new Error('Failed to load balances');
             const data = await response.json();
 
-            document.getElementById('split-total-owed').textContent = this.formatCurrency(data.totalOwed);
-            document.getElementById('split-total-owing').textContent = this.formatCurrency(data.totalOwing);
+            const owedEl = document.getElementById('split-total-owed');
+            if (owedEl) owedEl.textContent = this.formatCurrency(data.totalOwed);
+
+            const owingEl = document.getElementById('split-total-owing');
+            if (owingEl) owingEl.textContent = this.formatCurrency(data.totalOwing);
 
             const netBalance = data.netBalance;
             const netEl = document.getElementById('split-net-balance');
-            netEl.textContent = this.formatCurrency(Math.abs(netBalance));
-            netEl.className = 'summary-value ' + (netBalance >= 0 ? 'positive' : 'negative');
-            if (netBalance > 0) {
-                netEl.textContent = '+' + netEl.textContent;
-            } else if (netBalance < 0) {
-                netEl.textContent = '-' + this.formatCurrency(Math.abs(netBalance));
+            if (netEl) {
+                if (netBalance > 0) {
+                    netEl.textContent = '+' + this.formatCurrency(netBalance);
+                    netEl.className = 'split-balance-value positive';
+                } else if (netBalance < 0) {
+                    netEl.textContent = '-' + this.formatCurrency(Math.abs(netBalance));
+                    netEl.className = 'split-balance-value negative';
+                } else {
+                    netEl.textContent = this.formatCurrency(0);
+                    netEl.className = 'split-balance-value';
+                }
             }
 
             this.splitContacts = data.contacts;
@@ -112,34 +120,17 @@ export default class SharedExpensesModule {
                             ${balanceText}
                         </div>
                     </div>
-                    <div class="contact-actions">
-                        <button class="action-btn view-contact-btn" data-id="${item.contact.id}" title="${t('budget', 'View details')}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-                            </svg>
-                        </button>
+                    <div class="contact-actions-hover">
                         <button class="action-btn edit-contact-btn" data-id="${item.contact.id}" title="${t('budget', 'Edit')}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
-                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
                         </button>
                         <button class="action-btn delete-contact-btn" data-id="${item.contact.id}" title="${t('budget', 'Delete')}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
-                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>
                         </button>
                     </div>
                 </div>
             `;
         }).join('');
-
-        // Add click handlers
-        container.querySelectorAll('.view-contact-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.showContactDetails(parseInt(btn.dataset.id));
-            });
-        });
 
         container.querySelectorAll('.edit-contact-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {

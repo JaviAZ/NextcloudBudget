@@ -12833,6 +12833,58 @@ tr.scheduled-transaction:hover {
    Split Expenses / Shared Budgeting
    ========================================== */
 
+/* ===== Shared Expenses - Balance Bar ===== */
+.split-balance-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--color-main-background);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+}
+
+.split-balance-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 2px;
+}
+
+.split-balance-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-maxcontrast);
+    font-weight: 500;
+}
+
+.split-balance-value {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.split-balance-value.positive { color: var(--budget-color-positive, #46ba61); }
+.split-balance-value.negative { color: var(--budget-color-negative, #e9322d); }
+
+.split-balance-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--color-border, #ededed);
+    margin: 0 8px;
+}
+
+/* ===== Shared Expenses - Contact Grid ===== */
+.contacts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+}
+
+/* Old classes kept for compat */
 .split-summary-header {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -12909,6 +12961,47 @@ tr.scheduled-transaction:hover {
     font-weight: 600;
 }
 
+/* Hover-reveal action buttons */
+.contact-actions-hover {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.contact-card:hover .contact-actions-hover {
+    opacity: 1;
+}
+
+.contact-actions-hover .action-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: var(--color-main-background);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    color: var(--color-text-maxcontrast);
+    transition: all 0.15s;
+}
+
+.contact-actions-hover .action-btn:hover {
+    color: var(--color-main-text);
+    border-color: var(--color-main-text);
+}
+
+.contact-actions-hover .delete-contact-btn:hover {
+    color: var(--budget-color-negative, #e9322d);
+    border-color: var(--budget-color-negative, #e9322d);
+    background: rgba(233, 50, 45, 0.06);
+}
+
 .contacts-list {
     display: flex;
     flex-direction: column;
@@ -12916,6 +13009,7 @@ tr.scheduled-transaction:hover {
 }
 
 .contact-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     background: var(--color-main-background);
@@ -12987,12 +13081,7 @@ tr.scheduled-transaction:hover {
 }
 
 .contact-card .contact-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--color-border);
-    justify-content: flex-end;
+    display: none;
 }
 
 /* Contact Details Modal */
