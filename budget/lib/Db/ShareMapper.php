@@ -107,15 +107,40 @@ class ShareMapper extends QBMapper {
 
     /**
      * Delete all shares for a user (both as owner and recipient).
+     * Also deletes associated share items to avoid orphaned rows.
      * Used by factory reset.
      */
     public function deleteAllForUser(string $userId): void {
+        // First collect share IDs to cascade delete share items
         $qb = $this->db->getQueryBuilder();
-        $qb->delete($this->getTableName())
+        $qb->select('id')
+            ->from($this->getTableName())
             ->where($qb->expr()->orX(
                 $qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
                 $qb->expr()->eq('shared_with_user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
             ));
-        $qb->executeStatement();
+        $result = $qb->executeQuery();
+        $shareIds = [];
+        while ($row = $result->fetch()) {
+            $shareIds[] = (int) $row['id'];
+        }
+        $result->closeCursor();
+
+        // Delete share items for those shares
+        if (!empty($shareIds)) {
+            $delQb = $this->db->getQueryBuilder();
+            $delQb->delete('budget_share_items')
+                ->where($delQb->expr()->in('share_id', $delQb->createNamedParameter($shareIds, IQueryBuilder::PARAM_INT_ARRAY)));
+            $delQb->executeStatement();
+        }
+
+        // Delete the shares themselves
+        $qb2 = $this->db->getQueryBuilder();
+        $qb2->delete($this->getTableName())
+            ->where($qb2->expr()->orX(
+                $qb2->expr()->eq('owner_user_id', $qb2->createNamedParameter($userId, IQueryBuilder::PARAM_STR)),
+                $qb2->expr()->eq('shared_with_user_id', $qb2->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+            ));
+        $qb2->executeStatement();
     }
 }

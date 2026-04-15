@@ -39,7 +39,7 @@ class ShareItemMapper extends QBMapper {
         $qb->select('*')
             ->from($this->getTableName())
             ->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)));
+            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)));
         return $this->findEntities($qb);
     }
 
@@ -53,7 +53,7 @@ class ShareItemMapper extends QBMapper {
         $qb->select('entity_id')
             ->from($this->getTableName())
             ->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)));
+            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)));
 
         $result = $qb->executeQuery();
         $ids = [];
@@ -74,7 +74,7 @@ class ShareItemMapper extends QBMapper {
         $qb->select('entity_id', 'permission')
             ->from($this->getTableName())
             ->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)));
+            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)));
 
         $result = $qb->executeQuery();
         $permissions = [];
@@ -93,7 +93,7 @@ class ShareItemMapper extends QBMapper {
         $qb->select($qb->func()->count('*', 'cnt'))
             ->from($this->getTableName())
             ->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)))
+            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)))
             ->andWhere($qb->expr()->eq('entity_id', $qb->createNamedParameter($entityId, IQueryBuilder::PARAM_INT)));
 
         $result = $qb->executeQuery();
@@ -110,7 +110,7 @@ class ShareItemMapper extends QBMapper {
         $qb->select('permission')
             ->from($this->getTableName())
             ->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)))
+            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)))
             ->andWhere($qb->expr()->eq('entity_id', $qb->createNamedParameter($entityId, IQueryBuilder::PARAM_INT)));
 
         $result = $qb->executeQuery();
@@ -168,7 +168,7 @@ class ShareItemMapper extends QBMapper {
         $qb = $this->db->getQueryBuilder();
         $qb->delete($this->getTableName())
             ->where($qb->expr()->eq('share_id', $qb->createNamedParameter($shareId, IQueryBuilder::PARAM_INT)))
-            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)));
+            ->andWhere($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)));
         $qb->executeStatement();
     }
 
@@ -178,7 +178,7 @@ class ShareItemMapper extends QBMapper {
     public function deleteByEntity(string $entityType, int $entityId): void {
         $qb = $this->db->getQueryBuilder();
         $qb->delete($this->getTableName())
-            ->where($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType)))
+            ->where($qb->expr()->eq('entity_type', $qb->createNamedParameter($entityType, IQueryBuilder::PARAM_STR)))
             ->andWhere($qb->expr()->eq('entity_id', $qb->createNamedParameter($entityId, IQueryBuilder::PARAM_INT)));
         $qb->executeStatement();
     }
