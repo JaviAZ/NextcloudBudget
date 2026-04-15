@@ -29375,7 +29375,7 @@ var DashboardModule = /*#__PURE__*/function () {
               this.updateBudgetAlertsWidget(budgetAlerts);
 
               // Update Recent Transactions
-              this.updateRecentTransactions(transactions);
+              this.updateRecentTransactions(transactions.transactions || transactions);
 
               // Update Upcoming Bills Widget
               this.updateUpcomingBillsWidget(bills);
@@ -31264,7 +31264,7 @@ var DashboardModule = /*#__PURE__*/function () {
         var accountId,
           url,
           response,
-          transactions,
+          data,
           _args18 = arguments,
           _t15;
         return _regenerator().w(function (_context18) {
@@ -31293,8 +31293,8 @@ var DashboardModule = /*#__PURE__*/function () {
               _context18.n = 4;
               return response.json();
             case 4:
-              transactions = _context18.v;
-              this.updateRecentTransactions(transactions);
+              data = _context18.v;
+              this.updateRecentTransactions(data.transactions || data);
               _context18.n = 6;
               break;
             case 5:

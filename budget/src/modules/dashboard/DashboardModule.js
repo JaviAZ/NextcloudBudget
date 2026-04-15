@@ -181,7 +181,7 @@ export default class DashboardModule {
             this.updateBudgetAlertsWidget(budgetAlerts);
 
             // Update Recent Transactions
-            this.updateRecentTransactions(transactions);
+            this.updateRecentTransactions(transactions.transactions || transactions);
 
             // Update Upcoming Bills Widget
             this.updateUpcomingBillsWidget(bills);
@@ -1878,8 +1878,8 @@ export default class DashboardModule {
                 { headers: { 'requesttoken': OC.requestToken } }
             );
             if (!response.ok) throw new Error('Failed to fetch recent transactions');
-            const transactions = await response.json();
-            this.updateRecentTransactions(transactions);
+            const data = await response.json();
+            this.updateRecentTransactions(data.transactions || data);
         } catch (error) {
             console.error('Failed to refresh recent transactions:', error);
         }
