@@ -8,7 +8,7 @@ use OCA\Budget\AppInfo\Application;
 use OCA\Budget\Db\PensionAccount;
 use OCA\Budget\Service\PensionProjector;
 use OCA\Budget\Service\PensionService;
-use OCA\Budget\Service\ShareService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;

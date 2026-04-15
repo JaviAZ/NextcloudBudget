@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OCA\Budget\Controller;
 
 use OCA\Budget\AppInfo\Application;
-use OCA\Budget\Service\ShareService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\YearOverYearService;
 use OCA\Budget\Traits\SharedAccessTrait;
 use OCP\AppFramework\Controller;
