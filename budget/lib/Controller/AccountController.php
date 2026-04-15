@@ -7,9 +7,11 @@ namespace OCA\Budget\Controller;
 use OCA\Budget\AppInfo\Application;
 use OCA\Budget\Service\AccountService;
 use OCA\Budget\Service\AuditService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;
+use OCA\Budget\Traits\SharedAccessTrait;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Http;
@@ -23,6 +25,7 @@ use Psr\Log\LoggerInterface;
 class AccountController extends Controller {
     use ApiErrorHandlerTrait;
     use InputValidationTrait;
+    use SharedAccessTrait;
 
     private AccountService $service;
     private ValidationService $validationService;
@@ -35,6 +38,7 @@ class AccountController extends Controller {
         AccountService $service,
         ValidationService $validationService,
         AuditService $auditService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -47,6 +51,7 @@ class AccountController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -54,8 +59,15 @@ class AccountController extends Controller {
      */
     public function index(): DataResponse {
         try {
-            // Return accounts with balances adjusted to exclude future transactions
+            // Own accounts with balance adjustments
             $accounts = $this->service->findAllWithCurrentBalances($this->userId);
+
+            // Merge in shared accounts
+            $shared = $this->granularShareService->getSharedAccounts($this->userId);
+            if (!empty($shared)) {
+                $accounts = array_merge($accounts, $shared);
+            }
+
             return new DataResponse($accounts);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve accounts'));
@@ -67,8 +79,16 @@ class AccountController extends Controller {
      */
     public function show(int $id): DataResponse {
         try {
-            // Return account with balance adjusted to exclude future transactions
-            $account = $this->service->findWithCurrentBalance($id, $this->userId);
+            if (!$this->canAccessEntity('account', $id)) {
+                return new DataResponse(['error' => $this->l->t('Account not found')], Http::STATUS_NOT_FOUND);
+            }
+            // Try own account first, fall back to shared
+            try {
+                $account = $this->service->findWithCurrentBalance($id, $this->userId);
+            } catch (\Exception $e) {
+                $account = $this->service->findByIdsAsArrays([$id])[0] ?? null;
+                if (!$account) throw $e;
+            }
             return new DataResponse($account);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Account'), ['accountId' => $id]);
@@ -206,7 +226,7 @@ class AccountController extends Controller {
 
             // Create the account
             $account = $this->service->create(
-                $this->userId,
+                $this->getEffectiveUserId(),
                 $name,
                 $typeValidation['formatted'],
                 $balance,
@@ -227,7 +247,7 @@ class AccountController extends Controller {
             );
 
             // Audit log the account creation
-            $this->auditService->logAccountCreated($this->userId, $account->getId(), $name);
+            $this->auditService->logAccountCreated($this->getEffectiveUserId(), $account->getId(), $name);
 
             return new DataResponse($account, Http::STATUS_CREATED);
 
@@ -242,6 +262,8 @@ class AccountController extends Controller {
     #[UserRateLimit(limit: 30, period: 60)]
     public function update(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('account', $id);
+
             // Get JSON data from request body
             $data = json_decode(file_get_contents('php://input'), true);
 
@@ -396,10 +418,10 @@ class AccountController extends Controller {
                 return new DataResponse(['error' => $this->l->t('No valid fields to update')], Http::STATUS_BAD_REQUEST);
             }
 
-            $account = $this->service->update($id, $this->userId, $updates);
+            $account = $this->service->update($id, $this->getEffectiveUserId(), $updates);
 
             // Audit log the update
-            $this->auditService->logAccountUpdated($this->userId, $id, $updates);
+            $this->auditService->logAccountUpdated($this->getEffectiveUserId(), $id, $updates);
 
             return new DataResponse($account);
         } catch (\Exception $e) {
@@ -413,14 +435,16 @@ class AccountController extends Controller {
     #[UserRateLimit(limit: 10, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('account', $id);
+
             // Get account name before deletion for audit log
-            $account = $this->service->find($id, $this->userId);
+            $account = $this->service->find($id, $this->getEffectiveUserId());
             $accountName = $account->getName();
 
-            $this->service->delete($id, $this->userId);
+            $this->service->delete($id, $this->getEffectiveUserId());
 
             // Audit log the deletion
-            $this->auditService->logAccountDeleted($this->userId, $id, $accountName);
+            $this->auditService->logAccountDeleted($this->getEffectiveUserId(), $id, $accountName);
 
             return new DataResponse(['status' => 'success']);
         } catch (DoesNotExistException $e) {
@@ -440,6 +464,11 @@ class AccountController extends Controller {
     #[UserRateLimit(limit: 10, period: 60)]
     public function reveal(int $id): DataResponse {
         try {
+            // Only account owners can reveal sensitive data — never shared users
+            $ownIds = $this->granularShareService->getOwnAccountIds($this->userId);
+            if (!in_array($id, $ownIds, true)) {
+                return new DataResponse(['error' => $this->l->t('Account not found')], Http::STATUS_NOT_FOUND);
+            }
             $account = $this->service->find($id, $this->userId);
 
             // Check if account has sensitive data to reveal
@@ -451,7 +480,7 @@ class AccountController extends Controller {
 
             // Audit log the reveal action
             $this->auditService->logAccountRevealed(
-                $this->userId,
+                $this->getEffectiveUserId(),
                 $id,
                 $account->getPopulatedSensitiveFields()
             );
@@ -468,7 +497,7 @@ class AccountController extends Controller {
      */
     public function summary(): DataResponse {
         try {
-            $summary = $this->service->getSummary($this->userId);
+            $summary = $this->service->getSummary($this->getEffectiveUserId());
             return new DataResponse($summary);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve account summary'));
@@ -528,7 +557,7 @@ class AccountController extends Controller {
      */
     public function getBalanceHistory(int $id, int $days = 30): DataResponse {
         try {
-            $history = $this->service->getBalanceHistory($id, $this->userId, $days);
+            $history = $this->service->getBalanceHistory($id, $this->getEffectiveUserId(), $days);
             return new DataResponse($history);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Account'), ['accountId' => $id]);
@@ -540,7 +569,8 @@ class AccountController extends Controller {
      */
     public function reconcile(int $id, float $statementBalance): DataResponse {
         try {
-            $result = $this->service->reconcile($id, $this->userId, $statementBalance);
+            $this->requireWriteAccess('account', $id);
+            $result = $this->service->reconcile($id, $this->getEffectiveUserId(), $statementBalance);
             return new DataResponse($result);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to reconcile account'), Http::STATUS_BAD_REQUEST, ['accountId' => $id]);

@@ -244,8 +244,11 @@ class CategoryService extends AbstractCrudService {
         return $this->getCategoryMapper()->getCategorySpending($categoryId, $startDate, $endDate);
     }
 
-    public function getAllCategorySpending(string $userId, string $startDate, string $endDate): array {
-        $summary = $this->transactionMapper->getSpendingSummary($userId, $startDate, $endDate);
+    /**
+     * @param int[]|null $visibleAccountIds If provided, scope by account IDs for cross-user aggregation
+     */
+    public function getAllCategorySpending(string $userId, string $startDate, string $endDate, ?array $visibleAccountIds = null): array {
+        $summary = $this->transactionMapper->getSpendingSummary($userId, $startDate, $endDate, null, [], true, false, $visibleAccountIds);
 
         return array_map(fn($item) => [
             'categoryId' => (int)$item['id'],

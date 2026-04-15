@@ -44,6 +44,26 @@ class SavingsGoalMapper extends QBMapper {
     }
 
     /**
+     * Find multiple savings goals by IDs without user scoping.
+     * IDs are pre-authorized by GranularShareService.
+     *
+     * @param int[] $ids
+     * @return SavingsGoal[]
+     */
+    public function findByIds(array $ids): array {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+
+        return $this->findEntities($qb);
+    }
+
+    /**
      * Delete all savings goals for a user
      *
      * @param string $userId

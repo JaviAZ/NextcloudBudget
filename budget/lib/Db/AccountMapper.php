@@ -68,6 +68,26 @@ class AccountMapper extends QBMapper {
     }
 
     /**
+     * Find multiple accounts by IDs without user scoping.
+     * IDs are pre-authorized by GranularShareService.
+     *
+     * @param int[] $ids
+     * @return Account[]
+     */
+    public function findByIds(array $ids): array {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+
+        return $this->decryptEntities($this->findEntities($qb));
+    }
+
+    /**
      * Calculate total balance for user across all accounts
      */
     public function getTotalBalance(string $userId, ?string $currency = null): float {

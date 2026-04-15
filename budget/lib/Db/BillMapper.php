@@ -45,6 +45,26 @@ class BillMapper extends QBMapper {
     }
 
     /**
+     * Find multiple bills by IDs without user scoping.
+     * IDs are pre-authorized by GranularShareService.
+     *
+     * @param int[] $ids
+     * @return Bill[]
+     */
+    public function findByIds(array $ids): array {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+
+        return $this->findEntities($qb);
+    }
+
+    /**
      * @return Bill[]
      */
     public function findActive(string $userId): array {

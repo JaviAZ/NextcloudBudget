@@ -6,9 +6,11 @@ namespace OCA\Budget\Controller;
 
 use OCA\Budget\AppInfo\Application;
 use OCA\Budget\Service\CategoryService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;
+use OCA\Budget\Traits\SharedAccessTrait;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
@@ -20,6 +22,7 @@ use Psr\Log\LoggerInterface;
 class CategoryController extends Controller {
     use ApiErrorHandlerTrait;
     use InputValidationTrait;
+    use SharedAccessTrait;
 
     private CategoryService $service;
     private ValidationService $validationService;
@@ -30,6 +33,7 @@ class CategoryController extends Controller {
         IRequest $request,
         CategoryService $service,
         ValidationService $validationService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -41,6 +45,7 @@ class CategoryController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -53,6 +58,19 @@ class CategoryController extends Controller {
             } else {
                 $categories = $this->service->findAll($this->userId);
             }
+
+            // Always merge shared categories (marked with _shared flag)
+            $shared = $this->granularShareService->getSharedCategories($this->userId);
+            if (!empty($shared)) {
+                if ($type) {
+                    $shared = array_filter($shared, fn($c) => ($c['type'] ?? '') === $type);
+                }
+                $categories = array_merge(
+                    array_map(fn($c) => $c->jsonSerialize(), $categories),
+                    array_values($shared)
+                );
+            }
+
             return new DataResponse($categories);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve categories'));
@@ -65,6 +83,31 @@ class CategoryController extends Controller {
     public function tree(): DataResponse {
         try {
             $tree = $this->service->getCategoryTree($this->userId);
+
+            // Always merge shared categories (marked with _shared flag)
+            $shared = $this->granularShareService->getSharedCategories($this->userId);
+            if (!empty($shared)) {
+                // Index by ID and build parent-child hierarchy
+                $byId = [];
+                foreach ($shared as $cat) {
+                    $cat['children'] = [];
+                    $byId[$cat['id']] = $cat;
+                }
+
+                $sharedTree = [];
+                foreach ($byId as $id => &$cat) {
+                    $parentId = $cat['parentId'] ?? null;
+                    if ($parentId && isset($byId[$parentId])) {
+                        $byId[$parentId]['children'][] = &$cat;
+                    } else {
+                        $sharedTree[] = &$cat;
+                    }
+                }
+                unset($cat);
+
+                $tree = array_merge($tree, $sharedTree);
+            }
+
             return new DataResponse($tree);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve category tree'));
@@ -76,7 +119,7 @@ class CategoryController extends Controller {
      */
     public function transactionCounts(): DataResponse {
         try {
-            $counts = $this->service->getCategoryTransactionCounts($this->userId);
+            $counts = $this->service->getCategoryTransactionCounts($this->getEffectiveUserId());
             return new DataResponse($counts);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve transaction counts'));
@@ -88,7 +131,7 @@ class CategoryController extends Controller {
      */
     public function show(int $id): DataResponse {
         try {
-            $category = $this->service->find($id, $this->userId);
+            $category = $this->service->find($id, $this->getEffectiveUserId());
             return new DataResponse($category);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Category'), ['categoryId' => $id]);
@@ -140,7 +183,7 @@ class CategoryController extends Controller {
             }
 
             $category = $this->service->create(
-                $this->userId,
+                $this->getEffectiveUserId(),
                 $name,
                 $type,
                 $parentId,
@@ -171,6 +214,8 @@ class CategoryController extends Controller {
         ?int $sortOrder = null
     ): DataResponse {
         try {
+            $this->requireWriteAccess('category', $id);
+
             $updates = [];
 
             // Validate name if provided
@@ -233,7 +278,7 @@ class CategoryController extends Controller {
                 return new DataResponse(['error' => $this->l->t('No valid fields to update')], Http::STATUS_BAD_REQUEST);
             }
 
-            $category = $this->service->update($id, $this->userId, $updates);
+            $category = $this->service->update($id, $this->getEffectiveUserId(), $updates);
             return new DataResponse($category);
         } catch (\Exception $e) {
             return $this->handleValidationError($e);
@@ -246,7 +291,8 @@ class CategoryController extends Controller {
     #[UserRateLimit(limit: 20, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
-            $this->service->delete($id, $this->userId);
+            $this->requireWriteAccess('category', $id);
+            $this->service->delete($id, $this->getEffectiveUserId());
             return new DataResponse(['status' => 'success']);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to delete category'), Http::STATUS_BAD_REQUEST, ['categoryId' => $id]);
@@ -258,7 +304,8 @@ class CategoryController extends Controller {
      */
     public function allSpending(string $startDate, string $endDate): DataResponse {
         try {
-            $spending = $this->service->getAllCategorySpending($this->userId, $startDate, $endDate);
+            $visibleAccountIds = $this->getVisibleAccountIds();
+            $spending = $this->service->getAllCategorySpending($this->userId, $startDate, $endDate, $visibleAccountIds);
             return new DataResponse($spending);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve category spending'));
@@ -270,7 +317,7 @@ class CategoryController extends Controller {
      */
     public function spending(int $id, string $startDate, string $endDate): DataResponse {
         try {
-            $spending = $this->service->getCategorySpending($id, $this->userId, $startDate, $endDate);
+            $spending = $this->service->getCategorySpending($id, $this->getEffectiveUserId(), $startDate, $endDate);
             return new DataResponse(['spending' => $spending]);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve category spending'), Http::STATUS_BAD_REQUEST, ['categoryId' => $id]);
@@ -282,7 +329,7 @@ class CategoryController extends Controller {
      */
     public function details(int $id): DataResponse {
         try {
-            $details = $this->service->getCategoryDetails($id, $this->userId);
+            $details = $this->service->getCategoryDetails($id, $this->getEffectiveUserId());
             return new DataResponse($details);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Category'), ['categoryId' => $id]);
@@ -294,7 +341,7 @@ class CategoryController extends Controller {
      */
     public function transactions(int $id, int $limit = 5): DataResponse {
         try {
-            $transactions = $this->service->getCategoryTransactions($id, $this->userId, $limit);
+            $transactions = $this->service->getCategoryTransactions($id, $this->getEffectiveUserId(), $limit);
             return new DataResponse($transactions);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Category'), ['categoryId' => $id]);

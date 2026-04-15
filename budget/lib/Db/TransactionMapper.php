@@ -21,6 +21,20 @@ class TransactionMapper extends QBMapper {
     }
 
     /**
+     * Apply user scope to a query — either by userId or by visible account IDs.
+     * Used for granular sharing where the user can see specific shared accounts.
+     *
+     * @param int[]|null $visibleAccountIds If provided, scope by account IDs instead of userId
+     */
+    private function applyUserScope(IQueryBuilder $qb, string $userId, ?array $visibleAccountIds = null): void {
+        if ($visibleAccountIds !== null && !empty($visibleAccountIds)) {
+            $qb->andWhere($qb->expr()->in('a.id', $qb->createNamedParameter($visibleAccountIds, IQueryBuilder::PARAM_INT_ARRAY)));
+        } else {
+            $qb->andWhere($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)));
+        }
+    }
+
+    /**
      * @throws DoesNotExistException
      */
     public function find(int $id, string $userId): Transaction {
@@ -30,7 +44,23 @@ class TransactionMapper extends QBMapper {
             ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
             ->where($qb->expr()->eq('t.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
             ->andWhere($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)));
-        
+
+        return $this->findEntity($qb);
+    }
+
+    /**
+     * Find a transaction by ID scoped to visible account IDs (for shared access).
+     *
+     * @param int[] $visibleAccountIds
+     * @throws DoesNotExistException
+     */
+    public function findForAccounts(int $id, array $visibleAccountIds): Transaction {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('t.*')
+            ->from($this->getTableName(), 't')
+            ->where($qb->expr()->eq('t.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->in('t.account_id', $qb->createNamedParameter($visibleAccountIds, IQueryBuilder::PARAM_INT_ARRAY)));
+
         return $this->findEntity($qb);
     }
 
@@ -271,13 +301,17 @@ class TransactionMapper extends QBMapper {
     /**
      * Find transactions with filters, pagination and sorting
      */
-    public function findWithFilters(string $userId, array $filters, int $limit, int $offset): array {
+    /**
+     * @param int[]|null $visibleAccountIds If provided, scope by account IDs instead of userId (for shared access)
+     */
+    public function findWithFilters(string $userId, array $filters, int $limit, int $offset, ?array $visibleAccountIds = null): array {
         // Main query
         $qb = $this->db->getQueryBuilder();
         $qb->select('t.*')
             ->from($this->getTableName(), 't')
-            ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
-            ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)));
+            ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'));
+
+        $this->applyUserScope($qb, $userId, $visibleAccountIds);
 
         // Apply filters using the filter builder
         $this->filterBuilder->applyTransactionFilters($qb, $filters, 't');
@@ -286,8 +320,9 @@ class TransactionMapper extends QBMapper {
         $countQb = $this->db->getQueryBuilder();
         $countQb->select($countQb->func()->count('t.id'))
             ->from($this->getTableName(), 't')
-            ->innerJoin('t', 'budget_accounts', 'a', $countQb->expr()->eq('t.account_id', 'a.id'))
-            ->where($countQb->expr()->eq('a.user_id', $countQb->createNamedParameter($userId)));
+            ->innerJoin('t', 'budget_accounts', 'a', $countQb->expr()->eq('t.account_id', 'a.id'));
+
+        $this->applyUserScope($countQb, $userId, $visibleAccountIds);
 
         // Apply same filters to count query
         $this->filterBuilder->applyTransactionFilters($countQb, $filters, 't');
@@ -356,6 +391,9 @@ class TransactionMapper extends QBMapper {
      * @param int[] $tagIds Optional tag filter (OR logic)
      * @param bool $includeUntagged Include untagged transactions when filtering by tags
      */
+    /**
+     * @param int[]|null $visibleAccountIds If provided, scope by account IDs instead of userId
+     */
     public function getSpendingSummary(
         string $userId,
         string $startDate,
@@ -363,7 +401,8 @@ class TransactionMapper extends QBMapper {
         ?int $accountId = null,
         array $tagIds = [],
         bool $includeUntagged = true,
-        bool $excludeTransfers = false
+        bool $excludeTransfers = false,
+        ?array $visibleAccountIds = null
     ): array {
         $qb = $this->db->getQueryBuilder();
         $qb->select('c.id', 'c.name', 'c.color', 'c.icon')
@@ -371,9 +410,11 @@ class TransactionMapper extends QBMapper {
             ->selectAlias($qb->createFunction('COUNT(DISTINCT t.id)'), 'count')
             ->from($this->getTableName(), 't')
             ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
-            ->innerJoin('t', 'budget_categories', 'c', $qb->expr()->eq('t.category_id', 'c.id'))
-            ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)))
-            ->andWhere($qb->expr()->gte('t.date', $qb->createNamedParameter($startDate)))
+            ->innerJoin('t', 'budget_categories', 'c', $qb->expr()->eq('t.category_id', 'c.id'));
+
+        $this->applyUserScope($qb, $userId, $visibleAccountIds);
+
+        $qb->andWhere($qb->expr()->gte('t.date', $qb->createNamedParameter($startDate)))
             ->andWhere($qb->expr()->lte('t.date', $qb->createNamedParameter($endDate)))
             ->andWhere($qb->expr()->eq('t.type', $qb->createNamedParameter('debit')));
 

@@ -81,12 +81,14 @@ export default class CategoriesModule {
                 }),
             ]);
             if (treeResponse.ok) {
-                this.categoryTree = await treeResponse.json();
-                this.allCategories = this.flattenCategories(this.categoryTree);
-                // Sync to app-level state so other modules (e.g. TransactionsModule) can access it
-                this.app.categoryTree = this.categoryTree;
-                this.app.allCategories = this.allCategories;
-                this.app.categories = this.allCategories;
+                const fullTree = await treeResponse.json();
+                // Merge own + shared for dropdowns and budget view
+                const mergedTree = this.mergeCategoryTree(fullTree);
+                this.app.categoryTree = mergedTree;
+                this.app.allCategories = this.flattenCategories(mergedTree);
+                this.app.categories = this.app.allCategories;
+                // For the management view, show only own categories
+                this.managementTree = fullTree.filter(cat => !cat._shared);
             }
             if (countsResponse.ok) {
                 this.serverTransactionCounts = await countsResponse.json();
@@ -197,15 +199,16 @@ export default class CategoriesModule {
 
         if (!treeContainer) return;
 
-        // Handle case where categoryTree is not loaded or empty
-        if (!this.categoryTree || !Array.isArray(this.categoryTree) || this.categoryTree.length === 0) {
+        // Use management tree (own categories only, no shared) for the management page
+        const tree = this.managementTree || this.categoryTree;
+        if (!tree || !Array.isArray(tree) || tree.length === 0) {
             treeContainer.innerHTML = '';
             if (emptyState) emptyState.style.display = 'block';
             return;
         }
 
         // Filter categories by current type
-        const typedCategories = this.categoryTree.filter(cat => cat.type === this.currentCategoryType);
+        const typedCategories = tree.filter(cat => cat.type === this.currentCategoryType);
 
         if (typedCategories.length === 0) {
             treeContainer.innerHTML = '';
@@ -1082,24 +1085,20 @@ export default class CategoriesModule {
         // Populate month selector
         this.populateBudgetMonthSelector();
 
-        // Fetch categories if not already loaded
-        if (!this.allCategories || this.allCategories.length === 0) {
-            try {
-                const response = await fetch(OC.generateUrl('/apps/budget/api/categories/tree'), {
-                    headers: {
-                        'requesttoken': OC.requestToken
-                    }
-                });
-                if (response.ok) {
-                    this.categoryTree = await response.json();
-                    this.allCategories = this.flattenCategories(this.categoryTree);
-                    this.app.categoryTree = this.categoryTree;
-                    this.app.allCategories = this.allCategories;
-                    this.app.categories = this.allCategories;
-                }
-            } catch (error) {
-                console.error('Failed to load categories for budget:', error);
+        // Always fetch fresh with shared categories for budget view
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/categories/tree'), {
+                headers: this.app.getAuthHeaders()
+            });
+            if (response.ok) {
+                const rawTree = await response.json();
+                // Merge own + shared: shared takes priority, children merged
+                const mergedTree = this.mergeCategoryTree(rawTree);
+                this.categoryTree = mergedTree;
+                this.allCategories = this.flattenCategories(mergedTree);
             }
+        } catch (error) {
+            console.error('Failed to load categories for budget:', error);
         }
 
         // Calculate spending for each category
@@ -1497,5 +1496,97 @@ export default class CategoriesModule {
             }
         });
         return result;
+    }
+
+    /**
+     * Merge own and shared category trees intelligently.
+     * - Shared categories take priority over own categories with the same name+type
+     * - Children are merged: shared children replace own children with same name,
+     *   own-only children are kept alongside shared children
+     * - Unmatched shared parents are appended
+     *
+     * @param {Array} tree - Full tree containing both own and shared categories
+     * @returns {Array} Merged tree without duplicates
+     */
+    mergeCategoryTree(tree) {
+        const own = tree.filter(cat => !cat._shared);
+        const shared = tree.filter(cat => cat._shared);
+
+        if (shared.length === 0) return own;
+        if (own.length === 0) return shared;
+
+        const merged = [];
+        const usedSharedIds = new Set();
+
+        for (const ownCat of own) {
+            // Find matching shared category by name + type
+            const match = shared.find(s =>
+                s.name === ownCat.name && s.type === ownCat.type && !usedSharedIds.has(s.id)
+            );
+
+            if (match) {
+                usedSharedIds.add(match.id);
+                // Use the shared version (has budget amounts etc) but merge children
+                const mergedCat = { ...match };
+                mergedCat.children = this.mergeChildren(
+                    ownCat.children || [],
+                    match.children || []
+                );
+                merged.push(mergedCat);
+            } else {
+                // No shared match — keep own category as-is
+                merged.push(ownCat);
+            }
+        }
+
+        // Append any shared categories that didn't match an own category
+        for (const sharedCat of shared) {
+            if (!usedSharedIds.has(sharedCat.id)) {
+                merged.push(sharedCat);
+            }
+        }
+
+        return merged;
+    }
+
+    /**
+     * Merge children arrays: shared children replace own children with same name,
+     * own-only children are kept.
+     */
+    mergeChildren(ownChildren, sharedChildren) {
+        if (sharedChildren.length === 0) return ownChildren;
+        if (ownChildren.length === 0) return sharedChildren;
+
+        const merged = [];
+        const usedSharedIds = new Set();
+
+        for (const ownChild of ownChildren) {
+            const match = sharedChildren.find(s =>
+                s.name === ownChild.name && !usedSharedIds.has(s.id)
+            );
+
+            if (match) {
+                usedSharedIds.add(match.id);
+                // Use shared version, recursively merge grandchildren
+                const mergedChild = { ...match };
+                mergedChild.children = this.mergeChildren(
+                    ownChild.children || [],
+                    match.children || []
+                );
+                merged.push(mergedChild);
+            } else {
+                // Own child not shared — keep it
+                merged.push(ownChild);
+            }
+        }
+
+        // Append shared children that didn't match any own child
+        for (const sharedChild of sharedChildren) {
+            if (!usedSharedIds.has(sharedChild.id)) {
+                merged.push(sharedChild);
+            }
+        }
+
+        return merged;
     }
 }
