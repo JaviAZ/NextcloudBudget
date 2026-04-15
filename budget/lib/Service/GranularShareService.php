@@ -229,6 +229,14 @@ class GranularShareService {
         $this->cache = [];
     }
 
+    /**
+     * Get the user's own account IDs (not shared).
+     * @return int[]
+     */
+    public function getOwnAccountIds(string $userId): array {
+        return $this->getOwnIds($userId, ShareItem::TYPE_ACCOUNT);
+    }
+
     // ==========================================
     // Entity fetching (for controllers)
     // ==========================================

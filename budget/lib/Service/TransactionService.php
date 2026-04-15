@@ -50,6 +50,15 @@ class TransactionService {
         return $this->mapper->findForAccounts($id, $visibleAccountIds);
     }
 
+    /**
+     * Find an account by ID without user scoping (for shared account resolution).
+     *
+     * @throws DoesNotExistException
+     */
+    public function findAccountById(int $accountId): \OCA\Budget\Db\Account {
+        return $this->accountMapper->findById($accountId);
+    }
+
     public function findByAccount(string $userId, int $accountId, int $limit = 100, int $offset = 0): array {
         // Verify account belongs to user
         $this->accountMapper->find($accountId, $userId);

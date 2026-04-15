@@ -194,8 +194,17 @@ class TransactionController extends Controller {
                 $notes = $notesValidation['sanitized'];
             }
 
+            // For shared accounts, verify write access and resolve the account owner
+            $effectiveUserId = $this->userId;
+            if (!in_array($accountId, $this->granularShareService->getOwnAccountIds($this->userId))) {
+                $this->requireWriteAccess('account', $accountId);
+                // Find the account's actual owner for the service call
+                $account = $this->service->findAccountById($accountId);
+                $effectiveUserId = $account->getUserId();
+            }
+
             $transaction = $this->service->create(
-                $this->getEffectiveUserId(),
+                $effectiveUserId,
                 $accountId,
                 $date,
                 $description,
