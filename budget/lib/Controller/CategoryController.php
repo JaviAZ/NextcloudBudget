@@ -83,7 +83,17 @@ class CategoryController extends Controller {
      */
     public function tree(): DataResponse {
         try {
-            $tree = $this->service->getCategoryTree($this->getEffectiveUserId());
+            $tree = $this->service->getCategoryTree($this->userId);
+
+            // Append shared categories as top-level entries
+            $shared = $this->granularShareService->getSharedCategories($this->userId);
+            if (!empty($shared)) {
+                foreach ($shared as $cat) {
+                    $cat['children'] = [];
+                    $tree[] = $cat;
+                }
+            }
+
             return new DataResponse($tree);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve category tree'));
