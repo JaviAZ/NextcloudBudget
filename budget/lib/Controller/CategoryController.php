@@ -85,13 +85,28 @@ class CategoryController extends Controller {
         try {
             $tree = $this->service->getCategoryTree($this->userId);
 
-            // Append shared categories as top-level entries
+            // Build shared categories into their own tree and append
             $shared = $this->granularShareService->getSharedCategories($this->userId);
             if (!empty($shared)) {
+                // Index by ID and build parent-child hierarchy
+                $byId = [];
                 foreach ($shared as $cat) {
                     $cat['children'] = [];
-                    $tree[] = $cat;
+                    $byId[$cat['id']] = $cat;
                 }
+
+                $sharedTree = [];
+                foreach ($byId as $id => &$cat) {
+                    $parentId = $cat['parentId'] ?? null;
+                    if ($parentId && isset($byId[$parentId])) {
+                        $byId[$parentId]['children'][] = &$cat;
+                    } else {
+                        $sharedTree[] = &$cat;
+                    }
+                }
+                unset($cat);
+
+                $tree = array_merge($tree, $sharedTree);
             }
 
             return new DataResponse($tree);
