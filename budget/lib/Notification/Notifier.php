@@ -40,6 +40,7 @@ class Notifier implements INotifier {
 
         switch ($notification->getSubject()) {
             case 'bill_reminder':
+                // TRANSLATORS: {bill} is replaced with the bill name. Do NOT translate {bill} — keep it exactly as-is.
                 $notification->setRichSubject(
                     $l->t('Bill reminder: {bill}'),
                     [
@@ -59,6 +60,7 @@ class Notifier implements INotifier {
                             : $l->t('due in %s days', [(string)$parameters['daysUntilDue']])
                     );
 
+                // TRANSLATORS: {bill}, {amount}, {dueText} are placeholders — do NOT translate them. Keep all {placeholder} names exactly as-is.
                 $notification->setRichMessage(
                     $l->t('{bill} ({amount}) is {dueText}'),
                     [
@@ -91,6 +93,7 @@ class Notifier implements INotifier {
                 break;
 
             case 'bill_overdue':
+                // TRANSLATORS: {bill} is replaced with the bill name. Do NOT translate {bill} — keep it exactly as-is.
                 $notification->setRichSubject(
                     $l->t('Overdue bill: {bill}'),
                     [
@@ -107,6 +110,7 @@ class Notifier implements INotifier {
                     ? $l->t('1 day overdue')
                     : $l->t('%s days overdue', [(string)$daysOverdue]);
 
+                // TRANSLATORS: {bill}, {amount}, {overdueText} are placeholders — do NOT translate them. Keep all {placeholder} names exactly as-is.
                 $notification->setRichMessage(
                     $l->t('{bill} ({amount}) is {overdueText}'),
                     [
@@ -139,6 +143,7 @@ class Notifier implements INotifier {
                 break;
 
             case 'bill_auto_paid':
+                // TRANSLATORS: {bill} is replaced with the bill name. Do NOT translate {bill} — keep it exactly as-is.
                 $notification->setRichSubject(
                     $l->t('Bill auto-paid: {bill}'),
                     [
@@ -150,6 +155,7 @@ class Notifier implements INotifier {
                     ]
                 );
 
+                // TRANSLATORS: {bill}, {amount}, {nextDueDate} are placeholders — do NOT translate them. Keep all {placeholder} names exactly as-is.
                 $notification->setRichMessage(
                     $l->t('{bill} ({amount}) was automatically paid. Next due: {nextDueDate}'),
                     [
@@ -182,6 +188,7 @@ class Notifier implements INotifier {
                 break;
 
             case 'bill_auto_pay_failed':
+                // TRANSLATORS: {bill} is replaced with the bill name. Do NOT translate {bill} — keep it exactly as-is.
                 $notification->setRichSubject(
                     $l->t('Auto-pay failed: {bill}'),
                     [
@@ -193,6 +200,7 @@ class Notifier implements INotifier {
                     ]
                 );
 
+                // TRANSLATORS: {bill}, {amount}, {reason} are placeholders — do NOT translate them. Keep all {placeholder} names exactly as-is.
                 $notification->setRichMessage(
                     $l->t('Failed to auto-pay {bill} ({amount}). Auto-pay has been disabled. Reason: {reason}'),
                     [
@@ -225,6 +233,7 @@ class Notifier implements INotifier {
                 break;
 
             case 'share_invitation':
+                // TRANSLATORS: {user} is replaced with the username. Do NOT translate {user} — keep it exactly as-is.
                 $notification->setRichSubject(
                     $l->t('{user} shared their budget with you'),
                     [
@@ -236,6 +245,7 @@ class Notifier implements INotifier {
                     ]
                 );
 
+                // TRANSLATORS: {user} is replaced with the username. Do NOT translate {user} — keep it exactly as-is.
                 $notification->setRichMessage(
                     $l->t('{user} has invited you to view their budget. Open Budget to accept or decline.'),
                     [
