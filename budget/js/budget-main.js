@@ -43757,7 +43757,7 @@ var SharingModule = /*#__PURE__*/function () {
             case 1:
               _context7.p = 1;
               _context7.n = 2;
-              return Promise.all([this.fetchApi("/apps/budget/api/shares/".concat(shareId, "/items")), this.fetchApi('/apps/budget/api/accounts'), this.fetchApi('/apps/budget/api/categories'), this.fetchApi('/apps/budget/api/bills'), this.fetchApi('/apps/budget/api/recurring-income'), this.fetchApi('/apps/budget/api/goals')]);
+              return Promise.all([this.fetchApi("/apps/budget/api/shares/".concat(shareId, "/items")), this.fetchApi('/apps/budget/api/accounts'), this.fetchApi('/apps/budget/api/categories'), this.fetchApi('/apps/budget/api/bills'), this.fetchApi('/apps/budget/api/recurring-income'), this.fetchApi('/apps/budget/api/savings-goals')]);
             case 2:
               _yield$Promise$all = _context7.v;
               _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 6);

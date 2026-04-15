@@ -216,7 +216,7 @@ export default class SharingModule {
                 this.fetchApi('/apps/budget/api/categories'),
                 this.fetchApi('/apps/budget/api/bills'),
                 this.fetchApi('/apps/budget/api/recurring-income'),
-                this.fetchApi('/apps/budget/api/goals'),
+                this.fetchApi('/apps/budget/api/savings-goals'),
             ]);
 
             this.renderConfigPanel(panel, shareId, config, {
