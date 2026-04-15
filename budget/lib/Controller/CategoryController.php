@@ -190,6 +190,8 @@ class CategoryController extends Controller {
         ?int $sortOrder = null
     ): DataResponse {
         try {
+            $this->requireWriteAccess('category', $id);
+
             $updates = [];
 
             // Validate name if provided
@@ -265,6 +267,7 @@ class CategoryController extends Controller {
     #[UserRateLimit(limit: 20, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('category', $id);
             $this->service->delete($id, $this->getEffectiveUserId());
             return new DataResponse(['status' => 'success']);
         } catch (\Exception $e) {
@@ -277,7 +280,8 @@ class CategoryController extends Controller {
      */
     public function allSpending(string $startDate, string $endDate): DataResponse {
         try {
-            $spending = $this->service->getAllCategorySpending($this->getEffectiveUserId(), $startDate, $endDate);
+            $visibleAccountIds = $this->getVisibleAccountIds();
+            $spending = $this->service->getAllCategorySpending($this->userId, $startDate, $endDate, $visibleAccountIds);
             return new DataResponse($spending);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve category spending'));

@@ -40,6 +40,16 @@ class TransactionService {
         return $this->mapper->find($id, $userId);
     }
 
+    /**
+     * Find a transaction by ID scoped to visible account IDs (for shared access).
+     *
+     * @param int[] $visibleAccountIds
+     * @throws DoesNotExistException
+     */
+    public function findForAccounts(int $id, array $visibleAccountIds): Transaction {
+        return $this->mapper->findForAccounts($id, $visibleAccountIds);
+    }
+
     public function findByAccount(string $userId, int $accountId, int $limit = 100, int $offset = 0): array {
         // Verify account belongs to user
         $this->accountMapper->find($accountId, $userId);
@@ -397,8 +407,11 @@ class TransactionService {
         $this->mapper->delete($transaction);
     }
 
-    public function findWithFilters(string $userId, array $filters, int $limit, int $offset): array {
-        $result = $this->mapper->findWithFilters($userId, $filters, $limit, $offset);
+    /**
+     * @param int[]|null $visibleAccountIds If provided, scope by account IDs instead of userId
+     */
+    public function findWithFilters(string $userId, array $filters, int $limit, int $offset, ?array $visibleAccountIds = null): array {
+        $result = $this->mapper->findWithFilters($userId, $filters, $limit, $offset, $visibleAccountIds);
 
         // Compute running balance when viewing a single account sorted by date
         // with no non-date filters that break chronological contiguity

@@ -262,6 +262,8 @@ class AccountController extends Controller {
     #[UserRateLimit(limit: 30, period: 60)]
     public function update(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('account', $id);
+
             // Get JSON data from request body
             $data = json_decode(file_get_contents('php://input'), true);
 
@@ -433,6 +435,8 @@ class AccountController extends Controller {
     #[UserRateLimit(limit: 10, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('account', $id);
+
             // Get account name before deletion for audit log
             $account = $this->service->find($id, $this->getEffectiveUserId());
             $accountName = $account->getName();

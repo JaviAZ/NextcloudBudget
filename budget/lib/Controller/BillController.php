@@ -298,6 +298,8 @@ class BillController extends Controller {
     #[UserRateLimit(limit: 30, period: 60)]
     public function update(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('bill', $id);
+
             $data = json_decode(file_get_contents('php://input'), true);
             if (!is_array($data)) {
                 return new DataResponse(['error' => $this->l->t('Invalid request data')], Http::STATUS_BAD_REQUEST);
@@ -537,6 +539,7 @@ class BillController extends Controller {
     #[UserRateLimit(limit: 20, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('bill', $id);
             $this->service->delete($id, $this->getEffectiveUserId());
             return new DataResponse(['status' => 'success']);
         } catch (\Exception $e) {

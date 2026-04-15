@@ -48,6 +48,15 @@ trait ApiErrorHandlerTrait {
         int $statusCode = Http::STATUS_BAD_REQUEST,
         array $context = []
     ): DataResponse {
+        // Read-only share violations return 403 with a clear message
+        if ($e instanceof \OCA\Budget\Exception\ReadOnlyShareException) {
+            $l = $this->getL10N();
+            $message = $l !== null
+                ? $l->t('This shared item is read-only')
+                : 'This shared item is read-only';
+            return new DataResponse(['error' => $message], Http::STATUS_FORBIDDEN);
+        }
+
         // Log the full error details server-side
         $this->logError($e, $context);
 

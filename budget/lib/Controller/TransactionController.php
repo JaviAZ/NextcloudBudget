@@ -97,7 +97,8 @@ class TransactionController extends Controller {
                 'tagIds' => $tagIds,
             ];
 
-            $result = $this->service->findWithFilters($this->getEffectiveUserId(), $filters, $limit, $offset);
+            $visibleAccountIds = $this->getVisibleAccountIds();
+            $result = $this->service->findWithFilters($this->userId, $filters, $limit, $offset, $visibleAccountIds);
 
             $responseData = [
                 'transactions' => $result['transactions'],
@@ -121,7 +122,12 @@ class TransactionController extends Controller {
      */
     public function show(int $id): DataResponse {
         try {
-            $transaction = $this->service->find($id, $this->getEffectiveUserId());
+            // Try own first, fall back to shared accounts
+            try {
+                $transaction = $this->service->find($id, $this->userId);
+            } catch (\Exception $e) {
+                $transaction = $this->service->findForAccounts($id, $this->getVisibleAccountIds());
+            }
             return new DataResponse($transaction);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Transaction'), ['transactionId' => $id]);

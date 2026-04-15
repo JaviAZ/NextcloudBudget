@@ -174,6 +174,8 @@ class GoalsController extends Controller {
         int $tagId = null
     ): DataResponse {
         try {
+            $this->requireWriteAccess('savings_goal', $id);
+
             // Validate name if provided
             if ($name !== null) {
                 $nameValidation = $this->validationService->validateName($name, false);
@@ -248,6 +250,7 @@ class GoalsController extends Controller {
     #[UserRateLimit(limit: 20, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('savings_goal', $id);
             $this->service->delete($id, $this->getEffectiveUserId());
             return new DataResponse(['message' => $this->l->t('Goal deleted successfully')]);
         } catch (\Exception $e) {

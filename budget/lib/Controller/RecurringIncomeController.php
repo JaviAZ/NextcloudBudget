@@ -176,6 +176,8 @@ class RecurringIncomeController extends Controller {
     #[UserRateLimit(limit: 30, period: 60)]
     public function update(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('recurring_income', $id);
+
             $rawInput = file_get_contents('php://input');
             $data = json_decode($rawInput, true);
 
@@ -229,6 +231,7 @@ class RecurringIncomeController extends Controller {
     #[UserRateLimit(limit: 30, period: 60)]
     public function destroy(int $id): DataResponse {
         try {
+            $this->requireWriteAccess('recurring_income', $id);
             $this->service->delete($id, $this->getEffectiveUserId());
             return new DataResponse(['message' => $this->l->t('Recurring income deleted')]);
         } catch (\Exception $e) {
