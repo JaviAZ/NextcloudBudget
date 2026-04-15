@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.1] - 2026-04-16
+
+### Fixed
+- **Translator placeholder protection**: Added translator comments to notification strings warning not to translate `{placeholder}` names, and configured Weblate placeholder check ([#140](https://github.com/otherworld-dev/budget/issues/140))
+
 ## [2.11.0] - 2026-04-16
 
 ### Added
