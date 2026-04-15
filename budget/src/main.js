@@ -705,7 +705,9 @@ class BudgetApp {
 
             if (categoryTreeResponse.ok) {
                 const treeData = await categoryTreeResponse.json();
-                this.categoryTree = Array.isArray(treeData) ? treeData : [];
+                const rawTree = Array.isArray(treeData) ? treeData : [];
+                // Merge own + shared categories (shared takes priority, dedup by name)
+                this.categoryTree = this.categoriesModule.mergeCategoryTree(rawTree);
                 this.allCategories = this.flattenCategories(this.categoryTree);
             }
 

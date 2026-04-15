@@ -26796,6 +26796,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @nextcloud/l10n */ "./node_modules/@nextcloud/l10n/dist/index.mjs");
 /* harmony import */ var chart_js_auto__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! chart.js/auto */ "./node_modules/chart.js/auto/auto.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _regeneratorValues(e) { if (null != e) { var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"], r = 0; if (t) return t.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) return { next: function next() { return e && r >= e.length && (e = void 0), { value: e && e[r++], done: !e }; } }; } throw new TypeError(_typeof(e) + " is not iterable"); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -26902,7 +26905,7 @@ var CategoriesModule = /*#__PURE__*/function () {
     key: "loadCategories",
     value: function () {
       var _loadCategories = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-        var _yield$Promise$all, _yield$Promise$all2, treeResponse, countsResponse, fullTree, _t;
+        var _yield$Promise$all, _yield$Promise$all2, treeResponse, countsResponse, fullTree, mergedTree, _t;
         return _regenerator().w(function (_context) {
           while (1) switch (_context.p = _context.n) {
             case 0:
@@ -26930,11 +26933,12 @@ var CategoriesModule = /*#__PURE__*/function () {
               return treeResponse.json();
             case 2:
               fullTree = _context.v;
-              // Store full tree (with shared) for dropdowns and budget view
-              this.app.categoryTree = fullTree;
-              this.app.allCategories = this.flattenCategories(fullTree);
+              // Merge own + shared for dropdowns and budget view
+              mergedTree = this.mergeCategoryTree(fullTree);
+              this.app.categoryTree = mergedTree;
+              this.app.allCategories = this.flattenCategories(mergedTree);
               this.app.categories = this.app.allCategories;
-              // For the management view, filter out shared categories
+              // For the management view, show only own categories
               this.managementTree = fullTree.filter(function (cat) {
                 return !cat._shared;
               });
@@ -28200,7 +28204,7 @@ var CategoriesModule = /*#__PURE__*/function () {
     key: "loadBudgetView",
     value: function () {
       var _loadBudgetView = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var response, budgetTree, _t0;
+        var response, rawTree, mergedTree, _t0;
         return _regenerator().w(function (_context9) {
           while (1) switch (_context9.p = _context9.n) {
             case 0:
@@ -28232,9 +28236,11 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context9.n = 3;
               return response.json();
             case 3:
-              budgetTree = _context9.v;
-              this.categoryTree = budgetTree;
-              this.allCategories = this.flattenCategories(budgetTree);
+              rawTree = _context9.v;
+              // Merge own + shared: shared takes priority, children merged
+              mergedTree = this.mergeCategoryTree(rawTree);
+              this.categoryTree = mergedTree;
+              this.allCategories = this.flattenCategories(mergedTree);
             case 4:
               _context9.n = 6;
               break;
@@ -28760,6 +28766,135 @@ var CategoriesModule = /*#__PURE__*/function () {
         }
       });
       return result;
+    }
+
+    /**
+     * Merge own and shared category trees intelligently.
+     * - Shared categories take priority over own categories with the same name+type
+     * - Children are merged: shared children replace own children with same name,
+     *   own-only children are kept alongside shared children
+     * - Unmatched shared parents are appended
+     *
+     * @param {Array} tree - Full tree containing both own and shared categories
+     * @returns {Array} Merged tree without duplicates
+     */
+  }, {
+    key: "mergeCategoryTree",
+    value: function mergeCategoryTree(tree) {
+      var _this17 = this;
+      var own = tree.filter(function (cat) {
+        return !cat._shared;
+      });
+      var shared = tree.filter(function (cat) {
+        return cat._shared;
+      });
+      if (shared.length === 0) return own;
+      if (own.length === 0) return shared;
+      var merged = [];
+      var usedSharedIds = new Set();
+      var _iterator4 = _createForOfIteratorHelper(own),
+        _step4;
+      try {
+        var _loop2 = function _loop2() {
+          var ownCat = _step4.value;
+          // Find matching shared category by name + type
+          var match = shared.find(function (s) {
+            return s.name === ownCat.name && s.type === ownCat.type && !usedSharedIds.has(s.id);
+          });
+          if (match) {
+            usedSharedIds.add(match.id);
+            // Use the shared version (has budget amounts etc) but merge children
+            var mergedCat = _objectSpread({}, match);
+            mergedCat.children = _this17.mergeChildren(ownCat.children || [], match.children || []);
+            merged.push(mergedCat);
+          } else {
+            // No shared match — keep own category as-is
+            merged.push(ownCat);
+          }
+        };
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          _loop2();
+        }
+
+        // Append any shared categories that didn't match an own category
+      } catch (err) {
+        _iterator4.e(err);
+      } finally {
+        _iterator4.f();
+      }
+      var _iterator5 = _createForOfIteratorHelper(shared),
+        _step5;
+      try {
+        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+          var sharedCat = _step5.value;
+          if (!usedSharedIds.has(sharedCat.id)) {
+            merged.push(sharedCat);
+          }
+        }
+      } catch (err) {
+        _iterator5.e(err);
+      } finally {
+        _iterator5.f();
+      }
+      return merged;
+    }
+
+    /**
+     * Merge children arrays: shared children replace own children with same name,
+     * own-only children are kept.
+     */
+  }, {
+    key: "mergeChildren",
+    value: function mergeChildren(ownChildren, sharedChildren) {
+      var _this18 = this;
+      if (sharedChildren.length === 0) return ownChildren;
+      if (ownChildren.length === 0) return sharedChildren;
+      var merged = [];
+      var usedSharedIds = new Set();
+      var _iterator6 = _createForOfIteratorHelper(ownChildren),
+        _step6;
+      try {
+        var _loop3 = function _loop3() {
+          var ownChild = _step6.value;
+          var match = sharedChildren.find(function (s) {
+            return s.name === ownChild.name && !usedSharedIds.has(s.id);
+          });
+          if (match) {
+            usedSharedIds.add(match.id);
+            // Use shared version, recursively merge grandchildren
+            var mergedChild = _objectSpread({}, match);
+            mergedChild.children = _this18.mergeChildren(ownChild.children || [], match.children || []);
+            merged.push(mergedChild);
+          } else {
+            // Own child not shared — keep it
+            merged.push(ownChild);
+          }
+        };
+        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+          _loop3();
+        }
+
+        // Append shared children that didn't match any own child
+      } catch (err) {
+        _iterator6.e(err);
+      } finally {
+        _iterator6.f();
+      }
+      var _iterator7 = _createForOfIteratorHelper(sharedChildren),
+        _step7;
+      try {
+        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+          var sharedChild = _step7.value;
+          if (!usedSharedIds.has(sharedChild.id)) {
+            merged.push(sharedChild);
+          }
+        }
+      } catch (err) {
+        _iterator7.e(err);
+      } finally {
+        _iterator7.f();
+      }
+      return merged;
     }
   }]);
 }();
@@ -53809,7 +53944,7 @@ var BudgetApp = /*#__PURE__*/function () {
     key: "loadInitialData",
     value: function () {
       var _loadInitialData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var _yield$Promise$all, _yield$Promise$all2, settingsResponse, accountsResponse, categoriesResponse, categoryTreeResponse, optionsResponse, accountsData, categoriesData, treeData, _t;
+        var _yield$Promise$all, _yield$Promise$all2, settingsResponse, accountsResponse, categoriesResponse, categoryTreeResponse, optionsResponse, accountsData, categoriesData, treeData, rawTree, _t;
         return _regenerator().w(function (_context2) {
           while (1) switch (_context2.p = _context2.n) {
             case 0:
@@ -53888,7 +54023,8 @@ var BudgetApp = /*#__PURE__*/function () {
               return categoryTreeResponse.json();
             case 9:
               treeData = _context2.v;
-              this.categoryTree = Array.isArray(treeData) ? treeData : [];
+              rawTree = Array.isArray(treeData) ? treeData : []; // Merge own + shared categories (shared takes priority, dedup by name)
+              this.categoryTree = this.categoriesModule.mergeCategoryTree(rawTree);
               this.allCategories = this.flattenCategories(this.categoryTree);
             case 10:
               // Populate dropdowns

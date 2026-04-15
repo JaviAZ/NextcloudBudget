@@ -82,11 +82,12 @@ export default class CategoriesModule {
             ]);
             if (treeResponse.ok) {
                 const fullTree = await treeResponse.json();
-                // Store full tree (with shared) for dropdowns and budget view
-                this.app.categoryTree = fullTree;
-                this.app.allCategories = this.flattenCategories(fullTree);
+                // Merge own + shared for dropdowns and budget view
+                const mergedTree = this.mergeCategoryTree(fullTree);
+                this.app.categoryTree = mergedTree;
+                this.app.allCategories = this.flattenCategories(mergedTree);
                 this.app.categories = this.app.allCategories;
-                // For the management view, filter out shared categories
+                // For the management view, show only own categories
                 this.managementTree = fullTree.filter(cat => !cat._shared);
             }
             if (countsResponse.ok) {
@@ -1090,9 +1091,11 @@ export default class CategoriesModule {
                 headers: this.app.getAuthHeaders()
             });
             if (response.ok) {
-                const budgetTree = await response.json();
-                this.categoryTree = budgetTree;
-                this.allCategories = this.flattenCategories(budgetTree);
+                const rawTree = await response.json();
+                // Merge own + shared: shared takes priority, children merged
+                const mergedTree = this.mergeCategoryTree(rawTree);
+                this.categoryTree = mergedTree;
+                this.allCategories = this.flattenCategories(mergedTree);
             }
         } catch (error) {
             console.error('Failed to load categories for budget:', error);
@@ -1493,5 +1496,97 @@ export default class CategoriesModule {
             }
         });
         return result;
+    }
+
+    /**
+     * Merge own and shared category trees intelligently.
+     * - Shared categories take priority over own categories with the same name+type
+     * - Children are merged: shared children replace own children with same name,
+     *   own-only children are kept alongside shared children
+     * - Unmatched shared parents are appended
+     *
+     * @param {Array} tree - Full tree containing both own and shared categories
+     * @returns {Array} Merged tree without duplicates
+     */
+    mergeCategoryTree(tree) {
+        const own = tree.filter(cat => !cat._shared);
+        const shared = tree.filter(cat => cat._shared);
+
+        if (shared.length === 0) return own;
+        if (own.length === 0) return shared;
+
+        const merged = [];
+        const usedSharedIds = new Set();
+
+        for (const ownCat of own) {
+            // Find matching shared category by name + type
+            const match = shared.find(s =>
+                s.name === ownCat.name && s.type === ownCat.type && !usedSharedIds.has(s.id)
+            );
+
+            if (match) {
+                usedSharedIds.add(match.id);
+                // Use the shared version (has budget amounts etc) but merge children
+                const mergedCat = { ...match };
+                mergedCat.children = this.mergeChildren(
+                    ownCat.children || [],
+                    match.children || []
+                );
+                merged.push(mergedCat);
+            } else {
+                // No shared match — keep own category as-is
+                merged.push(ownCat);
+            }
+        }
+
+        // Append any shared categories that didn't match an own category
+        for (const sharedCat of shared) {
+            if (!usedSharedIds.has(sharedCat.id)) {
+                merged.push(sharedCat);
+            }
+        }
+
+        return merged;
+    }
+
+    /**
+     * Merge children arrays: shared children replace own children with same name,
+     * own-only children are kept.
+     */
+    mergeChildren(ownChildren, sharedChildren) {
+        if (sharedChildren.length === 0) return ownChildren;
+        if (ownChildren.length === 0) return sharedChildren;
+
+        const merged = [];
+        const usedSharedIds = new Set();
+
+        for (const ownChild of ownChildren) {
+            const match = sharedChildren.find(s =>
+                s.name === ownChild.name && !usedSharedIds.has(s.id)
+            );
+
+            if (match) {
+                usedSharedIds.add(match.id);
+                // Use shared version, recursively merge grandchildren
+                const mergedChild = { ...match };
+                mergedChild.children = this.mergeChildren(
+                    ownChild.children || [],
+                    match.children || []
+                );
+                merged.push(mergedChild);
+            } else {
+                // Own child not shared — keep it
+                merged.push(ownChild);
+            }
+        }
+
+        // Append shared children that didn't match any own child
+        for (const sharedChild of sharedChildren) {
+            if (!usedSharedIds.has(sharedChild.id)) {
+                merged.push(sharedChild);
+            }
+        }
+
+        return merged;
     }
 }
