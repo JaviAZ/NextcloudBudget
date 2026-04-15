@@ -263,9 +263,10 @@ class CategoryController extends Controller {
                 $updates['budgetPeriod'] = $budgetPeriod;
             }
 
-            // Handle other fields
-            if ($parentId !== null) {
-                $updates['parentId'] = $parentId;
+            // Handle parentId — use request params to distinguish "not sent" from "explicitly null"
+            $params = $this->request->getParams();
+            if (array_key_exists('parentId', $params)) {
+                $updates['parentId'] = $params['parentId'] !== null ? (int) $params['parentId'] : null;
             }
             if ($budgetAmount !== null) {
                 $updates['budgetAmount'] = $budgetAmount;
