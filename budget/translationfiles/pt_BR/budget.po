@@ -8,14 +8,16 @@ msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: https://github.com/otherworld-dev/budget/issues\n"
 "POT-Creation-Date: 2026-04-11 09:45+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2026-04-15 23:29+0000\n"
+"Last-Translator: H2Oufoe <regularwater@users.noreply.hosted.weblate.org>\n"
+"Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
+"nextcloud-budget/budget/pt_BR/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 5.17.1-dev\n"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:30
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:30
@@ -26,28 +28,28 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/templates/index.php:1819
 #: /var/www/html/apps-extra/budget/templates/index.php:1886
 msgid "Budget"
-msgstr ""
+msgstr "Orçamento"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:44
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:44
 msgid "Bill reminder: {bill}"
-msgstr ""
+msgstr "Lembrete de despesa: {Despesa}"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:55
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:55
 msgid "due today"
-msgstr ""
+msgstr "vence hoje"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:58
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:58
 msgid "due tomorrow"
-msgstr ""
+msgstr "vence amanhã"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:59
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:59
 #, php-format
 msgid "due in %s days"
-msgstr ""
+msgstr "vence em %s dias"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:63
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:63
