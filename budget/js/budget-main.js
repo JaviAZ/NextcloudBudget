@@ -28196,7 +28196,7 @@ var CategoriesModule = /*#__PURE__*/function () {
     key: "loadBudgetView",
     value: function () {
       var _loadBudgetView = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var response, _t0;
+        var response, budgetTree, _t0;
         return _regenerator().w(function (_context9) {
           while (1) switch (_context9.p = _context9.n) {
             case 0:
@@ -28213,11 +28213,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               // Populate month selector
               this.populateBudgetMonthSelector();
 
-              // Fetch categories if not already loaded
-              if (!(!this.allCategories || this.allCategories.length === 0)) {
-                _context9.n = 6;
-                break;
-              }
+              // Always fetch fresh with shared categories for budget view
               _context9.p = 1;
               _context9.n = 2;
               return fetch(OC.generateUrl('/apps/budget/api/categories/tree?includeShared=1'), {
@@ -28232,11 +28228,9 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context9.n = 3;
               return response.json();
             case 3:
-              this.categoryTree = _context9.v;
-              this.allCategories = this.flattenCategories(this.categoryTree);
-              this.app.categoryTree = this.categoryTree;
-              this.app.allCategories = this.allCategories;
-              this.app.categories = this.allCategories;
+              budgetTree = _context9.v;
+              this.categoryTree = budgetTree;
+              this.allCategories = this.flattenCategories(budgetTree);
             case 4:
               _context9.n = 6;
               break;

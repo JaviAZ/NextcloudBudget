@@ -1082,22 +1082,18 @@ export default class CategoriesModule {
         // Populate month selector
         this.populateBudgetMonthSelector();
 
-        // Fetch categories if not already loaded
-        if (!this.allCategories || this.allCategories.length === 0) {
-            try {
-                const response = await fetch(OC.generateUrl('/apps/budget/api/categories/tree?includeShared=1'), {
-                    headers: this.app.getAuthHeaders()
-                });
-                if (response.ok) {
-                    this.categoryTree = await response.json();
-                    this.allCategories = this.flattenCategories(this.categoryTree);
-                    this.app.categoryTree = this.categoryTree;
-                    this.app.allCategories = this.allCategories;
-                    this.app.categories = this.allCategories;
-                }
-            } catch (error) {
-                console.error('Failed to load categories for budget:', error);
+        // Always fetch fresh with shared categories for budget view
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/categories/tree?includeShared=1'), {
+                headers: this.app.getAuthHeaders()
+            });
+            if (response.ok) {
+                const budgetTree = await response.json();
+                this.categoryTree = budgetTree;
+                this.allCategories = this.flattenCategories(budgetTree);
             }
+        } catch (error) {
+            console.error('Failed to load categories for budget:', error);
         }
 
         // Calculate spending for each category
