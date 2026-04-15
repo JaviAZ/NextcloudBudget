@@ -51,7 +51,7 @@ class SettingController extends Controller {
     public function __construct(
         IRequest $request,
         SettingMapper $mapper,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         ?string $userId,
         LoggerInterface $logger
@@ -61,7 +61,7 @@ class SettingController extends Controller {
         $this->mapper = $mapper;
         $this->l = $l;
         $this->setLogger($logger);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

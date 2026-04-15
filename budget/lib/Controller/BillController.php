@@ -34,7 +34,7 @@ class BillController extends Controller {
         IRequest $request,
         BillService $service,
         ValidationService $validationService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -46,7 +46,7 @@ class BillController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -63,15 +63,24 @@ class BillController extends Controller {
 
             // Use mapper's findByType if filtering by transfer status
             if ($isTransferBool !== null) {
-                // Convert activeOnly to isActive parameter: false -> null (all), true -> true (active only)
                 $isActive = $activeOnlyBool ? true : null;
-                $bills = $this->service->findByType($this->getEffectiveUserId(), $isTransferBool, $isActive);
+                $bills = $this->service->findByType($this->userId, $isTransferBool, $isActive);
             } elseif ($activeOnlyBool) {
-                $bills = $this->service->findActive($this->getEffectiveUserId());
+                $bills = $this->service->findActive($this->userId);
             } else {
-                $bills = $this->service->findAll($this->getEffectiveUserId());
+                $bills = $this->service->findAll($this->userId);
             }
-            $bills = $this->service->enrichBillsWithCurrency($bills, $this->getEffectiveUserId());
+            $bills = $this->service->enrichBillsWithCurrency($bills, $this->userId);
+
+            // Merge shared bills
+            $shared = $this->granularShareService->getSharedBills($this->userId);
+            if (!empty($shared)) {
+                $bills = array_merge(
+                    array_map(fn($b) => $b->jsonSerialize(), $bills),
+                    $shared
+                );
+                return new DataResponse($bills);
+            }
             return new DataResponse($bills);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve bills'));

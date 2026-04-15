@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Budget\Controller;
 
 use OCA\Budget\AppInfo\Application;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\ShareService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCP\AppFramework\Controller;
@@ -20,18 +21,21 @@ class ShareController extends Controller {
     use ApiErrorHandlerTrait;
 
     private ShareService $shareService;
+    private GranularShareService $granularShareService;
     private IL10N $l;
     private string $userId;
 
     public function __construct(
         IRequest $request,
         ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
     ) {
         parent::__construct(Application::APP_ID, $request);
         $this->shareService = $shareService;
+        $this->granularShareService = $granularShareService;
         $this->l = $l;
         $this->userId = $userId;
         $this->setLogger($logger);
@@ -165,6 +169,55 @@ class ShareController extends Controller {
             return $this->handleNotFoundError($e, $this->l->t('Share'));
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to leave share'));
+        }
+    }
+
+    // ==================== Share Configuration Endpoints ====================
+
+    /**
+     * Get the full share configuration (which entities are shared and permissions)
+     *
+     * @NoAdminRequired
+     */
+    public function getConfig(int $id): DataResponse {
+        try {
+            $config = $this->granularShareService->getShareConfig($id);
+            return new DataResponse($config);
+        } catch (DoesNotExistException $e) {
+            return $this->handleNotFoundError($e, $this->l->t('Share'));
+        } catch (\Exception $e) {
+            return $this->handleError($e, $this->l->t('Failed to retrieve share configuration'));
+        }
+    }
+
+    /**
+     * Replace all shared items for a specific entity type
+     * Body: { "entityIds": [1, 3, 7], "permission": "read" }
+     *
+     * @NoAdminRequired
+     */
+    public function updateTypeItems(int $id, string $type): DataResponse {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            $entityIds = $data['entityIds'] ?? [];
+            $permission = $data['permission'] ?? 'read';
+
+            $this->granularShareService->updateShareItems(
+                $this->userId,
+                $id,
+                $type,
+                $entityIds,
+                $permission
+            );
+
+            return new DataResponse(['status' => 'success']);
+        } catch (\InvalidArgumentException $e) {
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+        } catch (DoesNotExistException $e) {
+            return $this->handleNotFoundError($e, $this->l->t('Share'));
+        } catch (\Exception $e) {
+            return $this->handleError($e, $this->l->t('Failed to update share configuration'));
         }
     }
 }

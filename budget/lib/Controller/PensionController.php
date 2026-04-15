@@ -37,7 +37,7 @@ class PensionController extends Controller {
         PensionService $service,
         PensionProjector $projector,
         ValidationService $validationService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         ?string $userId,
         LoggerInterface $logger
@@ -50,7 +50,7 @@ class PensionController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

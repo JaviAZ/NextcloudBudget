@@ -27,7 +27,7 @@ class SharedExpenseController extends Controller {
     public function __construct(
         IRequest $request,
         SharedExpenseService $service,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -37,7 +37,7 @@ class SharedExpenseController extends Controller {
         $this->l = $l;
         $this->userId = $userId;
         $this->logger = $logger;
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     // ==================== Contact Endpoints ====================

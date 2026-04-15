@@ -28,7 +28,7 @@ class ReportController extends Controller {
     public function __construct(
         IRequest $request,
         ReportService $service,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -38,7 +38,7 @@ class ReportController extends Controller {
         $this->l = $l;
         $this->userId = $userId;
         $this->setLogger($logger);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

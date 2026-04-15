@@ -8,7 +8,7 @@ use OCA\Budget\AppInfo\Application;
 use OCA\Budget\Db\Asset;
 use OCA\Budget\Service\AssetProjector;
 use OCA\Budget\Service\AssetService;
-use OCA\Budget\Service\ShareService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;
@@ -37,7 +37,7 @@ class AssetController extends Controller {
 		AssetService $service,
 		AssetProjector $projector,
 		ValidationService $validationService,
-		ShareService $shareService,
+		GranularShareService $granularShareService,
 		IL10N $l,
 		?string $userId,
 		LoggerInterface $logger
@@ -50,7 +50,7 @@ class AssetController extends Controller {
 		$this->userId = $userId;
 		$this->setLogger($logger);
 		$this->setInputValidator($validationService);
-		$this->setShareService($shareService);
+		$this->setGranularShareService($granularShareService);
 	}
 
 	/**

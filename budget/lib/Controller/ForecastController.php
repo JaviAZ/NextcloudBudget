@@ -27,7 +27,7 @@ class ForecastController extends Controller {
     public function __construct(
         IRequest $request,
         ForecastService $service,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -37,7 +37,7 @@ class ForecastController extends Controller {
         $this->l = $l;
         $this->userId = $userId;
         $this->setLogger($logger);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

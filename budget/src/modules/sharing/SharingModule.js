@@ -1,9 +1,9 @@
 /**
- * Sharing Module - Joint budget sharing management
+ * Sharing Module - Granular budget sharing management
  *
- * Manages sharing invitations. Once a share is accepted, the backend
- * transparently resolves both users to the same budget — no frontend
- * mode switching needed.
+ * Manages share invitations and per-entity sharing configuration.
+ * Owners configure which accounts, categories, bills, income, and
+ * goals to share (with read or write permission) via a settings panel.
  */
 import { translate as t } from '@nextcloud/l10n';
 import { showSuccess, showError } from '../../utils/notifications.js';
@@ -14,11 +14,9 @@ export default class SharingModule {
         this.outgoingShares = [];
         this.incomingShares = [];
         this.pendingShares = [];
+        this.expandedConfigId = null; // which share's config panel is open
     }
 
-    /**
-     * Make a fetch request with auth headers
-     */
     async fetchApi(url, options = {}) {
         const { headers: extraHeaders, ...rest } = options;
         const response = await fetch(OC.generateUrl(url), {
@@ -32,9 +30,6 @@ export default class SharingModule {
         return response.json();
     }
 
-    /**
-     * Load the sharing management view
-     */
     async loadSharingView() {
         const container = document.getElementById('sharing-content');
         if (!container) return;
@@ -55,30 +50,23 @@ export default class SharingModule {
     }
 
     async loadOutgoingShares() {
-        try {
-            this.outgoingShares = await this.fetchApi('/apps/budget/api/shares/outgoing');
-        } catch (e) {
-            this.outgoingShares = [];
-        }
+        try { this.outgoingShares = await this.fetchApi('/apps/budget/api/shares/outgoing'); }
+        catch (e) { this.outgoingShares = []; }
     }
 
     async loadIncomingShares() {
-        try {
-            this.incomingShares = await this.fetchApi('/apps/budget/api/shares/incoming');
-        } catch (e) {
-            this.incomingShares = [];
-        }
+        try { this.incomingShares = await this.fetchApi('/apps/budget/api/shares/incoming'); }
+        catch (e) { this.incomingShares = []; }
     }
 
     async loadPendingShares() {
-        try {
-            this.pendingShares = await this.fetchApi('/apps/budget/api/shares/pending');
-        } catch (e) {
-            this.pendingShares = [];
-        }
+        try { this.pendingShares = await this.fetchApi('/apps/budget/api/shares/pending'); }
+        catch (e) { this.pendingShares = []; }
     }
 
     renderSharingView(container) {
+        const acceptedOutgoing = this.outgoingShares.filter(s => s.status === 'accepted');
+        const pendingOutgoing = this.outgoingShares.filter(s => s.status === 'pending');
         const acceptedIncoming = this.incomingShares.filter(s => s.status === 'accepted');
 
         container.innerHTML = `
@@ -86,20 +74,16 @@ export default class SharingModule {
                 ${this.pendingShares.length > 0 ? `
                 <div class="sharing-section">
                     <h3>${t('budget', 'Pending Invitations')}</h3>
-                    <div class="sharing-list" id="pending-shares-list">
+                    <div class="sharing-list">
                         ${this.pendingShares.map(share => `
                             <div class="sharing-item sharing-item-pending" data-share-id="${share.id}">
                                 <div class="sharing-item-info">
-                                    <span class="sharing-item-user">${this.escapeHtml(share.ownerUserId)}</span>
+                                    <span class="sharing-item-user">${this.esc(share.ownerUserId)}</span>
                                     <span class="sharing-item-status badge-pending">${t('budget', 'Pending')}</span>
                                 </div>
                                 <div class="sharing-item-actions">
-                                    <button class="btn btn-primary btn-accept-share" data-id="${share.id}">
-                                        ${t('budget', 'Accept')}
-                                    </button>
-                                    <button class="btn btn-secondary btn-decline-share" data-id="${share.id}">
-                                        ${t('budget', 'Decline')}
-                                    </button>
+                                    <button class="btn btn-primary btn-accept-share" data-id="${share.id}">${t('budget', 'Accept')}</button>
+                                    <button class="btn btn-secondary btn-decline-share" data-id="${share.id}">${t('budget', 'Decline')}</button>
                                 </div>
                             </div>
                         `).join('')}
@@ -109,50 +93,69 @@ export default class SharingModule {
 
                 <div class="sharing-section">
                     <h3>${t('budget', 'Share Your Budget')}</h3>
-                    <p class="sharing-description">${t('budget', 'Invite another Nextcloud user to share your budget. Both of you will see and manage the same accounts, transactions, and reports.')}</p>
+                    <p class="sharing-description">${t('budget', 'Invite a Nextcloud user and then configure which parts of your budget they can access.')}</p>
                     <div class="sharing-add-form">
-                        <input type="text"
-                               id="share-username-input"
-                               placeholder="${t('budget', 'Enter Nextcloud username...')}"
-                               class="sharing-input" />
-                        <button id="share-add-btn" class="btn btn-primary">
-                            ${t('budget', 'Invite')}
-                        </button>
+                        <input type="text" id="share-username-input" placeholder="${t('budget', 'Enter Nextcloud username...')}" class="sharing-input" />
+                        <button id="share-add-btn" class="btn btn-primary">${t('budget', 'Invite')}</button>
                     </div>
-                    ${this.outgoingShares.length > 0 ? `
-                    <div class="sharing-list" id="outgoing-shares-list">
-                        ${this.outgoingShares.map(share => `
+
+                    ${pendingOutgoing.length > 0 ? `
+                    <div class="sharing-list">
+                        ${pendingOutgoing.map(share => `
                             <div class="sharing-item" data-share-id="${share.id}">
                                 <div class="sharing-item-info">
-                                    <span class="sharing-item-user">${this.escapeHtml(share.sharedWithUserId)}</span>
-                                    <span class="sharing-item-status badge-${share.status}">${this.getStatusLabel(share.status)}</span>
+                                    <span class="sharing-item-user">${this.esc(share.sharedWithUserId)}</span>
+                                    <span class="sharing-item-status badge-pending">${t('budget', 'Pending')}</span>
                                 </div>
                                 <div class="sharing-item-actions">
-                                    <button class="btn btn-danger btn-revoke-share" data-id="${share.id}">
-                                        ${t('budget', 'Revoke')}
-                                    </button>
+                                    <button class="btn btn-danger btn-revoke-share" data-id="${share.id}">${t('budget', 'Revoke')}</button>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-                    ` : `<p class="sharing-empty">${t('budget', 'You have not shared your budget with anyone yet.')}</p>`}
+                    ` : ''}
+
+                    ${acceptedOutgoing.length > 0 ? `
+                    <div class="sharing-list">
+                        ${acceptedOutgoing.map(share => `
+                            <div class="sharing-item-block" data-share-id="${share.id}">
+                                <div class="sharing-item">
+                                    <div class="sharing-item-info">
+                                        <span class="sharing-item-user">${this.esc(share.sharedWithUserId)}</span>
+                                        <span class="sharing-item-status badge-accepted">${t('budget', 'Active')}</span>
+                                    </div>
+                                    <div class="sharing-item-actions">
+                                        <button class="btn btn-secondary btn-configure-share" data-id="${share.id}">
+                                            ${this.expandedConfigId === share.id ? t('budget', 'Close') : t('budget', 'Configure')}
+                                        </button>
+                                        <button class="btn btn-danger btn-revoke-share" data-id="${share.id}">${t('budget', 'Revoke')}</button>
+                                    </div>
+                                </div>
+                                <div class="share-config-panel" id="share-config-${share.id}"
+                                     style="display: ${this.expandedConfigId === share.id ? 'block' : 'none'}">
+                                    <div class="share-config-loading">${t('budget', 'Loading configuration...')}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+
+                    ${this.outgoingShares.length === 0 ? `<p class="sharing-empty">${t('budget', 'You have not shared your budget with anyone yet.')}</p>` : ''}
                 </div>
 
                 ${acceptedIncoming.length > 0 ? `
                 <div class="sharing-section">
-                    <h3>${t('budget', 'Joint Budgets')}</h3>
-                    <p class="sharing-description">${t('budget', 'You are sharing a budget with these users. All data is shared — you both see the same accounts and transactions.')}</p>
-                    <div class="sharing-list" id="incoming-shares-list">
+                    <h3>${t('budget', 'Shared With Me')}</h3>
+                    <p class="sharing-description">${t('budget', 'Budgets shared with you by other users.')}</p>
+                    <div class="sharing-list">
                         ${acceptedIncoming.map(share => `
                             <div class="sharing-item" data-share-id="${share.id}">
                                 <div class="sharing-item-info">
-                                    <span class="sharing-item-user">${this.escapeHtml(share.ownerUserId)}</span>
+                                    <span class="sharing-item-user">${this.esc(share.ownerUserId)}</span>
                                     <span class="sharing-item-status badge-accepted">${t('budget', 'Active')}</span>
                                 </div>
                                 <div class="sharing-item-actions">
-                                    <button class="btn btn-danger btn-leave-share" data-id="${share.id}">
-                                        ${t('budget', 'Leave')}
-                                    </button>
+                                    <button class="btn btn-danger btn-leave-share" data-id="${share.id}">${t('budget', 'Leave')}</button>
                                 </div>
                             </div>
                         `).join('')}
@@ -163,44 +166,162 @@ export default class SharingModule {
         `;
 
         this.bindEvents(container);
+
+        // If a config panel was open, reload it
+        if (this.expandedConfigId) {
+            this.loadConfigPanel(this.expandedConfigId);
+        }
     }
 
     bindEvents(container) {
-        // Share button
         const addBtn = container.querySelector('#share-add-btn');
         const input = container.querySelector('#share-username-input');
         if (addBtn && input) {
             addBtn.addEventListener('click', () => this.handleShare(input.value.trim()));
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') this.handleShare(input.value.trim());
-            });
+            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.handleShare(input.value.trim()); });
         }
 
-        // Accept/decline pending
-        container.querySelectorAll('.btn-accept-share').forEach(btn => {
-            btn.addEventListener('click', () => this.handleAccept(parseInt(btn.dataset.id)));
-        });
-        container.querySelectorAll('.btn-decline-share').forEach(btn => {
-            btn.addEventListener('click', () => this.handleDecline(parseInt(btn.dataset.id)));
-        });
-
-        // Revoke outgoing
-        container.querySelectorAll('.btn-revoke-share').forEach(btn => {
-            btn.addEventListener('click', () => this.handleRevoke(parseInt(btn.dataset.id)));
-        });
-
-        // Leave share
-        container.querySelectorAll('.btn-leave-share').forEach(btn => {
-            btn.addEventListener('click', () => this.handleLeave(parseInt(btn.dataset.id)));
-        });
+        container.querySelectorAll('.btn-accept-share').forEach(btn =>
+            btn.addEventListener('click', () => this.handleAccept(parseInt(btn.dataset.id))));
+        container.querySelectorAll('.btn-decline-share').forEach(btn =>
+            btn.addEventListener('click', () => this.handleDecline(parseInt(btn.dataset.id))));
+        container.querySelectorAll('.btn-revoke-share').forEach(btn =>
+            btn.addEventListener('click', () => this.handleRevoke(parseInt(btn.dataset.id))));
+        container.querySelectorAll('.btn-leave-share').forEach(btn =>
+            btn.addEventListener('click', () => this.handleLeave(parseInt(btn.dataset.id))));
+        container.querySelectorAll('.btn-configure-share').forEach(btn =>
+            btn.addEventListener('click', () => this.toggleConfigPanel(parseInt(btn.dataset.id))));
     }
 
-    async handleShare(username) {
-        if (!username) {
-            showError(t('budget', 'Please enter a username'));
-            return;
-        }
+    // ==================== Configuration Panel ====================
 
+    async toggleConfigPanel(shareId) {
+        if (this.expandedConfigId === shareId) {
+            this.expandedConfigId = null;
+        } else {
+            this.expandedConfigId = shareId;
+        }
+        await this.loadSharingView();
+    }
+
+    async loadConfigPanel(shareId) {
+        const panel = document.getElementById(`share-config-${shareId}`);
+        if (!panel) return;
+
+        try {
+            // Load current config and all available entities in parallel
+            const [config, accounts, categories, bills, income, goals] = await Promise.all([
+                this.fetchApi(`/apps/budget/api/shares/${shareId}/items`),
+                this.fetchApi('/apps/budget/api/accounts'),
+                this.fetchApi('/apps/budget/api/categories'),
+                this.fetchApi('/apps/budget/api/bills'),
+                this.fetchApi('/apps/budget/api/recurring-income'),
+                this.fetchApi('/apps/budget/api/goals'),
+            ]);
+
+            this.renderConfigPanel(panel, shareId, config, {
+                account: Array.isArray(accounts) ? accounts : (accounts.accounts || []),
+                category: Array.isArray(categories) ? categories : [],
+                bill: Array.isArray(bills) ? bills : (bills.bills || []),
+                recurring_income: Array.isArray(income) ? income : (income.income || []),
+                savings_goal: Array.isArray(goals) ? goals : (goals.goals || []),
+            });
+        } catch (error) {
+            console.error('Failed to load config:', error);
+            panel.innerHTML = `<p class="sharing-error">${t('budget', 'Failed to load configuration')}</p>`;
+        }
+    }
+
+    renderConfigPanel(panel, shareId, config, entities) {
+        const sections = [
+            { type: 'account', label: t('budget', 'Accounts'), nameField: 'name' },
+            { type: 'category', label: t('budget', 'Categories'), nameField: 'name' },
+            { type: 'bill', label: t('budget', 'Bills'), nameField: 'name' },
+            { type: 'recurring_income', label: t('budget', 'Recurring Income'), nameField: 'name' },
+            { type: 'savings_goal', label: t('budget', 'Savings Goals'), nameField: 'name' },
+        ];
+
+        panel.innerHTML = `
+            <div class="share-config-content">
+                ${sections.map(section => {
+                    const items = entities[section.type] || [];
+                    const currentConfig = config[section.type] || { ids: [], permission: 'read' };
+
+                    if (items.length === 0) return '';
+
+                    return `
+                        <div class="share-config-section" data-type="${section.type}">
+                            <div class="share-config-section-header">
+                                <h4>${section.label}</h4>
+                                <select class="share-config-permission" data-type="${section.type}">
+                                    <option value="read" ${currentConfig.permission === 'read' ? 'selected' : ''}>${t('budget', 'Read only')}</option>
+                                    <option value="write" ${currentConfig.permission === 'write' ? 'selected' : ''}>${t('budget', 'Read & Write')}</option>
+                                </select>
+                            </div>
+                            <div class="share-config-checklist">
+                                ${items.map(item => {
+                                    const id = item.id;
+                                    const name = item[section.nameField] || `#${id}`;
+                                    const checked = currentConfig.ids.includes(id);
+                                    const indent = (section.type === 'category' && item.parentId) ? ' style="padding-left: 24px;"' : '';
+                                    return `
+                                        <label class="share-config-item"${indent}>
+                                            <input type="checkbox" data-type="${section.type}" data-entity-id="${id}"
+                                                   ${checked ? 'checked' : ''} />
+                                            <span>${this.esc(name)}</span>
+                                        </label>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+                <div class="share-config-actions">
+                    <button class="btn btn-primary btn-save-config" data-share-id="${shareId}">
+                        ${t('budget', 'Save Configuration')}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Bind save button
+        panel.querySelector('.btn-save-config')?.addEventListener('click', () => this.saveConfig(shareId));
+    }
+
+    async saveConfig(shareId) {
+        const panel = document.getElementById(`share-config-${shareId}`);
+        if (!panel) return;
+
+        const types = ['account', 'category', 'bill', 'recurring_income', 'savings_goal'];
+
+        try {
+            for (const type of types) {
+                const section = panel.querySelector(`.share-config-section[data-type="${type}"]`);
+                if (!section) continue;
+
+                const permSelect = section.querySelector('.share-config-permission');
+                const permission = permSelect ? permSelect.value : 'read';
+
+                const checkboxes = section.querySelectorAll(`input[data-type="${type}"]:checked`);
+                const entityIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.entityId));
+
+                await this.fetchApi(`/apps/budget/api/shares/${shareId}/items/${type}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ entityIds, permission }),
+                });
+            }
+
+            showSuccess(t('budget', 'Share configuration saved'));
+        } catch (error) {
+            showError(error.message || t('budget', 'Failed to save configuration'));
+        }
+    }
+
+    // ==================== Share Actions ====================
+
+    async handleShare(username) {
+        if (!username) { showError(t('budget', 'Please enter a username')); return; }
         try {
             await this.fetchApi('/apps/budget/api/shares', {
                 method: 'POST',
@@ -209,21 +330,16 @@ export default class SharingModule {
             });
             showSuccess(t('budget', 'Invitation sent to {user}', { user: username }));
             await this.loadSharingView();
-        } catch (error) {
-            showError(error.message || t('budget', 'Failed to share budget'));
-        }
+        } catch (error) { showError(error.message || t('budget', 'Failed to share budget')); }
     }
 
     async handleAccept(shareId) {
         try {
             await this.fetchApi(`/apps/budget/api/shares/${shareId}/accept`, { method: 'POST' });
             showSuccess(t('budget', 'Share accepted — reloading budget data'));
-            // Reload all data since we now see the owner's budget
             await this.app.loadInitialData();
             await this.loadSharingView();
-        } catch (error) {
-            showError(error.message || t('budget', 'Failed to accept share'));
-        }
+        } catch (error) { showError(error.message || t('budget', 'Failed to accept share')); }
     }
 
     async handleDecline(shareId) {
@@ -231,40 +347,30 @@ export default class SharingModule {
             await this.fetchApi(`/apps/budget/api/shares/${shareId}/decline`, { method: 'POST' });
             showSuccess(t('budget', 'Share declined'));
             await this.loadSharingView();
-        } catch (error) {
-            showError(error.message || t('budget', 'Failed to decline share'));
-        }
+        } catch (error) { showError(error.message || t('budget', 'Failed to decline share')); }
     }
 
     async handleRevoke(shareId) {
-        if (!confirm(t('budget', 'Are you sure you want to revoke this share? The user will lose access to your budget.'))) {
-            return;
-        }
-
+        if (!confirm(t('budget', 'Are you sure? The user will lose access to your budget.'))) return;
         try {
             await this.fetchApi(`/apps/budget/api/shares/${shareId}`, { method: 'DELETE' });
             showSuccess(t('budget', 'Share revoked'));
+            if (this.expandedConfigId === shareId) this.expandedConfigId = null;
             await this.loadSharingView();
-        } catch (error) {
-            showError(error.message || t('budget', 'Failed to revoke share'));
-        }
+        } catch (error) { showError(error.message || t('budget', 'Failed to revoke share')); }
     }
 
     async handleLeave(shareId) {
-        if (!confirm(t('budget', 'Are you sure you want to leave this shared budget? You will only see your own data.'))) {
-            return;
-        }
-
+        if (!confirm(t('budget', 'Are you sure you want to leave this shared budget?'))) return;
         try {
             await this.fetchApi(`/apps/budget/api/shares/${shareId}/leave`, { method: 'POST' });
             showSuccess(t('budget', 'Left shared budget — reloading your data'));
-            // Reload all data since we now see only our own budget
             await this.app.loadInitialData();
             await this.loadSharingView();
-        } catch (error) {
-            showError(error.message || t('budget', 'Failed to leave share'));
-        }
+        } catch (error) { showError(error.message || t('budget', 'Failed to leave share')); }
     }
+
+    // ==================== Helpers ====================
 
     getStatusLabel(status) {
         switch (status) {
@@ -275,7 +381,7 @@ export default class SharingModule {
         }
     }
 
-    escapeHtml(str) {
+    esc(str) {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;

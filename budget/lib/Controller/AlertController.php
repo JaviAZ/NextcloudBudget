@@ -6,7 +6,7 @@ namespace OCA\Budget\Controller;
 
 use OCA\Budget\AppInfo\Application;
 use OCA\Budget\Service\BudgetAlertService;
-use OCA\Budget\Service\ShareService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\SharedAccessTrait;
 use OCP\AppFramework\Controller;
@@ -26,7 +26,7 @@ class AlertController extends Controller {
     public function __construct(
         IRequest $request,
         BudgetAlertService $alertService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -36,7 +36,7 @@ class AlertController extends Controller {
         $this->l = $l;
         $this->userId = $userId;
         $this->setLogger($logger);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

@@ -45,6 +45,26 @@ class RecurringIncomeMapper extends QBMapper {
     }
 
     /**
+     * Find multiple recurring incomes by IDs without user scoping.
+     * IDs are pre-authorized by GranularShareService.
+     *
+     * @param int[] $ids
+     * @return RecurringIncome[]
+     */
+    public function findByIds(array $ids): array {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+
+        return $this->findEntities($qb);
+    }
+
+    /**
      * @return RecurringIncome[]
      */
     public function findActive(string $userId): array {

@@ -28,7 +28,7 @@ class YearOverYearController extends Controller {
     public function __construct(
         IRequest $request,
         YearOverYearService $service,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -38,7 +38,7 @@ class YearOverYearController extends Controller {
         $this->l = $l;
         $this->userId = $userId;
         $this->logger = $logger;
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

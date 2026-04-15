@@ -33,7 +33,7 @@ class RecurringIncomeController extends Controller {
         IRequest $request,
         RecurringIncomeService $service,
         ValidationService $validationService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -45,7 +45,7 @@ class RecurringIncomeController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -55,10 +55,21 @@ class RecurringIncomeController extends Controller {
     public function index(?bool $activeOnly = false): DataResponse {
         try {
             if ($activeOnly) {
-                $incomes = $this->service->findActive($this->getEffectiveUserId());
+                $incomes = $this->service->findActive($this->userId);
             } else {
-                $incomes = $this->service->findAll($this->getEffectiveUserId());
+                $incomes = $this->service->findAll($this->userId);
             }
+
+            // Merge shared recurring income
+            $shared = $this->granularShareService->getSharedRecurringIncome($this->userId);
+            if (!empty($shared)) {
+                $incomes = array_merge(
+                    array_map(fn($i) => $i->jsonSerialize(), $incomes),
+                    $shared
+                );
+                return new DataResponse($incomes);
+            }
+
             return new DataResponse($incomes);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve recurring income'));

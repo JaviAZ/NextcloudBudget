@@ -7,7 +7,7 @@ namespace OCA\Budget\Controller;
 use OCA\Budget\AppInfo\Application;
 use OCA\Budget\Service\AccountService;
 use OCA\Budget\Service\AuditService;
-use OCA\Budget\Service\ShareService;
+use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;
@@ -38,7 +38,7 @@ class AccountController extends Controller {
         AccountService $service,
         ValidationService $validationService,
         AuditService $auditService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -51,7 +51,7 @@ class AccountController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -59,7 +59,15 @@ class AccountController extends Controller {
      */
     public function index(): DataResponse {
         try {
-            $accounts = $this->service->findAllWithCurrentBalances($this->getEffectiveUserId());
+            // Own accounts with balance adjustments
+            $accounts = $this->service->findAllWithCurrentBalances($this->userId);
+
+            // Merge in shared accounts
+            $shared = $this->granularShareService->getSharedAccounts($this->userId);
+            if (!empty($shared)) {
+                $accounts = array_merge($accounts, $shared);
+            }
+
             return new DataResponse($accounts);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve accounts'));
@@ -71,7 +79,16 @@ class AccountController extends Controller {
      */
     public function show(int $id): DataResponse {
         try {
-            $account = $this->service->findWithCurrentBalance($id, $this->getEffectiveUserId());
+            if (!$this->canAccessEntity('account', $id)) {
+                return new DataResponse(['error' => $this->l->t('Account not found')], Http::STATUS_NOT_FOUND);
+            }
+            // Try own account first, fall back to shared
+            try {
+                $account = $this->service->findWithCurrentBalance($id, $this->userId);
+            } catch (\Exception $e) {
+                $account = $this->service->findByIdsAsArrays([$id])[0] ?? null;
+                if (!$account) throw $e;
+            }
             return new DataResponse($account);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Account'), ['accountId' => $id]);

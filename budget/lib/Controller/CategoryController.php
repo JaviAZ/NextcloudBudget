@@ -33,7 +33,7 @@ class CategoryController extends Controller {
         IRequest $request,
         CategoryService $service,
         ValidationService $validationService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -45,7 +45,7 @@ class CategoryController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -54,10 +54,24 @@ class CategoryController extends Controller {
     public function index(?string $type = null): DataResponse {
         try {
             if ($type) {
-                $categories = $this->service->findByType($this->getEffectiveUserId(), $type);
+                $categories = $this->service->findByType($this->userId, $type);
             } else {
-                $categories = $this->service->findAll($this->getEffectiveUserId());
+                $categories = $this->service->findAll($this->userId);
             }
+
+            // Merge shared categories
+            $shared = $this->granularShareService->getSharedCategories($this->userId);
+            if (!empty($shared)) {
+                if ($type) {
+                    $shared = array_filter($shared, fn($c) => ($c['type'] ?? '') === $type);
+                }
+                $categories = array_merge(
+                    array_map(fn($c) => $c->jsonSerialize(), $categories),
+                    array_values($shared)
+                );
+                return new DataResponse($categories);
+            }
+
             return new DataResponse($categories);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve categories'));

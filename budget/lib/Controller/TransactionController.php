@@ -39,7 +39,7 @@ class TransactionController extends Controller {
         TransactionSplitService $splitService,
         TransactionTagService $tagService,
         ValidationService $validationService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -53,7 +53,7 @@ class TransactionController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**

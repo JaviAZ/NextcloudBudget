@@ -6,6 +6,7 @@ namespace OCA\Budget\Service;
 
 use DateTime;
 use OCA\Budget\Db\Share;
+use OCA\Budget\Db\ShareItemMapper;
 use OCA\Budget\Db\ShareMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IUserManager;
@@ -14,6 +15,7 @@ use OCP\Notification\IManager as INotificationManager;
 
 class ShareService {
     private ShareMapper $mapper;
+    private ShareItemMapper $shareItemMapper;
     private AuditService $auditService;
     private IUserManager $userManager;
     private INotificationManager $notificationManager;
@@ -21,12 +23,14 @@ class ShareService {
 
     public function __construct(
         ShareMapper $mapper,
+        ShareItemMapper $shareItemMapper,
         AuditService $auditService,
         IUserManager $userManager,
         INotificationManager $notificationManager,
         IL10N $l
     ) {
         $this->mapper = $mapper;
+        $this->shareItemMapper = $shareItemMapper;
         $this->auditService = $auditService;
         $this->userManager = $userManager;
         $this->notificationManager = $notificationManager;
@@ -155,6 +159,9 @@ class ShareService {
         }
 
         $sharedWith = $share->getSharedWithUserId();
+
+        // Cascade delete share items before deleting the share
+        $this->shareItemMapper->deleteByShareId($shareId);
         $this->mapper->delete($share);
 
         // Dismiss any pending notifications for the revoked share
@@ -183,6 +190,8 @@ class ShareService {
             throw new \InvalidArgumentException($this->l->t('You are not the recipient of this share'));
         }
 
+        // Cascade delete share items before deleting the share
+        $this->shareItemMapper->deleteByShareId($shareId);
         $this->mapper->delete($share);
 
         $this->auditService->log(

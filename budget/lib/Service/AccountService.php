@@ -168,6 +168,32 @@ class AccountService extends AbstractCrudService {
     }
 
     /**
+     * Get specific accounts by IDs with masked data.
+     * Used for fetching shared accounts that belong to another user.
+     *
+     * @param int[] $accountIds
+     * @return array[] Array of account data arrays
+     */
+    public function findByIdsAsArrays(array $accountIds): array {
+        if (empty($accountIds)) {
+            return [];
+        }
+
+        /** @var AccountMapper $mapper */
+        $mapper = $this->mapper;
+        $accounts = $mapper->findByIds($accountIds);
+
+        $result = [];
+        foreach ($accounts as $account) {
+            $accountData = $account->toArrayMasked();
+            $accountData['_shared'] = true;
+            $result[] = $accountData;
+        }
+
+        return $result;
+    }
+
+    /**
      * Add convertedBalance and baseCurrency to an account data array
      * when the account's currency differs from the user's base currency.
      */

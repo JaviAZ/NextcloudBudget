@@ -33,7 +33,7 @@ class GoalsController extends Controller {
         IRequest $request,
         GoalsService $service,
         ValidationService $validationService,
-        ShareService $shareService,
+        GranularShareService $granularShareService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -45,7 +45,7 @@ class GoalsController extends Controller {
         $this->userId = $userId;
         $this->setLogger($logger);
         $this->setInputValidator($validationService);
-        $this->setShareService($shareService);
+        $this->setGranularShareService($granularShareService);
     }
 
     /**
@@ -53,7 +53,18 @@ class GoalsController extends Controller {
      */
     public function index(): DataResponse {
         try {
-            $goals = $this->service->findAll($this->getEffectiveUserId());
+            $goals = $this->service->findAll($this->userId);
+
+            // Merge shared savings goals
+            $shared = $this->granularShareService->getSharedSavingsGoals($this->userId);
+            if (!empty($shared)) {
+                $goals = array_merge(
+                    array_map(fn($g) => $g->jsonSerialize(), $goals),
+                    $shared
+                );
+                return new DataResponse($goals);
+            }
+
             return new DataResponse($goals);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve goals'));

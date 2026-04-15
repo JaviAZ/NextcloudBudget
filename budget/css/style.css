@@ -16301,3 +16301,93 @@ input.flatpickr-input[type="hidden"] + .flatpickr-input {
     color: var(--color-text-maxcontrast);
     font-style: italic;
 }
+
+/* Share item block (item + config panel) */
+.sharing-item-block {
+    border-radius: var(--border-radius-large, 8px);
+    overflow: hidden;
+}
+
+.sharing-item-block .sharing-item {
+    border-radius: 0;
+}
+
+/* Configuration panel */
+.share-config-panel {
+    background: var(--color-main-background, #fff);
+    border: 1px solid var(--color-border, #ddd);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-large, 8px) var(--border-radius-large, 8px);
+    padding: 16px;
+}
+
+.share-config-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.share-config-section {
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: var(--border-radius, 4px);
+    padding: 12px;
+}
+
+.share-config-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.share-config-section-header h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.share-config-permission {
+    padding: 4px 8px;
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--border-radius, 4px);
+    font-size: 13px;
+    background: var(--color-main-background);
+}
+
+.share-config-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.share-config-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: var(--border-radius, 4px);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.share-config-item:hover {
+    background: var(--color-background-hover, #eee);
+}
+
+.share-config-item input[type="checkbox"] {
+    margin: 0;
+}
+
+.share-config-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border, #ddd);
+}
+
+.sharing-error {
+    color: var(--color-error, #c00);
+    padding: 8px;
+}

@@ -635,9 +635,15 @@ class Application extends App implements IBootstrap {
         });
         $context->registerServiceAlias('ShareMapper', \OCA\Budget\Db\ShareMapper::class);
 
+        $context->registerService(\OCA\Budget\Db\ShareItemMapper::class, function($c) {
+            return new \OCA\Budget\Db\ShareItemMapper($c->get(\OCP\IDBConnection::class));
+        });
+        $context->registerServiceAlias('ShareItemMapper', \OCA\Budget\Db\ShareItemMapper::class);
+
         $context->registerService(\OCA\Budget\Service\ShareService::class, function($c) {
             return new \OCA\Budget\Service\ShareService(
                 $c->get(\OCA\Budget\Db\ShareMapper::class),
+                $c->get(\OCA\Budget\Db\ShareItemMapper::class),
                 $c->get(\OCA\Budget\Service\AuditService::class),
                 $c->get(\OCP\IUserManager::class),
                 $c->get(\OCP\Notification\IManager::class),
@@ -645,6 +651,20 @@ class Application extends App implements IBootstrap {
             );
         });
         $context->registerServiceAlias('ShareService', \OCA\Budget\Service\ShareService::class);
+
+        $context->registerService(\OCA\Budget\Service\GranularShareService::class, function($c) {
+            return new \OCA\Budget\Service\GranularShareService(
+                $c->get(\OCA\Budget\Db\ShareMapper::class),
+                $c->get(\OCA\Budget\Db\ShareItemMapper::class),
+                $c->get(\OCA\Budget\Db\AccountMapper::class),
+                $c->get(\OCA\Budget\Db\BillMapper::class),
+                $c->get(\OCA\Budget\Db\CategoryMapper::class),
+                $c->get(\OCA\Budget\Db\RecurringIncomeMapper::class),
+                $c->get(\OCA\Budget\Db\SavingsGoalMapper::class),
+                $c->get(\OCP\IL10N::class)
+            );
+        });
+        $context->registerServiceAlias('GranularShareService', \OCA\Budget\Service\GranularShareService::class);
 
         // ==========================================
         // Exchange Rate Services

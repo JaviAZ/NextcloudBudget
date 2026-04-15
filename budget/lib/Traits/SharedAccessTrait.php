@@ -4,49 +4,70 @@ declare(strict_types=1);
 
 namespace OCA\Budget\Traits;
 
-use OCA\Budget\Service\ShareService;
+use OCA\Budget\Exception\ReadOnlyShareException;
+use OCA\Budget\Service\GranularShareService;
 
 /**
- * Trait for controllers that support joint budget sharing.
+ * Trait for controllers that support granular budget sharing.
  *
- * If the current user has accepted a share from another user, all data
- * operations transparently use the owner's userId. This means both users
- * see and edit the same budget — true joint ownership.
+ * Provides convenience methods to get visible entity IDs and check
+ * write permissions. Controllers use these instead of raw userId scoping.
  *
  * Controllers using this trait must:
  * 1. Have a `$userId` property (the authenticated Nextcloud user)
- * 2. Have a `ShareService` injected and call `setShareService()` in constructor
- * 3. Use `$this->getEffectiveUserId()` instead of `$this->userId` for data access
+ * 2. Inject GranularShareService and call `setGranularShareService()` in constructor
  */
 trait SharedAccessTrait {
-    private ?ShareService $shareService = null;
-    private ?string $resolvedEffectiveUserId = null;
+    protected ?GranularShareService $granularShareService = null;
 
-    protected function setShareService(ShareService $shareService): void {
-        $this->shareService = $shareService;
+    protected function setGranularShareService(GranularShareService $service): void {
+        $this->granularShareService = $service;
     }
 
     /**
-     * Get the effective user ID for all data operations.
-     *
-     * If this user has accepted a share, returns the owner's userId so both
-     * users operate on the same data. Result is cached per request.
+     * Returns the authenticated user's own ID.
+     * Kept for backward compatibility — no longer swaps to another user.
      */
     protected function getEffectiveUserId(): string {
-        if ($this->resolvedEffectiveUserId !== null) {
-            return $this->resolvedEffectiveUserId;
-        }
+        return $this->userId;
+    }
 
-        if ($this->shareService !== null) {
-            $acceptedOwners = $this->shareService->getAcceptedOwnerIds($this->userId);
-            if (!empty($acceptedOwners)) {
-                // Use the first accepted share's owner — a user joins one shared budget
-                $this->resolvedEffectiveUserId = $acceptedOwners[0];
-                return $this->resolvedEffectiveUserId;
-            }
-        }
+    /** @return int[] */
+    protected function getVisibleAccountIds(): array {
+        return $this->granularShareService->getVisibleAccountIds($this->userId);
+    }
 
-        $this->resolvedEffectiveUserId = $this->userId;
-        return $this->resolvedEffectiveUserId;
+    /** @return int[] */
+    protected function getVisibleCategoryIds(): array {
+        return $this->granularShareService->getVisibleCategoryIds($this->userId);
+    }
+
+    /** @return int[] */
+    protected function getVisibleBillIds(): array {
+        return $this->granularShareService->getVisibleBillIds($this->userId);
+    }
+
+    /** @return int[] */
+    protected function getVisibleRecurringIncomeIds(): array {
+        return $this->granularShareService->getVisibleRecurringIncomeIds($this->userId);
+    }
+
+    /** @return int[] */
+    protected function getVisibleSavingsGoalIds(): array {
+        return $this->granularShareService->getVisibleSavingsGoalIds($this->userId);
+    }
+
+    /**
+     * Check write permission. Throws ReadOnlyShareException if denied.
+     */
+    protected function requireWriteAccess(string $entityType, int $entityId): void {
+        $this->granularShareService->requireWriteAccess($this->userId, $entityType, $entityId);
+    }
+
+    /**
+     * Check if user can access a specific entity.
+     */
+    protected function canAccessEntity(string $entityType, int $entityId): bool {
+        return $this->granularShareService->canAccess($this->userId, $entityType, $entityId);
     }
 }

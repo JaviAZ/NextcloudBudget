@@ -297,6 +297,8 @@ return [
         ['name' => 'share#decline', 'url' => '/api/shares/{id}/decline', 'verb' => 'POST'],
         ['name' => 'share#revoke', 'url' => '/api/shares/{id}', 'verb' => 'DELETE'],
         ['name' => 'share#leave', 'url' => '/api/shares/{id}/leave', 'verb' => 'POST'],
+        ['name' => 'share#getConfig', 'url' => '/api/shares/{id}/items', 'verb' => 'GET'],
+        ['name' => 'share#updateTypeItems', 'url' => '/api/shares/{id}/items/{type}', 'verb' => 'PUT'],
 
         // Exchange rate routes
         ['name' => 'exchangeRate#index', 'url' => '/api/exchange-rates', 'verb' => 'GET'],

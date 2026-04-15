@@ -172,6 +172,34 @@ class CategoryMapper extends QBMapper {
     }
 
     /**
+     * Find multiple categories by IDs without user scoping.
+     * IDs are pre-authorized by GranularShareService.
+     *
+     * @param int[] $ids
+     * @return array<int, Category> categoryId => Category
+     */
+    public function findByIdsUnscoped(array $ids): array {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->in('id', $qb->createNamedParameter($ids, IQueryBuilder::PARAM_INT_ARRAY)));
+
+        $entities = $this->findEntities($qb);
+
+        // Index by ID for quick lookup
+        $result = [];
+        foreach ($entities as $entity) {
+            $result[$entity->getId()] = $entity;
+        }
+
+        return $result;
+    }
+
+    /**
      * Delete all categories for a user
      *
      * @param string $userId
