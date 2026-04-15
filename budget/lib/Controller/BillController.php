@@ -558,10 +558,41 @@ class BillController extends Controller {
             $params = $this->request->getParams();
             $createNextTransaction = (bool) ($params['createNextTransaction'] ?? false);
 
-            $bill = $this->service->markPaid($id, $this->getEffectiveUserId(), $paidDate, $createNextTransaction);
-            return new DataResponse($bill);
+            $result = $this->service->markPaid($id, $this->getEffectiveUserId(), $paidDate, $createNextTransaction);
+            return new DataResponse($result);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to mark bill as paid'), Http::STATUS_BAD_REQUEST, ['billId' => $id]);
+        }
+    }
+
+    /**
+     * Undo a mark-paid action
+     * @NoAdminRequired
+     */
+    #[UserRateLimit(limit: 30, period: 60)]
+    public function undoPaid(int $id): DataResponse {
+        try {
+            $this->requireWriteAccess('bill', $id);
+            $params = $this->request->getParams();
+            $previousState = $params['previousState'] ?? null;
+            $createdTransactionIds = $params['createdTransactionIds'] ?? [];
+
+            if ($previousState === null || !is_array($previousState)) {
+                return new DataResponse(['error' => $this->l->t('Missing previous state')], Http::STATUS_BAD_REQUEST);
+            }
+
+            $hadScheduledTransaction = (bool) ($params['hadScheduledTransaction'] ?? false);
+
+            $bill = $this->service->undoPaid(
+                $id,
+                $this->getEffectiveUserId(),
+                $previousState,
+                array_map('intval', $createdTransactionIds),
+                $hadScheduledTransaction
+            );
+            return new DataResponse($bill);
+        } catch (\Exception $e) {
+            return $this->handleError($e, $this->l->t('Failed to undo mark as paid'), Http::STATUS_BAD_REQUEST, ['billId' => $id]);
         }
     }
 

@@ -308,8 +308,19 @@ class BillService {
      * @param bool $createNextTransaction Whether to create transaction for next occurrence
      * @return Bill Updated bill
      */
-    public function markPaid(int $id, string $userId, ?string $paidDate = null, bool $createNextTransaction = true): Bill {
+    public function markPaid(int $id, string $userId, ?string $paidDate = null, bool $createNextTransaction = true): array {
         $bill = $this->find($id, $userId);
+
+        // Capture previous state for undo support
+        $previousState = [
+            'lastPaidDate' => $bill->getLastPaidDate(),
+            'nextDueDate' => $bill->getNextDueDate(),
+            'remainingPayments' => $bill->getRemainingPayments(),
+            'isActive' => $bill->getIsActive(),
+            'autoPayFailed' => $bill->getAutoPayFailed(),
+        ];
+        $createdTransactionIds = [];
+        $hadScheduledTransaction = false;
 
         // Reset auto-pay failed flag on successful manual payment
         if ($bill->getAutoPayFailed()) {
@@ -326,8 +337,15 @@ class BillService {
             try {
                 // Clear pre-existing scheduled transaction(s), or create new cleared one
                 $transaction = $this->transactionService->clearScheduledBillTransaction($userId, $bill->getId(), $paidDate);
-                if (!$transaction) {
+                if ($transaction) {
+                    $hadScheduledTransaction = true;
+                } else {
                     $transaction = $this->transactionService->createFromBill($userId, $bill, $paidDate, 'cleared');
+                }
+                $createdTransactionIds[] = $transaction->getId();
+                // For transfers, also track the linked deposit transaction
+                if ($transaction->getLinkedTransactionId()) {
+                    $createdTransactionIds[] = $transaction->getLinkedTransactionId();
                 }
 
                 // Apply split template if defined
@@ -377,9 +395,68 @@ class BillService {
         if ($createNextTransaction && $bill->getIsActive() && $bill->getAccountId() !== null) {
             try {
                 $nextTransaction = $this->transactionService->createFromBill($userId, $bill, null);
+                $createdTransactionIds[] = $nextTransaction->getId();
+                // For transfers, also track the linked deposit transaction
+                if ($nextTransaction->getLinkedTransactionId()) {
+                    $createdTransactionIds[] = $nextTransaction->getLinkedTransactionId();
+                }
                 $this->applySplitTemplate($bill, $nextTransaction, $userId);
             } catch (\Exception $e) {
                 error_log("Failed to create next transaction for bill {$id}: {$e->getMessage()}");
+            }
+        }
+
+        return [
+            'bill' => $bill,
+            'previousState' => $previousState,
+            'createdTransactionIds' => $createdTransactionIds,
+            'hadScheduledTransaction' => $hadScheduledTransaction,
+        ];
+    }
+
+    /**
+     * Undo a mark-paid action, restoring the bill to its previous state
+     * and deleting any transactions that were created.
+     *
+     * @param int $id Bill ID
+     * @param string $userId User ID
+     * @param array $previousState Previous bill field values to restore
+     * @param int[] $createdTransactionIds Transaction IDs created by markPaid to delete
+     * @param bool $hadScheduledTransaction Whether a scheduled transaction existed before markPaid
+     * @return Bill Restored bill
+     */
+    public function undoPaid(int $id, string $userId, array $previousState, array $createdTransactionIds, bool $hadScheduledTransaction = false): Bill {
+        $bill = $this->find($id, $userId);
+
+        // Delete transactions that were created by markPaid
+        foreach ($createdTransactionIds as $transactionId) {
+            try {
+                $this->transactionService->delete((int) $transactionId, $userId);
+            } catch (\Exception $e) {
+                error_log("Failed to delete transaction {$transactionId} during undo-paid for bill {$id}: {$e->getMessage()}");
+            }
+        }
+
+        // Restore previous bill state
+        $bill->setLastPaidDate($previousState['lastPaidDate'] ?? null);
+        $bill->setNextDueDate($previousState['nextDueDate'] ?? null);
+        $bill->setIsActive($previousState['isActive'] ?? true);
+        if (array_key_exists('remainingPayments', $previousState)) {
+            $bill->setRemainingPayments($previousState['remainingPayments']);
+        }
+        if (array_key_exists('autoPayFailed', $previousState)) {
+            $bill->setAutoPayFailed($previousState['autoPayFailed'] ?? false);
+        }
+
+        $bill = $this->mapper->update($bill);
+
+        // Only recreate scheduled transaction if one existed before markPaid
+        if ($hadScheduledTransaction && $bill->getIsActive() && $bill->getAccountId() !== null && $bill->getNextDueDate() !== null) {
+            try {
+                $nextTransaction = $this->transactionService->createFromBill($userId, $bill, null);
+                $this->applySplitTemplate($bill, $nextTransaction, $userId);
+            } catch (\Exception $e) {
+                error_log("Failed to recreate scheduled transaction after undo-paid for bill {$id}: {$e->getMessage()}");
             }
         }
 
@@ -710,12 +787,12 @@ class BillService {
             }
 
             // Mark bill as paid
-            $bill = $this->markPaid($id, $userId, null, true);
+            $result = $this->markPaid($id, $userId, null, true);
 
             return [
                 'success' => true,
                 'message' => $this->l->t('Bill auto-paid successfully'),
-                'bill' => $bill,
+                'bill' => $result['bill'],
             ];
 
         } catch (\Exception $e) {

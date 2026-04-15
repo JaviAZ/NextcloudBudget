@@ -26121,7 +26121,7 @@ var BillsModule = /*#__PURE__*/function () {
     value: function () {
       var _markBillPaid = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(billId) {
         var _this5 = this;
-        var bill, previousPaidDate, response, isOneTime, message, _t6;
+        var bill, response, result, isOneTime, message, _t6;
         return _regenerator().w(function (_context6) {
           while (1) switch (_context6.p = _context6.n) {
             case 0:
@@ -26135,7 +26135,6 @@ var BillsModule = /*#__PURE__*/function () {
               }
               throw new Error('Bill not found');
             case 1:
-              previousPaidDate = bill.lastPaidDate || bill.last_paid_date || null;
               _context6.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId, "/paid")), {
                 method: 'POST',
@@ -26155,38 +26154,39 @@ var BillsModule = /*#__PURE__*/function () {
               }
               throw new Error("HTTP ".concat(response.status));
             case 3:
-              // Store undo data BEFORE reloading
+              _context6.n = 4;
+              return response.json();
+            case 4:
+              result = _context6.v;
+              // Store undo data from server response BEFORE reloading
               this._undoData = {
                 billId: billId,
-                previousPaidDate: previousPaidDate,
+                previousState: result.previousState,
+                createdTransactionIds: result.createdTransactionIds || [],
+                hadScheduledTransaction: result.hadScheduledTransaction || false,
                 action: 'markPaid'
               };
-              _context6.n = 4;
+              _context6.n = 5;
               return this.loadBillsView();
-            case 4:
-              if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-              }
+            case 5:
               isOneTime = bill.frequency === 'one-time';
               message = isOneTime ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Bill marked as paid. Transaction created.') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Bill marked as paid. Future transaction created.');
               this.showUndoNotification(message, function () {
                 return _this5.undoMarkBillPaid();
-              });
-              this._undoTimer = setTimeout(function () {
+              }, function () {
                 _this5._undoData = null;
-                _this5._undoTimer = null;
-              }, 5000);
-              _context6.n = 6;
+              });
+              _context6.n = 7;
               break;
-            case 5:
-              _context6.p = 5;
+            case 6:
+              _context6.p = 6;
               _t6 = _context6.v;
               console.error('Failed to mark bill as paid:', _t6);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to mark bill as paid'));
-            case 6:
+            case 7:
               return _context6.a(2);
           }
-        }, _callee6, this, [[0, 5]]);
+        }, _callee6, this, [[0, 6]]);
       }));
       function markBillPaid(_x3) {
         return _markBillPaid.apply(this, arguments);
@@ -26197,7 +26197,7 @@ var BillsModule = /*#__PURE__*/function () {
     key: "undoMarkBillPaid",
     value: function () {
       var _undoMarkBillPaid = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
-        var _this$_undoData, billId, previousPaidDate, response, errorData, _t7;
+        var _this$_undoData, billId, previousState, createdTransactionIds, hadScheduledTransaction, response, errorData, _t7;
         return _regenerator().w(function (_context7) {
           while (1) switch (_context7.p = _context7.n) {
             case 0:
@@ -26208,20 +26208,18 @@ var BillsModule = /*#__PURE__*/function () {
               return _context7.a(2);
             case 1:
               _context7.p = 1;
-              _this$_undoData = this._undoData, billId = _this$_undoData.billId, previousPaidDate = _this$_undoData.previousPaidDate;
-              if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-                this._undoTimer = null;
-              }
+              _this$_undoData = this._undoData, billId = _this$_undoData.billId, previousState = _this$_undoData.previousState, createdTransactionIds = _this$_undoData.createdTransactionIds, hadScheduledTransaction = _this$_undoData.hadScheduledTransaction;
               _context7.n = 2;
-              return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId)), {
-                method: 'PUT',
+              return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId, "/undo-paid")), {
+                method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                   'requesttoken': OC.requestToken
                 },
                 body: JSON.stringify({
-                  lastPaidDate: previousPaidDate
+                  previousState: previousState,
+                  createdTransactionIds: createdTransactionIds,
+                  hadScheduledTransaction: hadScheduledTransaction
                 })
               });
             case 2:
@@ -26316,16 +26314,11 @@ var BillsModule = /*#__PURE__*/function () {
               _context8.n = 6;
               return this.loadBillsView();
             case 6:
-              if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-              }
               this.showUndoNotification((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Payment skipped. Advanced to next due date.'), function () {
                 return _this6.undoSkipPayment();
-              });
-              this._undoTimer = setTimeout(function () {
+              }, function () {
                 _this6._undoData = null;
-                _this6._undoTimer = null;
-              }, 5000);
+              });
               _context8.n = 8;
               break;
             case 7:
@@ -26359,10 +26352,6 @@ var BillsModule = /*#__PURE__*/function () {
             case 1:
               _context9.p = 1;
               _this$_undoData2 = this._undoData, billId = _this$_undoData2.billId, previousNextDueDate = _this$_undoData2.previousNextDueDate;
-              if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-                this._undoTimer = null;
-              }
               _context9.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/bills/".concat(billId, "/undo-skip")), {
                 method: 'POST',
@@ -26414,9 +26403,10 @@ var BillsModule = /*#__PURE__*/function () {
     }()
   }, {
     key: "showUndoNotification",
-    value: function showUndoNotification(message, undoCallback) {
+    value: function showUndoNotification(message, undoCallback, onExpire) {
       var notification = document.createElement('div');
       notification.className = 'undo-notification';
+      var expired = false;
       notification.innerHTML = "\n            <span class=\"undo-message\">".concat(message, "</span>\n            <button class=\"undo-btn\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Undo'), "</button>\n        ");
       Object.assign(notification.style, {
         position: 'fixed',
@@ -26448,14 +26438,21 @@ var BillsModule = /*#__PURE__*/function () {
       undoBtn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        undoCallback();
+        if (!expired) {
+          expired = true;
+          undoCallback();
+        }
         notification.remove();
       });
       document.body.appendChild(notification);
       setTimeout(function () {
         notification.style.animation = 'slideDown 0.3s ease-in';
         setTimeout(function () {
-          return notification.remove();
+          notification.remove();
+          if (!expired && onExpire) {
+            expired = true;
+            onExpire();
+          }
         }, 300);
       }, 5000);
     }

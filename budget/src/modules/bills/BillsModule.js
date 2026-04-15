@@ -820,8 +820,6 @@ export default class BillsModule {
                 throw new Error('Bill not found');
             }
 
-            const previousPaidDate = bill.lastPaidDate || bill.last_paid_date || null;
-
             const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}/paid`), {
                 method: 'POST',
                 headers: {
@@ -835,29 +833,26 @@ export default class BillsModule {
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            // Store undo data BEFORE reloading
+            const result = await response.json();
+
+            // Store undo data from server response BEFORE reloading
             this._undoData = {
                 billId: billId,
-                previousPaidDate: previousPaidDate,
+                previousState: result.previousState,
+                createdTransactionIds: result.createdTransactionIds || [],
+                hadScheduledTransaction: result.hadScheduledTransaction || false,
                 action: 'markPaid'
             };
 
             await this.loadBillsView();
 
-            if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-            }
-
             const isOneTime = (bill.frequency === 'one-time');
             const message = isOneTime
                 ? t('budget', 'Bill marked as paid. Transaction created.')
                 : t('budget', 'Bill marked as paid. Future transaction created.');
-            this.showUndoNotification(message, () => this.undoMarkBillPaid());
-
-            this._undoTimer = setTimeout(() => {
+            this.showUndoNotification(message, () => this.undoMarkBillPaid(), () => {
                 this._undoData = null;
-                this._undoTimer = null;
-            }, 5000);
+            });
 
         } catch (error) {
             console.error('Failed to mark bill as paid:', error);
@@ -871,20 +866,15 @@ export default class BillsModule {
         }
 
         try {
-            const { billId, previousPaidDate } = this._undoData;
+            const { billId, previousState, createdTransactionIds, hadScheduledTransaction } = this._undoData;
 
-            if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-                this._undoTimer = null;
-            }
-
-            const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}`), {
-                method: 'PUT',
+            const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}/undo-paid`), {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'requesttoken': OC.requestToken
                 },
-                body: JSON.stringify({ lastPaidDate: previousPaidDate })
+                body: JSON.stringify({ previousState, createdTransactionIds, hadScheduledTransaction })
             });
 
             if (!response.ok) {
@@ -934,19 +924,11 @@ export default class BillsModule {
 
             await this.loadBillsView();
 
-            if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-            }
-
             this.showUndoNotification(
                 t('budget', 'Payment skipped. Advanced to next due date.'),
-                () => this.undoSkipPayment()
+                () => this.undoSkipPayment(),
+                () => { this._undoData = null; }
             );
-
-            this._undoTimer = setTimeout(() => {
-                this._undoData = null;
-                this._undoTimer = null;
-            }, 5000);
 
         } catch (error) {
             console.error('Failed to skip bill payment:', error);
@@ -961,11 +943,6 @@ export default class BillsModule {
 
         try {
             const { billId, previousNextDueDate } = this._undoData;
-
-            if (this._undoTimer) {
-                clearTimeout(this._undoTimer);
-                this._undoTimer = null;
-            }
 
             const response = await fetch(OC.generateUrl(`/apps/budget/api/bills/${billId}/undo-skip`), {
                 method: 'POST',
@@ -991,9 +968,10 @@ export default class BillsModule {
         }
     }
 
-    showUndoNotification(message, undoCallback) {
+    showUndoNotification(message, undoCallback, onExpire) {
         const notification = document.createElement('div');
         notification.className = 'undo-notification';
+        let expired = false;
         notification.innerHTML = `
             <span class="undo-message">${message}</span>
             <button class="undo-btn">${t('budget', 'Undo')}</button>
@@ -1031,7 +1009,10 @@ export default class BillsModule {
         undoBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            undoCallback();
+            if (!expired) {
+                expired = true;
+                undoCallback();
+            }
             notification.remove();
         });
 
@@ -1039,7 +1020,13 @@ export default class BillsModule {
 
         setTimeout(() => {
             notification.style.animation = 'slideDown 0.3s ease-in';
-            setTimeout(() => notification.remove(), 300);
+            setTimeout(() => {
+                notification.remove();
+                if (!expired && onExpire) {
+                    expired = true;
+                    onExpire();
+                }
+            }, 300);
         }, 5000);
     }
 

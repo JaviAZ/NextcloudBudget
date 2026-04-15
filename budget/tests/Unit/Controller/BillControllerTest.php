@@ -994,7 +994,8 @@ class BillControllerTest extends TestCase {
 	public function testMarkPaidReturnsBill(): void {
 		$this->mockInput(json_encode([]));
 		$bill = $this->createMock(Bill::class);
-		$this->service->method('markPaid')->willReturn($bill);
+		$result = ['bill' => $bill, 'previousState' => [], 'createdTransactionIds' => []];
+		$this->service->method('markPaid')->willReturn($result);
 
 		$response = $this->controller->markPaid(1, '2026-03-01');
 
@@ -1013,10 +1014,11 @@ class BillControllerTest extends TestCase {
 	public function testMarkPaidWithCreateNextTransaction(): void {
 		$this->mockInput(json_encode(['createNextTransaction' => false]));
 		$bill = $this->createMock(Bill::class);
+		$result = ['bill' => $bill, 'previousState' => [], 'createdTransactionIds' => []];
 		$this->service->expects($this->once())
 			->method('markPaid')
 			->with(1, 'user1', '2026-03-01', false)
-			->willReturn($bill);
+			->willReturn($result);
 
 		$response = $this->controller->markPaid(1, '2026-03-01');
 

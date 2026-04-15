@@ -146,10 +146,13 @@ class BillServiceTest extends TestCase {
 		$this->transactionService->method('createFromBill'); // allow call
 
 		$result = $this->service->markPaid(1, 'user1');
+		$bill = $result['bill'];
 
-		$this->assertSame(date('Y-m-d'), $result->getLastPaidDate());
-		$this->assertSame('2099-07-15', $result->getNextDueDate());
-		$this->assertTrue($result->getIsActive());
+		$this->assertSame(date('Y-m-d'), $bill->getLastPaidDate());
+		$this->assertSame('2099-07-15', $bill->getNextDueDate());
+		$this->assertTrue($bill->getIsActive());
+		$this->assertArrayHasKey('previousState', $result);
+		$this->assertArrayHasKey('createdTransactionIds', $result);
 	}
 
 	public function testMarkPaidUsesProvidedDate(): void {
@@ -160,7 +163,7 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1', '2099-06-10');
 
-		$this->assertSame('2099-06-10', $result->getLastPaidDate());
+		$this->assertSame('2099-06-10', $result['bill']->getLastPaidDate());
 	}
 
 	public function testMarkPaidOneTimeDeactivates(): void {
@@ -170,8 +173,8 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1');
 
-		$this->assertFalse($result->getIsActive());
-		$this->assertNull($result->getNextDueDate());
+		$this->assertFalse($result['bill']->getIsActive());
+		$this->assertNull($result['bill']->getNextDueDate());
 	}
 
 	public function testMarkPaidDecrementsRemainingPayments(): void {
@@ -182,8 +185,8 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1');
 
-		$this->assertSame(2, $result->getRemainingPayments());
-		$this->assertTrue($result->getIsActive());
+		$this->assertSame(2, $result['bill']->getRemainingPayments());
+		$this->assertTrue($result['bill']->getIsActive());
 	}
 
 	public function testMarkPaidLastPaymentDeactivates(): void {
@@ -194,9 +197,9 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1');
 
-		$this->assertSame(0, $result->getRemainingPayments());
-		$this->assertFalse($result->getIsActive());
-		$this->assertNull($result->getNextDueDate());
+		$this->assertSame(0, $result['bill']->getRemainingPayments());
+		$this->assertFalse($result['bill']->getIsActive());
+		$this->assertNull($result['bill']->getNextDueDate());
 	}
 
 	public function testMarkPaidDeactivatesWhenPastEndDate(): void {
@@ -208,8 +211,8 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1');
 
-		$this->assertFalse($result->getIsActive());
-		$this->assertNull($result->getNextDueDate());
+		$this->assertFalse($result['bill']->getIsActive());
+		$this->assertNull($result['bill']->getNextDueDate());
 	}
 
 	public function testMarkPaidResetsAutoPayFailed(): void {
@@ -220,7 +223,7 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1');
 
-		$this->assertFalse($result->getAutoPayFailed());
+		$this->assertFalse($result['bill']->getAutoPayFailed());
 	}
 
 	public function testMarkPaidCreatesTransactionForOneTimeBill(): void {
@@ -233,7 +236,7 @@ class BillServiceTest extends TestCase {
 
 		$result = $this->service->markPaid(1, 'user1');
 
-		$this->assertFalse($result->getIsActive());
+		$this->assertFalse($result['bill']->getIsActive());
 	}
 
 	// ── processAutoPay ──────────────────────────────────────────────
