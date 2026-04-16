@@ -14996,16 +14996,9 @@ tr.scheduled-transaction:hover {
         display: none; /* Hide drag hint on mobile */
     }
 
-    /* Collapse unlock button to icon-only on mobile to avoid overlapping nav menu */
-    #toggle-dashboard-lock-btn #lock-btn-text {
-        display: none;
-    }
-
-    #toggle-dashboard-lock-btn {
-        padding: 8px;
-        min-width: 36px;
-        min-height: 36px;
-        justify-content: center;
+    /* Move dashboard actions to the right to avoid overlapping nav toggle */
+    .dashboard-header {
+        justify-content: flex-end;
     }
 }
 
