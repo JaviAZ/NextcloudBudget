@@ -1,9 +1,18 @@
 /* Budget App Styles - Nextcloud Integration */
 
-/* Semantic color tokens — single source of truth for positive/negative amounts */
+/* Semantic color tokens — single source of truth for positive/negative amounts.
+ * Also override Nextcloud's --color-success/error/warning within our app scope
+ * so they are readable in both light and dark themes. */
 :root {
     --budget-color-negative: #b71c1c;
     --budget-color-positive: #2e7d32;
+}
+
+#app-navigation,
+#app-content {
+    --color-success: #2e7d32;
+    --color-error: #b71c1c;
+    --color-warning: #e65100;
 }
 
 /* App Navigation Search Bar - Match Files app style */
@@ -8032,7 +8041,7 @@ button.danger:hover {
 .income-amount {
     font-size: 18px;
     font-weight: 600;
-    color: var(--color-success);
+    color: var(--budget-color-positive);
     white-space: nowrap;
 }
 
@@ -8102,8 +8111,8 @@ button.danger:hover {
 }
 
 .income-action-btn.income-received-btn {
-    background: var(--color-success);
-    border-color: var(--color-success);
+    background: var(--budget-color-positive);
+    border-color: var(--budget-color-positive);
     color: white;
 }
 
@@ -8955,15 +8964,18 @@ button.danger:hover {
 }
 
 .budget-spent {
-    color: var(--color-error);
+    color: var(--budget-color-negative);
+    font-weight: 500;
 }
 
 .budget-remaining.positive {
     color: var(--budget-color-positive);
+    font-weight: 500;
 }
 
 .budget-remaining.negative {
     color: var(--budget-color-negative);
+    font-weight: 500;
 }
 
 .budget-remaining.zero {
@@ -8992,19 +9004,19 @@ button.danger:hover {
 }
 
 .budget-progress-fill.good {
-    background: var(--color-success);
+    background: var(--budget-color-positive);
 }
 
 .budget-progress-fill.warning {
-    background: var(--color-warning);
+    background: #f57c00;
 }
 
 .budget-progress-fill.danger {
-    background: var(--color-error);
+    background: var(--budget-color-negative);
 }
 
 .budget-progress-fill.over {
-    background: var(--color-error);
+    background: var(--budget-color-negative);
 }
 
 .budget-progress-text {
@@ -14754,7 +14766,7 @@ tr.scheduled-transaction:hover {
 
 .income-progress-bar {
     height: 100%;
-    background: var(--color-success, #46ba61);
+    background: var(--budget-color-positive);
     transition: width 0.3s ease;
 }
 
@@ -14763,7 +14775,7 @@ tr.scheduled-transaction:hover {
 }
 
 .income-progress-bar.error {
-    background: var(--color-error, #c62828);
+    background: var(--budget-color-negative);
 }
 
 /* Phase 3: Recent Imports Widget */
