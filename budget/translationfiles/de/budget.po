@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
 "PO-Revision-Date: 2026-04-18 10:09+0000\n"
-"Last-Translator: SGiersch <Stephan@sgiersch.de>\n"
+"Last-Translator: T0mFi <tomfinger97@gmail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
 "Language: de\n"
@@ -69,7 +69,7 @@ msgstr "Ungültige Währung: %1$s"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:141
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4704
 msgid "Institution"
-msgstr ""
+msgstr "Einrichtung"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:150
 msgid "Account holder name"
@@ -141,7 +141,7 @@ msgstr "Kontenabgleich fehlgeschlagen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AlertController.php:51
 msgid "Failed to retrieve budget alerts"
-msgstr ""
+msgstr "Budget Benachrichtigungen konnten nicht abgerufen werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AlertController.php:64
 msgid "Failed to retrieve budget status"
@@ -149,7 +149,7 @@ msgstr "Budgetstatus wurde nicht abgerufen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AlertController.php:77
 msgid "Failed to retrieve budget summary"
-msgstr ""
+msgstr "Budgetzusammenfassung konnte nicht abgerufen werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:78
 msgid "Failed to retrieve assets"
@@ -212,20 +212,20 @@ msgstr "Kaufdatum"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:181
 msgid "Failed to create asset"
-msgstr ""
+msgstr "Vermögenswert konnte nicht erstellt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:270
 msgid "Failed to update asset"
-msgstr ""
+msgstr "Vermögenswert konnte nicht aktualisiert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:281
 msgid "Asset deleted successfully"
-msgstr ""
+msgstr "Vermögenswert erfogreich gelöscht"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:283
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:414
 msgid "Failed to delete asset"
-msgstr ""
+msgstr "Vermögenswert konnte nicht gelöscht werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:299
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:311
@@ -314,11 +314,11 @@ msgstr "Passwortschutz wurde nicht eingerichtet"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:134
 msgid "Failed to verify password"
-msgstr ""
+msgstr "Passwortüberprüfung fehlgeschlagen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:148
 msgid "Failed to lock session"
-msgstr ""
+msgstr "Sitzung konnte nicht gesperrt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:164
 msgid "No session token provided"
@@ -326,11 +326,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:174
 msgid "Invalid session"
-msgstr ""
+msgstr "Ungültige Sitzung"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:178
 msgid "Failed to extend session"
-msgstr ""
+msgstr "Stitzung konnte nicht verlägert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:196
 #: /tmp/budget-v2.11.0/budget/src/modules/auth/AuthModule.js:179
@@ -341,31 +341,31 @@ msgstr "Falsches Passwort"
 #: /tmp/budget-v2.11.0/budget/src/main.js:1797
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:484
 msgid "Failed to disable password protection"
-msgstr ""
+msgstr "Passwortschutz konnte nicht deaktiviert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:224
 msgid "Incorrect current password"
-msgstr ""
+msgstr "Das aktuelle Passwort ist falsch"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:232
 #: /tmp/budget-v2.11.0/budget/src/main.js:1714
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:401
 msgid "Failed to change password"
-msgstr "Passwort nicht geändert"
+msgstr "Passwort konnte nicht geändert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:86
 msgid "Failed to retrieve bills"
-msgstr ""
+msgstr "Rechnungen konnten nicht abgerufen werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:110
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:546
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3172
 msgid "Bill"
-msgstr ""
+msgstr "Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:128
 msgid "Name and amount are required"
-msgstr ""
+msgstr "Name und Betrag sind erforderlich"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:164
 #: /tmp/budget-v2.11.0/budget/lib/Service/BillService.php:171
@@ -384,12 +384,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Service/BillService.php:181
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:619
 msgid "Cannot transfer to the same account"
-msgstr ""
+msgstr "Die Umbuchung kann nicht auf das selbe Konto erfolgen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:201
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:332
 msgid "Due day must be between 1 and 31"
-msgstr ""
+msgstr "Das Fälligkeitsdatum muss zwischen dem 1. und dem 31. liegen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:206
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:344
@@ -403,31 +403,31 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:242
 msgid "Transaction date"
-msgstr ""
+msgstr "Transaktionsdatum"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:250
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:436
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2805
 msgid "End date"
-msgstr ""
+msgstr "Enddatum"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:260
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:449
 msgid "Remaining payments must be at least 1"
-msgstr ""
+msgstr "Die verbleibenden Zahlungen müssen mindesten 1 betragen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:290
 msgid "Failed to create bill"
-msgstr ""
+msgstr "Rechnung konnte nicht erstellt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:531
 msgid "Failed to update bill"
-msgstr ""
+msgstr "Rechnung konnte nicht aktualisiert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:564
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:859
 msgid "Failed to mark bill as paid"
-msgstr ""
+msgstr "Rechnung konnte nicht als bezahlt markiert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:581
 msgid "Missing previous state"
@@ -706,7 +706,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:82
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2620
 msgid "Goal"
-msgstr ""
+msgstr "Ziel"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:118
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:199
@@ -911,7 +911,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:90
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:198
 msgid "Pension"
-msgstr ""
+msgstr "Rente"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:134
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:228
@@ -1164,12 +1164,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:284
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4243
 msgid "Sunday"
-msgstr ""
+msgstr "Sonntag"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:285
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4244
 msgid "Monday"
-msgstr ""
+msgstr "Montag"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:288
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:112
@@ -1182,7 +1182,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4823
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5226
 msgid "Weekly"
-msgstr ""
+msgstr "Wöchentlich"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:289
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:114
@@ -1195,7 +1195,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4825
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5228
 msgid "Monthly"
-msgstr ""
+msgstr "Monatlich"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:290
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:115
@@ -1208,7 +1208,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4826
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5229
 msgid "Quarterly"
-msgstr ""
+msgstr "Vierteljährlich"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:291
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:117
@@ -1221,7 +1221,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4828
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5231
 msgid "Yearly"
-msgstr ""
+msgstr "Jährlich"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SetupController.php:59
 msgid "Budget app initialized successfully"
@@ -1279,7 +1279,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ShareController.php:194
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ShareController.php:228
 msgid "Share"
-msgstr ""
+msgstr "Aktie"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ShareController.php:117
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:364
@@ -1496,7 +1496,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:686
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:682
 msgid "Transaction"
-msgstr ""
+msgstr "Transaktion"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:169
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:268
@@ -1598,7 +1598,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1186
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1337
 msgid "Split"
-msgstr ""
+msgstr "Aufteilung"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:702
 msgid "tagIds array is required"
@@ -1644,7 +1644,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1830
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1897
 msgid "Budget"
-msgstr ""
+msgstr "Budget"
 
 #. Do NOT translate {bill} — it is a placeholder replaced with the bill name at runtime.
 #: /tmp/budget-v2.11.0/budget/lib/Notification/Notifier.php:45
@@ -2162,7 +2162,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1176
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1327
 msgid "Uncategorized"
-msgstr ""
+msgstr "Unkategorisiert"
 
 #: /tmp/budget-v2.11.0/budget/src/config/dashboardWidgets.js:27
 #: /tmp/budget-v2.11.0/budget/templates/index.php:484
@@ -2217,7 +2217,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1004
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4472
 msgid "Accounts"
-msgstr ""
+msgstr "Konten"
 
 #: /tmp/budget-v2.11.0/budget/src/config/dashboardWidgets.js:40
 #: /tmp/budget-v2.11.0/budget/templates/index.php:647
@@ -2377,7 +2377,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1262
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4596
 msgid "Transfer"
-msgstr ""
+msgstr "Umbuchung"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:978
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:685
@@ -2395,7 +2395,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:988
 msgid "Shared"
-msgstr ""
+msgstr "Geteilt"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:990
 msgid "Shared expense - settled"
@@ -2407,7 +2407,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/shared-expenses/SharedExpensesModule.js:353
 #: /tmp/budget-v2.11.0/budget/src/modules/shared-expenses/SharedExpensesModule.js:383
 msgid "Settled"
-msgstr ""
+msgstr "Erledigt"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:993
 msgid "Match Transfer"
@@ -2540,7 +2540,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5742
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5829
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1568
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:255
@@ -2630,7 +2630,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1826
 msgid "Recalculating..."
-msgstr ""
+msgstr "Wird neu berechnet..."
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1840
 msgid "Recalculation failed"
@@ -2652,7 +2652,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:585
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:3411
 msgid "Deleting..."
-msgstr ""
+msgstr "Wird gelöscht..."
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1954
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:602
@@ -2672,7 +2672,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2051
 msgid "Exporting..."
-msgstr ""
+msgstr "Wird exportiert..."
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2060
 msgid "Export failed"
@@ -2706,7 +2706,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/exchange-rates/ExchangeRatesModule.js:173
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1732
 msgid "Unknown"
-msgstr ""
+msgstr "Unbekannt"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2157
 msgid "Failed to preview file: {error}"
@@ -2745,19 +2745,19 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2215
 msgid "categories"
-msgstr ""
+msgstr "Kategorien"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2216
 msgid "accounts"
-msgstr ""
+msgstr "Konten"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2217
 msgid "transactions"
-msgstr ""
+msgstr "Transaktionen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2218
 msgid "bills"
-msgstr ""
+msgstr "Rechnungen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2219
 msgid "import rules"
@@ -2765,7 +2765,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2220
 msgid "settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2228
 msgid "Import completed successfully"
@@ -2802,7 +2802,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1527
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2917
 msgid "Balance"
-msgstr ""
+msgstr "Saldo"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2472
 msgid "Interest Rate"
@@ -2841,7 +2841,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3969
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3983
 msgid "Interest"
-msgstr ""
+msgstr "Zinsen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2630
 msgid "Avalanche Recommended"
@@ -2939,7 +2939,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5359
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5435
 msgid "Description"
-msgstr ""
+msgstr "Beschreibung"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2922
 msgid "Total Amount"
@@ -2968,7 +2968,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5095
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5557
 msgid "Amount"
-msgstr ""
+msgstr "Betrag"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2997
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1882
@@ -3046,7 +3046,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:268
 msgid "Owed"
-msgstr ""
+msgstr "Geschuldet"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:268
 msgid "Credit"
@@ -3083,7 +3083,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:576
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1138
 msgid "Never"
-msgstr ""
+msgstr "Nie"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:646
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:553
@@ -3098,7 +3098,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1195
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1346
 msgid "Scheduled"
-msgstr ""
+msgstr "Geplant"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:684
 msgid "Transfer {direction} {account}"
@@ -3126,7 +3126,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1521
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1749
 msgid "Tags"
-msgstr ""
+msgstr "Stichworte"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:968
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:201
@@ -3324,7 +3324,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2073
 msgid "Valid"
-msgstr ""
+msgstr "Gültig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2139
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4667
@@ -3347,26 +3347,26 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:624
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:194
 msgid "Investment"
-msgstr ""
+msgstr "Investition"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2159
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:626
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:196
 msgid "Loan"
-msgstr ""
+msgstr "Darlehen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2164
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:625
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:195
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4672
 msgid "Cash"
-msgstr ""
+msgstr "Bargeld"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2169
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:199
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4673
 msgid "Cryptocurrency"
-msgstr ""
+msgstr "Kryptowährung"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2191
 msgid "Credit utilization very high"
@@ -3400,7 +3400,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4591
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5313
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:31
 msgid "Failed to load assets"
@@ -3414,12 +3414,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:92
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3760
 msgid "Vehicle"
-msgstr ""
+msgstr "Fahrzeug"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:97
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3761
 msgid "Jewelry"
-msgstr ""
+msgstr "Schmuck"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:102
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3762
@@ -3431,7 +3431,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2455
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3763
 msgid "Other"
-msgstr ""
+msgstr "Sonstiges"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:138
 msgid "Purchased at {price}"
@@ -3446,7 +3446,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1638
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3633
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:167
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:120
@@ -3456,7 +3456,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1408
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1642
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:174
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3654
@@ -3515,7 +3515,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:566
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3843
 msgid "Value"
-msgstr ""
+msgstr "Wert"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/assets/AssetsModule.js:639
 msgid "Projected Appreciation"
@@ -3545,11 +3545,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/auth/AuthModule.js:127
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/auth/AuthModule.js:132
 msgid "Unlock"
-msgstr ""
+msgstr "Entsperren"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/auth/AuthModule.js:186
 msgid "Failed to verify password. Please try again."
@@ -3564,7 +3564,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:231
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2258
 msgid "Paid"
-msgstr ""
+msgstr "Bezahlt"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:101
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:111
@@ -3572,7 +3572,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2230
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2257
 msgid "Overdue"
-msgstr ""
+msgstr "Überfällig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:104
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:110
@@ -3585,7 +3585,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:108
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:240
 msgid "Upcoming"
-msgstr ""
+msgstr "Demnächst"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:113
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:114
@@ -3595,7 +3595,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4824
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5227
 msgid "Bi-Weekly"
-msgstr ""
+msgstr "Alle zwei Wochen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:116
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:117
@@ -3604,7 +3604,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4827
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5230
 msgid "Semi-Annually"
-msgstr ""
+msgstr "Halbjährlich"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:118
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:119
@@ -3612,7 +3612,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4829
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5232
 msgid "One-Time"
-msgstr ""
+msgstr "Einmalig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:140
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:274
@@ -3672,7 +3672,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:161
 msgid "Skip"
-msgstr ""
+msgstr "Überspringen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:164
 msgid "Edit bill"
@@ -3804,12 +3804,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:2302
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:2458
 msgid "Undo"
-msgstr ""
+msgstr "Rückgängig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:1036
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:621
 msgid "Detecting..."
-msgstr ""
+msgstr "Wird erkannt..."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:1048
 msgid "No recurring transactions detected"
@@ -3871,7 +3871,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4594
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5315
 msgid "Expense"
-msgstr ""
+msgstr "Ausgabe"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:523
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1343
@@ -3893,19 +3893,19 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4595
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5316
 msgid "Income"
-msgstr ""
+msgstr "Einkommen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:544
 msgid "Increasing"
-msgstr ""
+msgstr "Zunehmend"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:545
 msgid "Decreasing"
-msgstr ""
+msgstr "Abnehmend"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:546
 msgid "Stable"
-msgstr ""
+msgstr "Stabil"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:563
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1710
@@ -4009,25 +4009,25 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1898
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2790
 msgid "Period"
-msgstr ""
+msgstr "Periode"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:1302
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1083
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1899
 msgid "Spent"
-msgstr ""
+msgstr "Ausgegeben"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:1305
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1084
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1867
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1900
 msgid "Remaining"
-msgstr ""
+msgstr "Verbleibend"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:1308
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1901
 msgid "Progress"
-msgstr ""
+msgstr "Fortschritt"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/categories/CategoriesModule.js:1314
 msgid "No budget set"
@@ -4062,11 +4062,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:368
 msgid "Good"
-msgstr ""
+msgstr "Gut"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:368
 msgid "Low"
-msgstr ""
+msgstr "Niedrig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:538
 msgid "%n category under budget"
@@ -4101,7 +4101,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:917
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:192
 msgid "Savings"
-msgstr ""
+msgstr "Ersparnisse"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:660
 msgid "No recent transactions"
@@ -4216,11 +4216,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1165
 msgid "Investments"
-msgstr ""
+msgstr "Investitionen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1166
 msgid "Loans"
-msgstr ""
+msgstr "Darlehen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1174
 msgid "%n account"
@@ -4256,7 +4256,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2915
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3026
 msgid "Expenses"
-msgstr ""
+msgstr "Ausgaben"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1444
 #: /tmp/budget-v2.11.0/budget/templates/index.php:153
@@ -4264,12 +4264,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3538
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3621
 msgid "Assets"
-msgstr ""
+msgstr "Vermögenswerte"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1453
 #: /tmp/budget-v2.11.0/budget/templates/index.php:991
 msgid "Liabilities"
-msgstr ""
+msgstr "Verbindlichkeiten"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1538
 msgid "Asset Value"
@@ -4277,7 +4277,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1561
 msgid "Portfolio"
-msgstr ""
+msgstr "Portfolio"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1616
 msgid "just now"
@@ -4291,7 +4291,7 @@ msgstr[1] ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1621
 msgid "yesterday"
-msgstr ""
+msgstr "gestern"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:1623
 msgid "%n day ago"
@@ -4361,11 +4361,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2446
 msgid "Budgeting"
-msgstr ""
+msgstr "Budgetplanung"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2447
 msgid "Forecasting"
-msgstr ""
+msgstr "Prognose"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2448
 #: /tmp/budget-v2.11.0/budget/templates/index.php:53
@@ -4376,15 +4376,15 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2972
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4476
 msgid "Transactions"
-msgstr ""
+msgstr "Transaktionen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2450
 msgid "Debts"
-msgstr ""
+msgstr "Schulden"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2451
 msgid "Goals"
-msgstr ""
+msgstr "Ziele"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2452
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:241
@@ -4392,15 +4392,15 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2200
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4480
 msgid "Bills"
-msgstr ""
+msgstr "Rechnungen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2453
 msgid "Alerts"
-msgstr ""
+msgstr "Benachrichtigungen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2454
 msgid "Interactive"
-msgstr ""
+msgstr "Interaktiv"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2476
 msgid "Hero"
@@ -4431,7 +4431,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5026
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5611
 msgid "Reference"
-msgstr ""
+msgstr "Referenz"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/exchange-rates/ExchangeRatesModule.js:170
 msgid "Manual"
@@ -4440,7 +4440,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/exchange-rates/ExchangeRatesModule.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4288
 msgid "None"
-msgstr ""
+msgstr "Keine"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/exchange-rates/ExchangeRatesModule.js:266
 msgid "Edit Manual Rate"
@@ -4474,7 +4474,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/exchange-rates/ExchangeRatesModule.js:351
 msgid "Refreshing…"
-msgstr ""
+msgstr "Aktualisiere…"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/exchange-rates/ExchangeRatesModule.js:360
 msgid "Exchange rates refreshed"
@@ -4512,7 +4512,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/forecast/ForecastModule.js:314
 msgid "Income/Expenses"
-msgstr ""
+msgstr "Einnahmen/Ausgaben"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/forecast/ForecastModule.js:341
 msgid "No category data available"
@@ -4520,7 +4520,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/forecast/ForecastModule.js:353
 msgid "{amount}/mo"
-msgstr ""
+msgstr "{amount}/mo"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/forecast/ForecastModule.js:379
 msgid "Based on {months} month(s) of data ({count} transactions)"
@@ -4576,7 +4576,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:563
 msgid "New"
-msgstr ""
+msgstr "Neu"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:584
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:625
@@ -4601,7 +4601,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:780
 msgid "Importing…"
-msgstr ""
+msgstr "Importiere…"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:798
 msgid "Server error ({status}): Invalid response"
@@ -4617,11 +4617,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:887
 msgid "Download"
-msgstr ""
+msgstr "Download"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:888
 msgid "Rollback"
-msgstr ""
+msgstr "Zurücksetzen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:911
 msgid "0 Bytes"
@@ -4629,19 +4629,19 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:913
 msgid "Bytes"
-msgstr ""
+msgstr "Bytes"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:913
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:913
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:913
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:935
 msgid "Download failed"
@@ -4679,13 +4679,13 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:112
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2520
 msgid "Completed"
-msgstr ""
+msgstr "Abgeschlossen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:102
 #: /tmp/budget-v2.11.0/budget/src/modules/shared-expenses/SharedExpensesModule.js:370
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2434
 msgid "Received"
-msgstr ""
+msgstr "Empfangen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:105
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2433
@@ -4810,12 +4810,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:87
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:447
 msgid "Workplace"
-msgstr ""
+msgstr "Arbeitsplatz"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:88
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:448
 msgid "Personal"
-msgstr ""
+msgstr "Persönlich"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:89
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:449
@@ -4838,11 +4838,11 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:99
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:465
 msgid "{amount}/year"
-msgstr ""
+msgstr "{amount}/Jahr"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:111
 msgid "{amount}/month"
-msgstr ""
+msgstr "{amount}/Monat"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/pensions/PensionsModule.js:114
 msgid "View details"
@@ -4975,28 +4975,28 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3173
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4838
 msgid "Jan"
-msgstr ""
+msgstr "Jan"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3174
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4839
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3175
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4840
 msgid "Mar"
-msgstr ""
+msgstr "Mär"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3176
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4841
 msgid "Apr"
-msgstr ""
+msgstr "Apr"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
@@ -5007,56 +5007,56 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4868
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5251
 msgid "May"
-msgstr ""
+msgstr "Mai"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3178
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4843
 msgid "Jun"
-msgstr ""
+msgstr "Jun"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3179
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4844
 msgid "Jul"
-msgstr ""
+msgstr "Jul"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3180
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4845
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3181
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4846
 msgid "Sep"
-msgstr ""
+msgstr "Sep"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3182
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4847
 msgid "Oct"
-msgstr ""
+msgstr "Okt"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3183
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4848
 msgid "Nov"
-msgstr ""
+msgstr "Nov"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1290
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:171
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3184
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4849
 msgid "Dec"
-msgstr ""
+msgstr "Dez"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1301
 msgid "Total Bills"
@@ -5065,7 +5065,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1315
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5725
 msgid "Total"
-msgstr ""
+msgstr "Summe"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1365
 msgid "Monthly Totals"
@@ -5076,77 +5076,77 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4864
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5247
 msgid "January"
-msgstr ""
+msgstr "Januar"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3061
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4865
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5248
 msgid "February"
-msgstr ""
+msgstr "Februar"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3062
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4866
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5249
 msgid "March"
-msgstr ""
+msgstr "März"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3063
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4867
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5250
 msgid "April"
-msgstr ""
+msgstr "April"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3065
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4869
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5252
 msgid "June"
-msgstr ""
+msgstr "Juni"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3066
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4870
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5253
 msgid "July"
-msgstr ""
+msgstr "July"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3067
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4871
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5254
 msgid "August"
-msgstr ""
+msgstr "August"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3068
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4872
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5255
 msgid "September"
-msgstr ""
+msgstr "September"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3069
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4873
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5256
 msgid "October"
-msgstr ""
+msgstr "Oktober"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3070
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4874
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5257
 msgid "November"
-msgstr ""
+msgstr "November"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1376
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3071
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4875
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5258
 msgid "December"
-msgstr ""
+msgstr "Dezember"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1394
 #: /tmp/budget-v2.11.0/budget/src/modules/reports/ReportsModule.js:1396
@@ -5163,13 +5163,13 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:182
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:137
 msgid "contains"
-msgstr ""
+msgstr "beinhaltet"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:130
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:185
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:145
 msgid "equals"
-msgstr ""
+msgstr "gleich"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:131
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:183
@@ -5186,7 +5186,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:133
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:186
 msgid "matches"
-msgstr ""
+msgstr "stimmt überein"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:143
 msgid "Click to disable"
@@ -5201,7 +5201,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1154
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2146
 msgid "Import"
-msgstr ""
+msgstr "Importieren"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:152
 msgid "Edit rule"
@@ -5221,11 +5221,11 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1344
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4109
 msgid "All"
-msgstr ""
+msgstr "Alles"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:173
 msgid "Any"
-msgstr ""
+msgstr "Alle"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:174
 msgid "{operator} of {count} conditions"
@@ -5234,22 +5234,22 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:189
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:148
 msgid "between"
-msgstr ""
+msgstr "zwischen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:190
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:153
 msgid "before"
-msgstr ""
+msgstr "bevor"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:191
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:154
 msgid "after"
-msgstr ""
+msgstr "nach"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:194
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:113
 msgid "NOT"
-msgstr ""
+msgstr "NICHT"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:223
 msgid "Category #{id}"
@@ -5257,7 +5257,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:230
 msgid "Vendor:"
-msgstr ""
+msgstr "Anbieter:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:235
 msgid "Set notes"
@@ -5310,7 +5310,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:865
 #: /tmp/budget-v2.11.0/budget/templates/index.php:874
 msgid "Loading..."
-msgstr ""
+msgstr "Lädt..."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:594
 msgid "Failed to preview rule: {error}"
@@ -5333,7 +5333,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:666
 msgid "Saving..."
-msgstr ""
+msgstr "Speichern..."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:674
 msgid "Failed to save rule"
@@ -5341,7 +5341,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:678
 msgid "Running..."
-msgstr ""
+msgstr "Läuft..."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:702
 msgid "Rule applied: %n transaction updated"
@@ -5432,7 +5432,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:1078
 msgid "Applying..."
-msgstr ""
+msgstr "Übernehme..."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/RulesModule.js:1104
 msgid "Rules applied: {success} updated, {skipped} skipped, {failed} failed"
@@ -5517,7 +5517,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:173
 msgid "Category:"
-msgstr ""
+msgstr "Kategorie:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:175
 msgid "-- Select Category --"
@@ -5529,7 +5529,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:254
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:309
 msgid "Behavior:"
-msgstr ""
+msgstr "Verhalten:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:182
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:199
@@ -5569,7 +5569,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:222
 msgid "Separator:"
-msgstr ""
+msgstr "Trennzeichen:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:224
 msgid "e.g., | or -"
@@ -5593,7 +5593,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:267
 msgid "Account:"
-msgstr ""
+msgstr "Konto:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/ActionBuilder.js:269
 msgid "-- Select Account --"
@@ -5675,7 +5675,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5025
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5605
 msgid "Vendor"
-msgstr ""
+msgstr "Anbieter"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:120
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:464
@@ -5688,7 +5688,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5690
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5736
 msgid "Notes"
-msgstr ""
+msgstr "Notizen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/rules/components/CriteriaBuilder.js:129
 msgid "Remove this condition"
@@ -5963,7 +5963,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/shared-expenses/SharedExpensesModule.js:353
 msgid "Open"
-msgstr ""
+msgstr "Offen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/shared-expenses/SharedExpensesModule.js:362
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5781
@@ -6042,15 +6042,15 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:84
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:110
 msgid "Pending"
-msgstr ""
+msgstr "Ausstehend"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:87
 msgid "Accept"
-msgstr ""
+msgstr "Akzeptieren"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:88
 msgid "Decline"
-msgstr ""
+msgstr "Ablehnen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:97
 msgid "Share Your Budget"
@@ -6068,19 +6068,19 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:101
 msgid "Invite"
-msgstr ""
+msgstr "Einladen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:113
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:133
 msgid "Revoke"
-msgstr ""
+msgstr "Widerrufen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:127
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:157
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2337
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5071
 msgid "Active"
-msgstr ""
+msgstr "Aktiv"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:131
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:3245
@@ -6098,11 +6098,11 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5471
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5786
 msgid "Close"
-msgstr ""
+msgstr "Schließen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:131
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurieren"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:138
 msgid "Loading configuration..."
@@ -6122,7 +6122,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:160
 msgid "Leave"
-msgstr ""
+msgstr "Verlassen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:233
 msgid "Failed to load configuration"
@@ -6133,7 +6133,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1549
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4468
 msgid "Categories"
-msgstr ""
+msgstr "Kategorien"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:242
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2377
@@ -6525,7 +6525,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1051
 msgid "Difference:"
-msgstr ""
+msgstr "Differenz:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1056
 msgid "Balances match. You can finish reconciliation."
@@ -6642,12 +6642,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1802
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5549
 msgid "Date:"
-msgstr ""
+msgstr "Datum:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1806
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5541
 msgid "Description:"
-msgstr ""
+msgstr "Beschreibung:"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1810
 msgid "Total Amount:"
@@ -6729,7 +6729,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:2418
 msgid "Linking..."
-msgstr ""
+msgstr "Verbinde..."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:2425
 msgid "Linked %n pair"
@@ -6827,15 +6827,15 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:3339
 msgid "keep"
-msgstr ""
+msgstr "behalten"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:3340
 msgid "bill"
-msgstr ""
+msgstr "Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:3341
 msgid "scheduled"
-msgstr ""
+msgstr "geplant"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:3402
 msgid "Delete %n suspected duplicate transaction? This cannot be undone."
@@ -6940,7 +6940,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3751
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5638
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:388
 msgid "e.g., Monthly Savings"
@@ -6950,7 +6950,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4821
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5224
 msgid "Frequency"
-msgstr ""
+msgstr "Häufigkeit"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:413
 msgid "From Account"
@@ -7077,7 +7077,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/utils/formatters.js:197
 msgid "Mortgage"
-msgstr ""
+msgstr "Hypothek"
 
 #: /tmp/budget-v2.11.0/budget/src/utils/validators.js:25
 msgid "This field is required"
@@ -7135,16 +7135,16 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:33
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:113
 msgid "Transfers"
-msgstr ""
+msgstr "Umbuchungen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:143
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3211
 msgid "Pensions"
-msgstr ""
+msgstr "Renten"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:163
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4005
@@ -7154,11 +7154,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:173
 msgid "Forecast"
-msgstr ""
+msgstr "Prognose"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:183
 msgid "Reports"
-msgstr ""
+msgstr "Berichte"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:195
 msgid "Tools & Settings"
@@ -7167,7 +7167,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:216
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2307
 msgid "Rules"
-msgstr ""
+msgstr "Regeln"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:226
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4048
@@ -7176,13 +7176,13 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:236
 msgid "Sharing"
-msgstr ""
+msgstr "Teilen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:246
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4165
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4488
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:256
 msgid "Lock App"
@@ -7258,16 +7258,16 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:639
 #: /tmp/budget-v2.11.0/budget/templates/index.php:681
 msgid "Manage"
-msgstr ""
+msgstr "Verwalten"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:648
 #: /tmp/budget-v2.11.0/budget/templates/index.php:670
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:692
 msgid "Plan"
-msgstr ""
+msgstr "Plan"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:697
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3871
@@ -7299,7 +7299,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:919
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1599
 msgid "Clear"
-msgstr ""
+msgstr "Leeren"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:933
 msgid "Add new account"
@@ -7329,7 +7329,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1016
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1294
 msgid "Reconcile"
-msgstr ""
+msgstr "Abgleichen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1030
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4658
@@ -7383,7 +7383,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1117
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4746
 msgid "IBAN"
-msgstr ""
+msgstr "IBAN"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1121
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4740
@@ -7392,14 +7392,14 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1125
 msgid "SWIFT/BIC"
-msgstr ""
+msgstr "SWIFT/BIC"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1129
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3414
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3784
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4691
 msgid "Currency"
-msgstr ""
+msgstr "Währung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1133
 msgid "Opened Date"
@@ -7415,7 +7415,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1158
 msgid "Export"
-msgstr ""
+msgstr "Exportieren"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1160
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1284
@@ -7425,7 +7425,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1162
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1286
 msgid "Filters"
-msgstr ""
+msgstr "Filter"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1170
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1314
@@ -7444,7 +7444,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2186
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2349
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1194
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1345
@@ -7476,7 +7476,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1220
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1381
 msgid "Search"
-msgstr ""
+msgstr "Suchen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1221
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1382
@@ -7504,17 +7504,17 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2351
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5060
 msgid "Actions"
-msgstr ""
+msgstr "Aktionen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1264
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2162
 msgid "Previous"
-msgstr ""
+msgstr "Zurück"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1270
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2163
 msgid "Next"
-msgstr ""
+msgstr "Weiter"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1288
 msgid "Bulk actions"
@@ -7558,11 +7558,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1405
 msgid "Reconciled"
-msgstr ""
+msgstr "Abgeglichen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1406
 msgid "Unreconciled"
-msgstr ""
+msgstr "Nicht abgeglichen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1407
 msgid "Edit Fields..."
@@ -7672,11 +7672,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1679
 msgid "Average"
-msgstr ""
+msgstr "Durchschnitt"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1685
 msgid "Trend"
-msgstr ""
+msgstr "Trend"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1699
 msgid "Monthly Spending"
@@ -7693,7 +7693,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1723
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2631
 msgid "Add"
-msgstr ""
+msgstr "Hinzufügen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1739
 msgid ""
@@ -7740,7 +7740,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5384
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5410
 msgid "Color"
-msgstr ""
+msgstr "Farbe"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1821
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4639
@@ -7751,11 +7751,11 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5339
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5648
 msgid "Save"
-msgstr ""
+msgstr "Speichern"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1833
 msgid "Month:"
-msgstr ""
+msgstr "Monat:"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1849
 msgid "Total Budgeted"
@@ -7814,7 +7814,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1959
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4444
 msgid "or"
-msgstr ""
+msgstr "oder"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1960
 msgid "Browse for file to import"
@@ -7865,7 +7865,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1995
 msgid "Tab"
-msgstr ""
+msgstr "Tab"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1997
 msgid "Change if columns are not detected correctly"
@@ -7907,7 +7907,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2044
 msgid "Vendor/Payee"
-msgstr ""
+msgstr "Anbieter/Zahlungsempfänger"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2050
 msgid "Reference/Check Number"
@@ -8218,7 +8218,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2658
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3224
 msgid "Note:"
-msgstr ""
+msgstr "Hinweis:"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2658
 msgid ""
@@ -8370,7 +8370,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3027
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4027
 msgid "Net"
-msgstr ""
+msgstr "Netto"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2943
 msgid "Category Breakdown"
@@ -8396,7 +8396,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3024
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3058
 msgid "Month"
-msgstr ""
+msgstr "Monat"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3028
 msgid "Cumulative"
@@ -8436,7 +8436,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3074
 msgid "Compare"
-msgstr ""
+msgstr "Vergleichen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3087
 msgid "Income & Expenses by Year"
@@ -8448,7 +8448,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3118
 msgid "Year"
-msgstr ""
+msgstr "Jahr"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3124
 msgid "Bill Status"
@@ -8468,7 +8468,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3144
 msgid "View"
-msgstr ""
+msgstr "Ansicht"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3146
 msgid "Table View"
@@ -8480,7 +8480,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3150
 msgid "Generate"
-msgstr ""
+msgstr "Generieren"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3156
 msgid "Monthly Bill Totals"
@@ -8617,7 +8617,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3408
 msgid "Provider"
-msgstr ""
+msgstr "Anbieter"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3409
 msgid "e.g., Scottish Widows, Aviva"
@@ -8678,11 +8678,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3500
 msgid "Update"
-msgstr ""
+msgstr "Update"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3523
 msgid "Note"
-msgstr ""
+msgstr "Notiz"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3524
 msgid "e.g., Bonus top-up"
@@ -8690,7 +8690,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3529
 msgid "Log"
-msgstr ""
+msgstr "Log"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3539
 msgid "Add new asset"
@@ -8901,7 +8901,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3965
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3979
 msgid "Months"
-msgstr ""
+msgstr "Monate"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3975
 msgid "Debt Snowball"
@@ -8971,7 +8971,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4111
 msgid "Crypto"
-msgstr ""
+msgstr "Krypto"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4112
 msgid "Manual Only"
@@ -9122,11 +9122,11 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4294
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5088
 msgid "Preview:"
-msgstr ""
+msgstr "Vorschau:"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4301
 msgid "Notifications"
-msgstr ""
+msgstr "Benachrichtigungen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4309
 msgid "Notify when approaching or exceeding budget limits"
@@ -9182,7 +9182,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4367
 msgid "Security"
-msgstr ""
+msgstr "Sicherheit"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4374
 msgid "Password Protection"
@@ -9263,7 +9263,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4437
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4539
 msgid "Warning:"
-msgstr ""
+msgstr "Warnung:"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4437
 msgid ""
@@ -9305,7 +9305,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4511
 msgid "Done"
-msgstr ""
+msgstr "Fertig"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4519
 msgid "Maintenance"
