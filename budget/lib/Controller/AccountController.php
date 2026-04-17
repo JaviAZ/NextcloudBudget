@@ -9,6 +9,7 @@ use OCA\Budget\Service\AccountService;
 use OCA\Budget\Service\AuditService;
 use OCA\Budget\Service\GranularShareService;
 use OCA\Budget\Service\InterestService;
+use OCA\Budget\Service\InvestmentService;
 use OCA\Budget\Service\ValidationService;
 use OCA\Budget\Traits\ApiErrorHandlerTrait;
 use OCA\Budget\Traits\InputValidationTrait;
@@ -32,6 +33,7 @@ class AccountController extends Controller {
     private ValidationService $validationService;
     private AuditService $auditService;
     private InterestService $interestService;
+    private InvestmentService $investmentService;
     private IL10N $l;
     private string $userId;
 
@@ -42,6 +44,7 @@ class AccountController extends Controller {
         AuditService $auditService,
         GranularShareService $granularShareService,
         InterestService $interestService,
+        InvestmentService $investmentService,
         IL10N $l,
         string $userId,
         LoggerInterface $logger
@@ -51,6 +54,7 @@ class AccountController extends Controller {
         $this->validationService = $validationService;
         $this->auditService = $auditService;
         $this->interestService = $interestService;
+        $this->investmentService = $investmentService;
         $this->l = $l;
         $this->userId = $userId;
         $this->setLogger($logger);
@@ -684,6 +688,22 @@ class AccountController extends Controller {
             return new DataResponse(['status' => 'ok']);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to delete interest rate'), Http::STATUS_BAD_REQUEST, ['accountId' => $id, 'rateId' => $rateId]);
+        }
+    }
+
+    // ── Investment Valuation ────────────────────────────────────
+
+    /**
+     * Get unrealised P&L for an investment or crypto account.
+     * @NoAdminRequired
+     */
+    #[UserRateLimit(limit: 30, period: 60)]
+    public function getValuation(int $id): DataResponse {
+        try {
+            $result = $this->investmentService->calculateUnrealisedPnL($id, $this->getEffectiveUserId());
+            return new DataResponse($result);
+        } catch (\Exception $e) {
+            return $this->handleNotFoundError($e, $this->l->t('Account'), ['accountId' => $id]);
         }
     }
 }

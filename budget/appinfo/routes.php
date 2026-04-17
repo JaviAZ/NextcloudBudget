@@ -24,6 +24,9 @@ return [
         ['name' => 'account#addInterestRate', 'url' => '/api/accounts/{id}/interest-rates', 'verb' => 'POST'],
         ['name' => 'account#deleteInterestRate', 'url' => '/api/accounts/{id}/interest-rates/{rateId}', 'verb' => 'DELETE'],
 
+        // Investment valuation routes
+        ['name' => 'account#getValuation', 'url' => '/api/accounts/{id}/valuation', 'verb' => 'GET'],
+
         // Account validation routes
         ['name' => 'account#validateIban', 'url' => '/api/accounts/validate/iban', 'verb' => 'POST'],
         ['name' => 'account#validateRoutingNumber', 'url' => '/api/accounts/validate/routing-number', 'verb' => 'POST'],

@@ -1070,6 +1070,18 @@ style('budget', 'budget-main');
                                     <label><?php p($l->t('Total (incl. Interest)')); ?></label>
                                     <div id="account-total-owing" class="balance-amount"></div>
                                 </div>
+                                <div class="balance-item" id="investment-cost-info" style="display: none;">
+                                    <label><?php p($l->t('Net Invested')); ?></label>
+                                    <div id="account-total-cost" class="balance-amount"></div>
+                                </div>
+                                <div class="balance-item" id="investment-value-info" style="display: none;">
+                                    <label><?php p($l->t('Current Value')); ?></label>
+                                    <div id="account-current-value" class="balance-amount"></div>
+                                </div>
+                                <div class="balance-item" id="investment-pnl-info" style="display: none;">
+                                    <label><?php p($l->t('Unrealised P&L')); ?></label>
+                                    <div id="account-unrealised-pnl" class="balance-amount"></div>
+                                </div>
                             </div>
                         </div>
                     </div>

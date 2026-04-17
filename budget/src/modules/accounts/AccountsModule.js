@@ -577,6 +577,19 @@ export default class AccountsModule {
             if (rateHistorySection) rateHistorySection.style.display = 'none';
         }
 
+        // Show unrealised P&L for investment and crypto accounts
+        const isInvestmentType = ['investment', 'cryptocurrency'].includes(account.type);
+        const investmentCostInfo = document.getElementById('investment-cost-info');
+        const investmentValueInfo = document.getElementById('investment-value-info');
+        const investmentPnlInfo = document.getElementById('investment-pnl-info');
+        if (isInvestmentType) {
+            this.loadValuation(account.id);
+        } else {
+            if (investmentCostInfo) investmentCostInfo.style.display = 'none';
+            if (investmentValueInfo) investmentValueInfo.style.display = 'none';
+            if (investmentPnlInfo) investmentPnlInfo.style.display = 'none';
+        }
+
         // Update account details
         document.getElementById('account-number').textContent = account.accountNumber ? '***' + account.accountNumber.slice(-4) : t('budget', 'Not provided');
         document.getElementById('routing-number').textContent = account.routingNumber || t('budget', 'Not provided');
@@ -727,6 +740,63 @@ export default class AccountsModule {
             }
         } catch (error) {
             showError(t('budget', 'Failed to add rate change'));
+        }
+    }
+
+    async loadValuation(accountId) {
+        try {
+            const response = await fetch(OC.generateUrl(`/apps/budget/api/accounts/${accountId}/valuation`), {
+                headers: { 'requesttoken': OC.requestToken }
+            });
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const baseCurrency = data.baseCurrency || 'GBP';
+
+            const costInfo = document.getElementById('investment-cost-info');
+            const costEl = document.getElementById('account-total-cost');
+            const valueInfo = document.getElementById('investment-value-info');
+            const valueEl = document.getElementById('account-current-value');
+            const pnlInfo = document.getElementById('investment-pnl-info');
+            const pnlEl = document.getElementById('account-unrealised-pnl');
+
+            // Hide all if no meaningful data
+            const hasData = data.netInvested !== 0 || data.currentValue !== 0;
+            if (!hasData) {
+                if (costInfo) costInfo.style.display = 'none';
+                if (valueInfo) valueInfo.style.display = 'none';
+                if (pnlInfo) pnlInfo.style.display = 'none';
+                return;
+            }
+
+            if (costInfo && costEl) {
+                costInfo.style.display = 'block';
+                costEl.textContent = this.formatCurrency(data.netInvested, baseCurrency);
+            }
+
+            if (valueInfo && valueEl) {
+                valueInfo.style.display = 'block';
+                valueEl.textContent = this.formatCurrency(data.currentValue, baseCurrency);
+            }
+
+            if (pnlInfo && pnlEl) {
+                pnlInfo.style.display = 'block';
+                const pnlSign = data.unrealisedPnL >= 0 ? '+' : '';
+                const pnlPct = data.pnlPercentage != null && isFinite(data.pnlPercentage)
+                    ? ` (${pnlSign}${data.pnlPercentage.toFixed(1)}%)`
+                    : '';
+                let pnlText = `${pnlSign}${this.formatCurrency(data.unrealisedPnL, baseCurrency)}${pnlPct}`;
+                if (data.conversionWarning) {
+                    pnlText += ` ⚠`;
+                }
+                pnlEl.textContent = pnlText;
+                pnlEl.className = `balance-amount ${data.unrealisedPnL >= 0 ? 'positive' : 'negative'}`;
+                if (data.conversionWarning) {
+                    pnlEl.title = t('budget', 'Some historical exchange rates could not be found. P&L may be approximate.');
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load valuation:', error);
         }
     }
 

@@ -559,6 +559,15 @@ class Application extends App implements IBootstrap {
         });
         $context->registerServiceAlias('InterestService', \OCA\Budget\Service\InterestService::class);
 
+        $context->registerService(\OCA\Budget\Service\InvestmentService::class, function($c) {
+            return new \OCA\Budget\Service\InvestmentService(
+                $c->get(\OCA\Budget\Db\AccountMapper::class),
+                $c->get(\OCA\Budget\Db\TransactionMapper::class),
+                $c->get(\OCA\Budget\Service\CurrencyConversionService::class)
+            );
+        });
+        $context->registerServiceAlias('InvestmentService', \OCA\Budget\Service\InvestmentService::class);
+
         // ==========================================
         // Recurring Income Services
         // ==========================================
