@@ -25554,31 +25554,29 @@ var BankSyncModule = /*#__PURE__*/function () {
     key: "setupEventListeners",
     value: function setupEventListeners() {
       var _this = this;
-      // Provider selection toggle
-      var providerSelect = document.getElementById('bank-sync-provider');
-      if (providerSelect) {
-        providerSelect.addEventListener('change', function () {
-          var provider = providerSelect.value;
+      if (this._listenersSetup) return;
+      this._listenersSetup = true;
+
+      // Use event delegation for all bank sync UI interactions
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('#add-bank-connection-btn')) {
+          e.preventDefault();
+          _this.showConnectModal();
+          return;
+        }
+        if (e.target.closest('#bank-sync-connect-btn')) {
+          e.preventDefault();
+          _this.connect();
+          return;
+        }
+      });
+      document.addEventListener('change', function (e) {
+        if (e.target.id === 'bank-sync-provider') {
+          var provider = e.target.value;
           document.getElementById('simplefin-fields').style.display = provider === 'simplefin' ? 'block' : 'none';
           document.getElementById('gocardless-fields').style.display = provider === 'gocardless' ? 'block' : 'none';
-        });
-      }
-
-      // Add connection button
-      var addBtn = document.getElementById('add-bank-connection-btn');
-      if (addBtn) {
-        addBtn.addEventListener('click', function () {
-          return _this.showConnectModal();
-        });
-      }
-
-      // Connect button in modal
-      var connectBtn = document.getElementById('bank-sync-connect-btn');
-      if (connectBtn) {
-        connectBtn.addEventListener('click', function () {
-          return _this.connect();
-        });
-      }
+        }
+      });
     }
   }, {
     key: "loadBankSyncView",
@@ -25604,6 +25602,9 @@ var BankSyncModule = /*#__PURE__*/function () {
             case 2:
               if (disabledNotice) disabledNotice.style.display = 'none';
               if (content) content.style.display = 'block';
+
+              // Re-bind event listeners in case they weren't bound during init
+              this.setupEventListeners();
               _context3.n = 3;
               return this.loadConnections();
             case 3:

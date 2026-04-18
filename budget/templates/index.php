@@ -5968,52 +5968,53 @@ style('budget', 'budget-main');
             </button>
         </div>
     </div>
+</div>
 
-    <!-- Bank Sync Connection Modal -->
-    <div id="bank-sync-modal" class="modal" style="display: none;" role="dialog" aria-label="<?php p($l->t('Add Bank Connection')); ?>">
-        <div class="modal-content" style="max-width: 500px;">
-            <h3><?php p($l->t('Add Bank Connection')); ?></h3>
+<!-- Bank Sync Connection Modal -->
+<div id="bank-sync-modal" class="modal" style="display: none;" role="dialog" aria-label="<?php p($l->t('Add Bank Connection')); ?>">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3><?php p($l->t('Add Bank Connection')); ?></h3>
 
+        <div class="form-group">
+            <label for="bank-sync-provider"><?php p($l->t('Provider')); ?></label>
+            <select id="bank-sync-provider">
+                <option value=""><?php p($l->t('Select a provider...')); ?></option>
+                <option value="gocardless"><?php p($l->t('GoCardless (UK/Europe)')); ?></option>
+                <option value="simplefin"><?php p($l->t('SimpleFIN Bridge (US)')); ?></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="bank-sync-name"><?php p($l->t('Connection Name')); ?></label>
+            <input type="text" id="bank-sync-name" placeholder="<?php p($l->t('e.g. My Bank')); ?>" maxlength="255">
+        </div>
+
+        <!-- SimpleFIN fields -->
+        <div id="simplefin-fields" style="display: none;">
             <div class="form-group">
-                <label for="bank-sync-provider"><?php p($l->t('Provider')); ?></label>
-                <select id="bank-sync-provider">
-                    <option value=""><?php p($l->t('Select a provider...')); ?></option>
-                    <option value="gocardless"><?php p($l->t('GoCardless (UK/Europe)')); ?></option>
-                    <option value="simplefin"><?php p($l->t('SimpleFIN Bridge (US)')); ?></option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="bank-sync-name"><?php p($l->t('Connection Name')); ?></label>
-                <input type="text" id="bank-sync-name" placeholder="<?php p($l->t('e.g. My Bank')); ?>" maxlength="255">
-            </div>
-
-            <!-- SimpleFIN fields -->
-            <div id="simplefin-fields" style="display: none;">
-                <div class="form-group">
-                    <label for="bank-sync-setup-token"><?php p($l->t('Setup Token')); ?></label>
-                    <input type="text" id="bank-sync-setup-token" placeholder="<?php p($l->t('Paste your SimpleFIN setup token')); ?>">
-                    <small class="form-text"><?php p($l->t('Get a token from beta-bridge.simplefin.org')); ?></small>
-                </div>
-            </div>
-
-            <!-- GoCardless fields -->
-            <div id="gocardless-fields" style="display: none;">
-                <div class="form-group">
-                    <label for="bank-sync-secret-id"><?php p($l->t('Secret ID')); ?></label>
-                    <input type="text" id="bank-sync-secret-id" placeholder="<?php p($l->t('Your GoCardless Secret ID')); ?>">
-                </div>
-                <div class="form-group">
-                    <label for="bank-sync-secret-key"><?php p($l->t('Secret Key')); ?></label>
-                    <input type="password" id="bank-sync-secret-key" placeholder="<?php p($l->t('Your GoCardless Secret Key')); ?>">
-                </div>
-                <small class="form-text"><?php p($l->t('Get API keys from bankaccountdata.gocardless.com')); ?></small>
-            </div>
-
-            <div class="modal-buttons">
-                <button type="button" class="primary" id="bank-sync-connect-btn"><?php p($l->t('Connect')); ?></button>
-                <button type="button" class="secondary cancel-btn"><?php p($l->t('Cancel')); ?></button>
+                <label for="bank-sync-setup-token"><?php p($l->t('Setup Token')); ?></label>
+                <input type="text" id="bank-sync-setup-token" placeholder="<?php p($l->t('Paste your SimpleFIN setup token')); ?>">
+                <small class="form-text"><?php p($l->t('Get a token from beta-bridge.simplefin.org')); ?></small>
             </div>
         </div>
+
+        <!-- GoCardless fields -->
+        <div id="gocardless-fields" style="display: none;">
+            <div class="form-group">
+                <label for="bank-sync-secret-id"><?php p($l->t('Secret ID')); ?></label>
+                <input type="text" id="bank-sync-secret-id" placeholder="<?php p($l->t('Your GoCardless Secret ID')); ?>">
+            </div>
+            <div class="form-group">
+                <label for="bank-sync-secret-key"><?php p($l->t('Secret Key')); ?></label>
+                <input type="password" id="bank-sync-secret-key" placeholder="<?php p($l->t('Your GoCardless Secret Key')); ?>">
+            </div>
+            <small class="form-text"><?php p($l->t('Get API keys from bankaccountdata.gocardless.com')); ?></small>
+        </div>
+
+        <div class="modal-buttons">
+            <button type="button" class="primary" id="bank-sync-connect-btn"><?php p($l->t('Connect')); ?></button>
+            <button type="button" class="secondary cancel-btn"><?php p($l->t('Cancel')); ?></button>
+        </div>
     </div>
+</div>
 </div>

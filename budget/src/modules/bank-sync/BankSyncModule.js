@@ -38,27 +38,30 @@ export default class BankSyncModule {
     }
 
     setupEventListeners() {
-        // Provider selection toggle
-        const providerSelect = document.getElementById('bank-sync-provider');
-        if (providerSelect) {
-            providerSelect.addEventListener('change', () => {
-                const provider = providerSelect.value;
+        if (this._listenersSetup) return;
+        this._listenersSetup = true;
+
+        // Use event delegation for all bank sync UI interactions
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#add-bank-connection-btn')) {
+                e.preventDefault();
+                this.showConnectModal();
+                return;
+            }
+            if (e.target.closest('#bank-sync-connect-btn')) {
+                e.preventDefault();
+                this.connect();
+                return;
+            }
+        });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'bank-sync-provider') {
+                const provider = e.target.value;
                 document.getElementById('simplefin-fields').style.display = provider === 'simplefin' ? 'block' : 'none';
                 document.getElementById('gocardless-fields').style.display = provider === 'gocardless' ? 'block' : 'none';
-            });
-        }
-
-        // Add connection button
-        const addBtn = document.getElementById('add-bank-connection-btn');
-        if (addBtn) {
-            addBtn.addEventListener('click', () => this.showConnectModal());
-        }
-
-        // Connect button in modal
-        const connectBtn = document.getElementById('bank-sync-connect-btn');
-        if (connectBtn) {
-            connectBtn.addEventListener('click', () => this.connect());
-        }
+            }
+        });
     }
 
     async loadBankSyncView() {
@@ -75,6 +78,9 @@ export default class BankSyncModule {
 
         if (disabledNotice) disabledNotice.style.display = 'none';
         if (content) content.style.display = 'block';
+
+        // Re-bind event listeners in case they weren't bound during init
+        this.setupEventListeners();
 
         await this.loadConnections();
     }
