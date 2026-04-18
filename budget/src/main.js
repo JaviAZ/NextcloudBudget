@@ -41,6 +41,7 @@ import AccountsModule from './modules/accounts/AccountsModule.js';
 import CategoriesModule from './modules/categories/CategoriesModule.js';
 import ExchangeRatesModule from './modules/exchange-rates/ExchangeRatesModule.js';
 import SharingModule from './modules/sharing/SharingModule.js';
+import BankSyncModule from './modules/bank-sync/BankSyncModule.js';
 
 class BudgetApp {
     constructor() {
@@ -117,6 +118,7 @@ class BudgetApp {
         this.categoriesModule = new CategoriesModule(this);
         this.exchangeRatesModule = new ExchangeRatesModule(this);
         this.sharingModule = new SharingModule(this);
+        this.bankSyncModule = new BankSyncModule(this);
 
         this.init();
     }
@@ -137,6 +139,7 @@ class BudgetApp {
         this.authModule.setupActivityMonitoring();
         await this.authModule.setupLockButton();
         await this.loadInitialData();
+        this.bankSyncModule.init();
         this.showView('dashboard');
     }
 
@@ -2267,6 +2270,11 @@ class BudgetApp {
         return this.sharingModule.loadSharingView();
     }
 
+    // Bank Sync - delegated to BankSyncModule
+    async loadBankSyncView() {
+        return this.bankSyncModule.loadBankSyncView();
+    }
+
     // Settings - delegated to SettingsModule
     async loadSettingsView() {
         return this.settingsModule.loadSettingsView();
@@ -3224,7 +3232,8 @@ class BudgetApp {
             'asset-value-modal',
             'manual-rate-modal',
             'global-tag-modal',
-            'duplicates-modal'
+            'duplicates-modal',
+            'bank-sync-modal'
         ];
 
         modalIds.forEach(modalId => {

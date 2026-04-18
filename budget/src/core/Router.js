@@ -152,6 +152,9 @@ export default class Router {
                 case 'sharing':
                     this.app.loadSharingView();
                     break;
+                case 'bank-sync':
+                    this.app.loadBankSyncView();
+                    break;
                 case 'settings':
                     this.app.loadSettingsView();
                     break;

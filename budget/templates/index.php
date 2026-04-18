@@ -242,6 +242,16 @@ style('budget', 'budget-main');
                     <?php p($l->t('Sharing')); ?>
                 </a>
             </li>
+            <li class="app-navigation-entry" data-id="bank-sync" id="bank-sync-nav" style="display: none;">
+                <a href="#bank-sync" class="nav-icon-bank-sync svg">
+                    <span class="app-navigation-entry-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.5,1L2,6V8H21V6M16,10V17H19V10M2,22H21V19H2M10,10V17H13V10M4,10V17H7V10H4Z"/>
+                        </svg>
+                    </span>
+                    <?php p($l->t('Bank Sync')); ?>
+                </a>
+            </li>
             <li class="app-navigation-entry" data-id="settings">
                 <a href="#settings" class="nav-icon-settings svg">
                     <span class="app-navigation-entry-icon">
@@ -4209,6 +4219,46 @@ style('budget', 'budget-main');
             <div id="sharing-content"></div>
         </div>
 
+        <!-- Bank Sync View -->
+        <div id="bank-sync-view" class="view">
+            <div class="view-header">
+                <h2><?php p($l->t('Bank Sync')); ?></h2>
+            </div>
+
+            <div id="bank-sync-disabled-notice" class="settings-section" style="display: none;">
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.3;">
+                        <path d="M11.5,1L2,6V8H21V6M16,10V17H19V10M2,22H21V19H2M10,10V17H13V10M4,10V17H7V10H4Z"/>
+                    </svg>
+                    <h3><?php p($l->t('Bank Sync is disabled')); ?></h3>
+                    <p><?php p($l->t('An administrator must enable bank sync before it can be used.')); ?></p>
+                </div>
+            </div>
+
+            <div id="bank-sync-content" style="display: none;">
+                <!-- Connections List -->
+                <div class="settings-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3><?php p($l->t('Bank Connections')); ?></h3>
+                        <button class="btn btn-primary" id="add-bank-connection-btn">
+                            <span class="icon-add" aria-hidden="true"></span>
+                            <?php p($l->t('Add Connection')); ?>
+                        </button>
+                    </div>
+                    <div id="bank-connections-list">
+                        <div class="empty-state-small"><?php p($l->t('No bank connections yet. Click "Add Connection" to get started.')); ?></div>
+                    </div>
+                </div>
+
+                <!-- Account Mappings (shown when a connection is selected) -->
+                <div class="settings-section" id="bank-mappings-section" style="display: none;">
+                    <h3 id="bank-mappings-title"><?php p($l->t('Account Mappings')); ?></h3>
+                    <p class="section-description"><?php p($l->t('Map your bank accounts to Budget accounts to enable automatic transaction import.')); ?></p>
+                    <div id="bank-mappings-list"></div>
+                </div>
+            </div>
+        </div>
+
         <div id="settings-view" class="view">
             <div class="view-header">
                 <h2><?php p($l->t('Settings')); ?></h2>
@@ -5900,6 +5950,54 @@ style('budget', 'budget-main');
                 <span class="icon-delete" aria-hidden="true"></span>
                 <?php p($l->t('Delete Everything')); ?>
             </button>
+        </div>
+    </div>
+
+    <!-- Bank Sync Connection Modal -->
+    <div id="bank-sync-modal" class="modal" style="display: none;" role="dialog" aria-label="<?php p($l->t('Add Bank Connection')); ?>">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3><?php p($l->t('Add Bank Connection')); ?></h3>
+
+            <div class="form-group">
+                <label for="bank-sync-provider"><?php p($l->t('Provider')); ?></label>
+                <select id="bank-sync-provider">
+                    <option value=""><?php p($l->t('Select a provider...')); ?></option>
+                    <option value="gocardless"><?php p($l->t('GoCardless (UK/Europe)')); ?></option>
+                    <option value="simplefin"><?php p($l->t('SimpleFIN Bridge (US)')); ?></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="bank-sync-name"><?php p($l->t('Connection Name')); ?></label>
+                <input type="text" id="bank-sync-name" placeholder="<?php p($l->t('e.g. My Bank')); ?>" maxlength="255">
+            </div>
+
+            <!-- SimpleFIN fields -->
+            <div id="simplefin-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="bank-sync-setup-token"><?php p($l->t('Setup Token')); ?></label>
+                    <input type="text" id="bank-sync-setup-token" placeholder="<?php p($l->t('Paste your SimpleFIN setup token')); ?>">
+                    <small class="form-text"><?php p($l->t('Get a token from beta-bridge.simplefin.org')); ?></small>
+                </div>
+            </div>
+
+            <!-- GoCardless fields -->
+            <div id="gocardless-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="bank-sync-secret-id"><?php p($l->t('Secret ID')); ?></label>
+                    <input type="text" id="bank-sync-secret-id" placeholder="<?php p($l->t('Your GoCardless Secret ID')); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="bank-sync-secret-key"><?php p($l->t('Secret Key')); ?></label>
+                    <input type="password" id="bank-sync-secret-key" placeholder="<?php p($l->t('Your GoCardless Secret Key')); ?>">
+                </div>
+                <small class="form-text"><?php p($l->t('Get API keys from bankaccountdata.gocardless.com')); ?></small>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" class="primary" id="bank-sync-connect-btn"><?php p($l->t('Connect')); ?></button>
+                <button type="button" class="secondary cancel-btn"><?php p($l->t('Cancel')); ?></button>
+            </div>
         </div>
     </div>
 </div>
