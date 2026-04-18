@@ -31,9 +31,56 @@ export default class SettingsModule {
             const settings = await response.json();
             await this.populateSettings(settings);
             this.updateNumberFormatPreview();
+            await this.loadAdminSettings();
         } catch (error) {
             console.error('Error loading settings:', error);
             showError(t('budget', 'Failed to load settings'));
+        }
+    }
+
+    async loadAdminSettings() {
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/admin/settings'), {
+                headers: { 'requesttoken': OC.requestToken }
+            });
+
+            // Non-admin users get a 403 — hide the section
+            if (response.status === 403 || !response.ok) {
+                return;
+            }
+
+            const adminSettings = await response.json();
+            const section = document.getElementById('admin-settings-section');
+            if (section) {
+                section.style.display = 'block';
+            }
+
+            const toggle = document.getElementById('setting-bank-sync-enabled');
+            if (toggle) {
+                toggle.checked = adminSettings.bankSyncEnabled || false;
+                toggle.addEventListener('change', async () => {
+                    try {
+                        await fetch(OC.generateUrl('/apps/budget/api/admin/settings'), {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'requesttoken': OC.requestToken
+                            },
+                            body: JSON.stringify({ bankSyncEnabled: toggle.checked })
+                        });
+                        showSuccess(t('budget', 'Admin settings saved'));
+                        // Update bank sync nav visibility
+                        if (this.app.bankSyncModule) {
+                            this.app.bankSyncModule.checkStatus();
+                        }
+                    } catch (error) {
+                        showError(t('budget', 'Failed to save admin settings'));
+                        toggle.checked = !toggle.checked;
+                    }
+                });
+            }
+        } catch (error) {
+            // Silently ignore — non-admin users won't see admin settings
         }
     }
 

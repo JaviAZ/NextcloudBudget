@@ -42812,17 +42812,20 @@ var SettingsModule = /*#__PURE__*/function () {
               return this.populateSettings(settings);
             case 4:
               this.updateNumberFormatPreview();
-              _context.n = 6;
-              break;
+              _context.n = 5;
+              return this.loadAdminSettings();
             case 5:
-              _context.p = 5;
+              _context.n = 7;
+              break;
+            case 6:
+              _context.p = 6;
               _t = _context.v;
               console.error('Error loading settings:', _t);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to load settings'));
-            case 6:
+            case 7:
               return _context.a(2);
           }
-        }, _callee, this, [[0, 5]]);
+        }, _callee, this, [[0, 6]]);
       }));
       function loadSettingsView() {
         return _loadSettingsView.apply(this, arguments);
@@ -42830,11 +42833,97 @@ var SettingsModule = /*#__PURE__*/function () {
       return loadSettingsView;
     }()
   }, {
+    key: "loadAdminSettings",
+    value: function () {
+      var _loadAdminSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+        var _this = this;
+        var response, adminSettings, section, toggle, _t3;
+        return _regenerator().w(function (_context3) {
+          while (1) switch (_context3.p = _context3.n) {
+            case 0:
+              _context3.p = 0;
+              _context3.n = 1;
+              return fetch(OC.generateUrl('/apps/budget/api/admin/settings'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 1:
+              response = _context3.v;
+              if (!(response.status === 403 || !response.ok)) {
+                _context3.n = 2;
+                break;
+              }
+              return _context3.a(2);
+            case 2:
+              _context3.n = 3;
+              return response.json();
+            case 3:
+              adminSettings = _context3.v;
+              section = document.getElementById('admin-settings-section');
+              if (section) {
+                section.style.display = 'block';
+              }
+              toggle = document.getElementById('setting-bank-sync-enabled');
+              if (toggle) {
+                toggle.checked = adminSettings.bankSyncEnabled || false;
+                toggle.addEventListener('change', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+                  var _t2;
+                  return _regenerator().w(function (_context2) {
+                    while (1) switch (_context2.p = _context2.n) {
+                      case 0:
+                        _context2.p = 0;
+                        _context2.n = 1;
+                        return fetch(OC.generateUrl('/apps/budget/api/admin/settings'), {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'requesttoken': OC.requestToken
+                          },
+                          body: JSON.stringify({
+                            bankSyncEnabled: toggle.checked
+                          })
+                        });
+                      case 1:
+                        (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Admin settings saved'));
+                        // Update bank sync nav visibility
+                        if (_this.app.bankSyncModule) {
+                          _this.app.bankSyncModule.checkStatus();
+                        }
+                        _context2.n = 3;
+                        break;
+                      case 2:
+                        _context2.p = 2;
+                        _t2 = _context2.v;
+                        (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to save admin settings'));
+                        toggle.checked = !toggle.checked;
+                      case 3:
+                        return _context2.a(2);
+                    }
+                  }, _callee2, null, [[0, 2]]);
+                })));
+              }
+              _context3.n = 5;
+              break;
+            case 4:
+              _context3.p = 4;
+              _t3 = _context3.v;
+            case 5:
+              return _context3.a(2);
+          }
+        }, _callee3, null, [[0, 4]]);
+      }));
+      function loadAdminSettings() {
+        return _loadAdminSettings.apply(this, arguments);
+      }
+      return loadAdminSettings;
+    }()
+  }, {
     key: "populateSettings",
     value: function () {
-      var _populateSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(settings) {
-        return _regenerator().w(function (_context2) {
-          while (1) switch (_context2.n) {
+      var _populateSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(settings) {
+        return _regenerator().w(function (_context4) {
+          while (1) switch (_context4.n) {
             case 0:
               // Populate each setting input
               Object.keys(settings).forEach(function (key) {
@@ -42849,12 +42938,12 @@ var SettingsModule = /*#__PURE__*/function () {
               });
 
               // Check password protection status and update UI
-              _context2.n = 1;
+              _context4.n = 1;
               return this.updatePasswordProtectionUI();
             case 1:
-              return _context2.a(2);
+              return _context4.a(2);
           }
-        }, _callee2, this);
+        }, _callee4, this);
       }));
       function populateSettings(_x) {
         return _populateSettings.apply(this, arguments);
@@ -42864,28 +42953,28 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "updatePasswordProtectionUI",
     value: function () {
-      var _updatePasswordProtectionUI = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-        var response, status, passwordToggle, passwordConfig, _t2;
-        return _regenerator().w(function (_context3) {
-          while (1) switch (_context3.p = _context3.n) {
+      var _updatePasswordProtectionUI = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
+        var response, status, passwordToggle, passwordConfig, _t4;
+        return _regenerator().w(function (_context5) {
+          while (1) switch (_context5.p = _context5.n) {
             case 0:
-              _context3.p = 0;
-              _context3.n = 1;
+              _context5.p = 0;
+              _context5.n = 1;
               return fetch(OC.generateUrl('/apps/budget/api/auth/status'), {
                 headers: this.app.getAuthHeaders()
               });
             case 1:
-              response = _context3.v;
+              response = _context5.v;
               if (response.ok) {
-                _context3.n = 2;
+                _context5.n = 2;
                 break;
               }
-              return _context3.a(2);
+              return _context5.a(2);
             case 2:
-              _context3.n = 3;
+              _context5.n = 3;
               return response.json();
             case 3:
-              status = _context3.v;
+              status = _context5.v;
               passwordToggle = document.getElementById('setting-password-protection-enabled');
               passwordConfig = document.getElementById('password-protection-config');
               if (passwordToggle) {
@@ -42897,16 +42986,16 @@ var SettingsModule = /*#__PURE__*/function () {
                   passwordConfig.style.display = 'none';
                 }
               }
-              _context3.n = 5;
+              _context5.n = 5;
               break;
             case 4:
-              _context3.p = 4;
-              _t2 = _context3.v;
-              console.error('Failed to check password protection status:', _t2);
+              _context5.p = 4;
+              _t4 = _context5.v;
+              console.error('Failed to check password protection status:', _t4);
             case 5:
-              return _context3.a(2);
+              return _context5.a(2);
           }
-        }, _callee3, this, [[0, 4]]);
+        }, _callee5, this, [[0, 4]]);
       }));
       function updatePasswordProtectionUI() {
         return _updatePasswordProtectionUI.apply(this, arguments);
@@ -42926,14 +43015,14 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "saveSettings",
     value: function () {
-      var _saveSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
-        var settings, response, result, _t3;
-        return _regenerator().w(function (_context4) {
-          while (1) switch (_context4.p = _context4.n) {
+      var _saveSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6() {
+        var settings, response, result, _t5;
+        return _regenerator().w(function (_context6) {
+          while (1) switch (_context6.p = _context6.n) {
             case 0:
-              _context4.p = 0;
+              _context6.p = 0;
               settings = this.gatherSettings();
-              _context4.n = 1;
+              _context6.n = 1;
               return fetch(OC.generateUrl('/apps/budget/api/settings'), {
                 method: 'PUT',
                 headers: {
@@ -42943,17 +43032,17 @@ var SettingsModule = /*#__PURE__*/function () {
                 body: JSON.stringify(settings)
               });
             case 1:
-              response = _context4.v;
+              response = _context6.v;
               if (response.ok) {
-                _context4.n = 2;
+                _context6.n = 2;
                 break;
               }
               throw new Error((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to save settings'));
             case 2:
-              _context4.n = 3;
+              _context6.n = 3;
               return response.json();
             case 3:
-              result = _context4.v;
+              result = _context6.v;
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Settings saved successfully'));
 
               // Update stored settings to apply immediately
@@ -42969,17 +43058,17 @@ var SettingsModule = /*#__PURE__*/function () {
               if (this.app.reloadCurrentView) {
                 this.app.reloadCurrentView();
               }
-              _context4.n = 5;
+              _context6.n = 5;
               break;
             case 4:
-              _context4.p = 4;
-              _t3 = _context4.v;
-              console.error('Error saving settings:', _t3);
+              _context6.p = 4;
+              _t5 = _context6.v;
+              console.error('Error saving settings:', _t5);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to save settings'));
             case 5:
-              return _context4.a(2);
+              return _context6.a(2);
           }
-        }, _callee4, this, [[0, 4]]);
+        }, _callee6, this, [[0, 4]]);
       }));
       function saveSettings() {
         return _saveSettings.apply(this, arguments);
@@ -43004,19 +43093,19 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "resetSettings",
     value: function () {
-      var _resetSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
-        var response, result, _t4;
-        return _regenerator().w(function (_context5) {
-          while (1) switch (_context5.p = _context5.n) {
+      var _resetSettings = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
+        var response, result, _t6;
+        return _regenerator().w(function (_context7) {
+          while (1) switch (_context7.p = _context7.n) {
             case 0:
               if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Are you sure you want to reset all settings to defaults? This action cannot be undone.'))) {
-                _context5.n = 1;
+                _context7.n = 1;
                 break;
               }
-              return _context5.a(2);
+              return _context7.a(2);
             case 1:
-              _context5.p = 1;
-              _context5.n = 2;
+              _context7.p = 1;
+              _context7.n = 2;
               return fetch(OC.generateUrl('/apps/budget/api/settings/reset'), {
                 method: 'POST',
                 headers: {
@@ -43024,33 +43113,33 @@ var SettingsModule = /*#__PURE__*/function () {
                 }
               });
             case 2:
-              response = _context5.v;
+              response = _context7.v;
               if (response.ok) {
-                _context5.n = 3;
+                _context7.n = 3;
                 break;
               }
               throw new Error((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to reset settings'));
             case 3:
-              _context5.n = 4;
+              _context7.n = 4;
               return response.json();
             case 4:
-              result = _context5.v;
-              _context5.n = 5;
+              result = _context7.v;
+              _context7.n = 5;
               return this.populateSettings(result.defaults);
             case 5:
               this.updateNumberFormatPreview();
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Settings reset to defaults'));
-              _context5.n = 7;
+              _context7.n = 7;
               break;
             case 6:
-              _context5.p = 6;
-              _t4 = _context5.v;
-              console.error('Error resetting settings:', _t4);
+              _context7.p = 6;
+              _t6 = _context7.v;
+              console.error('Error resetting settings:', _t6);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to reset settings'));
             case 7:
-              return _context5.a(2);
+              return _context7.a(2);
           }
-        }, _callee5, this, [[1, 6]]);
+        }, _callee7, this, [[1, 6]]);
       }));
       function resetSettings() {
         return _resetSettings.apply(this, arguments);
@@ -43143,7 +43232,7 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "showSetupPasswordModal",
     value: function showSetupPasswordModal() {
-      var _this = this;
+      var _this2 = this;
       var modal = document.createElement('div');
       modal.id = 'setup-password-modal';
       modal.className = 'budget-modal-overlay';
@@ -43154,67 +43243,67 @@ var SettingsModule = /*#__PURE__*/function () {
       var confirmPasswordInput = document.getElementById('confirm-password');
       var errorDiv = document.getElementById('setup-password-error');
       form.addEventListener('submit', /*#__PURE__*/function () {
-        var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(e) {
-          var newPassword, confirmPassword, response, result, _t5;
-          return _regenerator().w(function (_context6) {
-            while (1) switch (_context6.p = _context6.n) {
+        var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(e) {
+          var newPassword, confirmPassword, response, result, _t7;
+          return _regenerator().w(function (_context8) {
+            while (1) switch (_context8.p = _context8.n) {
               case 0:
                 e.preventDefault();
                 newPassword = newPasswordInput.value;
                 confirmPassword = confirmPasswordInput.value;
                 if (!(newPassword !== confirmPassword)) {
-                  _context6.n = 1;
+                  _context8.n = 1;
                   break;
                 }
                 errorDiv.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Passwords do not match');
                 errorDiv.style.display = 'block';
-                return _context6.a(2);
+                return _context8.a(2);
               case 1:
-                _context6.p = 1;
-                _context6.n = 2;
+                _context8.p = 1;
+                _context8.n = 2;
                 return fetch(OC.generateUrl('/apps/budget/api/auth/setup'), {
                   method: 'POST',
                   headers: _objectSpread({
                     'Content-Type': 'application/json'
-                  }, _this.app.getAuthHeaders()),
+                  }, _this2.app.getAuthHeaders()),
                   body: JSON.stringify({
                     password: newPassword
                   })
                 });
               case 2:
-                response = _context6.v;
-                _context6.n = 3;
+                response = _context8.v;
+                _context8.n = 3;
                 return response.json();
               case 3:
-                result = _context6.v;
+                result = _context8.v;
                 if (response.ok && result.success) {
                   // Store session token
-                  _this.app.sessionToken = result.sessionToken;
+                  _this2.app.sessionToken = result.sessionToken;
                   localStorage.setItem('budget_session_token', result.sessionToken);
                   (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Password protection enabled'));
                   modal.remove();
 
                   // Update UI
-                  _this.updatePasswordButtons(true);
+                  _this2.updatePasswordButtons(true);
                 } else {
                   errorDiv.textContent = result.error || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to set password');
                   errorDiv.style.display = 'block';
                 }
-                _context6.n = 5;
+                _context8.n = 5;
                 break;
               case 4:
-                _context6.p = 4;
-                _t5 = _context6.v;
-                console.error('Failed to set password:', _t5);
+                _context8.p = 4;
+                _t7 = _context8.v;
+                console.error('Failed to set password:', _t7);
                 errorDiv.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to set password. Please try again.');
                 errorDiv.style.display = 'block';
               case 5:
-                return _context6.a(2);
+                return _context8.a(2);
             }
-          }, _callee6, null, [[1, 4]]);
+          }, _callee8, null, [[1, 4]]);
         }));
         return function (_x2) {
-          return _ref.apply(this, arguments);
+          return _ref2.apply(this, arguments);
         };
       }());
 
@@ -43232,7 +43321,7 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "showChangePasswordModal",
     value: function showChangePasswordModal() {
-      var _this2 = this;
+      var _this3 = this;
       var modal = document.createElement('div');
       modal.id = 'change-password-modal';
       modal.className = 'budget-modal-overlay';
@@ -43244,41 +43333,41 @@ var SettingsModule = /*#__PURE__*/function () {
       var confirmPasswordInput = document.getElementById('confirm-password-change');
       var errorDiv = document.getElementById('change-password-error');
       form.addEventListener('submit', /*#__PURE__*/function () {
-        var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(e) {
-          var currentPassword, newPassword, confirmPassword, response, result, _t6;
-          return _regenerator().w(function (_context7) {
-            while (1) switch (_context7.p = _context7.n) {
+        var _ref3 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(e) {
+          var currentPassword, newPassword, confirmPassword, response, result, _t8;
+          return _regenerator().w(function (_context9) {
+            while (1) switch (_context9.p = _context9.n) {
               case 0:
                 e.preventDefault();
                 currentPassword = currentPasswordInput.value;
                 newPassword = newPasswordInput.value;
                 confirmPassword = confirmPasswordInput.value;
                 if (!(newPassword !== confirmPassword)) {
-                  _context7.n = 1;
+                  _context9.n = 1;
                   break;
                 }
                 errorDiv.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'New passwords do not match');
                 errorDiv.style.display = 'block';
-                return _context7.a(2);
+                return _context9.a(2);
               case 1:
-                _context7.p = 1;
-                _context7.n = 2;
+                _context9.p = 1;
+                _context9.n = 2;
                 return fetch(OC.generateUrl('/apps/budget/api/auth/password'), {
                   method: 'PUT',
                   headers: _objectSpread({
                     'Content-Type': 'application/json'
-                  }, _this2.app.getAuthHeaders()),
+                  }, _this3.app.getAuthHeaders()),
                   body: JSON.stringify({
                     currentPassword: currentPassword,
                     newPassword: newPassword
                   })
                 });
               case 2:
-                response = _context7.v;
-                _context7.n = 3;
+                response = _context9.v;
+                _context9.n = 3;
                 return response.json();
               case 3:
-                result = _context7.v;
+                result = _context9.v;
                 if (response.ok && result.success) {
                   (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Password changed successfully'));
                   modal.remove();
@@ -43286,21 +43375,21 @@ var SettingsModule = /*#__PURE__*/function () {
                   errorDiv.textContent = result.error || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to change password');
                   errorDiv.style.display = 'block';
                 }
-                _context7.n = 5;
+                _context9.n = 5;
                 break;
               case 4:
-                _context7.p = 4;
-                _t6 = _context7.v;
-                console.error('Failed to change password:', _t6);
+                _context9.p = 4;
+                _t8 = _context9.v;
+                console.error('Failed to change password:', _t8);
                 errorDiv.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to change password. Please try again.');
                 errorDiv.style.display = 'block';
               case 5:
-                return _context7.a(2);
+                return _context9.a(2);
             }
-          }, _callee7, null, [[1, 4]]);
+          }, _callee9, null, [[1, 4]]);
         }));
         return function (_x3) {
-          return _ref2.apply(this, arguments);
+          return _ref3.apply(this, arguments);
         };
       }());
 
@@ -43318,7 +43407,7 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "showDisablePasswordModal",
     value: function showDisablePasswordModal() {
-      var _this3 = this;
+      var _this4 = this;
       var modal = document.createElement('div');
       modal.id = 'disable-password-modal';
       modal.className = 'budget-modal-overlay';
@@ -43328,30 +43417,30 @@ var SettingsModule = /*#__PURE__*/function () {
       var passwordInput = document.getElementById('disable-current-password');
       var errorDiv = document.getElementById('disable-password-error');
       form.addEventListener('submit', /*#__PURE__*/function () {
-        var _ref3 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(e) {
-          var password, response, result, passwordToggle, passwordConfig, _t7;
-          return _regenerator().w(function (_context8) {
-            while (1) switch (_context8.p = _context8.n) {
+        var _ref4 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(e) {
+          var password, response, result, passwordToggle, passwordConfig, _t9;
+          return _regenerator().w(function (_context0) {
+            while (1) switch (_context0.p = _context0.n) {
               case 0:
                 e.preventDefault();
                 password = passwordInput.value;
-                _context8.p = 1;
-                _context8.n = 2;
+                _context0.p = 1;
+                _context0.n = 2;
                 return fetch(OC.generateUrl('/apps/budget/api/auth/disable'), {
                   method: 'DELETE',
                   headers: _objectSpread({
                     'Content-Type': 'application/json'
-                  }, _this3.app.getAuthHeaders()),
+                  }, _this4.app.getAuthHeaders()),
                   body: JSON.stringify({
                     password: password
                   })
                 });
               case 2:
-                response = _context8.v;
-                _context8.n = 3;
+                response = _context0.v;
+                _context0.n = 3;
                 return response.json();
               case 3:
-                result = _context8.v;
+                result = _context0.v;
                 if (response.ok && result.success) {
                   // Update UI
                   passwordToggle = document.getElementById('setting-password-protection-enabled');
@@ -43364,21 +43453,21 @@ var SettingsModule = /*#__PURE__*/function () {
                   errorDiv.textContent = result.error || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to disable password protection');
                   errorDiv.style.display = 'block';
                 }
-                _context8.n = 5;
+                _context0.n = 5;
                 break;
               case 4:
-                _context8.p = 4;
-                _t7 = _context8.v;
-                console.error('Failed to disable password protection:', _t7);
+                _context0.p = 4;
+                _t9 = _context0.v;
+                console.error('Failed to disable password protection:', _t9);
                 errorDiv.textContent = (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to disable password protection. Please try again.');
                 errorDiv.style.display = 'block';
               case 5:
-                return _context8.a(2);
+                return _context0.a(2);
             }
-          }, _callee8, null, [[1, 4]]);
+          }, _callee0, null, [[1, 4]]);
         }));
         return function (_x4) {
-          return _ref3.apply(this, arguments);
+          return _ref4.apply(this, arguments);
         };
       }());
 
@@ -43398,7 +43487,7 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "setupFactoryResetEventListeners",
     value: function setupFactoryResetEventListeners() {
-      var _this4 = this;
+      var _this5 = this;
       var factoryResetBtn = document.getElementById('factory-reset-btn');
       var factoryResetModal = document.getElementById('factory-reset-modal');
       var factoryResetInput = document.getElementById('factory-reset-confirm-input');
@@ -43408,7 +43497,7 @@ var SettingsModule = /*#__PURE__*/function () {
       // Open modal
       if (factoryResetBtn) {
         factoryResetBtn.addEventListener('click', function () {
-          _this4.openFactoryResetModal();
+          _this5.openFactoryResetModal();
         });
       }
 
@@ -43423,14 +43512,14 @@ var SettingsModule = /*#__PURE__*/function () {
       // Confirm button
       if (factoryResetConfirmBtn) {
         factoryResetConfirmBtn.addEventListener('click', function () {
-          _this4.executeFactoryReset();
+          _this5.executeFactoryReset();
         });
       }
 
       // Close modal buttons
       modalCloseButtons.forEach(function (btn) {
         btn.addEventListener('click', function () {
-          _this4.closeFactoryResetModal();
+          _this5.closeFactoryResetModal();
         });
       });
 
@@ -43438,7 +43527,7 @@ var SettingsModule = /*#__PURE__*/function () {
       if (factoryResetModal) {
         factoryResetModal.addEventListener('click', function (e) {
           if (e.target === factoryResetModal) {
-            _this4.closeFactoryResetModal();
+            _this5.closeFactoryResetModal();
           }
         });
       }
@@ -43472,19 +43561,19 @@ var SettingsModule = /*#__PURE__*/function () {
   }, {
     key: "executeFactoryReset",
     value: function () {
-      var _executeFactoryReset = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var confirmBtn, response, data, _confirmBtn, _t8;
-        return _regenerator().w(function (_context9) {
-          while (1) switch (_context9.p = _context9.n) {
+      var _executeFactoryReset = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
+        var confirmBtn, response, data, _confirmBtn, _t0;
+        return _regenerator().w(function (_context1) {
+          while (1) switch (_context1.p = _context1.n) {
             case 0:
-              _context9.p = 0;
+              _context1.p = 0;
               // Show loading state
               confirmBtn = document.getElementById('factory-reset-confirm-btn');
               if (confirmBtn) {
                 confirmBtn.disabled = true;
                 confirmBtn.innerHTML = '<span class="icon-loading-small" aria-hidden="true"></span> ' + (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Deleting...');
               }
-              _context9.n = 1;
+              _context1.n = 1;
               return fetch(OC.generateUrl('/apps/budget/api/setup/factory-reset'), {
                 method: 'POST',
                 headers: {
@@ -43496,13 +43585,13 @@ var SettingsModule = /*#__PURE__*/function () {
                 })
               });
             case 1:
-              response = _context9.v;
-              _context9.n = 2;
+              response = _context1.v;
+              _context1.n = 2;
               return response.json();
             case 2:
-              data = _context9.v;
+              data = _context1.v;
               if (response.ok) {
-                _context9.n = 3;
+                _context1.n = 3;
                 break;
               }
               throw new Error(data.error || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Factory reset failed'));
@@ -43517,12 +43606,12 @@ var SettingsModule = /*#__PURE__*/function () {
               setTimeout(function () {
                 window.location.reload();
               }, 1500);
-              _context9.n = 5;
+              _context1.n = 5;
               break;
             case 4:
-              _context9.p = 4;
-              _t8 = _context9.v;
-              console.error('Factory reset error:', _t8);
+              _context1.p = 4;
+              _t0 = _context1.v;
+              console.error('Factory reset error:', _t0);
 
               // Reset button state
               _confirmBtn = document.getElementById('factory-reset-confirm-btn');
@@ -43530,11 +43619,11 @@ var SettingsModule = /*#__PURE__*/function () {
                 _confirmBtn.disabled = false;
                 _confirmBtn.innerHTML = '<span class="icon-delete" aria-hidden="true"></span> ' + (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Delete Everything');
               }
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)(_t8.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to perform factory reset'));
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)(_t0.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to perform factory reset'));
             case 5:
-              return _context9.a(2);
+              return _context1.a(2);
           }
-        }, _callee9, this, [[0, 4]]);
+        }, _callee1, this, [[0, 4]]);
       }));
       function executeFactoryReset() {
         return _executeFactoryReset.apply(this, arguments);

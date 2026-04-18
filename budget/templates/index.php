@@ -4630,6 +4630,22 @@ style('budget', 'budget-main');
                     </div>
                 </div>
 
+                <!-- Admin Settings Section (visible to admins only) -->
+                <div class="settings-section" id="admin-settings-section" style="display: none;">
+                    <h3><?php p($l->t('Admin Settings')); ?></h3>
+                    <div class="settings-group">
+                        <div class="setting-item checkbox-setting">
+                            <label>
+                                <input type="checkbox" id="setting-bank-sync-enabled">
+                                <div>
+                                    <strong><?php p($l->t('Enable Bank Sync')); ?></strong>
+                                    <small><?php p($l->t('Allow users to connect external bank accounts for automatic transaction imports. Supports GoCardless (UK/Europe) and SimpleFIN (US). Disabled by default for security.')); ?></small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Danger Zone Section -->
                 <div class="settings-section danger-zone">
                     <h3><?php p($l->t('Danger Zone')); ?></h3>
