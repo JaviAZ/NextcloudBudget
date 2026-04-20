@@ -28719,19 +28719,17 @@ var CategoriesModule = /*#__PURE__*/function () {
     value: function () {
       var _calculateCategorySpending = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
         var _this11 = this;
-        var allCategories, categoriesWithBudgets, categoriesByPeriod, _loop, _i, _Object$entries, _t1;
+        var allCategories, categoriesByPeriod, _loop, _i, _Object$entries, _t1;
         return _regenerator().w(function (_context10) {
           while (1) switch (_context10.p = _context10.n) {
             case 0:
-              // Initialize spending object
+              // Initialize spending object and reset own-spending baseline
               this.categorySpending = {};
+              this._ownSpending = {};
 
-              // Get all categories that have budgets
+              // Get all categories (not just ones with budgets — parents need children's spending)
               allCategories = this.flattenCategories(this.categoryTree || []);
-              categoriesWithBudgets = allCategories.filter(function (cat) {
-                return parseFloat(cat.budgetAmount) > 0;
-              });
-              if (!(categoriesWithBudgets.length === 0)) {
+              if (!(allCategories.length === 0)) {
                 _context10.n = 1;
                 break;
               }
@@ -28744,7 +28742,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 quarterly: [],
                 yearly: []
               };
-              categoriesWithBudgets.forEach(function (cat) {
+              allCategories.forEach(function (cat) {
                 var period = cat.budgetPeriod || 'monthly';
                 if (categoriesByPeriod[period]) {
                   categoriesByPeriod[period].push(cat.id);
@@ -28836,7 +28834,8 @@ var CategoriesModule = /*#__PURE__*/function () {
       return calculateCategorySpending;
     }()
     /**
-     * Recursively sum children's spending into parent categories.
+     * Recursively sum children's spending and budgets into parent categories.
+     * Safe to call multiple times — uses _ownSpending baseline to avoid double-counting.
      */
   }, {
     key: "aggregateParentSpending",
@@ -28850,23 +28849,36 @@ var CategoriesModule = /*#__PURE__*/function () {
             // Recurse into children first
             this.aggregateParentSpending(category.children);
 
-            // Sum all children's spending into this parent
-            var childTotal = 0;
+            // Save own spending on first pass, reuse on subsequent calls
+            if (this._ownSpending == null) {
+              this._ownSpending = {};
+            }
+            if (!(category.id in this._ownSpending)) {
+              this._ownSpending[category.id] = this.categorySpending[category.id] || 0;
+            }
+
+            // Sum all children's spending and budgets into this parent
+            var childSpentTotal = 0;
+            var childBudgetTotal = 0;
             var _iterator5 = _createForOfIteratorHelper(category.children),
               _step5;
             try {
               for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
                 var child = _step5.value;
-                childTotal += this.categorySpending[child.id] || 0;
+                childSpentTotal += this.categorySpending[child.id] || 0;
+                childBudgetTotal += parseFloat(child.budgetAmount) || 0;
               }
 
-              // Add children's total to any direct spending on the parent itself
+              // Own spending + children's spending (idempotent)
             } catch (err) {
               _iterator5.e(err);
             } finally {
               _iterator5.f();
             }
-            this.categorySpending[category.id] = (this.categorySpending[category.id] || 0) + childTotal;
+            this.categorySpending[category.id] = this._ownSpending[category.id] + childSpentTotal;
+
+            // Store aggregated budget: parent's own budget + children's budgets
+            category._aggregatedBudget = (parseFloat(category.budgetAmount) || 0) + childBudgetTotal;
           }
         }
       } catch (err) {
@@ -28918,15 +28930,14 @@ var CategoriesModule = /*#__PURE__*/function () {
         // Get the stored budget amount
         var storedBudget = parseFloat(category.budgetAmount) || 0;
 
-        // Budget is already in the correct period since we store it by period
-        // No pro-rating needed - the budget amount is for the selected period
-        var budget = storedBudget;
+        // For parents, use aggregated budget (own + children's); for leaves, use stored budget
+        var budget = hasChildren && category._aggregatedBudget != null ? category._aggregatedBudget : storedBudget;
         var remaining = budget - spent;
         var percentage = budget > 0 ? Math.min(spent / budget * 100, 100) : 0;
         var progressStatus = 'good';
         if (percentage >= 100) progressStatus = 'over';else if (percentage >= 80) progressStatus = 'danger';else if (percentage >= 60) progressStatus = 'warning';
         var remainingClass = remaining > 0 ? 'positive' : remaining < 0 ? 'negative' : 'zero';
-        return "\n                <div class=\"budget-category-row ".concat(hasChildren ? 'parent-row' : '', "\" data-category-id=\"").concat(category.id, "\">\n                    <div class=\"budget-category-name level-").concat(level, "\" data-label=\"\">\n                        <span class=\"category-color\" style=\"background-color: ").concat(category.color || '#3b82f6', "\"></span>\n                        <span class=\"category-label\">").concat(category.name, "</span>\n                    </div>\n                    <div class=\"budget-input-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Budget'), "\">\n                        <input type=\"number\"\n                               class=\"budget-input\"\n                               data-category-id=\"").concat(category.id, "\"\n                               value=\"").concat(budget ? Math.round(budget * 100) / 100 : '', "\"\n                               placeholder=\"0.00\"\n                               step=\"0.01\"\n                               min=\"0\">\n                    </div>\n                    <div data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Period'), "\">\n                        <select class=\"budget-period-select\" data-category-id=\"").concat(category.id, "\">\n                            <option value=\"monthly\" ").concat(category.budgetPeriod === 'monthly' || !category.budgetPeriod ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Monthly'), "</option>\n                            <option value=\"weekly\" ").concat(category.budgetPeriod === 'weekly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Weekly'), "</option>\n                            <option value=\"quarterly\" ").concat(category.budgetPeriod === 'quarterly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Quarterly'), "</option>\n                            <option value=\"yearly\" ").concat(category.budgetPeriod === 'yearly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Yearly'), "</option>\n                        </select>\n                    </div>\n                    <div class=\"budget-spent\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Spent'), "\">\n                        ").concat(_this13.formatCurrency(spent), "\n                    </div>\n                    <div class=\"budget-remaining ").concat(remainingClass, "\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Remaining'), "\">\n                        ").concat(budget > 0 ? _this13.formatCurrency(remaining) : '<span class="no-budget">—</span>', "\n                    </div>\n                    <div class=\"budget-progress-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Progress'), "\">\n                        ").concat(budget > 0 ? "\n                            <div class=\"budget-progress-bar\">\n                                <div class=\"budget-progress-fill ".concat(progressStatus, "\" style=\"width: ").concat(percentage, "%\"></div>\n                            </div>\n                            <span class=\"budget-progress-text\">").concat(Math.round(percentage), "%</span>\n                        ") : "<span class=\"no-budget\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'No budget set'), "</span>"), "\n                    </div>\n                </div>\n                ").concat(hasChildren ? _this13.renderBudgetCategoryNodes(category.children, level + 1) : '', "\n            ");
+        return "\n                <div class=\"budget-category-row ".concat(hasChildren ? 'parent-row' : '', "\" data-category-id=\"").concat(category.id, "\">\n                    <div class=\"budget-category-name level-").concat(level, "\" data-label=\"\">\n                        <span class=\"category-color\" style=\"background-color: ").concat(category.color || '#3b82f6', "\"></span>\n                        <span class=\"category-label\">").concat(category.name, "</span>\n                    </div>\n                    <div class=\"budget-input-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Budget'), "\">\n                        <input type=\"number\"\n                               class=\"budget-input\"\n                               data-category-id=\"").concat(category.id, "\"\n                               value=\"").concat(storedBudget ? Math.round(storedBudget * 100) / 100 : '', "\"\n                               placeholder=\"0.00\"\n                               step=\"0.01\"\n                               min=\"0\">\n                        ").concat(hasChildren && budget > storedBudget ? "<span class=\"budget-aggregate-hint\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Total'), ": ").concat(_this13.formatCurrency(budget), "</span>") : '', "\n                    </div>\n                    <div data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Period'), "\">\n                        <select class=\"budget-period-select\" data-category-id=\"").concat(category.id, "\">\n                            <option value=\"monthly\" ").concat(category.budgetPeriod === 'monthly' || !category.budgetPeriod ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Monthly'), "</option>\n                            <option value=\"weekly\" ").concat(category.budgetPeriod === 'weekly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Weekly'), "</option>\n                            <option value=\"quarterly\" ").concat(category.budgetPeriod === 'quarterly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Quarterly'), "</option>\n                            <option value=\"yearly\" ").concat(category.budgetPeriod === 'yearly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Yearly'), "</option>\n                        </select>\n                    </div>\n                    <div class=\"budget-spent\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Spent'), "\">\n                        ").concat(_this13.formatCurrency(spent), "\n                    </div>\n                    <div class=\"budget-remaining ").concat(remainingClass, "\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Remaining'), "\">\n                        ").concat(budget > 0 ? _this13.formatCurrency(remaining) : '<span class="no-budget">—</span>', "\n                    </div>\n                    <div class=\"budget-progress-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Progress'), "\">\n                        ").concat(budget > 0 ? "\n                            <div class=\"budget-progress-bar\">\n                                <div class=\"budget-progress-fill ".concat(progressStatus, "\" style=\"width: ").concat(percentage, "%\"></div>\n                            </div>\n                            <span class=\"budget-progress-text\">").concat(Math.round(percentage), "%</span>\n                        ") : "<span class=\"no-budget\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'No budget set'), "</span>"), "\n                    </div>\n                </div>\n                ").concat(hasChildren ? _this13.renderBudgetCategoryNodes(category.children, level + 1) : '', "\n            ");
       }).join('');
     }
   }, {
@@ -29081,7 +29092,8 @@ var CategoriesModule = /*#__PURE__*/function () {
                 Object.assign(category, updates);
               }
 
-              // Re-render to update calculations
+              // Re-aggregate parent budgets and re-render
+              this.aggregateParentSpending(this.categoryTree || []);
               this.renderBudgetTree();
               this.updateBudgetSummary();
 
