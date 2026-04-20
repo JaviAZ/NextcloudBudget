@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
 "PO-Revision-Date: 2026-04-21 21:09+0000\n"
-"Last-Translator: SGiersch <Stephan@sgiersch.de>\n"
+"Last-Translator: T0mFi <tomfinger97@gmail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
 "Language: de\n"
@@ -379,7 +379,7 @@ msgstr "Automatische Zahlung erfordert ein Konto"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:490
 #: /tmp/budget-v2.11.0/budget/lib/Service/BillService.php:176
 msgid "Transfer requires a destination account"
-msgstr ""
+msgstr "Umbuchung erfordert ein Zielkonto"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:180
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:518
@@ -396,7 +396,7 @@ msgstr "Das Fälligkeitsdatum muss zwischen dem 1. und dem 31. liegen"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:206
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:344
 msgid "Due month must be between 1 and 12"
-msgstr ""
+msgstr "Der Monat muss zwischen 1 und 12 liegen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:229
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:394
@@ -437,7 +437,7 @@ msgstr "Vorheriger Zustand fehlt"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:595
 msgid "Failed to undo mark as paid"
-msgstr ""
+msgstr "Die Kennzeichnung \"bezahlt\" konnte nicht entfernt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:612
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:935
