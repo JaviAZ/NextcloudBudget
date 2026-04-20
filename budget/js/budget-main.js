@@ -28731,7 +28731,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context10.p = 2;
               _loop = /*#__PURE__*/_regenerator().m(function _loop() {
                 var _this11$app$settings;
-                var _Object$entries$_i, period, categoryIds, startDay, dateRange, response, spendingData;
+                var _Object$entries$_i, period, categoryIds, startDay, referenceDate, dateRange, response, spendingData;
                 return _regenerator().w(function (_context1) {
                   while (1) switch (_context1.n) {
                     case 0:
@@ -28743,8 +28743,9 @@ var CategoriesModule = /*#__PURE__*/function () {
                       return _context1.a(2, 1);
                     case 1:
                       // Get date range for this period
-                      startDay = period === 'monthly' ? parseInt(((_this11$app$settings = _this11.app.settings) === null || _this11$app$settings === void 0 ? void 0 : _this11$app$settings.budget_start_day) || '1', 10) : 1;
-                      dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay); // Fetch spending for this period
+                      startDay = period === 'monthly' ? parseInt(((_this11$app$settings = _this11.app.settings) === null || _this11$app$settings === void 0 ? void 0 : _this11$app$settings.budget_start_day) || '1', 10) : 1; // Use selected budget month as reference date (1st of month)
+                      referenceDate = _this11.budgetMonth ? "".concat(_this11.budgetMonth, "-15") : null;
+                      dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay, referenceDate); // Fetch spending for this period
                       _context1.n = 2;
                       return fetch(OC.generateUrl("/apps/budget/api/categories/spending?startDate=".concat(dateRange.start, "&endDate=").concat(dateRange.end)), {
                         headers: {
@@ -53149,7 +53150,8 @@ function daysBetweenDates(dateStr1, dateStr2) {
  */
 function getPeriodDateRange(period) {
   var startDay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  var now = new Date();
+  var referenceDate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var now = referenceDate ? new Date(referenceDate) : new Date();
   switch (period) {
     case 'weekly':
       {
@@ -53250,7 +53252,7 @@ function getPeriodDateRange(period) {
       }
     default:
       // Default to monthly
-      return getPeriodDateRange('monthly', startDay);
+      return getPeriodDateRange('monthly', startDay, referenceDate);
   }
 }
 

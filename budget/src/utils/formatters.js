@@ -327,8 +327,8 @@ export function daysBetweenDates(dateStr1, dateStr2) {
  * @param {number} [startDay=1] - Day of month when budget cycle starts (1-31, monthly only)
  * @returns {object} Object with {start, end, label} date strings
  */
-export function getPeriodDateRange(period, startDay = 1) {
-    const now = new Date();
+export function getPeriodDateRange(period, startDay = 1, referenceDate = null) {
+    const now = referenceDate ? new Date(referenceDate) : new Date();
 
     switch (period) {
         case 'weekly': {
@@ -429,7 +429,7 @@ export function getPeriodDateRange(period, startDay = 1) {
 
         default:
             // Default to monthly
-            return getPeriodDateRange('monthly', startDay);
+            return getPeriodDateRange('monthly', startDay, referenceDate);
     }
 }
 

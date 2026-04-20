@@ -1197,7 +1197,9 @@ export default class CategoriesModule {
 
                 // Get date range for this period
                 const startDay = period === 'monthly' ? parseInt(this.app.settings?.budget_start_day || '1', 10) : 1;
-                const dateRange = formatters.getPeriodDateRange(period, startDay);
+                // Use selected budget month as reference date (1st of month)
+                const referenceDate = this.budgetMonth ? `${this.budgetMonth}-15` : null;
+                const dateRange = formatters.getPeriodDateRange(period, startDay, referenceDate);
 
                 // Fetch spending for this period
                 const response = await fetch(
