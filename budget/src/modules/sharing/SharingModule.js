@@ -97,7 +97,9 @@ export default class SharingModule {
                     <h3>${t('budget', 'Share Your Budget')}</h3>
                     <p class="sharing-description">${t('budget', 'Invite a Nextcloud user and then configure which parts of your budget they can access.')}</p>
                     <div class="sharing-add-form">
-                        <input type="text" id="share-username-input" placeholder="${t('budget', 'Enter Nextcloud username...')}" class="sharing-input" />
+                        <select id="share-username-input" class="sharing-input">
+                            <option value="">${t('budget', 'Select a user...')}</option>
+                        </select>
                         <button id="share-add-btn" class="btn btn-primary">${t('budget', 'Invite')}</button>
                     </div>
 
@@ -177,10 +179,10 @@ export default class SharingModule {
 
     bindEvents(container) {
         const addBtn = container.querySelector('#share-add-btn');
-        const input = container.querySelector('#share-username-input');
-        if (addBtn && input) {
-            addBtn.addEventListener('click', () => this.handleShare(input.value.trim()));
-            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.handleShare(input.value.trim()); });
+        const select = container.querySelector('#share-username-input');
+        if (addBtn && select) {
+            addBtn.addEventListener('click', () => this.handleShare(select.value));
+            this.populateUserDropdown(select);
         }
 
         container.querySelectorAll('.btn-accept-share').forEach(btn =>
@@ -341,6 +343,25 @@ export default class SharingModule {
     }
 
     // ==================== Share Actions ====================
+
+    async populateUserDropdown(select) {
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/shared/users/search?query=*'), {
+                headers: { 'requesttoken': OC.requestToken }
+            });
+            if (!response.ok) return;
+
+            const users = await response.json();
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.uid;
+                option.textContent = `${user.displayName} (${user.uid})`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to load users for sharing:', error);
+        }
+    }
 
     async handleShare(username) {
         if (!username) { showError(t('budget', 'Please enter a username')); return; }

@@ -317,23 +317,29 @@ The app provides a REST API for all functionality:
 - Check browser console for JavaScript errors
 - Try refreshing browser cache (Ctrl+F5 / Cmd+Shift+R)
 
-## Translating
+## Help Translate
 
-The app is fully prepared for translation with 2,177 translatable strings. Help translate Nextcloud Budget into your language!
+Nextcloud Budget is fully translatable with 2,177+ strings. We'd love your help making it available in more languages!
 
-### Translate via Weblate (Recommended)
-
-Visit our [Weblate project](https://hosted.weblate.org/projects/nextcloud-budget/) to translate directly in your browser — no development setup needed.
+**[Translate on Weblate](https://hosted.weblate.org/projects/nextcloud-budget/)** — translate directly in your browser, no coding required. Just sign in, pick your language, and start. Your translations are automatically merged into the app.
 
 [![Translation status](https://hosted.weblate.org/widget/nextcloud-budget/budget/svg-badge.svg)](https://hosted.weblate.org/engage/nextcloud-budget/)
 
-### Translate via Pull Request
+Currently available in: English, German, Spanish, French, Russian, and Portuguese (Brazil).
+
+> **Note:** Strings containing `{placeholders}` (e.g. `{amount}`, `{bill}`) must keep the placeholder names exactly as-is — only translate the surrounding text.
+
+<details>
+<summary>Alternative: translate via pull request</summary>
+
+If you prefer working with `.po` files directly:
 
 1. Copy `budget/translationfiles/templates/budget.pot` to `budget/translationfiles/<lang>/budget.po`
 2. Translate the strings using [Poedit](https://poedit.net/) or any `.po` editor
 3. Submit a pull request
 
 See the [translation guide](budget/translationfiles/README.md) for detailed instructions.
+</details>
 
 ## Contributing
 

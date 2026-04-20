@@ -20569,6 +20569,30 @@ var Router = /*#__PURE__*/function () {
           _this.closeMobileNavigation();
         });
       });
+
+      // Dashboard card links (View All, Manage, Details, etc.)
+      document.addEventListener('click', function (e) {
+        var cardLink = e.target.closest('.card-link');
+        if (cardLink) {
+          e.preventDefault();
+          var href = cardLink.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            var view = href.substring(1);
+            _this.showView(view);
+
+            // Update nav active state
+            document.querySelectorAll('.app-navigation-entry').forEach(function (entry) {
+              var navLink = entry.querySelector('a');
+              if (navLink && navLink.getAttribute('href') === href) {
+                document.querySelectorAll('.app-navigation-entry').forEach(function (e) {
+                  return e.classList.remove('active');
+                });
+                entry.classList.add('active');
+              }
+            });
+          }
+        }
+      });
       this.setupMobileNavigationToggle();
     }
   }, {
@@ -29361,19 +29385,17 @@ var CategoriesModule = /*#__PURE__*/function () {
     value: function () {
       var _calculateCategorySpending = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
         var _this11 = this;
-        var allCategories, categoriesWithBudgets, categoriesByPeriod, _loop, _i, _Object$entries, _t1;
+        var allCategories, categoriesByPeriod, _loop, _i, _Object$entries, _t1;
         return _regenerator().w(function (_context10) {
           while (1) switch (_context10.p = _context10.n) {
             case 0:
-              // Initialize spending object
+              // Initialize spending object and reset own-spending baseline
               this.categorySpending = {};
+              this._ownSpending = {};
 
-              // Get all categories that have budgets
+              // Get all categories (not just ones with budgets — parents need children's spending)
               allCategories = this.flattenCategories(this.categoryTree || []);
-              categoriesWithBudgets = allCategories.filter(function (cat) {
-                return parseFloat(cat.budgetAmount) > 0;
-              });
-              if (!(categoriesWithBudgets.length === 0)) {
+              if (!(allCategories.length === 0)) {
                 _context10.n = 1;
                 break;
               }
@@ -29386,7 +29408,7 @@ var CategoriesModule = /*#__PURE__*/function () {
                 quarterly: [],
                 yearly: []
               };
-              categoriesWithBudgets.forEach(function (cat) {
+              allCategories.forEach(function (cat) {
                 var period = cat.budgetPeriod || 'monthly';
                 if (categoriesByPeriod[period]) {
                   categoriesByPeriod[period].push(cat.id);
@@ -29397,7 +29419,7 @@ var CategoriesModule = /*#__PURE__*/function () {
               _context10.p = 2;
               _loop = /*#__PURE__*/_regenerator().m(function _loop() {
                 var _this11$app$settings;
-                var _Object$entries$_i, period, categoryIds, startDay, dateRange, response, spendingData;
+                var _Object$entries$_i, period, categoryIds, startDay, referenceDate, dateRange, response, spendingData;
                 return _regenerator().w(function (_context1) {
                   while (1) switch (_context1.n) {
                     case 0:
@@ -29409,8 +29431,9 @@ var CategoriesModule = /*#__PURE__*/function () {
                       return _context1.a(2, 1);
                     case 1:
                       // Get date range for this period
-                      startDay = period === 'monthly' ? parseInt(((_this11$app$settings = _this11.app.settings) === null || _this11$app$settings === void 0 ? void 0 : _this11$app$settings.budget_start_day) || '1', 10) : 1;
-                      dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay); // Fetch spending for this period
+                      startDay = period === 'monthly' ? parseInt(((_this11$app$settings = _this11.app.settings) === null || _this11$app$settings === void 0 ? void 0 : _this11$app$settings.budget_start_day) || '1', 10) : 1; // Use selected budget month as reference date (1st of month)
+                      referenceDate = _this11.budgetMonth ? "".concat(_this11.budgetMonth, "-15") : null;
+                      dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay, referenceDate); // Fetch spending for this period
                       _context1.n = 2;
                       return fetch(OC.generateUrl("/apps/budget/api/categories/spending?startDate=".concat(dateRange.start, "&endDate=").concat(dateRange.end)), {
                         headers: {
@@ -29464,6 +29487,9 @@ var CategoriesModule = /*#__PURE__*/function () {
               console.error('Failed to fetch category spending:', _t1);
               this.categorySpending = {};
             case 8:
+              // Aggregate children's spending into parent categories
+              this.aggregateParentSpending(this.categoryTree || []);
+            case 9:
               return _context10.a(2);
           }
         }, _callee1, this, [[2, 7]]);
@@ -29473,6 +29499,60 @@ var CategoriesModule = /*#__PURE__*/function () {
       }
       return calculateCategorySpending;
     }()
+    /**
+     * Recursively sum children's spending and budgets into parent categories.
+     * Safe to call multiple times — uses _ownSpending baseline to avoid double-counting.
+     */
+  }, {
+    key: "aggregateParentSpending",
+    value: function aggregateParentSpending(categories) {
+      var _iterator4 = _createForOfIteratorHelper(categories),
+        _step4;
+      try {
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          var category = _step4.value;
+          if (category.children && category.children.length > 0) {
+            // Recurse into children first
+            this.aggregateParentSpending(category.children);
+
+            // Save own spending on first pass, reuse on subsequent calls
+            if (this._ownSpending == null) {
+              this._ownSpending = {};
+            }
+            if (!(category.id in this._ownSpending)) {
+              this._ownSpending[category.id] = this.categorySpending[category.id] || 0;
+            }
+
+            // Sum all children's spending and budgets into this parent
+            var childSpentTotal = 0;
+            var childBudgetTotal = 0;
+            var _iterator5 = _createForOfIteratorHelper(category.children),
+              _step5;
+            try {
+              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+                var child = _step5.value;
+                childSpentTotal += this.categorySpending[child.id] || 0;
+                childBudgetTotal += parseFloat(child.budgetAmount) || 0;
+              }
+
+              // Own spending + children's spending (idempotent)
+            } catch (err) {
+              _iterator5.e(err);
+            } finally {
+              _iterator5.f();
+            }
+            this.categorySpending[category.id] = this._ownSpending[category.id] + childSpentTotal;
+
+            // Store aggregated budget: parent's own budget + children's budgets
+            category._aggregatedBudget = (parseFloat(category.budgetAmount) || 0) + childBudgetTotal;
+          }
+        }
+      } catch (err) {
+        _iterator4.e(err);
+      } finally {
+        _iterator4.f();
+      }
+    }
   }, {
     key: "renderBudgetTree",
     value: function renderBudgetTree() {
@@ -29516,15 +29596,14 @@ var CategoriesModule = /*#__PURE__*/function () {
         // Get the stored budget amount
         var storedBudget = parseFloat(category.budgetAmount) || 0;
 
-        // Budget is already in the correct period since we store it by period
-        // No pro-rating needed - the budget amount is for the selected period
-        var budget = storedBudget;
+        // For parents, use aggregated budget (own + children's); for leaves, use stored budget
+        var budget = hasChildren && category._aggregatedBudget != null ? category._aggregatedBudget : storedBudget;
         var remaining = budget - spent;
         var percentage = budget > 0 ? Math.min(spent / budget * 100, 100) : 0;
         var progressStatus = 'good';
         if (percentage >= 100) progressStatus = 'over';else if (percentage >= 80) progressStatus = 'danger';else if (percentage >= 60) progressStatus = 'warning';
         var remainingClass = remaining > 0 ? 'positive' : remaining < 0 ? 'negative' : 'zero';
-        return "\n                <div class=\"budget-category-row ".concat(hasChildren ? 'parent-row' : '', "\" data-category-id=\"").concat(category.id, "\">\n                    <div class=\"budget-category-name level-").concat(level, "\" data-label=\"\">\n                        <span class=\"category-color\" style=\"background-color: ").concat(category.color || '#3b82f6', "\"></span>\n                        <span class=\"category-label\">").concat(category.name, "</span>\n                    </div>\n                    <div class=\"budget-input-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Budget'), "\">\n                        <input type=\"number\"\n                               class=\"budget-input\"\n                               data-category-id=\"").concat(category.id, "\"\n                               value=\"").concat(budget ? Math.round(budget * 100) / 100 : '', "\"\n                               placeholder=\"0.00\"\n                               step=\"0.01\"\n                               min=\"0\">\n                    </div>\n                    <div data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Period'), "\">\n                        <select class=\"budget-period-select\" data-category-id=\"").concat(category.id, "\">\n                            <option value=\"monthly\" ").concat(category.budgetPeriod === 'monthly' || !category.budgetPeriod ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Monthly'), "</option>\n                            <option value=\"weekly\" ").concat(category.budgetPeriod === 'weekly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Weekly'), "</option>\n                            <option value=\"quarterly\" ").concat(category.budgetPeriod === 'quarterly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Quarterly'), "</option>\n                            <option value=\"yearly\" ").concat(category.budgetPeriod === 'yearly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Yearly'), "</option>\n                        </select>\n                    </div>\n                    <div class=\"budget-spent\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Spent'), "\">\n                        ").concat(_this13.formatCurrency(spent), "\n                    </div>\n                    <div class=\"budget-remaining ").concat(remainingClass, "\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Remaining'), "\">\n                        ").concat(budget > 0 ? _this13.formatCurrency(remaining) : '<span class="no-budget">—</span>', "\n                    </div>\n                    <div class=\"budget-progress-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Progress'), "\">\n                        ").concat(budget > 0 ? "\n                            <div class=\"budget-progress-bar\">\n                                <div class=\"budget-progress-fill ".concat(progressStatus, "\" style=\"width: ").concat(percentage, "%\"></div>\n                            </div>\n                            <span class=\"budget-progress-text\">").concat(Math.round(percentage), "%</span>\n                        ") : "<span class=\"no-budget\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'No budget set'), "</span>"), "\n                    </div>\n                </div>\n                ").concat(hasChildren ? _this13.renderBudgetCategoryNodes(category.children, level + 1) : '', "\n            ");
+        return "\n                <div class=\"budget-category-row ".concat(hasChildren ? 'parent-row' : '', "\" data-category-id=\"").concat(category.id, "\">\n                    <div class=\"budget-category-name level-").concat(level, "\" data-label=\"\">\n                        <span class=\"category-color\" style=\"background-color: ").concat(category.color || '#3b82f6', "\"></span>\n                        <span class=\"category-label\">").concat(category.name, "</span>\n                    </div>\n                    <div class=\"budget-input-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Budget'), "\">\n                        <input type=\"number\"\n                               class=\"budget-input\"\n                               data-category-id=\"").concat(category.id, "\"\n                               value=\"").concat(storedBudget ? Math.round(storedBudget * 100) / 100 : '', "\"\n                               placeholder=\"0.00\"\n                               step=\"0.01\"\n                               min=\"0\">\n                        ").concat(hasChildren && budget > storedBudget ? "<span class=\"budget-aggregate-hint\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Total'), ": ").concat(_this13.formatCurrency(budget), "</span>") : '', "\n                    </div>\n                    <div data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Period'), "\">\n                        <select class=\"budget-period-select\" data-category-id=\"").concat(category.id, "\">\n                            <option value=\"monthly\" ").concat(category.budgetPeriod === 'monthly' || !category.budgetPeriod ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Monthly'), "</option>\n                            <option value=\"weekly\" ").concat(category.budgetPeriod === 'weekly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Weekly'), "</option>\n                            <option value=\"quarterly\" ").concat(category.budgetPeriod === 'quarterly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Quarterly'), "</option>\n                            <option value=\"yearly\" ").concat(category.budgetPeriod === 'yearly' ? 'selected' : '', ">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Yearly'), "</option>\n                        </select>\n                    </div>\n                    <div class=\"budget-spent\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Spent'), "\">\n                        ").concat(_this13.formatCurrency(spent), "\n                    </div>\n                    <div class=\"budget-remaining ").concat(remainingClass, "\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Remaining'), "\">\n                        ").concat(budget > 0 ? _this13.formatCurrency(remaining) : '<span class="no-budget">—</span>', "\n                    </div>\n                    <div class=\"budget-progress-wrapper\" data-label=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'Progress'), "\">\n                        ").concat(budget > 0 ? "\n                            <div class=\"budget-progress-bar\">\n                                <div class=\"budget-progress-fill ".concat(progressStatus, "\" style=\"width: ").concat(percentage, "%\"></div>\n                            </div>\n                            <span class=\"budget-progress-text\">").concat(Math.round(percentage), "%</span>\n                        ") : "<span class=\"no-budget\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_3__.translate)('budget', 'No budget set'), "</span>"), "\n                    </div>\n                </div>\n                ").concat(hasChildren ? _this13.renderBudgetCategoryNodes(category.children, level + 1) : '', "\n            ");
       }).join('');
     }
   }, {
@@ -29679,7 +29758,8 @@ var CategoriesModule = /*#__PURE__*/function () {
                 Object.assign(category, updates);
               }
 
-              // Re-render to update calculations
+              // Re-aggregate parent budgets and re-render
+              this.aggregateParentSpending(this.categoryTree || []);
               this.renderBudgetTree();
               this.updateBudgetSummary();
 
@@ -29805,11 +29885,11 @@ var CategoriesModule = /*#__PURE__*/function () {
       if (own.length === 0) return shared;
       var merged = [];
       var usedSharedIds = new Set();
-      var _iterator4 = _createForOfIteratorHelper(own),
-        _step4;
+      var _iterator6 = _createForOfIteratorHelper(own),
+        _step6;
       try {
         var _loop2 = function _loop2() {
-          var ownCat = _step4.value;
+          var ownCat = _step6.value;
           // Find matching shared category by name + type
           var match = shared.find(function (s) {
             return s.name === ownCat.name && s.type === ownCat.type && !usedSharedIds.has(s.id);
@@ -29825,29 +29905,29 @@ var CategoriesModule = /*#__PURE__*/function () {
             merged.push(ownCat);
           }
         };
-        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
           _loop2();
         }
 
         // Append any shared categories that didn't match an own category
       } catch (err) {
-        _iterator4.e(err);
+        _iterator6.e(err);
       } finally {
-        _iterator4.f();
+        _iterator6.f();
       }
-      var _iterator5 = _createForOfIteratorHelper(shared),
-        _step5;
+      var _iterator7 = _createForOfIteratorHelper(shared),
+        _step7;
       try {
-        for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-          var sharedCat = _step5.value;
+        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+          var sharedCat = _step7.value;
           if (!usedSharedIds.has(sharedCat.id)) {
             merged.push(sharedCat);
           }
         }
       } catch (err) {
-        _iterator5.e(err);
+        _iterator7.e(err);
       } finally {
-        _iterator5.f();
+        _iterator7.f();
       }
       return merged;
     }
@@ -29864,11 +29944,11 @@ var CategoriesModule = /*#__PURE__*/function () {
       if (ownChildren.length === 0) return sharedChildren;
       var merged = [];
       var usedSharedIds = new Set();
-      var _iterator6 = _createForOfIteratorHelper(ownChildren),
-        _step6;
+      var _iterator8 = _createForOfIteratorHelper(ownChildren),
+        _step8;
       try {
         var _loop3 = function _loop3() {
-          var ownChild = _step6.value;
+          var ownChild = _step8.value;
           var match = sharedChildren.find(function (s) {
             return s.name === ownChild.name && !usedSharedIds.has(s.id);
           });
@@ -29883,29 +29963,29 @@ var CategoriesModule = /*#__PURE__*/function () {
             merged.push(ownChild);
           }
         };
-        for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+        for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
           _loop3();
         }
 
         // Append shared children that didn't match any own child
       } catch (err) {
-        _iterator6.e(err);
+        _iterator8.e(err);
       } finally {
-        _iterator6.f();
+        _iterator8.f();
       }
-      var _iterator7 = _createForOfIteratorHelper(sharedChildren),
-        _step7;
+      var _iterator9 = _createForOfIteratorHelper(sharedChildren),
+        _step9;
       try {
-        for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
-          var sharedChild = _step7.value;
+        for (_iterator9.s(); !(_step9 = _iterator9.n()).done;) {
+          var sharedChild = _step9.value;
           if (!usedSharedIds.has(sharedChild.id)) {
             merged.push(sharedChild);
           }
         }
       } catch (err) {
-        _iterator7.e(err);
+        _iterator9.e(err);
       } finally {
-        _iterator7.f();
+        _iterator9.f();
       }
       return merged;
     }
@@ -30652,7 +30732,7 @@ var DashboardModule = /*#__PURE__*/function () {
     key: "refreshSavedWidgetSelections",
     value: function () {
       var _refreshSavedWidgetSelections = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-        var refreshes, trendAcct, periodEl, months, spendingAcct, _periodEl, period, netWorthAcct, activeBtn, days, recentTxAcct;
+        var refreshes, trendAcct, periodEl, months, spendingAcct, _periodEl, period, accountId, netWorthAcct, activeBtn, days, recentTxAcct;
         return _regenerator().w(function (_context3) {
           while (1) switch (_context3.n) {
             case 0:
@@ -30664,11 +30744,10 @@ var DashboardModule = /*#__PURE__*/function () {
                 refreshes.push(this.refreshTrendChart(months, trendAcct.value));
               }
               spendingAcct = document.getElementById('spending-account-select');
-              if (spendingAcct !== null && spendingAcct !== void 0 && spendingAcct.value) {
-                _periodEl = document.getElementById('spending-period-select');
-                period = _periodEl ? _periodEl.value : 'month';
-                refreshes.push(this.refreshSpendingChart(period, spendingAcct.value));
-              }
+              _periodEl = document.getElementById('spending-period-select');
+              period = _periodEl ? _periodEl.value : 'month';
+              accountId = (spendingAcct === null || spendingAcct === void 0 ? void 0 : spendingAcct.value) || null;
+              refreshes.push(this.refreshSpendingChart(period, accountId));
               netWorthAcct = document.getElementById('net-worth-account-select');
               if (netWorthAcct !== null && netWorthAcct !== void 0 && netWorthAcct.value) {
                 activeBtn = document.querySelector('#net-worth-period-selector .period-btn.active');
@@ -43934,34 +44013,118 @@ var SharedExpensesModule = /*#__PURE__*/function () {
       var form = document.getElementById('contact-form');
       form.reset();
       document.getElementById('contact-id').value = contact ? contact.id : '';
+      document.getElementById('contact-nextcloud-user-id').value = contact ? contact.nextcloudUserId || '' : '';
       title.textContent = contact ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Edit Contact') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Add Contact');
       if (contact) {
         document.getElementById('contact-name').value = contact.name || '';
         document.getElementById('contact-email').value = contact.email || '';
       }
+      this.populateUserDropdown((contact === null || contact === void 0 ? void 0 : contact.nextcloudUserId) || '');
+      this.setupUserSelectHandler();
       modal.style.display = 'flex';
+    }
+  }, {
+    key: "populateUserDropdown",
+    value: function () {
+      var _populateUserDropdown = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
+        var selectedUserId,
+          select,
+          response,
+          users,
+          _args4 = arguments,
+          _t3;
+        return _regenerator().w(function (_context4) {
+          while (1) switch (_context4.p = _context4.n) {
+            case 0:
+              selectedUserId = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : '';
+              select = document.getElementById('contact-user-select');
+              if (select) {
+                _context4.n = 1;
+                break;
+              }
+              return _context4.a(2);
+            case 1:
+              // Keep the manual option
+              select.innerHTML = "<option value=\"\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', '— None (enter details manually) —'), "</option>");
+              _context4.p = 2;
+              _context4.n = 3;
+              return fetch(OC.generateUrl('/apps/budget/api/shared/users/search?query=*'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 3:
+              response = _context4.v;
+              if (response.ok) {
+                _context4.n = 4;
+                break;
+              }
+              return _context4.a(2);
+            case 4:
+              _context4.n = 5;
+              return response.json();
+            case 5:
+              users = _context4.v;
+              users.forEach(function (user) {
+                var option = document.createElement('option');
+                option.value = user.uid;
+                option.textContent = "".concat(user.displayName, " (").concat(user.uid, ")");
+                option.dataset.displayName = user.displayName;
+                if (user.uid === selectedUserId) option.selected = true;
+                select.appendChild(option);
+              });
+              _context4.n = 7;
+              break;
+            case 6:
+              _context4.p = 6;
+              _t3 = _context4.v;
+              console.error('Failed to load users:', _t3);
+            case 7:
+              return _context4.a(2);
+          }
+        }, _callee4, null, [[2, 6]]);
+      }));
+      function populateUserDropdown() {
+        return _populateUserDropdown.apply(this, arguments);
+      }
+      return populateUserDropdown;
+    }()
+  }, {
+    key: "setupUserSelectHandler",
+    value: function setupUserSelectHandler() {
+      var select = document.getElementById('contact-user-select');
+      if (!select) return;
+      select.onchange = function () {
+        var selectedOption = select.options[select.selectedIndex];
+        var uid = select.value;
+        document.getElementById('contact-nextcloud-user-id').value = uid;
+        if (uid && selectedOption.dataset.displayName) {
+          document.getElementById('contact-name').value = selectedOption.dataset.displayName;
+        }
+      };
     }
   }, {
     key: "saveContact",
     value: function () {
-      var _saveContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
-        var id, name, email, url, response, _t3;
-        return _regenerator().w(function (_context4) {
-          while (1) switch (_context4.p = _context4.n) {
+      var _saveContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
+        var id, name, email, nextcloudUserId, url, response, _t4;
+        return _regenerator().w(function (_context5) {
+          while (1) switch (_context5.p = _context5.n) {
             case 0:
               id = document.getElementById('contact-id').value;
               name = document.getElementById('contact-name').value.trim();
               email = document.getElementById('contact-email').value.trim();
+              nextcloudUserId = document.getElementById('contact-nextcloud-user-id').value.trim() || null;
               if (name) {
-                _context4.n = 1;
+                _context5.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Name is required'));
-              return _context4.a(2);
+              return _context5.a(2);
             case 1:
-              _context4.p = 1;
+              _context5.p = 1;
               url = id ? OC.generateUrl("/apps/budget/api/shared/contacts/".concat(id)) : OC.generateUrl('/apps/budget/api/shared/contacts');
-              _context4.n = 2;
+              _context5.n = 2;
               return fetch(url, {
                 method: id ? 'PUT' : 'POST',
                 headers: {
@@ -43970,36 +44133,37 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 },
                 body: JSON.stringify({
                   name: name,
-                  email: email || null
+                  email: email || null,
+                  nextcloudUserId: nextcloudUserId
                 })
               });
             case 2:
-              response = _context4.v;
+              response = _context5.v;
               if (response.ok) {
-                _context4.n = 3;
+                _context5.n = 3;
                 break;
               }
               throw new Error('Failed to save contact');
             case 3:
               this.closeModal(document.getElementById('contact-modal'));
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)(id ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Contact updated') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Contact added'));
-              _context4.n = 4;
+              _context5.n = 4;
               return this.loadBalanceSummary();
             case 4:
-              _context4.n = 5;
+              _context5.n = 5;
               return this.loadContacts();
             case 5:
-              _context4.n = 7;
+              _context5.n = 7;
               break;
             case 6:
-              _context4.p = 6;
-              _t3 = _context4.v;
-              console.error('Failed to save contact:', _t3);
+              _context5.p = 6;
+              _t4 = _context5.v;
+              console.error('Failed to save contact:', _t4);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to save contact'));
             case 7:
-              return _context4.a(2);
+              return _context5.a(2);
           }
-        }, _callee4, this, [[1, 6]]);
+        }, _callee5, this, [[1, 6]]);
       }));
       function saveContact() {
         return _saveContact.apply(this, arguments);
@@ -44009,11 +44173,11 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "editContact",
     value: function () {
-      var _editContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(id) {
+      var _editContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(id) {
         var _this$contacts;
         var contact;
-        return _regenerator().w(function (_context5) {
-          while (1) switch (_context5.n) {
+        return _regenerator().w(function (_context6) {
+          while (1) switch (_context6.n) {
             case 0:
               contact = (_this$contacts = this.contacts) === null || _this$contacts === void 0 ? void 0 : _this$contacts.find(function (c) {
                 return c.id === id;
@@ -44022,9 +44186,9 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 this.showContactModal(contact);
               }
             case 1:
-              return _context5.a(2);
+              return _context6.a(2);
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
       function editContact(_x) {
         return _editContact.apply(this, arguments);
@@ -44034,19 +44198,19 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "deleteContact",
     value: function () {
-      var _deleteContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(id) {
-        var response, _t4;
-        return _regenerator().w(function (_context6) {
-          while (1) switch (_context6.p = _context6.n) {
+      var _deleteContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(id) {
+        var response, _t5;
+        return _regenerator().w(function (_context7) {
+          while (1) switch (_context7.p = _context7.n) {
             case 0:
               if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Are you sure you want to delete this contact? This will also remove all shared expense records with them.'))) {
-                _context6.n = 1;
+                _context7.n = 1;
                 break;
               }
-              return _context6.a(2);
+              return _context7.a(2);
             case 1:
-              _context6.p = 1;
-              _context6.n = 2;
+              _context7.p = 1;
+              _context7.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/shared/contacts/".concat(id)), {
                 method: 'DELETE',
                 headers: {
@@ -44054,31 +44218,31 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 }
               });
             case 2:
-              response = _context6.v;
+              response = _context7.v;
               if (response.ok) {
-                _context6.n = 3;
+                _context7.n = 3;
                 break;
               }
               throw new Error('Failed to delete contact');
             case 3:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Contact deleted'));
-              _context6.n = 4;
+              _context7.n = 4;
               return this.loadBalanceSummary();
             case 4:
-              _context6.n = 5;
+              _context7.n = 5;
               return this.loadContacts();
             case 5:
-              _context6.n = 7;
+              _context7.n = 7;
               break;
             case 6:
-              _context6.p = 6;
-              _t4 = _context6.v;
-              console.error('Failed to delete contact:', _t4);
+              _context7.p = 6;
+              _t5 = _context7.v;
+              console.error('Failed to delete contact:', _t5);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to delete contact'));
             case 7:
-              return _context6.a(2);
+              return _context7.a(2);
           }
-        }, _callee6, this, [[1, 6]]);
+        }, _callee7, this, [[1, 6]]);
       }));
       function deleteContact(_x2) {
         return _deleteContact.apply(this, arguments);
@@ -44088,31 +44252,31 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "showContactDetails",
     value: function () {
-      var _showContactDetails = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(contactId) {
+      var _showContactDetails = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(contactId) {
         var _this3 = this;
-        var response, data, balanceEl, balance, settleAllBtn, recordSettlementBtn, tabs, _t5;
-        return _regenerator().w(function (_context7) {
-          while (1) switch (_context7.p = _context7.n) {
+        var response, data, balanceEl, balance, settleAllBtn, recordSettlementBtn, tabs, _t6;
+        return _regenerator().w(function (_context8) {
+          while (1) switch (_context8.p = _context8.n) {
             case 0:
-              _context7.p = 0;
-              _context7.n = 1;
+              _context8.p = 0;
+              _context8.n = 1;
               return fetch(OC.generateUrl("/apps/budget/api/shared/contacts/".concat(contactId, "/details")), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 1:
-              response = _context7.v;
+              response = _context8.v;
               if (response.ok) {
-                _context7.n = 2;
+                _context8.n = 2;
                 break;
               }
               throw new Error('Failed to load contact details');
             case 2:
-              _context7.n = 3;
+              _context8.n = 3;
               return response.json();
             case 3:
-              data = _context7.v;
+              data = _context8.v;
               this.currentContactDetails = data;
 
               // Populate modal
@@ -44158,17 +44322,17 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 });
               });
               document.getElementById('contact-details-modal').style.display = 'flex';
-              _context7.n = 5;
+              _context8.n = 5;
               break;
             case 4:
-              _context7.p = 4;
-              _t5 = _context7.v;
-              console.error('Failed to load contact details:', _t5);
+              _context8.p = 4;
+              _t6 = _context8.v;
+              console.error('Failed to load contact details:', _t6);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to load contact details'));
             case 5:
-              return _context7.a(2);
+              return _context8.a(2);
           }
-        }, _callee7, this, [[0, 4]]);
+        }, _callee8, this, [[0, 4]]);
       }));
       function showContactDetails(_x3) {
         return _showContactDetails.apply(this, arguments);
@@ -44207,11 +44371,11 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "showSettlementModal",
     value: function () {
-      var _showSettlementModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(contactId, contactName, balance) {
+      var _showSettlementModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(contactId, contactName, balance) {
         var _this6 = this;
-        var modal, sharesList, response, data, unsettledShares, selectAll, _t6;
-        return _regenerator().w(function (_context8) {
-          while (1) switch (_context8.p = _context8.n) {
+        var modal, sharesList, response, data, unsettledShares, selectAll, _t7;
+        return _regenerator().w(function (_context9) {
+          while (1) switch (_context9.p = _context9.n) {
             case 0:
               this.closeModal(document.getElementById('contact-details-modal'));
               modal = document.getElementById('settlement-modal');
@@ -44229,34 +44393,34 @@ var SharedExpensesModule = /*#__PURE__*/function () {
               sharesList = document.getElementById('settlement-shares-list');
               sharesList.innerHTML = "<div class=\"loading\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Loading...'), "</div>");
               modal.style.display = 'flex';
-              _context8.p = 1;
-              _context8.n = 2;
+              _context9.p = 1;
+              _context9.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/shared/contacts/".concat(contactId, "/details")), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
             case 2:
-              response = _context8.v;
+              response = _context9.v;
               if (response.ok) {
-                _context8.n = 3;
+                _context9.n = 3;
                 break;
               }
               throw new Error('Failed to load shares');
             case 3:
-              _context8.n = 4;
+              _context9.n = 4;
               return response.json();
             case 4:
-              data = _context8.v;
+              data = _context9.v;
               unsettledShares = (data.shares || []).filter(function (item) {
                 return !item.share.isSettled;
               });
               if (!(unsettledShares.length === 0)) {
-                _context8.n = 5;
+                _context9.n = 5;
                 break;
               }
               sharesList.innerHTML = "<div class=\"empty-state-small\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'No unsettled expenses'), "</div>");
-              return _context8.a(2);
+              return _context9.a(2);
             case 5:
               sharesList.innerHTML = unsettledShares.map(function (item) {
                 var share = item.share;
@@ -44281,17 +44445,17 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 });
               });
               this._updateSettlementTotal();
-              _context8.n = 7;
+              _context9.n = 7;
               break;
             case 6:
-              _context8.p = 6;
-              _t6 = _context8.v;
-              console.error('Failed to load unsettled shares:', _t6);
+              _context9.p = 6;
+              _t7 = _context9.v;
+              console.error('Failed to load unsettled shares:', _t7);
               sharesList.innerHTML = "<div class=\"empty-state-small\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to load expenses'), "</div>");
             case 7:
-              return _context8.a(2);
+              return _context9.a(2);
           }
-        }, _callee8, this, [[1, 6]]);
+        }, _callee9, this, [[1, 6]]);
       }));
       function showSettlementModal(_x4, _x5, _x6) {
         return _showSettlementModal.apply(this, arguments);
@@ -44314,10 +44478,10 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "saveSettlement",
     value: function () {
-      var _saveSettlement = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
-        var contactId, date, notes, shareIds, response, _t7;
-        return _regenerator().w(function (_context9) {
-          while (1) switch (_context9.p = _context9.n) {
+      var _saveSettlement = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
+        var contactId, date, notes, shareIds, response, _t8;
+        return _regenerator().w(function (_context0) {
+          while (1) switch (_context0.p = _context0.n) {
             case 0:
               contactId = parseInt(document.getElementById('settlement-contact-id').value);
               date = document.getElementById('settlement-date').value;
@@ -44327,21 +44491,21 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 shareIds.push(parseInt(cb.dataset.shareId));
               });
               if (!(shareIds.length === 0)) {
-                _context9.n = 1;
+                _context0.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Please select at least one expense to settle'));
-              return _context9.a(2);
+              return _context0.a(2);
             case 1:
               if (date) {
-                _context9.n = 2;
+                _context0.n = 2;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Date is required'));
-              return _context9.a(2);
+              return _context0.a(2);
             case 2:
-              _context9.p = 2;
-              _context9.n = 3;
+              _context0.p = 2;
+              _context0.n = 3;
               return fetch(OC.generateUrl('/apps/budget/api/shared/settle-selected'), {
                 method: 'POST',
                 headers: {
@@ -44355,35 +44519,35 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 })
               });
             case 3:
-              response = _context9.v;
+              response = _context0.v;
               if (response.ok) {
-                _context9.n = 4;
+                _context0.n = 4;
                 break;
               }
               throw new Error('Failed to settle expenses');
             case 4:
               this.closeModal(document.getElementById('settlement-modal'));
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Expenses settled'));
-              _context9.n = 5;
+              _context0.n = 5;
               return this.loadBalanceSummary();
             case 5:
-              _context9.n = 6;
+              _context0.n = 6;
               return this.app.loadSharedTransactionIds();
             case 6:
-              _context9.n = 7;
+              _context0.n = 7;
               return this.showContactDetails(contactId);
             case 7:
-              _context9.n = 9;
+              _context0.n = 9;
               break;
             case 8:
-              _context9.p = 8;
-              _t7 = _context9.v;
-              console.error('Failed to settle expenses:', _t7);
+              _context0.p = 8;
+              _t8 = _context0.v;
+              console.error('Failed to settle expenses:', _t8);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to settle expenses'));
             case 9:
-              return _context9.a(2);
+              return _context0.a(2);
           }
-        }, _callee9, this, [[2, 8]]);
+        }, _callee0, this, [[2, 8]]);
       }));
       function saveSettlement() {
         return _saveSettlement.apply(this, arguments);
@@ -44393,20 +44557,20 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "settleAllWithContact",
     value: function () {
-      var _settleAllWithContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(contactId) {
-        var date, response, _t8;
-        return _regenerator().w(function (_context0) {
-          while (1) switch (_context0.p = _context0.n) {
+      var _settleAllWithContact = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(contactId) {
+        var date, response, _t9;
+        return _regenerator().w(function (_context1) {
+          while (1) switch (_context1.p = _context1.n) {
             case 0:
               if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'This will mark all shared expenses with this contact as settled. Continue?'))) {
-                _context0.n = 1;
+                _context1.n = 1;
                 break;
               }
-              return _context0.a(2);
+              return _context1.a(2);
             case 1:
-              _context0.p = 1;
+              _context1.p = 1;
               date = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_1__.getTodayDateString();
-              _context0.n = 2;
+              _context1.n = 2;
               return fetch(OC.generateUrl("/apps/budget/api/shared/contacts/".concat(contactId, "/settle")), {
                 method: 'POST',
                 headers: {
@@ -44418,32 +44582,32 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 })
               });
             case 2:
-              response = _context0.v;
+              response = _context1.v;
               if (response.ok) {
-                _context0.n = 3;
+                _context1.n = 3;
                 break;
               }
               throw new Error('Failed to settle');
             case 3:
               this.closeModal(document.getElementById('contact-details-modal'));
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'All expenses settled'));
-              _context0.n = 4;
+              _context1.n = 4;
               return this.loadBalanceSummary();
             case 4:
-              _context0.n = 5;
+              _context1.n = 5;
               return this.app.loadSharedTransactionIds();
             case 5:
-              _context0.n = 7;
+              _context1.n = 7;
               break;
             case 6:
-              _context0.p = 6;
-              _t8 = _context0.v;
-              console.error('Failed to settle:', _t8);
+              _context1.p = 6;
+              _t9 = _context1.v;
+              console.error('Failed to settle:', _t9);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to settle expenses'));
             case 7:
-              return _context0.a(2);
+              return _context1.a(2);
           }
-        }, _callee0, this, [[1, 6]]);
+        }, _callee1, this, [[1, 6]]);
       }));
       function settleAllWithContact(_x7) {
         return _settleAllWithContact.apply(this, arguments);
@@ -44453,29 +44617,29 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "showShareExpenseModal",
     value: function () {
-      var _showShareExpenseModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(transaction) {
+      var _showShareExpenseModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(transaction) {
         var _this7 = this;
         var modal, contactSelect;
-        return _regenerator().w(function (_context1) {
-          while (1) switch (_context1.n) {
+        return _regenerator().w(function (_context10) {
+          while (1) switch (_context10.n) {
             case 0:
               modal = document.getElementById('share-expense-modal'); // Ensure form listeners are attached (may not be if user hasn't visited Shared Expenses page)
               this._ensureShareFormListeners();
 
               // Load contacts if not already loaded
               if (!(!this.contacts || this.contacts.length === 0)) {
-                _context1.n = 1;
+                _context10.n = 1;
                 break;
               }
-              _context1.n = 1;
+              _context10.n = 1;
               return this.loadContacts();
             case 1:
               if (!(!this.contacts || this.contacts.length === 0)) {
-                _context1.n = 2;
+                _context10.n = 2;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Please add contacts first in Shared Expenses'));
-              return _context1.a(2);
+              return _context10.a(2);
             case 2:
               document.getElementById('share-transaction-id').value = transaction.id;
               document.getElementById('share-transaction-date').textContent = transaction.date;
@@ -44493,9 +44657,9 @@ var SharedExpensesModule = /*#__PURE__*/function () {
               document.getElementById('share-notes').value = '';
               modal.style.display = 'flex';
             case 3:
-              return _context1.a(2);
+              return _context10.a(2);
           }
-        }, _callee1, this);
+        }, _callee10, this);
       }));
       function showShareExpenseModal(_x8) {
         return _showShareExpenseModal.apply(this, arguments);
@@ -44505,25 +44669,25 @@ var SharedExpensesModule = /*#__PURE__*/function () {
   }, {
     key: "saveShareExpense",
     value: function () {
-      var _saveShareExpense = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
-        var transactionId, contactId, splitType, notes, url, body, amount, response, errorData, message, tbody, _t9;
-        return _regenerator().w(function (_context10) {
-          while (1) switch (_context10.p = _context10.n) {
+      var _saveShareExpense = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11() {
+        var transactionId, contactId, splitType, notes, url, body, amount, response, errorData, message, tbody, _t0;
+        return _regenerator().w(function (_context11) {
+          while (1) switch (_context11.p = _context11.n) {
             case 0:
               transactionId = parseInt(document.getElementById('share-transaction-id').value);
               contactId = parseInt(document.getElementById('share-contact').value);
               splitType = document.getElementById('share-split-type').value;
               notes = document.getElementById('share-notes').value.trim();
               if (contactId) {
-                _context10.n = 1;
+                _context11.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Please select a contact'));
-              return _context10.a(2);
+              return _context11.a(2);
             case 1:
-              _context10.p = 1;
+              _context11.p = 1;
               if (!(splitType === '50-50')) {
-                _context10.n = 2;
+                _context11.n = 2;
                 break;
               }
               url = OC.generateUrl('/apps/budget/api/shared/shares/split');
@@ -44532,16 +44696,16 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 contactId: contactId,
                 notes: notes || null
               };
-              _context10.n = 4;
+              _context11.n = 4;
               break;
             case 2:
               amount = parseFloat(document.getElementById('share-amount').value);
               if (amount) {
-                _context10.n = 3;
+                _context11.n = 3;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showWarning)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Amount is required for custom splits'));
-              return _context10.a(2);
+              return _context11.a(2);
             case 3:
               url = OC.generateUrl('/apps/budget/api/shared/shares');
               body = {
@@ -44551,7 +44715,7 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 notes: notes || null
               };
             case 4:
-              _context10.n = 5;
+              _context11.n = 5;
               return fetch(url, {
                 method: 'POST',
                 headers: {
@@ -44561,24 +44725,24 @@ var SharedExpensesModule = /*#__PURE__*/function () {
                 body: JSON.stringify(body)
               });
             case 5:
-              response = _context10.v;
+              response = _context11.v;
               if (response.ok) {
-                _context10.n = 7;
+                _context11.n = 7;
                 break;
               }
-              _context10.n = 6;
+              _context11.n = 6;
               return response.json()["catch"](function () {
                 return null;
               });
             case 6:
-              errorData = _context10.v;
+              errorData = _context11.v;
               message = (errorData === null || errorData === void 0 ? void 0 : errorData.error) || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to share expense');
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)(message);
-              return _context10.a(2);
+              return _context11.a(2);
             case 7:
               this.closeModal(document.getElementById('share-expense-modal'));
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Expense shared'));
-              _context10.n = 8;
+              _context11.n = 8;
               return this.app.loadSharedTransactionIds();
             case 8:
               // Refresh transaction table if visible to show shared badge
@@ -44586,17 +44750,17 @@ var SharedExpensesModule = /*#__PURE__*/function () {
               if (tbody) {
                 this.app.renderEnhancedTransactionsTable();
               }
-              _context10.n = 10;
+              _context11.n = 10;
               break;
             case 9:
-              _context10.p = 9;
-              _t9 = _context10.v;
-              console.error('Failed to share expense:', _t9);
+              _context11.p = 9;
+              _t0 = _context11.v;
+              console.error('Failed to share expense:', _t0);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_3__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to share expense'));
             case 10:
-              return _context10.a(2);
+              return _context11.a(2);
           }
-        }, _callee10, this, [[1, 9]]);
+        }, _callee11, this, [[1, 9]]);
       }));
       function saveShareExpense() {
         return _saveShareExpense.apply(this, arguments);
@@ -44870,7 +45034,7 @@ var SharingModule = /*#__PURE__*/function () {
       });
       container.innerHTML = "\n            <div class=\"sharing-page\">\n                <div class=\"sharing-intro\">\n                    <p>".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share parts of your budget with other Nextcloud users. You choose exactly which accounts, categories, bills, income, and savings goals to share, and whether the other person can view or also edit them.'), "</p>\n                    <p>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Shared categories merge with the other user\'s own categories — matching names are combined so you both work from the same budgets and spending totals. Transactions in shared accounts count toward shared category budgets for both users.'), "</p>\n                </div>\n\n                ").concat(this.pendingShares.length > 0 ? "\n                <div class=\"sharing-section\">\n                    <h3>".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Pending Invitations'), "</h3>\n                    <div class=\"sharing-list\">\n                        ").concat(this.pendingShares.map(function (share) {
         return "\n                            <div class=\"sharing-item sharing-item-pending\" data-share-id=\"".concat(share.id, "\">\n                                <div class=\"sharing-item-info\">\n                                    <span class=\"sharing-item-user\">").concat(_this.esc(share.ownerUserId), "</span>\n                                    <span class=\"sharing-item-status badge-pending\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Pending'), "</span>\n                                </div>\n                                <div class=\"sharing-item-actions\">\n                                    <button class=\"btn btn-primary btn-accept-share\" data-id=\"").concat(share.id, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Accept'), "</button>\n                                    <button class=\"btn btn-secondary btn-decline-share\" data-id=\"").concat(share.id, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Decline'), "</button>\n                                </div>\n                            </div>\n                        ");
-      }).join(''), "\n                    </div>\n                </div>\n                ") : '', "\n\n                <div class=\"sharing-section\">\n                    <h3>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share Your Budget'), "</h3>\n                    <p class=\"sharing-description\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Invite a Nextcloud user and then configure which parts of your budget they can access.'), "</p>\n                    <div class=\"sharing-add-form\">\n                        <input type=\"text\" id=\"share-username-input\" placeholder=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Enter Nextcloud username...'), "\" class=\"sharing-input\" />\n                        <button id=\"share-add-btn\" class=\"btn btn-primary\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Invite'), "</button>\n                    </div>\n\n                    ").concat(pendingOutgoing.length > 0 ? "\n                    <div class=\"sharing-list\">\n                        ".concat(pendingOutgoing.map(function (share) {
+      }).join(''), "\n                    </div>\n                </div>\n                ") : '', "\n\n                <div class=\"sharing-section\">\n                    <h3>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share Your Budget'), "</h3>\n                    <p class=\"sharing-description\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Invite a Nextcloud user and then configure which parts of your budget they can access.'), "</p>\n                    <div class=\"sharing-add-form\">\n                        <select id=\"share-username-input\" class=\"sharing-input\">\n                            <option value=\"\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Select a user...'), "</option>\n                        </select>\n                        <button id=\"share-add-btn\" class=\"btn btn-primary\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Invite'), "</button>\n                    </div>\n\n                    ").concat(pendingOutgoing.length > 0 ? "\n                    <div class=\"sharing-list\">\n                        ".concat(pendingOutgoing.map(function (share) {
         return "\n                            <div class=\"sharing-item\" data-share-id=\"".concat(share.id, "\">\n                                <div class=\"sharing-item-info\">\n                                    <span class=\"sharing-item-user\">").concat(_this.esc(share.sharedWithUserId), "</span>\n                                    <span class=\"sharing-item-status badge-pending\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Pending'), "</span>\n                                </div>\n                                <div class=\"sharing-item-actions\">\n                                    <button class=\"btn btn-danger btn-revoke-share\" data-id=\"").concat(share.id, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Revoke'), "</button>\n                                </div>\n                            </div>\n                        ");
       }).join(''), "\n                    </div>\n                    ") : '', "\n\n                    ").concat(acceptedOutgoing.length > 0 ? "\n                    <div class=\"sharing-list\">\n                        ".concat(acceptedOutgoing.map(function (share) {
         return "\n                            <div class=\"sharing-item-block\" data-share-id=\"".concat(share.id, "\">\n                                <div class=\"sharing-item\">\n                                    <div class=\"sharing-item-info\">\n                                        <span class=\"sharing-item-user\">").concat(_this.esc(share.sharedWithUserId), "</span>\n                                        <span class=\"sharing-item-status badge-accepted\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Active'), "</span>\n                                    </div>\n                                    <div class=\"sharing-item-actions\">\n                                        <button class=\"btn btn-secondary btn-configure-share\" data-id=\"").concat(share.id, "\">\n                                            ").concat(_this.expandedConfigId === share.id ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Close') : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Configure'), "\n                                        </button>\n                                        <button class=\"btn btn-danger btn-revoke-share\" data-id=\"").concat(share.id, "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Revoke'), "</button>\n                                    </div>\n                                </div>\n                                <div class=\"share-config-panel\" id=\"share-config-").concat(share.id, "\"\n                                     style=\"display: ").concat(_this.expandedConfigId === share.id ? 'block' : 'none', "\">\n                                    <div class=\"share-config-loading\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Loading configuration...'), "</div>\n                                </div>\n                            </div>\n                        ");
@@ -44889,14 +45053,12 @@ var SharingModule = /*#__PURE__*/function () {
     value: function bindEvents(container) {
       var _this2 = this;
       var addBtn = container.querySelector('#share-add-btn');
-      var input = container.querySelector('#share-username-input');
-      if (addBtn && input) {
+      var select = container.querySelector('#share-username-input');
+      if (addBtn && select) {
         addBtn.addEventListener('click', function () {
-          return _this2.handleShare(input.value.trim());
+          return _this2.handleShare(select.value);
         });
-        input.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') _this2.handleShare(input.value.trim());
-        });
+        this.populateUserDropdown(select);
       }
       container.querySelectorAll('.btn-accept-share').forEach(function (btn) {
         return btn.addEventListener('click', function () {
@@ -45143,22 +45305,71 @@ var SharingModule = /*#__PURE__*/function () {
       return saveConfig;
     }() // ==================== Share Actions ====================
   }, {
-    key: "handleShare",
+    key: "populateUserDropdown",
     value: function () {
-      var _handleShare = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(username) {
-        var _t4;
+      var _populateUserDropdown = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(select) {
+        var response, users, _t4;
         return _regenerator().w(function (_context9) {
           while (1) switch (_context9.p = _context9.n) {
             case 0:
+              _context9.p = 0;
+              _context9.n = 1;
+              return fetch(OC.generateUrl('/apps/budget/api/shared/users/search?query=*'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
+            case 1:
+              response = _context9.v;
+              if (response.ok) {
+                _context9.n = 2;
+                break;
+              }
+              return _context9.a(2);
+            case 2:
+              _context9.n = 3;
+              return response.json();
+            case 3:
+              users = _context9.v;
+              users.forEach(function (user) {
+                var option = document.createElement('option');
+                option.value = user.uid;
+                option.textContent = "".concat(user.displayName, " (").concat(user.uid, ")");
+                select.appendChild(option);
+              });
+              _context9.n = 5;
+              break;
+            case 4:
+              _context9.p = 4;
+              _t4 = _context9.v;
+              console.error('Failed to load users for sharing:', _t4);
+            case 5:
+              return _context9.a(2);
+          }
+        }, _callee9, null, [[0, 4]]);
+      }));
+      function populateUserDropdown(_x5) {
+        return _populateUserDropdown.apply(this, arguments);
+      }
+      return populateUserDropdown;
+    }()
+  }, {
+    key: "handleShare",
+    value: function () {
+      var _handleShare = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(username) {
+        var _t5;
+        return _regenerator().w(function (_context0) {
+          while (1) switch (_context0.p = _context0.n) {
+            case 0:
               if (username) {
-                _context9.n = 1;
+                _context0.n = 1;
                 break;
               }
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Please enter a username'));
-              return _context9.a(2);
+              return _context0.a(2);
             case 1:
-              _context9.p = 1;
-              _context9.n = 2;
+              _context0.p = 1;
+              _context0.n = 2;
               return this.fetchApi('/apps/budget/api/shares', {
                 method: 'POST',
                 headers: {
@@ -45172,43 +45383,6 @@ var SharingModule = /*#__PURE__*/function () {
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Invitation sent to {user}', {
                 user: username
               }));
-              _context9.n = 3;
-              return this.loadSharingView();
-            case 3:
-              _context9.n = 5;
-              break;
-            case 4:
-              _context9.p = 4;
-              _t4 = _context9.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t4.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to share budget'));
-            case 5:
-              return _context9.a(2);
-          }
-        }, _callee9, this, [[1, 4]]);
-      }));
-      function handleShare(_x5) {
-        return _handleShare.apply(this, arguments);
-      }
-      return handleShare;
-    }()
-  }, {
-    key: "handleAccept",
-    value: function () {
-      var _handleAccept = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(shareId) {
-        var _t5;
-        return _regenerator().w(function (_context0) {
-          while (1) switch (_context0.p = _context0.n) {
-            case 0:
-              _context0.p = 0;
-              _context0.n = 1;
-              return this.fetchApi("/apps/budget/api/shares/".concat(shareId, "/accept"), {
-                method: 'POST'
-              });
-            case 1:
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share accepted — reloading budget data'));
-              _context0.n = 2;
-              return this.app.loadInitialData();
-            case 2:
               _context0.n = 3;
               return this.loadSharingView();
             case 3:
@@ -45217,13 +45391,50 @@ var SharingModule = /*#__PURE__*/function () {
             case 4:
               _context0.p = 4;
               _t5 = _context0.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t5.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to accept share'));
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t5.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to share budget'));
             case 5:
               return _context0.a(2);
           }
-        }, _callee0, this, [[0, 4]]);
+        }, _callee0, this, [[1, 4]]);
       }));
-      function handleAccept(_x6) {
+      function handleShare(_x6) {
+        return _handleShare.apply(this, arguments);
+      }
+      return handleShare;
+    }()
+  }, {
+    key: "handleAccept",
+    value: function () {
+      var _handleAccept = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(shareId) {
+        var _t6;
+        return _regenerator().w(function (_context1) {
+          while (1) switch (_context1.p = _context1.n) {
+            case 0:
+              _context1.p = 0;
+              _context1.n = 1;
+              return this.fetchApi("/apps/budget/api/shares/".concat(shareId, "/accept"), {
+                method: 'POST'
+              });
+            case 1:
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share accepted — reloading budget data'));
+              _context1.n = 2;
+              return this.app.loadInitialData();
+            case 2:
+              _context1.n = 3;
+              return this.loadSharingView();
+            case 3:
+              _context1.n = 5;
+              break;
+            case 4:
+              _context1.p = 4;
+              _t6 = _context1.v;
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t6.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to accept share'));
+            case 5:
+              return _context1.a(2);
+          }
+        }, _callee1, this, [[0, 4]]);
+      }));
+      function handleAccept(_x7) {
         return _handleAccept.apply(this, arguments);
       }
       return handleAccept;
@@ -45231,33 +45442,33 @@ var SharingModule = /*#__PURE__*/function () {
   }, {
     key: "handleDecline",
     value: function () {
-      var _handleDecline = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(shareId) {
-        var _t6;
-        return _regenerator().w(function (_context1) {
-          while (1) switch (_context1.p = _context1.n) {
+      var _handleDecline = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(shareId) {
+        var _t7;
+        return _regenerator().w(function (_context10) {
+          while (1) switch (_context10.p = _context10.n) {
             case 0:
-              _context1.p = 0;
-              _context1.n = 1;
+              _context10.p = 0;
+              _context10.n = 1;
               return this.fetchApi("/apps/budget/api/shares/".concat(shareId, "/decline"), {
                 method: 'POST'
               });
             case 1:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share declined'));
-              _context1.n = 2;
+              _context10.n = 2;
               return this.loadSharingView();
             case 2:
-              _context1.n = 4;
+              _context10.n = 4;
               break;
             case 3:
-              _context1.p = 3;
-              _t6 = _context1.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t6.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to decline share'));
+              _context10.p = 3;
+              _t7 = _context10.v;
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t7.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to decline share'));
             case 4:
-              return _context1.a(2);
+              return _context10.a(2);
           }
-        }, _callee1, this, [[0, 3]]);
+        }, _callee10, this, [[0, 3]]);
       }));
-      function handleDecline(_x7) {
+      function handleDecline(_x8) {
         return _handleDecline.apply(this, arguments);
       }
       return handleDecline;
@@ -45265,53 +45476,12 @@ var SharingModule = /*#__PURE__*/function () {
   }, {
     key: "handleRevoke",
     value: function () {
-      var _handleRevoke = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10(shareId) {
-        var _t7;
-        return _regenerator().w(function (_context10) {
-          while (1) switch (_context10.p = _context10.n) {
-            case 0:
-              if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Are you sure? The user will lose access to your budget.'))) {
-                _context10.n = 1;
-                break;
-              }
-              return _context10.a(2);
-            case 1:
-              _context10.p = 1;
-              _context10.n = 2;
-              return this.fetchApi("/apps/budget/api/shares/".concat(shareId), {
-                method: 'DELETE'
-              });
-            case 2:
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share revoked'));
-              if (this.expandedConfigId === shareId) this.expandedConfigId = null;
-              _context10.n = 3;
-              return this.loadSharingView();
-            case 3:
-              _context10.n = 5;
-              break;
-            case 4:
-              _context10.p = 4;
-              _t7 = _context10.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t7.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to revoke share'));
-            case 5:
-              return _context10.a(2);
-          }
-        }, _callee10, this, [[1, 4]]);
-      }));
-      function handleRevoke(_x8) {
-        return _handleRevoke.apply(this, arguments);
-      }
-      return handleRevoke;
-    }()
-  }, {
-    key: "handleLeave",
-    value: function () {
-      var _handleLeave = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(shareId) {
+      var _handleRevoke = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(shareId) {
         var _t8;
         return _regenerator().w(function (_context11) {
           while (1) switch (_context11.p = _context11.n) {
             case 0:
-              if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Are you sure you want to leave this shared budget?'))) {
+              if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Are you sure? The user will lose access to your budget.'))) {
                 _context11.n = 1;
                 break;
               }
@@ -45319,29 +45489,70 @@ var SharingModule = /*#__PURE__*/function () {
             case 1:
               _context11.p = 1;
               _context11.n = 2;
+              return this.fetchApi("/apps/budget/api/shares/".concat(shareId), {
+                method: 'DELETE'
+              });
+            case 2:
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Share revoked'));
+              if (this.expandedConfigId === shareId) this.expandedConfigId = null;
+              _context11.n = 3;
+              return this.loadSharingView();
+            case 3:
+              _context11.n = 5;
+              break;
+            case 4:
+              _context11.p = 4;
+              _t8 = _context11.v;
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t8.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to revoke share'));
+            case 5:
+              return _context11.a(2);
+          }
+        }, _callee11, this, [[1, 4]]);
+      }));
+      function handleRevoke(_x9) {
+        return _handleRevoke.apply(this, arguments);
+      }
+      return handleRevoke;
+    }()
+  }, {
+    key: "handleLeave",
+    value: function () {
+      var _handleLeave = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(shareId) {
+        var _t9;
+        return _regenerator().w(function (_context12) {
+          while (1) switch (_context12.p = _context12.n) {
+            case 0:
+              if (confirm((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Are you sure you want to leave this shared budget?'))) {
+                _context12.n = 1;
+                break;
+              }
+              return _context12.a(2);
+            case 1:
+              _context12.p = 1;
+              _context12.n = 2;
               return this.fetchApi("/apps/budget/api/shares/".concat(shareId, "/leave"), {
                 method: 'POST'
               });
             case 2:
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Left shared budget — reloading your data'));
-              _context11.n = 3;
+              _context12.n = 3;
               return this.app.loadInitialData();
             case 3:
-              _context11.n = 4;
+              _context12.n = 4;
               return this.loadSharingView();
             case 4:
-              _context11.n = 6;
+              _context12.n = 6;
               break;
             case 5:
-              _context11.p = 5;
-              _t8 = _context11.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t8.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to leave share'));
+              _context12.p = 5;
+              _t9 = _context12.v;
+              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(_t9.message || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Failed to leave share'));
             case 6:
-              return _context11.a(2);
+              return _context12.a(2);
           }
-        }, _callee11, this, [[1, 5]]);
+        }, _callee12, this, [[1, 5]]);
       }));
-      function handleLeave(_x9) {
+      function handleLeave(_x0) {
         return _handleLeave.apply(this, arguments);
       }
       return handleLeave;
@@ -53772,7 +53983,8 @@ function daysBetweenDates(dateStr1, dateStr2) {
  */
 function getPeriodDateRange(period) {
   var startDay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  var now = new Date();
+  var referenceDate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var now = referenceDate ? new Date(referenceDate) : new Date();
   switch (period) {
     case 'weekly':
       {
@@ -53873,7 +54085,7 @@ function getPeriodDateRange(period) {
       }
     default:
       // Default to monthly
-      return getPeriodDateRange('monthly', startDay);
+      return getPeriodDateRange('monthly', startDay, referenceDate);
   }
 }
 

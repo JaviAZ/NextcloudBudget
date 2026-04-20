@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.1] - 2026-04-20
+
+### Added
+- **Nextcloud user integration for shared expenses**: Add contacts by selecting Nextcloud users from a dropdown instead of manually entering names ([#143](https://github.com/otherworld-dev/budget/issues/143))
+- **User dropdown for budget sharing**: Share your budget by selecting users from a dropdown instead of typing exact usernames
+- **User search API**: New endpoint for searching Nextcloud users by name or username
+
+### Changed
+- Contacts can now be linked to Nextcloud user accounts (optional `nextcloudUserId` field)
+- German translation updates via Weblate
+
 ## [2.12.0] - 2026-04-17
 
 ### Added

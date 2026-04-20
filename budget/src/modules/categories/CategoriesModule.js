@@ -1164,14 +1164,14 @@ export default class CategoriesModule {
     }
 
     async calculateCategorySpending() {
-        // Initialize spending object
+        // Initialize spending object and reset own-spending baseline
         this.categorySpending = {};
+        this._ownSpending = {};
 
-        // Get all categories that have budgets
+        // Get all categories (not just ones with budgets — parents need children's spending)
         const allCategories = this.flattenCategories(this.categoryTree || []);
-        const categoriesWithBudgets = allCategories.filter(cat => parseFloat(cat.budgetAmount) > 0);
 
-        if (categoriesWithBudgets.length === 0) {
+        if (allCategories.length === 0) {
             return;
         }
 
@@ -1183,7 +1183,7 @@ export default class CategoriesModule {
             yearly: []
         };
 
-        categoriesWithBudgets.forEach(cat => {
+        allCategories.forEach(cat => {
             const period = cat.budgetPeriod || 'monthly';
             if (categoriesByPeriod[period]) {
                 categoriesByPeriod[period].push(cat.id);
@@ -1197,7 +1197,9 @@ export default class CategoriesModule {
 
                 // Get date range for this period
                 const startDay = period === 'monthly' ? parseInt(this.app.settings?.budget_start_day || '1', 10) : 1;
-                const dateRange = formatters.getPeriodDateRange(period, startDay);
+                // Use selected budget month as reference date (1st of month)
+                const referenceDate = this.budgetMonth ? `${this.budgetMonth}-15` : null;
+                const dateRange = formatters.getPeriodDateRange(period, startDay, referenceDate);
 
                 // Fetch spending for this period
                 const response = await fetch(
@@ -1220,6 +1222,44 @@ export default class CategoriesModule {
         } catch (error) {
             console.error('Failed to fetch category spending:', error);
             this.categorySpending = {};
+        }
+
+        // Aggregate children's spending into parent categories
+        this.aggregateParentSpending(this.categoryTree || []);
+    }
+
+    /**
+     * Recursively sum children's spending and budgets into parent categories.
+     * Safe to call multiple times — uses _ownSpending baseline to avoid double-counting.
+     */
+    aggregateParentSpending(categories) {
+        for (const category of categories) {
+            if (category.children && category.children.length > 0) {
+                // Recurse into children first
+                this.aggregateParentSpending(category.children);
+
+                // Save own spending on first pass, reuse on subsequent calls
+                if (this._ownSpending == null) {
+                    this._ownSpending = {};
+                }
+                if (!(category.id in this._ownSpending)) {
+                    this._ownSpending[category.id] = this.categorySpending[category.id] || 0;
+                }
+
+                // Sum all children's spending and budgets into this parent
+                let childSpentTotal = 0;
+                let childBudgetTotal = 0;
+                for (const child of category.children) {
+                    childSpentTotal += this.categorySpending[child.id] || 0;
+                    childBudgetTotal += parseFloat(child.budgetAmount) || 0;
+                }
+
+                // Own spending + children's spending (idempotent)
+                this.categorySpending[category.id] = this._ownSpending[category.id] + childSpentTotal;
+
+                // Store aggregated budget: parent's own budget + children's budgets
+                category._aggregatedBudget = (parseFloat(category.budgetAmount) || 0) + childBudgetTotal;
+            }
         }
     }
 
@@ -1262,9 +1302,10 @@ export default class CategoriesModule {
             // Get the stored budget amount
             const storedBudget = parseFloat(category.budgetAmount) || 0;
 
-            // Budget is already in the correct period since we store it by period
-            // No pro-rating needed - the budget amount is for the selected period
-            const budget = storedBudget;
+            // For parents, use aggregated budget (own + children's); for leaves, use stored budget
+            const budget = (hasChildren && category._aggregatedBudget != null)
+                ? category._aggregatedBudget
+                : storedBudget;
 
             const remaining = budget - spent;
             const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
@@ -1286,10 +1327,11 @@ export default class CategoriesModule {
                         <input type="number"
                                class="budget-input"
                                data-category-id="${category.id}"
-                               value="${budget ? Math.round(budget * 100) / 100 : ''}"
+                               value="${storedBudget ? Math.round(storedBudget * 100) / 100 : ''}"
                                placeholder="0.00"
                                step="0.01"
                                min="0">
+                        ${hasChildren && budget > storedBudget ? `<span class="budget-aggregate-hint">${t('budget', 'Total')}: ${this.formatCurrency(budget)}</span>` : ''}
                     </div>
                     <div data-label="${t('budget', 'Period')}">
                         <select class="budget-period-select" data-category-id="${category.id}">
@@ -1423,7 +1465,8 @@ export default class CategoriesModule {
                     Object.assign(category, updates);
                 }
 
-                // Re-render to update calculations
+                // Re-aggregate parent budgets and re-render
+                this.aggregateParentSpending(this.categoryTree || []);
                 this.renderBudgetTree();
                 this.updateBudgetSummary();
 

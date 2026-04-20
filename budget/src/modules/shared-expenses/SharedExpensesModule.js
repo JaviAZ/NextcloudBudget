@@ -199,6 +199,7 @@ export default class SharedExpensesModule {
 
         form.reset();
         document.getElementById('contact-id').value = contact ? contact.id : '';
+        document.getElementById('contact-nextcloud-user-id').value = contact ? (contact.nextcloudUserId || '') : '';
         title.textContent = contact ? t('budget', 'Edit Contact') : t('budget', 'Add Contact');
 
         if (contact) {
@@ -206,13 +207,59 @@ export default class SharedExpensesModule {
             document.getElementById('contact-email').value = contact.email || '';
         }
 
+        this.populateUserDropdown(contact?.nextcloudUserId || '');
+        this.setupUserSelectHandler();
         modal.style.display = 'flex';
+    }
+
+    async populateUserDropdown(selectedUserId = '') {
+        const select = document.getElementById('contact-user-select');
+        if (!select) return;
+
+        // Keep the manual option
+        select.innerHTML = `<option value="">${t('budget', '— None (enter details manually) —')}</option>`;
+
+        try {
+            // Fetch all users (empty query with low minimum)
+            const response = await fetch(OC.generateUrl('/apps/budget/api/shared/users/search?query=*'), {
+                headers: { 'requesttoken': OC.requestToken }
+            });
+            if (!response.ok) return;
+
+            const users = await response.json();
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.uid;
+                option.textContent = `${user.displayName} (${user.uid})`;
+                option.dataset.displayName = user.displayName;
+                if (user.uid === selectedUserId) option.selected = true;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Failed to load users:', error);
+        }
+    }
+
+    setupUserSelectHandler() {
+        const select = document.getElementById('contact-user-select');
+        if (!select) return;
+
+        select.onchange = () => {
+            const selectedOption = select.options[select.selectedIndex];
+            const uid = select.value;
+            document.getElementById('contact-nextcloud-user-id').value = uid;
+
+            if (uid && selectedOption.dataset.displayName) {
+                document.getElementById('contact-name').value = selectedOption.dataset.displayName;
+            }
+        };
     }
 
     async saveContact() {
         const id = document.getElementById('contact-id').value;
         const name = document.getElementById('contact-name').value.trim();
         const email = document.getElementById('contact-email').value.trim();
+        const nextcloudUserId = document.getElementById('contact-nextcloud-user-id').value.trim() || null;
 
         if (!name) {
             showWarning(t('budget', 'Name is required'));
@@ -230,7 +277,7 @@ export default class SharedExpensesModule {
                     'requesttoken': OC.requestToken,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name, email: email || null })
+                body: JSON.stringify({ name, email: email || null, nextcloudUserId })
             });
 
             if (!response.ok) throw new Error('Failed to save contact');

@@ -5768,6 +5768,15 @@ style('budget', 'budget-main');
         <h3 id="contact-modal-title"><?php p($l->t('Add Contact')); ?></h3>
         <form id="contact-form" aria-label="<?php p($l->t('Contact form')); ?>">
             <input type="hidden" id="contact-id" name="id">
+            <input type="hidden" id="contact-nextcloud-user-id" name="nextcloudUserId">
+
+            <div class="form-group">
+                <label for="contact-user-select"><?php p($l->t('Nextcloud User')); ?></label>
+                <select id="contact-user-select">
+                    <option value=""><?php p($l->t('— None (enter details manually) —')); ?></option>
+                </select>
+                <small class="form-text"><?php p($l->t('Select a Nextcloud user to link this contact, or choose manual for non-Nextcloud contacts')); ?></small>
+            </div>
 
             <div class="form-group">
                 <label for="contact-name"><?php p($l->t('Name')); ?> <span class="required">*</span></label>
