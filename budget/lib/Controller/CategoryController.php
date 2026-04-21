@@ -303,10 +303,14 @@ class CategoryController extends Controller {
     /**
      * @NoAdminRequired
      */
-    public function allSpending(string $startDate, string $endDate): DataResponse {
+    public function allSpending(string $startDate, string $endDate, string $transactionType = 'debit'): DataResponse {
         try {
+            // Validate transaction type
+            if (!in_array($transactionType, ['debit', 'credit'], true)) {
+                $transactionType = 'debit';
+            }
             $visibleAccountIds = $this->getVisibleAccountIds();
-            $spending = $this->service->getAllCategorySpending($this->userId, $startDate, $endDate, $visibleAccountIds);
+            $spending = $this->service->getAllCategorySpending($this->userId, $startDate, $endDate, $visibleAccountIds, $transactionType);
             return new DataResponse($spending);
         } catch (\Exception $e) {
             return $this->handleError($e, $this->l->t('Failed to retrieve category spending'));

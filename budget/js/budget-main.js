@@ -29029,7 +29029,7 @@ var CategoriesModule = /*#__PURE__*/function () {
     value: function () {
       var _calculateCategorySpending = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14() {
         var _this14 = this;
-        var allCategories, categoriesByPeriod, _loop, _i, _Object$entries, _t13;
+        var allCategories, groups, _loop, _i, _Object$values, _t13;
         return _regenerator().w(function (_context15) {
           while (1) switch (_context15.p = _context15.n) {
             case 0:
@@ -29045,29 +29045,32 @@ var CategoriesModule = /*#__PURE__*/function () {
               }
               return _context15.a(2);
             case 1:
-              // Group categories by their period to minimize API calls
-              categoriesByPeriod = {
-                weekly: [],
-                monthly: [],
-                quarterly: [],
-                yearly: []
-              };
+              // Group categories by period and type to minimize API calls
+              // Income categories need credit transactions, expense categories need debit
+              groups = {};
               allCategories.forEach(function (cat) {
                 var period = cat.budgetPeriod || 'monthly';
-                if (categoriesByPeriod[period]) {
-                  categoriesByPeriod[period].push(cat.id);
+                var txType = cat.type === 'income' ? 'credit' : 'debit';
+                var key = "".concat(period, ":").concat(txType);
+                if (!groups[key]) {
+                  groups[key] = {
+                    period: period,
+                    txType: txType,
+                    categoryIds: []
+                  };
                 }
+                groups[key].categoryIds.push(cat.id);
               });
 
-              // Fetch spending for each period
+              // Fetch spending for each period+type group
               _context15.p = 2;
               _loop = /*#__PURE__*/_regenerator().m(function _loop() {
                 var _this14$app$settings;
-                var _Object$entries$_i, period, categoryIds, startDay, referenceDate, dateRange, response, spendingData;
+                var _Object$values$_i, period, txType, categoryIds, startDay, referenceDate, dateRange, response, spendingData;
                 return _regenerator().w(function (_context14) {
                   while (1) switch (_context14.n) {
                     case 0:
-                      _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), period = _Object$entries$_i[0], categoryIds = _Object$entries$_i[1];
+                      _Object$values$_i = _Object$values[_i], period = _Object$values$_i.period, txType = _Object$values$_i.txType, categoryIds = _Object$values$_i.categoryIds;
                       if (!(categoryIds.length === 0)) {
                         _context14.n = 1;
                         break;
@@ -29077,9 +29080,9 @@ var CategoriesModule = /*#__PURE__*/function () {
                       // Get date range for this period
                       startDay = period === 'monthly' ? parseInt(((_this14$app$settings = _this14.app.settings) === null || _this14$app$settings === void 0 ? void 0 : _this14$app$settings.budget_start_day) || '1', 10) : 1; // Use selected budget month as reference date (1st of month)
                       referenceDate = _this14.budgetMonth ? "".concat(_this14.budgetMonth, "-15") : null;
-                      dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay, referenceDate); // Fetch spending for this period
+                      dateRange = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getPeriodDateRange(period, startDay, referenceDate); // Fetch spending for this period and transaction type
                       _context14.n = 2;
-                      return fetch(OC.generateUrl("/apps/budget/api/categories/spending?startDate=".concat(dateRange.start, "&endDate=").concat(dateRange.end)), {
+                      return fetch(OC.generateUrl("/apps/budget/api/categories/spending?startDate=".concat(dateRange.start, "&endDate=").concat(dateRange.end, "&transactionType=").concat(txType)), {
                         headers: {
                           'requesttoken': OC.requestToken
                         }
@@ -29105,9 +29108,9 @@ var CategoriesModule = /*#__PURE__*/function () {
                   }
                 }, _loop);
               });
-              _i = 0, _Object$entries = Object.entries(categoriesByPeriod);
+              _i = 0, _Object$values = Object.values(groups);
             case 3:
-              if (!(_i < _Object$entries.length)) {
+              if (!(_i < _Object$values.length)) {
                 _context15.n = 6;
                 break;
               }

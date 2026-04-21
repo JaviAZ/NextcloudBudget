@@ -262,8 +262,8 @@ class CategoryService extends AbstractCrudService {
     /**
      * @param int[]|null $visibleAccountIds If provided, scope by account IDs for cross-user aggregation
      */
-    public function getAllCategorySpending(string $userId, string $startDate, string $endDate, ?array $visibleAccountIds = null): array {
-        $summary = $this->transactionMapper->getSpendingSummary($userId, $startDate, $endDate, null, [], true, false, $visibleAccountIds);
+    public function getAllCategorySpending(string $userId, string $startDate, string $endDate, ?array $visibleAccountIds = null, string $transactionType = 'debit'): array {
+        $summary = $this->transactionMapper->getSpendingSummary($userId, $startDate, $endDate, null, [], true, false, $visibleAccountIds, $transactionType);
 
         return array_map(fn($item) => [
             'categoryId' => (int)$item['id'],
@@ -422,20 +422,29 @@ class CategoryService extends AbstractCrudService {
         // Resolve effective budgets for this month (snapshot-aware)
         $effectiveBudgets = $this->resolveEffectiveBudgets($userId, $month);
 
-        // Collect category IDs with budgets for batch query
-        $categoryIds = [];
+        // Split categories by type for correct transaction type queries
+        $expenseCategoryIds = [];
+        $incomeCategoryIds = [];
         foreach ($categories as $category) {
             $catId = $category->getId();
             $budget = $effectiveBudgets[$catId]['amount'] ?? 0;
             if ($budget > 0) {
-                $categoryIds[] = $catId;
+                if ($category->getType() === 'income') {
+                    $incomeCategoryIds[] = $catId;
+                } else {
+                    $expenseCategoryIds[] = $catId;
+                }
             }
         }
 
-        // Single batch query for all spending (avoids N+1)
+        // Batch queries: debit for expenses, credit for income
         $spendingMap = $this->transactionMapper->getCategorySpendingBatch(
-            $categoryIds, $startDate, $endDate
+            $expenseCategoryIds, $startDate, $endDate, 'debit'
         );
+        $incomeMap = $this->transactionMapper->getCategorySpendingBatch(
+            $incomeCategoryIds, $startDate, $endDate, 'credit'
+        );
+        $spendingMap = $spendingMap + $incomeMap;
 
         $analysis = [];
         foreach ($categories as $category) {

@@ -1358,24 +1358,23 @@ export default class CategoriesModule {
             return;
         }
 
-        // Group categories by their period to minimize API calls
-        const categoriesByPeriod = {
-            weekly: [],
-            monthly: [],
-            quarterly: [],
-            yearly: []
-        };
+        // Group categories by period and type to minimize API calls
+        // Income categories need credit transactions, expense categories need debit
+        const groups = {};
 
         allCategories.forEach(cat => {
             const period = cat.budgetPeriod || 'monthly';
-            if (categoriesByPeriod[period]) {
-                categoriesByPeriod[period].push(cat.id);
+            const txType = cat.type === 'income' ? 'credit' : 'debit';
+            const key = `${period}:${txType}`;
+            if (!groups[key]) {
+                groups[key] = { period, txType, categoryIds: [] };
             }
+            groups[key].categoryIds.push(cat.id);
         });
 
-        // Fetch spending for each period
+        // Fetch spending for each period+type group
         try {
-            for (const [period, categoryIds] of Object.entries(categoriesByPeriod)) {
+            for (const { period, txType, categoryIds } of Object.values(groups)) {
                 if (categoryIds.length === 0) continue;
 
                 // Get date range for this period
@@ -1384,9 +1383,9 @@ export default class CategoriesModule {
                 const referenceDate = this.budgetMonth ? `${this.budgetMonth}-15` : null;
                 const dateRange = formatters.getPeriodDateRange(period, startDay, referenceDate);
 
-                // Fetch spending for this period
+                // Fetch spending for this period and transaction type
                 const response = await fetch(
-                    OC.generateUrl(`/apps/budget/api/categories/spending?startDate=${dateRange.start}&endDate=${dateRange.end}`),
+                    OC.generateUrl(`/apps/budget/api/categories/spending?startDate=${dateRange.start}&endDate=${dateRange.end}&transactionType=${txType}`),
                     {
                         headers: { 'requesttoken': OC.requestToken }
                     }
