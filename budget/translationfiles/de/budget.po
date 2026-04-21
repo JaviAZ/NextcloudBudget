@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
 "PO-Revision-Date: 2026-04-21 21:09+0000\n"
-"Last-Translator: Jakob <git@jakob-info.de>\n"
+"Last-Translator: SGiersch <Stephan@sgiersch.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
 "Language: de\n"
@@ -79,7 +79,7 @@ msgstr "Kontoinhaber"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:327
 #, php-format
 msgid "Invalid routing number: %1$s"
-msgstr "Falsche USA-Bankleitzahl: %1$s"
+msgstr "Ungültige Bankleitzahl: %1$s"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:206
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:340
@@ -180,7 +180,7 @@ msgstr "Name und Typ sind erforderlich"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:219
 #, php-format
 msgid "Invalid asset type. Must be one of: %1$s"
-msgstr ""
+msgstr "Ungültiger Vermögenswert-Typ. Muss einer der folgenden sein: %1$s"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:146
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:234
@@ -204,6 +204,8 @@ msgstr "Der Kaufpreis darf nicht negativ sein"
 #, php-format
 msgid "Annual change rate must be between -1 and 1 (e.g., 0.03 for 3%%)"
 msgstr ""
+"Die jährliche Änderungsrate muss zwischen -1 und 1 liegen (z. B. 0,03 für 3 "
+"%%)"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:162
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:250
@@ -269,21 +271,21 @@ msgstr "Datum"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:337
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:350
 msgid "Failed to create snapshot"
-msgstr ""
+msgstr "Fehler beim Erstellen der Momentaufnahme"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:348
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:361
 msgid "Snapshot deleted successfully"
-msgstr ""
+msgstr "Momentaufnahme erfolgreich gelöscht"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:350
 #: /tmp/budget-v2.11.0/budget/lib/Controller/PensionController.php:363
 msgid "Failed to delete snapshot"
-msgstr ""
+msgstr "Momentaufnahme konnte nicht gelöscht werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:366
 msgid "Failed to retrieve asset summary"
-msgstr ""
+msgstr "Zusammenfassung der Vermögenswerte konnte nicht abgerufen werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:378
 msgid "Failed to retrieve asset projection"
@@ -322,7 +324,7 @@ msgstr "Sitzung konnte nicht gesperrt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:164
 msgid "No session token provided"
-msgstr ""
+msgstr "Es wurde kein Sitzungstoken bereitgestellt"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AuthController.php:174
 msgid "Invalid session"
@@ -371,7 +373,7 @@ msgstr "Name und Betrag sind erforderlich"
 #: /tmp/budget-v2.11.0/budget/lib/Service/BillService.php:171
 #: /tmp/budget-v2.11.0/budget/lib/Service/BillService.php:245
 msgid "Auto-pay requires an account to be set"
-msgstr ""
+msgstr "Automatische Zahlung erfordert ein Konto"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:172
 #: /tmp/budget-v2.11.0/budget/lib/Controller/BillController.php:490
