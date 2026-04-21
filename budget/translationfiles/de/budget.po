@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
 "PO-Revision-Date: 2026-04-21 21:09+0000\n"
-"Last-Translator: T0mFi <tomfinger97@gmail.com>\n"
+"Last-Translator: Jakob <git@jakob-info.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
 "Language: de\n"
@@ -79,13 +79,13 @@ msgstr "Kontoinhaber"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:327
 #, php-format
 msgid "Invalid routing number: %1$s"
-msgstr "Ungültige Bankleitzahl: %1$s"
+msgstr "Ungültige Routingnummer: %1$s"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:206
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:340
 #, php-format
 msgid "Invalid sort code: %1$s"
-msgstr "Ungültige Bankleitzahl: %1$s"
+msgstr "Ungültige sechsstellige (UK) Bankleitzahl (NN-NN-NN): %1$s"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:214
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AccountController.php:353
@@ -157,7 +157,7 @@ msgstr "Fehler beim Abrufen der Vermögenswerte"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:90
 msgid "Asset"
-msgstr "Vermögenswert"
+msgstr "Anlage"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:104
 #: /tmp/budget-v2.11.0/budget/lib/Controller/AssetController.php:195
@@ -4379,7 +4379,7 @@ msgstr "Budgetplanung"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2447
 msgid "Forecasting"
-msgstr "Prognose"
+msgstr "Prognostik"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2448
 #: /tmp/budget-v2.11.0/budget/templates/index.php:53
