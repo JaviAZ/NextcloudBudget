@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: https://github.com/otherworld-dev/budget/issues\n"
 "POT-Creation-Date: 2026-04-11 09:45+0000\n"
-"PO-Revision-Date: 2026-04-23 00:09+0000\n"
+"PO-Revision-Date: 2026-04-24 01:09+0000\n"
 "Last-Translator: H2Oufoe <regularwater@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "nextcloud-budget/budget/pt_BR/>\n"
@@ -424,39 +424,39 @@ msgstr "Nome e quantidade são necessários"
 #: /var/www/html/apps-extra/budget/lib/Service/BillService.php:128
 #: /var/www/html/apps-extra/budget/lib/Service/BillService.php:196
 msgid "Auto-pay requires an account to be set"
-msgstr ""
+msgstr "O pagamento automático requer que uma conta seja selecionada"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:147
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:443
 #: /var/www/html/apps-extra/budget/lib/Service/BillService.php:133
 msgid "Transfer requires a destination account"
-msgstr ""
+msgstr "Transferência requer uma conta de destino"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:155
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:471
 #: /var/www/html/apps-extra/budget/lib/Service/BillService.php:138
 #: /var/www/html/apps-extra/budget/src/modules/transfers/TransfersModule.js:619
 msgid "Cannot transfer to the same account"
-msgstr ""
+msgstr "Não é possível transferir para a mesma conta"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:176
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:304
 msgid "Due day must be between 1 and 31"
-msgstr ""
+msgstr "O dia de vencimento deve ser entre 1 e 31"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:181
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:316
 msgid "Due month must be between 1 and 12"
-msgstr ""
+msgstr "O mês de vencimento deve ser entre 1 e 12"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:204
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:366
 msgid "Reminder days must be between 0 and 30"
-msgstr ""
+msgstr "Os dias de lembrete devem ser entre 0 e 30"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:217
 msgid "Transaction date"
-msgstr ""
+msgstr "Data da transação"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:225
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:408
@@ -467,49 +467,49 @@ msgstr "Data final"
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:235
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:421
 msgid "Remaining payments must be at least 1"
-msgstr ""
+msgstr "Deve ter pelo menos um pagamento restante"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:264
 msgid "Failed to create bill"
-msgstr ""
+msgstr "Não foi possível criar a conta"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:484
 msgid "Failed to update bill"
-msgstr ""
+msgstr "Não foi possível alterar a conta"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:515
 #: /var/www/html/apps-extra/budget/src/modules/bills/BillsModule.js:651
 msgid "Failed to mark bill as paid"
-msgstr ""
+msgstr "Não foi possível marcar a conta como paga"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:528
 msgid "Failed to retrieve upcoming bills"
-msgstr ""
+msgstr "Não foi possível recuperar as contas que vencerão"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:541
 msgid "Failed to retrieve bills due this month"
-msgstr ""
+msgstr "Não foi possível recuperar contas com vencimento neste mês"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:554
 msgid "Failed to retrieve overdue bills"
-msgstr ""
+msgstr "Não foi possível recuperar as contas em atraso"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:567
 msgid "Failed to retrieve bill summary"
-msgstr ""
+msgstr "Não foi possível recuperar o resumo das contas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:580
 msgid "Failed to retrieve bill status"
-msgstr ""
+msgstr "Não foi possível recuperar o status das contas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:593
 #: /var/www/html/apps-extra/budget/src/modules/bills/BillsModule.js:767
 msgid "Failed to detect recurring bills"
-msgstr ""
+msgstr "Não foi possível detectar contas recorrentes"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:615
 msgid "Failed to create bills from detected patterns"
-msgstr ""
+msgstr "Não foi possível criar contas a partir de padrões detectados"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:630
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:663
@@ -518,67 +518,67 @@ msgstr "Ano inválido"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:645
 msgid "Failed to generate annual overview"
-msgstr ""
+msgstr "Não foi possível gerar visão geral anual"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:686
 msgid "Failed to export bills calendar"
-msgstr ""
+msgstr "Não foi possível exportar o calendário de contas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:829
 msgid "Invalid JSON in custom recurrence pattern"
-msgstr ""
+msgstr "JSON inválido em padrão de recorrência personalizado"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:836
 msgid "Custom recurrence pattern must be a JSON object"
-msgstr ""
+msgstr "O padrão de recorrência personalizado deve ser um objeto JSON"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:845
 msgid "Months must be an array"
-msgstr ""
+msgstr "Meses devem ser um array"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:852
 msgid "At least one month must be specified"
-msgstr ""
+msgstr "Pelo menos um mês deve ser especificado"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:860
 msgid "Each month must be a number between 1 and 12"
-msgstr ""
+msgstr "Cada mês deve ser um número entre 1 e 12"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:873
 msgid "Dates must be an array"
-msgstr ""
+msgstr "As datas devem ser um array"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:880
 msgid "At least one date must be specified"
-msgstr ""
+msgstr "Pelo menos uma data deve ser especificada"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:888
 msgid "Each date must have \"month\" and \"day\" fields"
-msgstr ""
+msgstr "Cada data deve ter os campos de \"mês\" e \"dia\""
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:895
 msgid "Month must be a number between 1 and 12"
-msgstr ""
+msgstr "O mês deve ser um número entre 1 e 12"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:902
 msgid "Day must be a number between 1 and 31"
-msgstr ""
+msgstr "O dia deve ser um número entre 1 e 31"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:912
 msgid "Custom pattern must contain either \"months\" or \"dates\" field"
-msgstr ""
+msgstr "O padrão personalizado deve conter o campo \"meses\" ou \"datas\""
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:58
 msgid "Failed to retrieve categories"
-msgstr ""
+msgstr "Não foi possível recuperar as categorias"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:70
 msgid "Failed to retrieve category tree"
-msgstr ""
+msgstr "Não foi possível recuperar a árvore de categorias"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:82
 msgid "Failed to retrieve transaction counts"
-msgstr ""
+msgstr "Não foi possível recuperar contagens de transações"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:94
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:288
@@ -605,16 +605,17 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/templates/index.php:5551
 #: /var/www/html/apps-extra/budget/templates/index.php:5592
 msgid "Category"
-msgstr ""
+msgstr "Categorias"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:122
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:189
 msgid "Invalid category type. Must be income or expense"
-msgstr ""
+msgstr "Tipo de categoria inválido. Deve ser renda ou despesa"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:216
 msgid "Invalid budget period. Must be monthly, weekly, yearly, or quarterly"
 msgstr ""
+"Período orçamental inválido. Deve ser mensal, semanal, anual ou trimestral"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:252
 #: /var/www/html/apps-extra/budget/src/modules/categories/CategoriesModule.js:809
@@ -622,20 +623,20 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/src/modules/categories/CategoriesModule.js:844
 #: /var/www/html/apps-extra/budget/src/modules/categories/CategoriesModule.js:848
 msgid "Failed to delete category"
-msgstr ""
+msgstr "Não foi possível excluir a categoria"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:264
 #: /var/www/html/apps-extra/budget/lib/Controller/CategoryController.php:276
 msgid "Failed to retrieve category spending"
-msgstr ""
+msgstr "Não foi possível recuperar os gastos da categoria"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/DebtController.php:52
 msgid "Failed to retrieve debts"
-msgstr ""
+msgstr "Não foi possível recuperar as dívidas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/DebtController.php:73
 msgid "Failed to retrieve debt summary"
-msgstr ""
+msgstr "Não foi possível recuperar o resumo da dívidas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/DebtController.php:90
 msgid "Invalid strategy. Must be \"avalanche\" or \"snowball\""
