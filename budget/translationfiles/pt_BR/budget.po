@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: https://github.com/otherworld-dev/budget/issues\n"
 "POT-Creation-Date: 2026-04-11 09:45+0000\n"
-"PO-Revision-Date: 2026-04-17 00:09+0000\n"
+"PO-Revision-Date: 2026-04-23 00:09+0000\n"
 "Last-Translator: H2Oufoe <regularwater@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "nextcloud-budget/budget/pt_BR/>\n"
@@ -197,19 +197,19 @@ msgstr "Falha ao tentar recuperar os alertas orçamentários"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AlertController.php:59
 msgid "Failed to retrieve budget status"
-msgstr ""
+msgstr "Não foi possível recuperar o status do orçamento"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AlertController.php:72
 msgid "Failed to retrieve budget summary"
-msgstr ""
+msgstr "Não foi possível recuperar o resumo do orçamento"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:73
 msgid "Failed to retrieve assets"
-msgstr ""
+msgstr "Não foi possível recuperar os investimentos"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:85
 msgid "Asset"
-msgstr ""
+msgstr "Investimentos"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:99
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:190
@@ -221,76 +221,77 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/lib/Controller/RecurringIncomeController.php:167
 #: /var/www/html/apps-extra/budget/lib/Controller/TransactionController.php:636
 msgid "Invalid JSON data"
-msgstr ""
+msgstr "Dados JSON inválidos"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:113
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:116
 msgid "Name and type are required"
-msgstr ""
+msgstr "Nome e tipo são necessários"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:126
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:214
 #, php-format
 msgid "Invalid asset type. Must be one of: %1$s"
-msgstr ""
+msgstr "Tipo de investimento inválido. Deve ser um dos:%1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:141
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:229
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:144
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:238
 msgid "Currency must be a 3-letter code"
-msgstr ""
+msgstr "A moeda deve ser um código de 3 letras"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:146
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:234
 msgid "Current value cannot be negative"
-msgstr ""
+msgstr "O valor atual não pode ser negativo"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:149
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:237
 msgid "Purchase price cannot be negative"
-msgstr ""
+msgstr "Preço de compra não pode ser negativo"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:152
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:240
 #, php-format
 msgid "Annual change rate must be between -1 and 1 (e.g., 0.03 for 3%%)"
 msgstr ""
+"A taxa de variação anual deve estar entre -1 e 1 (por exemplo, 0,03 para 3%%)"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:157
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:245
 msgid "Purchase date"
-msgstr ""
+msgstr "Data de compra"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:176
 msgid "Failed to create asset"
-msgstr ""
+msgstr "Não conseguiu criar investimento"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:265
 msgid "Failed to update asset"
-msgstr ""
+msgstr "Não foi possível atualizar o investimento"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:276
 msgid "Asset deleted successfully"
-msgstr ""
+msgstr "Investimento excluído com sucesso"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:278
 #: /var/www/html/apps-extra/budget/src/modules/assets/AssetsModule.js:414
 msgid "Failed to delete asset"
-msgstr ""
+msgstr "Não foi possível excluir o investimento"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:294
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:306
 msgid "Failed to retrieve snapshots"
-msgstr ""
+msgstr "Não foi possível recuperar os snapshots"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:315
 msgid "Value and date are required"
-msgstr ""
+msgstr "Valor e data são necessários"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:320
 msgid "Value cannot be negative"
-msgstr ""
+msgstr "O valor não pode ser negativo"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:324
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:337
@@ -316,22 +317,22 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/templates/index.php:5088
 #: /var/www/html/apps-extra/budget/templates/index.php:5716
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:332
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:345
 msgid "Failed to create snapshot"
-msgstr ""
+msgstr "Não foi possível criar o snapshot"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:343
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:356
 msgid "Snapshot deleted successfully"
-msgstr ""
+msgstr "Snapshot apagado com sucesso"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:345
 #: /var/www/html/apps-extra/budget/lib/Controller/PensionController.php:358
 msgid "Failed to delete snapshot"
-msgstr ""
+msgstr "Não foi possível apagar o snapshot"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:361
 msgid "Failed to retrieve asset summary"
@@ -366,58 +367,58 @@ msgstr ""
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:134
 msgid "Failed to verify password"
-msgstr ""
+msgstr "Não foi possível verificar a senha"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:148
 msgid "Failed to lock session"
-msgstr ""
+msgstr "Não foi possível bloquear a sessão"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:164
 msgid "No session token provided"
-msgstr ""
+msgstr "Nenhum token de sessão fornecido"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:174
 msgid "Invalid session"
-msgstr ""
+msgstr "Sessão inválida"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:178
 msgid "Failed to extend session"
-msgstr ""
+msgstr "Não foi possível prolongar a sessão"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:196
 #: /var/www/html/apps-extra/budget/src/modules/auth/AuthModule.js:179
 msgid "Incorrect password"
-msgstr ""
+msgstr "Senha incorreta"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:200
 #: /var/www/html/apps-extra/budget/src/main.js:1772
 #: /var/www/html/apps-extra/budget/src/modules/settings/SettingsModule.js:484
 msgid "Failed to disable password protection"
-msgstr ""
+msgstr "Não foi possível desativar a proteção por senha"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:224
 msgid "Incorrect current password"
-msgstr ""
+msgstr "Senha atual incorreta"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AuthController.php:232
 #: /var/www/html/apps-extra/budget/src/main.js:1689
 #: /var/www/html/apps-extra/budget/src/modules/settings/SettingsModule.js:401
 msgid "Failed to change password"
-msgstr ""
+msgstr "Não foi possível alterar a senha"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:71
 msgid "Failed to retrieve bills"
-msgstr ""
+msgstr "Não foi possível recuperar as contas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:94
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:498
 #: /var/www/html/apps-extra/budget/templates/index.php:3161
 msgid "Bill"
-msgstr ""
+msgstr "Contas"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:112
 msgid "Name and amount are required"
-msgstr ""
+msgstr "Nome e quantidade são necessários"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:139
 #: /var/www/html/apps-extra/budget/lib/Service/BillService.php:128
@@ -461,7 +462,7 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:408
 #: /var/www/html/apps-extra/budget/templates/index.php:2794
 msgid "End date"
-msgstr ""
+msgstr "Data final"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:235
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:421
@@ -513,7 +514,7 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:630
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:663
 msgid "Invalid year"
-msgstr ""
+msgstr "Ano inválido"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:645
 msgid "Failed to generate annual overview"
