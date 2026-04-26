@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.0] - 2026-04-26
+
+### Added
+- **External Bank Sync (Beta)** ([#61](https://github.com/otherworld-dev/budget/issues/61)): Connect external bank accounts for automatic transaction imports
+  - GoCardless provider for UK/Europe banks
+  - SimpleFIN provider for US banks
+  - Admin toggle (disabled by default) with experimental feature warning
+  - Encrypted credential storage, daily background sync, duplicate detection
+  - Account mapping between external and local accounts
+- **Kazakhstani Tenge (KZT)** ([#154](https://github.com/otherworld-dev/budget/issues/154)): Added KZT currency with ₸ symbol
+- **One-time transfers** ([#160](https://github.com/otherworld-dev/budget/issues/160)): Transfer form now supports one-time frequency
+
+### Fixed
+- **Dashboard tiles stuck on Loading** ([#157](https://github.com/otherworld-dev/budget/issues/157)): 11 Phase 2/3 dashboard tiles had no render methods — now display data correctly
+- **Asset/liability colors inverted** ([#153](https://github.com/otherworld-dev/budget/issues/153)): Colors now match actual values; income budget progress uses correct semantics
+- **Income amount not saving on update** ([#159](https://github.com/otherworld-dev/budget/issues/159)): Fixed `php://input` consumption issue in RecurringIncomeController
+
+### Changed
+- Updated German and Portuguese (Brazil) translations from Weblate
+
 ## [2.13.1] - 2026-04-21
 
 ### Fixed
