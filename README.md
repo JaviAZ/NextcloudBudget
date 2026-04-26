@@ -8,11 +8,11 @@ A comprehensive financial management app for Nextcloud. Track spending habits, m
 
 ![Dashboard Screenshot](screenshots/dashboard.png)
 
-## What's New in v2.13
+## What's New in v2.14
 
+- **External Bank Sync (Beta)** - Connect bank accounts via GoCardless (UK/Europe) or SimpleFIN (US) for automatic transaction imports with daily background sync
 - **Per-Month Budget Adjustments** - Budget values can now differ between months. Click "Adjust budgets from this month" to create a new baseline while preserving previous months' values
-- **Parent Category Budget Aggregation** - Parent categories show combined totals of their own budget plus all children's budgets
-- **Income Budget Tracking** - Budget tab now correctly tracks income categories alongside expenses
+- **11 Dashboard Tiles Fixed** - Large Transactions, Weekly Spending, Category Trends, Bills Due Soon, Income Tracking, and more now render correctly
 
 See the [full changelog](budget/CHANGELOG.md) for details.
 
@@ -35,6 +35,12 @@ See the [full changelog](budget/CHANGELOG.md) for details.
 - **Pending Transactions** - Future-dated transactions shown with visual indicators and filterable status (All / Cleared / Pending)
 
 ### Import & Automation
+- **Bank Sync (Beta)** - Connect external bank accounts for automatic transaction imports
+  - GoCardless provider for UK/Europe banks
+  - SimpleFIN provider for US banks
+  - Daily background sync with duplicate detection
+  - Encrypted credential storage
+  - Admin-enabled with experimental feature warnings
 - **Smart Import** - Import bank statements from CSV, OFX, and QIF formats
   - Auto-detection of CSV delimiters (comma, semicolon, tab)
   - Dual-column amount mapping for separate income/expense columns
@@ -279,6 +285,8 @@ The app provides a REST API for all functionality:
 | `/api/transactions` | Transaction CRUD and search |
 | `/api/categories` | Category hierarchy |
 | `/api/budget-snapshots` | Per-month budget adjustments |
+| `/api/bank-sync` | External bank sync (Beta) |
+| `/api/admin/settings` | Admin settings (bank sync toggle) |
 | `/api/tag-sets` | Tag set management |
 | `/api/import` | Bank statement import |
 | `/api/import-rules` | Advanced auto-categorization rules |
