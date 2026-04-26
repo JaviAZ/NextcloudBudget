@@ -1428,14 +1428,20 @@ export default class DashboardModule {
             return;
         }
 
-        container.innerHTML = data.slice(0, 5).map(imp => `
-            <div class="widget-list-item">
-                <div class="widget-item-info">
-                    <div class="widget-item-name">${this.escapeHtml(imp.filename || t('budget', 'Import'))}</div>
-                    <div class="widget-item-meta">${imp.count || 0} ${t('budget', 'transactions')}</div>
+        container.innerHTML = data.slice(0, 5).map(imp => {
+            const accountName = imp.account_name || t('budget', 'Unknown');
+            const count = parseInt(imp.count) || 0;
+            const importedAt = imp.imported_at ? formatters.formatDate(imp.imported_at.split(' ')[0], this.settings) : '';
+
+            return `
+                <div class="widget-list-item">
+                    <div class="widget-item-info">
+                        <div class="widget-item-name">${this.escapeHtml(accountName)}</div>
+                        <div class="widget-item-meta">${n('budget', '%n transaction', '%n transactions', count)}${importedAt ? ` · ${importedAt}` : ''}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     updateRuleEffectivenessWidget() {
@@ -2537,10 +2543,14 @@ export default class DashboardModule {
                     this.widgetData.daysUntilDebtFree = await debtResp.json();
                     break;
 
-                case 'recentImports':
-                    // Placeholder - would use /api/import/history if it exists
-                    this.widgetData.recentImports = [];
+                case 'recentImports': {
+                    const importsResp = await fetch(
+                        OC.generateUrl('/apps/budget/api/import/history?limit=5'),
+                        { headers: { 'requesttoken': OC.requestToken } }
+                    );
+                    this.widgetData.recentImports = importsResp.ok ? await importsResp.json() : [];
                     break;
+                }
 
                 case 'ruleEffectiveness':
                     const rulesResp = await fetch(

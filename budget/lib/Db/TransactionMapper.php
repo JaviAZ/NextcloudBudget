@@ -283,6 +283,34 @@ class TransactionMapper extends QBMapper {
     }
 
     /**
+     * Get recent import batches grouped by import_id prefix and date.
+     * Returns summary of recent imports: account, count, date range.
+     */
+    public function getRecentImports(string $userId, int $limit = 10): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('a.name AS account_name', 'a.id AS account_id')
+            ->selectAlias($qb->func()->count('t.id'), 'count')
+            ->selectAlias($qb->func()->min('t.date'), 'min_date')
+            ->selectAlias($qb->func()->max('t.date'), 'max_date')
+            ->selectAlias($qb->func()->max('t.created_at'), 'imported_at')
+            ->from($this->getTableName(), 't')
+            ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
+            ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)))
+            ->andWhere($qb->expr()->isNotNull('t.import_id'))
+            ->andWhere($qb->expr()->neq('t.import_id', $qb->createNamedParameter('')))
+            ->groupBy('a.id', 'a.name',
+                $qb->createFunction('SUBSTR(CAST(t.created_at AS CHAR(10)), 1, 10)'))
+            ->orderBy($qb->createFunction('MAX(t.created_at)'), 'DESC')
+            ->setMaxResults($limit);
+
+        $result = $qb->executeQuery();
+        $data = $result->fetchAll();
+        $result->closeCursor();
+
+        return $data;
+    }
+
+    /**
      * @return Transaction[]
      */
     public function findUncategorized(string $userId, int $limit = 100): array {

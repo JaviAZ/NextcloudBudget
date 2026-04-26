@@ -434,6 +434,7 @@ class Application extends App implements IBootstrap {
             return new \OCA\Budget\Service\ImportService(
                 $c->get(\OCP\Files\IAppData::class),
                 $c->get(\OCA\Budget\Service\TransactionService::class),
+                $c->get(\OCA\Budget\Db\TransactionMapper::class),
                 $c->get(\OCA\Budget\Db\AccountMapper::class),
                 $c->get(\OCA\Budget\Service\Import\FileValidator::class),
                 $c->get(\OCA\Budget\Service\Import\ParserFactory::class),

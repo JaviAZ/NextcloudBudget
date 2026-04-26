@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Budget\Service;
 
 use OCA\Budget\Db\AccountMapper;
+use OCA\Budget\Db\TransactionMapper;
 use OCA\Budget\Service\Import\DuplicateDetector;
 use OCA\Budget\Service\Import\FileValidator;
 use OCA\Budget\Service\Import\ImportRuleApplicator;
@@ -20,6 +21,7 @@ use OCP\IL10N;
 class ImportService {
     private IAppData $appData;
     private TransactionService $transactionService;
+    private TransactionMapper $transactionMapper;
     private AccountMapper $accountMapper;
     private FileValidator $fileValidator;
     private ParserFactory $parserFactory;
@@ -31,6 +33,7 @@ class ImportService {
     public function __construct(
         IAppData $appData,
         TransactionService $transactionService,
+        TransactionMapper $transactionMapper,
         AccountMapper $accountMapper,
         FileValidator $fileValidator,
         ParserFactory $parserFactory,
@@ -41,6 +44,7 @@ class ImportService {
     ) {
         $this->appData = $appData;
         $this->transactionService = $transactionService;
+        $this->transactionMapper = $transactionMapper;
         $this->accountMapper = $accountMapper;
         $this->fileValidator = $fileValidator;
         $this->parserFactory = $parserFactory;
@@ -185,8 +189,8 @@ class ImportService {
         ];
     }
 
-    public function getImportHistory(string $userId, int $limit = 50): array {
-        return [];
+    public function getImportHistory(string $userId, int $limit = 10): array {
+        return $this->transactionMapper->getRecentImports($userId, $limit);
     }
 
     public function validateFile(string $userId, string $fileId): array {

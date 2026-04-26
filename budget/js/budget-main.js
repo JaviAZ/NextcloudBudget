@@ -31972,7 +31972,10 @@ var DashboardModule = /*#__PURE__*/function () {
         return;
       }
       container.innerHTML = data.slice(0, 5).map(function (imp) {
-        return "\n            <div class=\"widget-list-item\">\n                <div class=\"widget-item-info\">\n                    <div class=\"widget-item-name\">".concat(_this17.escapeHtml(imp.filename || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translate)('budget', 'Import')), "</div>\n                    <div class=\"widget-item-meta\">").concat(imp.count || 0, " ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translate)('budget', 'transactions'), "</div>\n                </div>\n            </div>\n        ");
+        var accountName = imp.account_name || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translate)('budget', 'Unknown');
+        var count = parseInt(imp.count) || 0;
+        var importedAt = imp.imported_at ? _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDate(imp.imported_at.split(' ')[0], _this17.settings) : '';
+        return "\n                <div class=\"widget-list-item\">\n                    <div class=\"widget-item-info\">\n                        <div class=\"widget-item-name\">".concat(_this17.escapeHtml(accountName), "</div>\n                        <div class=\"widget-item-meta\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translatePlural)('budget', '%n transaction', '%n transactions', count)).concat(importedAt ? " \xB7 ".concat(importedAt) : '', "</div>\n                    </div>\n                </div>\n            ");
       }).join('');
     }
   }, {
@@ -33502,7 +33505,7 @@ var DashboardModule = /*#__PURE__*/function () {
     key: "loadWidgetData",
     value: function () {
       var _loadWidgetData = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee25(widgetKey) {
-        var uncatResp, now, thisMonth, lastMonthDate, lastMonth, _yield$Promise$all3, _yield$Promise$all4, currentResp, previousResp, largeResp, forecastResp, yoyResp, incomeResp, debtResp, rulesResp, weekEnd, weekStart, weekResp, weekData, unmatchedResp, unmatchedData, billsResp, allBills, todayStr, ctNow, ctThisMonth, ctLastDate, ctLastMonth, _yield$Promise$all5, _yield$Promise$all6, ctCurrentResp, ctPrevResp, ctCurrent, ctPrev, prevMap, svNow, svMonthStart, svToday, svDayOfMonth, svResp, svData, totalSpent, _t19, _t20, _t21, _t22;
+        var uncatResp, now, thisMonth, lastMonthDate, lastMonth, _yield$Promise$all3, _yield$Promise$all4, currentResp, previousResp, largeResp, forecastResp, yoyResp, incomeResp, debtResp, importsResp, rulesResp, weekEnd, weekStart, weekResp, weekData, unmatchedResp, unmatchedData, billsResp, allBills, todayStr, ctNow, ctThisMonth, ctLastDate, ctLastMonth, _yield$Promise$all5, _yield$Promise$all6, ctCurrentResp, ctPrevResp, ctCurrent, ctPrev, prevMap, svNow, svMonthStart, svToday, svDayOfMonth, svResp, svData, totalSpent, _t19, _t20, _t21, _t22, _t23;
         return _regenerator().w(function (_context25) {
           while (1) switch (_context25.p = _context25.n) {
             case 0:
@@ -33514,7 +33517,7 @@ var DashboardModule = /*#__PURE__*/function () {
             case 1:
               _context25.p = 1;
               _t19 = widgetKey;
-              _context25.n = _t19 === 'uncategorizedCount' ? 2 : _t19 === 'monthlyComparison' ? 5 : _t19 === 'largeTransactions' ? 9 : _t19 === 'cashFlowForecast' ? 12 : _t19 === 'yoyComparison' ? 15 : _t19 === 'incomeTracking' ? 18 : _t19 === 'daysUntilDebtFree' ? 21 : _t19 === 'recentImports' ? 24 : _t19 === 'ruleEffectiveness' ? 25 : _t19 === 'weeklyTrend' ? 28 : _t19 === 'unmatchedTransfers' ? 31 : _t19 === 'billsDueSoon' ? 34 : _t19 === 'categoryTrends' ? 37 : _t19 === 'spendingVelocity' ? 41 : 44;
+              _context25.n = _t19 === 'uncategorizedCount' ? 2 : _t19 === 'monthlyComparison' ? 5 : _t19 === 'largeTransactions' ? 9 : _t19 === 'cashFlowForecast' ? 12 : _t19 === 'yoyComparison' ? 15 : _t19 === 'incomeTracking' ? 18 : _t19 === 'daysUntilDebtFree' ? 21 : _t19 === 'recentImports' ? 24 : _t19 === 'ruleEffectiveness' ? 29 : _t19 === 'weeklyTrend' ? 32 : _t19 === 'unmatchedTransfers' ? 35 : _t19 === 'billsDueSoon' ? 38 : _t19 === 'categoryTrends' ? 41 : _t19 === 'spendingVelocity' ? 45 : 48;
               break;
             case 2:
               _context25.n = 3;
@@ -33529,7 +33532,7 @@ var DashboardModule = /*#__PURE__*/function () {
               return uncatResp.json();
             case 4:
               this.widgetData.uncategorizedCount = _context25.v;
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 5:
               now = new Date();
               thisMonth = {
@@ -33568,7 +33571,7 @@ var DashboardModule = /*#__PURE__*/function () {
                 current: _t20,
                 previous: _t21
               };
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 9:
               _context25.n = 10;
               return fetch(OC.generateUrl('/apps/budget/api/transactions?limit=10&sort=amount'), {
@@ -33582,7 +33585,7 @@ var DashboardModule = /*#__PURE__*/function () {
               return largeResp.json();
             case 11:
               this.widgetData.largeTransactions = _context25.v;
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 12:
               _context25.n = 13;
               return fetch(OC.generateUrl('/apps/budget/api/forecast/live?days=90'), {
@@ -33596,7 +33599,7 @@ var DashboardModule = /*#__PURE__*/function () {
               return forecastResp.json();
             case 14:
               this.widgetData.cashFlowForecast = _context25.v;
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 15:
               _context25.n = 16;
               return fetch(OC.generateUrl('/apps/budget/api/yoy/years?years=2'), {
@@ -33610,7 +33613,7 @@ var DashboardModule = /*#__PURE__*/function () {
               return yoyResp.json();
             case 17:
               this.widgetData.yoyComparison = _context25.v;
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 18:
               _context25.n = 19;
               return fetch(OC.generateUrl('/apps/budget/api/recurring-income/summary'), {
@@ -33624,7 +33627,7 @@ var DashboardModule = /*#__PURE__*/function () {
               return incomeResp.json();
             case 20:
               this.widgetData.incomeTracking = _context25.v;
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 21:
               _context25.n = 22;
               return fetch(OC.generateUrl('/apps/budget/api/debts/payoff-plan?strategy=avalanche'), {
@@ -33638,72 +33641,92 @@ var DashboardModule = /*#__PURE__*/function () {
               return debtResp.json();
             case 23:
               this.widgetData.daysUntilDebtFree = _context25.v;
-              return _context25.a(3, 44);
+              return _context25.a(3, 48);
             case 24:
-              // Placeholder - would use /api/import/history if it exists
-              this.widgetData.recentImports = [];
-              return _context25.a(3, 44);
+              _context25.n = 25;
+              return fetch(OC.generateUrl('/apps/budget/api/import/history?limit=5'), {
+                headers: {
+                  'requesttoken': OC.requestToken
+                }
+              });
             case 25:
+              importsResp = _context25.v;
+              if (!importsResp.ok) {
+                _context25.n = 27;
+                break;
+              }
               _context25.n = 26;
+              return importsResp.json();
+            case 26:
+              _t22 = _context25.v;
+              _context25.n = 28;
+              break;
+            case 27:
+              _t22 = [];
+            case 28:
+              this.widgetData.recentImports = _t22;
+              return _context25.a(3, 48);
+            case 29:
+              _context25.n = 30;
               return fetch(OC.generateUrl('/apps/budget/api/import-rules'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
-            case 26:
+            case 30:
               rulesResp = _context25.v;
-              _context25.n = 27;
+              _context25.n = 31;
               return rulesResp.json();
-            case 27:
+            case 31:
               this.widgetData.ruleEffectiveness = _context25.v;
-              return _context25.a(3, 44);
-            case 28:
+              return _context25.a(3, 48);
+            case 32:
               weekEnd = new Date();
               weekStart = new Date();
               weekStart.setDate(weekEnd.getDate() - 7);
-              _context25.n = 29;
+              _context25.n = 33;
               return fetch(OC.generateUrl("/apps/budget/api/reports/summary?startDate=".concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDateForAPI(weekStart), "&endDate=").concat(_utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDateForAPI(weekEnd))), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
-            case 29:
+            case 33:
               weekResp = _context25.v;
-              _context25.n = 30;
+              _context25.n = 34;
               return weekResp.json();
-            case 30:
+            case 34:
               weekData = _context25.v;
               this.widgetData.weeklyTrend = [{
                 total: weekData.totalExpenses || 0
               }];
-              return _context25.a(3, 44);
-            case 31:
-              _context25.n = 32;
+              return _context25.a(3, 48);
+            case 35:
+              _context25.n = 36;
               return fetch(OC.generateUrl('/apps/budget/api/transactions?limit=10&unmatched=true'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
-            case 32:
+            case 36:
               unmatchedResp = _context25.v;
-              _context25.n = 33;
+              _context25.n = 37;
               return unmatchedResp.json();
-            case 33:
+            case 37:
               unmatchedData = _context25.v;
               this.widgetData.unmatchedTransfers = Array.isArray(unmatchedData) ? unmatchedData : [];
-              return _context25.a(3, 44);
-            case 34:
-              _context25.n = 35;
+              return _context25.a(3, 48);
+            case 38:
+              _context25.n = 39;
               return fetch(OC.generateUrl('/apps/budget/api/bills?isTransfer=false'), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
-            case 35:
+            case 39:
               billsResp = _context25.v;
-              _context25.n = 36;
+              _context25.n = 40;
               return billsResp.json();
-            case 36:
+            case 40:
               allBills = _context25.v;
               // Filter to upcoming bills (due within 14 days)
               todayStr = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getTodayDateString();
@@ -33715,8 +33738,8 @@ var DashboardModule = /*#__PURE__*/function () {
               }).sort(function (a, b) {
                 return (a.nextDueDate || a.next_due_date || '').localeCompare(b.nextDueDate || b.next_due_date || '');
               });
-              return _context25.a(3, 44);
-            case 37:
+              return _context25.a(3, 48);
+            case 41:
               ctNow = new Date();
               ctThisMonth = {
                 start: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getMonthStart(ctNow.getFullYear(), ctNow.getMonth() + 1),
@@ -33727,7 +33750,7 @@ var DashboardModule = /*#__PURE__*/function () {
                 start: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getMonthStart(ctLastDate.getFullYear(), ctLastDate.getMonth() + 1),
                 end: _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getMonthEnd(ctLastDate.getFullYear(), ctLastDate.getMonth() + 1)
               };
-              _context25.n = 38;
+              _context25.n = 42;
               return Promise.all([fetch(OC.generateUrl("/apps/budget/api/categories/spending?startDate=".concat(ctThisMonth.start, "&endDate=").concat(ctThisMonth.end)), {
                 headers: {
                   'requesttoken': OC.requestToken
@@ -33737,18 +33760,18 @@ var DashboardModule = /*#__PURE__*/function () {
                   'requesttoken': OC.requestToken
                 }
               })]);
-            case 38:
+            case 42:
               _yield$Promise$all5 = _context25.v;
               _yield$Promise$all6 = _slicedToArray(_yield$Promise$all5, 2);
               ctCurrentResp = _yield$Promise$all6[0];
               ctPrevResp = _yield$Promise$all6[1];
-              _context25.n = 39;
+              _context25.n = 43;
               return ctCurrentResp.json();
-            case 39:
+            case 43:
               ctCurrent = _context25.v;
-              _context25.n = 40;
+              _context25.n = 44;
               return ctPrevResp.json();
-            case 40:
+            case 44:
               ctPrev = _context25.v;
               // Build lookup for previous month
               prevMap = {};
@@ -33769,41 +33792,41 @@ var DashboardModule = /*#__PURE__*/function () {
               }).sort(function (a, b) {
                 return b.currentTotal - a.currentTotal;
               });
-              return _context25.a(3, 44);
-            case 41:
+              return _context25.a(3, 48);
+            case 45:
               svNow = new Date();
               svMonthStart = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.getMonthStart(svNow.getFullYear(), svNow.getMonth() + 1);
               svToday = _utils_formatters_js__WEBPACK_IMPORTED_MODULE_0__.formatDateForAPI(svNow);
               svDayOfMonth = svNow.getDate();
-              _context25.n = 42;
+              _context25.n = 46;
               return fetch(OC.generateUrl("/apps/budget/api/reports/summary?startDate=".concat(svMonthStart, "&endDate=").concat(svToday)), {
                 headers: {
                   'requesttoken': OC.requestToken
                 }
               });
-            case 42:
+            case 46:
               svResp = _context25.v;
-              _context25.n = 43;
+              _context25.n = 47;
               return svResp.json();
-            case 43:
+            case 47:
               svData = _context25.v;
               totalSpent = parseFloat(svData.totalExpenses || 0);
               this.widgetData.spendingVelocity = {
                 dailyRate: svDayOfMonth > 0 ? totalSpent / svDayOfMonth : 0
               };
-              return _context25.a(3, 44);
-            case 44:
+              return _context25.a(3, 48);
+            case 48:
               this.widgetDataLoaded[widgetKey] = true;
-              _context25.n = 46;
+              _context25.n = 50;
               break;
-            case 45:
-              _context25.p = 45;
-              _t22 = _context25.v;
-              console.error("Failed to load data for ".concat(widgetKey, ":"), _t22);
-            case 46:
+            case 49:
+              _context25.p = 49;
+              _t23 = _context25.v;
+              console.error("Failed to load data for ".concat(widgetKey, ":"), _t23);
+            case 50:
               return _context25.a(2);
           }
-        }, _callee25, this, [[1, 45]]);
+        }, _callee25, this, [[1, 49]]);
       }));
       function loadWidgetData(_x16) {
         return _loadWidgetData.apply(this, arguments);
@@ -33849,7 +33872,7 @@ var DashboardModule = /*#__PURE__*/function () {
     key: "toggleDashboardLock",
     value: function () {
       var _toggleDashboardLock = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee26() {
-        var _t23;
+        var _t24;
         return _regenerator().w(function (_context26) {
           while (1) switch (_context26.p = _context26.n) {
             case 0:
@@ -33872,8 +33895,8 @@ var DashboardModule = /*#__PURE__*/function () {
               break;
             case 3:
               _context26.p = 3;
-              _t23 = _context26.v;
-              console.error('Failed to save lock state:', _t23);
+              _t24 = _context26.v;
+              console.error('Failed to save lock state:', _t24);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_4__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translate)('budget', 'Failed to save dashboard lock state'));
             case 4:
               return _context26.a(2);
@@ -34179,7 +34202,7 @@ var DashboardModule = /*#__PURE__*/function () {
     key: "reorderDashboardWidget",
     value: function () {
       var _reorderDashboardWidget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee27(draggedId, targetId, position, category) {
-        var config, order, draggedIndex, targetIndex, settingKey, _t24;
+        var config, order, draggedIndex, targetIndex, settingKey, _t25;
         return _regenerator().w(function (_context27) {
           while (1) switch (_context27.p = _context27.n) {
             case 0:
@@ -34247,8 +34270,8 @@ var DashboardModule = /*#__PURE__*/function () {
               break;
             case 6:
               _context27.p = 6;
-              _t24 = _context27.v;
-              console.error('Failed to save widget order:', _t24);
+              _t25 = _context27.v;
+              console.error('Failed to save widget order:', _t25);
               (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_4__.showError)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_5__.translate)('budget', 'Failed to save widget order'));
             case 7:
               // Reorder DOM elements after config is saved
