@@ -4239,6 +4239,11 @@ style('budget', 'budget-main');
             </div>
 
             <div id="bank-sync-content" style="display: none;">
+                <div class="bank-sync-beta-notice">
+                    <span class="icon-info" aria-hidden="true"></span>
+                    <span><?php p($l->t('Bank Sync is in beta. If you encounter any issues, please')); ?> <a href="https://github.com/otherworld-dev/budget/issues" target="_blank" rel="noopener"><?php p($l->t('report them on GitHub')); ?></a>.</span>
+                </div>
+
                 <!-- Connections List -->
                 <div class="settings-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">

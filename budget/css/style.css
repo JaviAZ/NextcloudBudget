@@ -7499,6 +7499,34 @@ button.danger:hover {
     text-decoration: underline;
 }
 
+/* Bank Sync Beta Notice (user-facing) */
+.bank-sync-beta-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    background: var(--color-background-dark);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    color: var(--color-text-maxcontrast);
+}
+
+.bank-sync-beta-notice .icon-info {
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+.bank-sync-beta-notice a {
+    color: var(--color-primary-element);
+    text-decoration: none;
+}
+
+.bank-sync-beta-notice a:hover {
+    text-decoration: underline;
+}
+
 /* Number format preview */
 .setting-preview {
     margin-top: 16px;
