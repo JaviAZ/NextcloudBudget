@@ -1419,7 +1419,7 @@ export default class DashboardModule {
     }
 
     updateRecentImportsWidget() {
-        const container = document.getElementById('recent-imports-content');
+        const container = document.getElementById('recent-imports-list');
         if (!container) return;
 
         const data = this.widgetData.recentImports;

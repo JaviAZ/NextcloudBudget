@@ -31964,7 +31964,7 @@ var DashboardModule = /*#__PURE__*/function () {
     key: "updateRecentImportsWidget",
     value: function updateRecentImportsWidget() {
       var _this17 = this;
-      var container = document.getElementById('recent-imports-content');
+      var container = document.getElementById('recent-imports-list');
       if (!container) return;
       var data = this.widgetData.recentImports;
       if (!Array.isArray(data) || data.length === 0) {
