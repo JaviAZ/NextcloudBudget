@@ -8,15 +8,17 @@ msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: https://github.com/otherworld-dev/budget/issues\n"
 "POT-Creation-Date: 2026-04-11 09:45+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2026-04-27 06:09+0000\n"
+"Last-Translator: Shandy <mrshandy@yandex.ru>\n"
+"Language-Team: Russian <https://hosted.weblate.org/projects/nextcloud-budget/"
+"budget/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Weblate 5.17.1-dev\n"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:30
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:30
@@ -27,28 +29,28 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/templates/index.php:1819
 #: /var/www/html/apps-extra/budget/templates/index.php:1886
 msgid "Budget"
-msgstr ""
+msgstr "Бюджет"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:44
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:44
 msgid "Bill reminder: {bill}"
-msgstr ""
+msgstr "Напоминание о счёте: {bill}"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:55
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:55
 msgid "due today"
-msgstr ""
+msgstr "оплата сегодня"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:58
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:58
 msgid "due tomorrow"
-msgstr ""
+msgstr "оплата завтра"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:59
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:59
 #, php-format
 msgid "due in %s days"
-msgstr ""
+msgstr "оплата через %s дней"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:63
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:63
@@ -58,18 +60,18 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:95
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:95
 msgid "Overdue bill: {bill}"
-msgstr ""
+msgstr "Просроченный платёж: {bill}"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:107
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:107
 msgid "1 day overdue"
-msgstr ""
+msgstr "Просрочен на 1 день"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:108
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:108
 #, php-format
 msgid "%s days overdue"
-msgstr ""
+msgstr "Просрочен на %s дней"
 
 #: /var/www/html/apps-extra/budget/build/budget/lib/Notification/Notifier.php:111
 #: /var/www/html/apps-extra/budget/lib/Notification/Notifier.php:111
@@ -78,7 +80,7 @@ msgstr ""
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:61
 msgid "Failed to retrieve accounts"
-msgstr ""
+msgstr "Не удалось найти счета"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:74
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:427
@@ -96,27 +98,27 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/templates/index.php:4596
 #: /var/www/html/apps-extra/budget/templates/index.php:5138
 msgid "Account"
-msgstr ""
+msgstr "Счёт"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:90
 msgid "Invalid JSON data or empty request"
-msgstr ""
+msgstr "Неверные данные JSON или пустой запрос"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:102
 msgid "Account type is required and cannot be empty"
-msgstr ""
+msgstr "Тип счёта обязателен к заполнению и не может быть пустым"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:108
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:267
 #, php-format
 msgid "Invalid account type: %1$s"
-msgstr ""
+msgstr "Неверный тип счёта: %1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:115
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:276
 #, php-format
 msgid "Invalid currency: %1$s"
-msgstr ""
+msgstr "Неверная валюта: %1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:121
 #: /var/www/html/apps-extra/budget/templates/index.php:4716
@@ -125,35 +127,35 @@ msgstr ""
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:130
 msgid "Account holder name"
-msgstr ""
+msgstr "Имя держателя счёта"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:178
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:305
 #, php-format
 msgid "Invalid routing number: %1$s"
-msgstr ""
+msgstr "Неверный номер маршрута: %1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:186
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:318
 #, php-format
 msgid "Invalid sort code: %1$s"
-msgstr ""
+msgstr "Неверный код сортировки: %1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:194
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:331
 #, php-format
 msgid "Invalid IBAN: %1$s"
-msgstr ""
+msgstr "Неверный IBAN: %1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:202
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:344
 #, php-format
 msgid "Invalid SWIFT/BIC: %1$s"
-msgstr ""
+msgstr "Неверный SWIFT/BIC: %1$s"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:235
 msgid "Failed to create account"
-msgstr ""
+msgstr "Не удалось создать счёт"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:249
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:107
@@ -161,7 +163,7 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:606
 #: /var/www/html/apps-extra/budget/lib/Controller/RecurringIncomeController.php:301
 msgid "Invalid request data"
-msgstr ""
+msgstr "Неверные данные запроса"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:396
 #: /var/www/html/apps-extra/budget/lib/Controller/BillController.php:478
@@ -172,43 +174,43 @@ msgstr ""
 #: /var/www/html/apps-extra/budget/lib/Controller/TagSetController.php:354
 #: /var/www/html/apps-extra/budget/lib/Controller/TransactionController.php:302
 msgid "No valid fields to update"
-msgstr ""
+msgstr "Нет допустимых полей для обновления"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:406
 msgid "Failed to update account"
-msgstr ""
+msgstr "Не удалось обновить счёт"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:448
 msgid "This account has no sensitive banking data to reveal"
-msgstr ""
+msgstr "В этом счёте нет конфиденциальных банковских данных"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:474
 msgid "Failed to retrieve account summary"
-msgstr ""
+msgstr "Не удалось получить сводку по счёту"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AccountController.php:546
 msgid "Failed to reconcile account"
-msgstr ""
+msgstr "Не удалось согласовать счёт"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AlertController.php:46
 msgid "Failed to retrieve budget alerts"
-msgstr ""
+msgstr "Не удалось получить оповещения бюджета"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AlertController.php:59
 msgid "Failed to retrieve budget status"
-msgstr ""
+msgstr "Не удалось восстановить статус бюджета"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AlertController.php:72
 msgid "Failed to retrieve budget summary"
-msgstr ""
+msgstr "Не удалось получить сводку по бюджету"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:73
 msgid "Failed to retrieve assets"
-msgstr ""
+msgstr "Не удалось получить имущество"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:85
 msgid "Asset"
-msgstr ""
+msgstr "Имущество"
 
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:99
 #: /var/www/html/apps-extra/budget/lib/Controller/AssetController.php:190
