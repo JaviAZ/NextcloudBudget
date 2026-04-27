@@ -814,14 +814,7 @@ class BudgetApp {
             settings: { title: t('budget', 'Settings'), summary: t('budget', 'Configure currency, date format, number format, notifications, import preferences, security, and data migration.'), doc: 'settings' },
         };
 
-        fab.addEventListener('click', () => {
-            const isVisible = panel.style.display !== 'none';
-            if (isVisible) {
-                panel.style.display = 'none';
-                return;
-            }
-
-            // Determine current view from hash
+        const updateHelpContent = () => {
             const hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
             const topic = helpTopics[hash] || helpTopics.dashboard;
 
@@ -842,8 +835,23 @@ class BudgetApp {
                     </ul>
                 </div>
             `;
+        };
 
+        fab.addEventListener('click', () => {
+            const isVisible = panel.style.display !== 'none';
+            if (isVisible) {
+                panel.style.display = 'none';
+                return;
+            }
+            updateHelpContent();
             panel.style.display = 'flex';
+        });
+
+        // Update help content when navigating while panel is open
+        window.addEventListener('hashchange', () => {
+            if (panel.style.display !== 'none') {
+                updateHelpContent();
+            }
         });
 
         closeBtn?.addEventListener('click', () => {

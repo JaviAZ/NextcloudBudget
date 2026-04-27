@@ -56623,18 +56623,26 @@ var BudgetApp = /*#__PURE__*/function () {
           doc: 'settings'
         }
       };
+      var updateHelpContent = function updateHelpContent() {
+        var hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
+        var topic = helpTopics[hash] || helpTopics.dashboard;
+        content.innerHTML = "\n                <div class=\"help-topic\">\n                    <h4>".concat(topic.title, "</h4>\n                    <p>").concat(topic.summary, "</p>\n                    <a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/").concat(topic.doc, ".md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Read full guide'), " &rarr;</a>\n                </div>\n                <hr>\n                <div class=\"help-quick-links\">\n                    <h4>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Quick Links'), "</h4>\n                    <ul>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/getting-started.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Getting Started Guide'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/import.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Importing Bank Statements'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/budget.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Budget Tracking'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/rules.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Auto-Categorisation Rules'), "</a></li>\n                    </ul>\n                </div>\n            ");
+      };
       fab.addEventListener('click', function () {
         var isVisible = panel.style.display !== 'none';
         if (isVisible) {
           panel.style.display = 'none';
           return;
         }
-
-        // Determine current view from hash
-        var hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
-        var topic = helpTopics[hash] || helpTopics.dashboard;
-        content.innerHTML = "\n                <div class=\"help-topic\">\n                    <h4>".concat(topic.title, "</h4>\n                    <p>").concat(topic.summary, "</p>\n                    <a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/").concat(topic.doc, ".md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Read full guide'), " &rarr;</a>\n                </div>\n                <hr>\n                <div class=\"help-quick-links\">\n                    <h4>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Quick Links'), "</h4>\n                    <ul>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/getting-started.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Getting Started Guide'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/import.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Importing Bank Statements'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/budget.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Budget Tracking'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/rules.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Auto-Categorisation Rules'), "</a></li>\n                    </ul>\n                </div>\n            ");
+        updateHelpContent();
         panel.style.display = 'flex';
+      });
+
+      // Update help content when navigating while panel is open
+      window.addEventListener('hashchange', function () {
+        if (panel.style.display !== 'none') {
+          updateHelpContent();
+        }
       });
       closeBtn === null || closeBtn === void 0 || closeBtn.addEventListener('click', function () {
         panel.style.display = 'none';
