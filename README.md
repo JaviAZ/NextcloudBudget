@@ -8,11 +8,11 @@ A comprehensive financial management app for Nextcloud. Track spending habits, m
 
 ![Dashboard Screenshot](screenshots/dashboard.png)
 
-## What's New in v2.14
+## What's New in v2.15
 
-- **External Bank Sync (Beta)** - Connect bank accounts via GoCardless (UK/Europe) or SimpleFIN (US) for automatic transaction imports with daily background sync
-- **Per-Month Budget Adjustments** - Budget values can now differ between months. Click "Adjust budgets from this month" to create a new baseline while preserving previous months' values
-- **11 Dashboard Tiles Fixed** - Large Transactions, Weekly Spending, Category Trends, Bills Due Soon, Income Tracking, and more now render correctly
+- **Accounts Tile Customisation** - Unlock dashboard to reorder and hide accounts on the Accounts tile via a new config panel
+- **Projected Balance** - Account detail shows both current and projected balance when scheduled transactions exist
+- **Bills Calendar History** - Paid bills remain visible in the calendar with strikethrough styling for a complete annual overview
 
 See the [full changelog](budget/CHANGELOG.md) for details.
 
