@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
-"PO-Revision-Date: 2026-04-27 06:09+0000\n"
+"PO-Revision-Date: 2026-04-28 18:09+0000\n"
 "Last-Translator: SGiersch <Stephan@sgiersch.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
@@ -695,19 +695,19 @@ msgstr "Ausgabe-Trends konnten nicht abgerufen werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ForecastController.php:126
 msgid "Failed to run forecast scenarios"
-msgstr ""
+msgstr "Prognoseszenarien konnten nicht ausgeführt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ForecastController.php:149
 msgid "Failed to generate enhanced forecast"
-msgstr ""
+msgstr "Erweiterte Prognose konnte nicht erstellt werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ForecastController.php:165
 msgid "Failed to retrieve live forecast"
-msgstr ""
+msgstr "Aktuelle Prognose konnte nicht abgerufen werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ForecastController.php:183
 msgid "Failed to export forecast"
-msgstr ""
+msgstr "Prognose konnte nicht exportiert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:70
 msgid "Failed to retrieve goals"
@@ -3590,7 +3590,7 @@ msgstr "Überfällig"
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:237
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2256
 msgid "Due Soon"
-msgstr ""
+msgstr "Bald fällig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:107
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:108
@@ -3633,7 +3633,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:144
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4894
 msgid "Split across categories"
-msgstr ""
+msgstr "Auf mehrere Kategorien verteilen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:145
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:278
@@ -3657,7 +3657,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:147
 msgid "Remaining payments"
-msgstr ""
+msgstr "Verbleibende Zahlungen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:147
 msgid "{count} left"
@@ -3670,7 +3670,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:153
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:284
 msgid "Mark as paid"
-msgstr ""
+msgstr "Als bezahlt markieren"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:155
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:286
@@ -3700,7 +3700,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:470
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2208
 msgid "Add Bill"
-msgstr ""
+msgstr "Rechnung hinzufügen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:547
 msgid "Due Day (1-7)"
@@ -3715,7 +3715,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:555
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4855
 msgid "Due Day"
-msgstr ""
+msgstr "Fälligkeitstag"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:552
 msgid "Day of the selected months when bill is due"
@@ -3724,14 +3724,14 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:556
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4857
 msgid "Day of the month when bill is due"
-msgstr ""
+msgstr "Tag im Monat, an dem die Rechnung fällig ist"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:575
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:390
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4910
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5274
 msgid "No specific account"
-msgstr ""
+msgstr "Kein Konto ausgewählt"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:636
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5558
@@ -3829,7 +3829,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:1059
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2204
 msgid "Detect Bills"
-msgstr ""
+msgstr "Rechnungen erkennen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/bills/BillsModule.js:1080
 #: /tmp/budget-v2.11.0/budget/src/modules/income/IncomeModule.js:670
@@ -6911,13 +6911,13 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:84
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2221
 msgid "Due This Month"
-msgstr ""
+msgstr "Dieser Monat fällig"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:93
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2239
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2407
 msgid "Monthly Total"
-msgstr ""
+msgstr "Monatssumme"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:102
 msgid "Completed This Month"
@@ -7022,12 +7022,12 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:479
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4963
 msgid "Transaction Date"
-msgstr ""
+msgstr "Buchungsdatum"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:481
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4965
 msgid "Leave empty to use next due date"
-msgstr ""
+msgstr "Leer lassen, um das nächste Fälligkeitsdatum zu verwenden"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:488
 msgid "Enable auto-pay (automatically create transactions when due)"
@@ -8013,12 +8013,12 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2248
 msgid "Paid This Month"
-msgstr ""
+msgstr "Dieser Monat bezahlt"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2255
 #: /tmp/budget-v2.11.0/budget/templates/index.php:3128
 msgid "All Bills"
-msgstr ""
+msgstr "Alle Rechnungen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2270
 msgid "No bills yet"
@@ -9591,11 +9591,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4811
 msgid "Name of the vendor or recurring bill"
-msgstr ""
+msgstr "Name des Anbieters oder der wiederkehrenden Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4817
 msgid "Expected bill amount"
-msgstr ""
+msgstr "Erwarteter Rechnungsbetrag"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4830
 msgid "Custom"
@@ -9603,7 +9603,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4832
 msgid "How often this bill is due"
-msgstr ""
+msgstr "Turnus der Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4836
 msgid "Select Months"
@@ -9628,11 +9628,13 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4885
 msgid "Categorize this bill (optional)"
-msgstr ""
+msgstr "Diese Rechnung kategorisieren (optional)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4896
 msgid "Define how this bill should be split across categories when paid"
 msgstr ""
+"Legen Sie fest, wie diese Rechnung bei Zahlung auf Kategorien aufgeteilt "
+"werden soll"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4902
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5571
@@ -9641,16 +9643,16 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4908
 msgid "Pay From Account"
-msgstr ""
+msgstr "Zahlung vom Konto"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4912
 msgid "Account used to pay this bill (optional)"
-msgstr ""
+msgstr "Verwendetes Konto für diese Rechnung (optional)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4916
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5280
 msgid "Auto-detect Pattern"
-msgstr ""
+msgstr "Muster automatisch erkennen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4917
 msgid "e.g., NETFLIX, SPOTIFY"
@@ -9659,25 +9661,25 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4918
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5282
 msgid "Pattern to match in transaction descriptions for auto-linking"
-msgstr ""
+msgstr "Suchmuster in Transaktionsbeschreibungen zur automatischen Zuordnung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4923
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5287
 msgid "Additional notes..."
-msgstr ""
+msgstr "Zusätzliche Notizen …"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4924
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5288
 msgid "Any additional notes (optional)"
-msgstr ""
+msgstr "Weitere Notizen (optional)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4928
 msgid "End Date"
-msgstr ""
+msgstr "Endtermin"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4930
 msgid "Bill will automatically stop after this date (optional)"
-msgstr ""
+msgstr "Die Rechnung endet nach diesem Datum automatisch (optional)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4934
 msgid "Remaining Payments"
@@ -9690,14 +9692,16 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4936
 msgid "Number of payments left before bill auto-deactivates (optional)"
 msgstr ""
+"Anzahl der verbleibenden Zahlungen, bevor die Rechnung automatisch "
+"deaktiviert wird (optional)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4940
 msgid "Reminder"
-msgstr ""
+msgstr "Erinnerung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4942
 msgid "No reminder"
-msgstr ""
+msgstr "Keine Erinnerung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4943
 msgid "On due date"
@@ -9729,24 +9733,26 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4951
 msgid "Receive a notification before bill is due"
-msgstr ""
+msgstr "Erhalten Sie eine Benachrichtigung, bevor die Rechnung fällig ist"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4957
 msgid "Create future transaction for this bill"
-msgstr ""
+msgstr "Erstelle zukünftige Transaktionen für diese Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4959
 msgid "Automatically creates a transaction on the bill's due date"
-msgstr ""
+msgstr "Erstellt automatisch eine Transaktion am Fälligkeitstag der Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4971
 msgid "Auto-pay when due"
-msgstr ""
+msgstr "Automatische Zahlung bei Fälligkeit"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4973
 msgid ""
 "Automatically mark this bill as paid when due date arrives (requires account)"
 msgstr ""
+"Diese Rechnung bei Fälligkeit automatisch als bezahlt markieren (Konto "
+"erforderlich)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4978
 msgid "Auto-pay failed!"
