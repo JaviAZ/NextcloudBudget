@@ -18,8 +18,10 @@ class Version001000051Date20260418 extends SimpleMigrationStep {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 
-        if (!$schema->hasTable('budget_bank_account_mappings')) {
-            $table = $schema->createTable('budget_bank_account_mappings');
+        // Use short name to avoid table/index name length issues on MariaDB
+        // Migration 055 handles renaming for users who already ran this with the old name
+        if (!$schema->hasTable('budget_bam') && !$schema->hasTable('budget_bank_account_mappings')) {
+            $table = $schema->createTable('budget_bam');
 
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
@@ -80,9 +82,9 @@ class Version001000051Date20260418 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['connection_id'], 'budget_bam_conn_idx');
-            $table->addIndex(['budget_account_id'], 'budget_bam_acct_idx');
-            $table->addUniqueIndex(['connection_id', 'external_account_id'], 'budget_bam_conn_ext_idx');
+            $table->addIndex(['connection_id'], 'bam_conn_idx');
+            $table->addIndex(['budget_account_id'], 'bam_acct_idx');
+            $table->addUniqueIndex(['connection_id', 'external_account_id'], 'bam_conn_ext_idx');
         }
 
         return $schema;

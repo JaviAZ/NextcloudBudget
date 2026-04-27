@@ -18,8 +18,10 @@ class Version001000050Date20260418 extends SimpleMigrationStep {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 
-        if (!$schema->hasTable('budget_bank_connections')) {
-            $table = $schema->createTable('budget_bank_connections');
+        // Use short name to avoid index name length issues on MariaDB
+        // Migration 056 handles renaming for users who already ran this with the old name
+        if (!$schema->hasTable('budget_bc') && !$schema->hasTable('budget_bank_connections')) {
+            $table = $schema->createTable('budget_bc');
 
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
@@ -69,8 +71,8 @@ class Version001000050Date20260418 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['user_id'], 'budget_bc_user_idx');
-            $table->addIndex(['user_id', 'provider'], 'budget_bc_user_prov_idx');
+            $table->addIndex(['user_id'], 'bc_user_idx');
+            $table->addIndex(['user_id', 'provider'], 'bc_user_prov_idx');
         }
 
         return $schema;

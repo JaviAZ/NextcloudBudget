@@ -19,8 +19,10 @@ class Version001000053Date20260421 extends SimpleMigrationStep {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 
-        if (!$schema->hasTable('budget_budget_snapshots')) {
-            $table = $schema->createTable('budget_budget_snapshots');
+        // Use short name to avoid index name length issues on MariaDB
+        // Migration 054 handles renaming for users who already ran this with the old name
+        if (!$schema->hasTable('budget_bgt_snapshots') && !$schema->hasTable('budget_budget_snapshots')) {
+            $table = $schema->createTable('budget_bgt_snapshots');
 
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
@@ -62,9 +64,9 @@ class Version001000053Date20260421 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['user_id', 'effective_from'], 'budget_snap_user_eff');
-            $table->addIndex(['category_id', 'effective_from'], 'budget_snap_cat_eff');
-            $table->addUniqueIndex(['user_id', 'category_id', 'effective_from'], 'budget_snap_unique');
+            $table->addIndex(['user_id', 'effective_from'], 'bgt_snap_user_eff');
+            $table->addIndex(['category_id', 'effective_from'], 'bgt_snap_cat_eff');
+            $table->addUniqueIndex(['user_id', 'category_id', 'effective_from'], 'bgt_snap_unique');
         }
 
         return $schema;

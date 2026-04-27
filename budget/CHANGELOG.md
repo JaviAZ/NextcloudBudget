@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.1] - 2026-04-27
+
+### Fixed
+- **Upgrade fails from pre-2.14 versions** ([#165](https://github.com/otherworld-dev/budget/issues/165)): Migrations 050, 051, and 053 used table/index names that exceeded database limits. Previously, fix migrations (054-056) would correct these, but users upgrading multiple versions at once would hit the broken migration before the fix could run. Now the original migrations create short table names directly, while fix migrations still handle renaming for users who already ran the old versions.
+
 ## [2.15.0] - 2026-04-27
 
 ### Added
