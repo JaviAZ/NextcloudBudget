@@ -16,6 +16,21 @@ A comprehensive financial management app for Nextcloud. Track spending habits, m
 
 See the [full changelog](budget/CHANGELOG.md) for details.
 
+## Documentation
+
+Full user documentation is available in the [docs/](docs/index.md) directory:
+
+- **[Quick Start Guide](docs/getting-started.md)** — Set up in 10 minutes
+- **[Full Documentation Index](docs/index.md)** — All 23 features documented
+
+Popular topics:
+- [Importing bank statements](docs/import.md)
+- [Setting up auto-categorization rules](docs/rules.md)
+- [Budget tracking](docs/budget.md)
+- [Dashboard customization](docs/dashboard.md)
+- [Bills & recurring payments](docs/bills.md)
+- [Settings reference](docs/settings.md)
+
 ## Features
 
 ### Dashboard & Visualization
@@ -199,6 +214,8 @@ budget/
 ```
 
 ## Usage
+
+> See the [full documentation](docs/index.md) for detailed guides on every feature.
 
 ### Getting Started
 
