@@ -527,6 +527,9 @@ class BudgetApp {
         // Dashboard customization
         this.setupDashboardCustomization();
 
+        // Help panel
+        this.setupHelpPanel();
+
         // Window resize handler for responsive dashboard layout
         let resizeTimeout;
         window.addEventListener('resize', () => {
@@ -777,6 +780,75 @@ class BudgetApp {
 
     async saveDashboardVisibility() {
         return this.dashboardModule.saveDashboardVisibility();
+    }
+
+    setupHelpPanel() {
+        const fab = document.getElementById('help-fab');
+        const panel = document.getElementById('help-panel');
+        const closeBtn = document.getElementById('help-panel-close');
+        const content = document.getElementById('help-panel-content');
+        if (!fab || !panel) return;
+
+        const helpTopics = {
+            dashboard: { title: t('budget', 'Dashboard'), summary: t('budget', 'Your financial overview with customizable tiles. Unlock the dashboard to rearrange, add, or remove tiles. Click the gear icon on the Accounts tile to reorder or hide accounts.'), doc: 'dashboard' },
+            accounts: { title: t('budget', 'Accounts'), summary: t('budget', 'Manage bank accounts, credit cards, cash, and crypto across 45+ currencies. Click an account to see its transaction history and balance details.'), doc: 'accounts' },
+            transactions: { title: t('budget', 'Transactions'), summary: t('budget', 'Add, edit, filter, and bulk-manage transactions. Use the Filters button for advanced search. Split transactions across categories.'), doc: 'transactions' },
+            categories: { title: t('budget', 'Categories'), summary: t('budget', 'Organise transactions with a hierarchical category tree. Drag to reorder. Click a category to see spending analytics.'), doc: 'categories' },
+            tags: { title: t('budget', 'Tags'), summary: t('budget', 'Create tag sets per category for multi-dimensional tracking (e.g. store, project, payment method).'), doc: 'tags' },
+            budget: { title: t('budget', 'Budget'), summary: t('budget', 'Set spending limits per category. Switch between weekly, monthly, quarterly, and yearly periods. Use "Adjust budgets from this month" to set different values for future months.'), doc: 'budget' },
+            income: { title: t('budget', 'Income'), summary: t('budget', 'Track recurring income sources. Use "Detect Income" to auto-find patterns. Mark income as received to create transactions.'), doc: 'income' },
+            bills: { title: t('budget', 'Bills'), summary: t('budget', 'Track recurring payments with auto-pay, custom frequencies, and notifications. View the bills calendar in Reports.'), doc: 'bills' },
+            transfers: { title: t('budget', 'Transfers'), summary: t('budget', 'Set up recurring or one-time transfers between your accounts with auto-pay support.'), doc: 'transfers' },
+            'savings-goals': { title: t('budget', 'Savings Goals'), summary: t('budget', 'Set financial targets and track progress. Link goals to tags for automatic amount calculation.'), doc: 'savings-goals' },
+            'debt-payoff': { title: t('budget', 'Debt Payoff'), summary: t('budget', 'Plan debt repayment using avalanche (highest interest first) or snowball (smallest balance first) strategies.'), doc: 'debt-payoff' },
+            pensions: { title: t('budget', 'Pensions'), summary: t('budget', 'Track retirement accounts with contributions and growth projections.'), doc: 'pensions' },
+            assets: { title: t('budget', 'Assets'), summary: t('budget', 'Track non-liquid assets like property, vehicles, and collectibles with value snapshots over time.'), doc: 'assets' },
+            'shared-expenses': { title: t('budget', 'Shared Expenses'), summary: t('budget', 'Split expenses with contacts and track who owes whom. Record settlements to clear debts.'), doc: 'shared-expenses' },
+            forecast: { title: t('budget', 'Forecast'), summary: t('budget', 'Predict future account balances using historical spending patterns and scenario modeling.'), doc: 'forecast' },
+            reports: { title: t('budget', 'Reports'), summary: t('budget', 'Six report types: budget analysis, spending by category, income vs expenses, year-over-year, bills calendar, and net worth history.'), doc: 'reports' },
+            import: { title: t('budget', 'Import'), summary: t('budget', 'Import bank statements from CSV, OFX, or QIF files. Auto-detects delimiters and supports European number formats.'), doc: 'import' },
+            rules: { title: t('budget', 'Rules'), summary: t('budget', 'Auto-categorise transactions with pattern-based rules. Build complex criteria with AND/OR/NOT logic and preview matches.'), doc: 'rules' },
+            'exchange-rates': { title: t('budget', 'Exchange Rates'), summary: t('budget', 'View and manage currency exchange rates. ECB rates for fiat, CoinGecko for crypto. Add manual overrides.'), doc: 'exchange-rates' },
+            sharing: { title: t('budget', 'Sharing'), summary: t('budget', 'Share your budget data with other Nextcloud users for household or team financial management.'), doc: 'sharing' },
+            'bank-sync': { title: t('budget', 'Bank Sync'), summary: t('budget', 'Connect external bank accounts for automatic transaction imports via GoCardless (UK/EU) or SimpleFIN (US). Beta feature.'), doc: 'bank-sync' },
+            settings: { title: t('budget', 'Settings'), summary: t('budget', 'Configure currency, date format, number format, notifications, import preferences, security, and data migration.'), doc: 'settings' },
+        };
+
+        fab.addEventListener('click', () => {
+            const isVisible = panel.style.display !== 'none';
+            if (isVisible) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            // Determine current view from hash
+            const hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
+            const topic = helpTopics[hash] || helpTopics.dashboard;
+
+            content.innerHTML = `
+                <div class="help-topic">
+                    <h4>${topic.title}</h4>
+                    <p>${topic.summary}</p>
+                    <a href="https://github.com/otherworld-dev/budget/blob/master/docs/${topic.doc}.md" target="_blank" rel="noopener">${t('budget', 'Read full guide')} &rarr;</a>
+                </div>
+                <hr>
+                <div class="help-quick-links">
+                    <h4>${t('budget', 'Quick Links')}</h4>
+                    <ul>
+                        <li><a href="https://github.com/otherworld-dev/budget/blob/master/docs/getting-started.md" target="_blank" rel="noopener">${t('budget', 'Getting Started Guide')}</a></li>
+                        <li><a href="https://github.com/otherworld-dev/budget/blob/master/docs/import.md" target="_blank" rel="noopener">${t('budget', 'Importing Bank Statements')}</a></li>
+                        <li><a href="https://github.com/otherworld-dev/budget/blob/master/docs/budget.md" target="_blank" rel="noopener">${t('budget', 'Budget Tracking')}</a></li>
+                        <li><a href="https://github.com/otherworld-dev/budget/blob/master/docs/rules.md" target="_blank" rel="noopener">${t('budget', 'Auto-Categorisation Rules')}</a></li>
+                    </ul>
+                </div>
+            `;
+
+            panel.style.display = 'flex';
+        });
+
+        closeBtn?.addEventListener('click', () => {
+            panel.style.display = 'none';
+        });
     }
 
     setupDashboardCustomization() {

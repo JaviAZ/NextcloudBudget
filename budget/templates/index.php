@@ -262,6 +262,16 @@ style('budget', 'budget-main');
                     <?php p($l->t('Settings')); ?>
                 </a>
             </li>
+            <li class="app-navigation-entry" data-id="help">
+                <a href="https://github.com/otherworld-dev/budget/tree/master/docs#readme" target="_blank" rel="noopener" class="nav-icon-help svg">
+                    <span class="app-navigation-entry-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15.07,11.25L14.17,12.17C13.45,12.89 13,13.5 13,15H11V14.5C11,13.5 11.45,12.58 12.17,11.83L13.41,10.59C13.78,10.22 14,9.71 14,9.14C14,7.96 13.1,7 12,7C10.9,7 10,7.96 10,9.14H8C8,6.84 9.79,5 12,5C14.21,5 16,6.84 16,9.14C16,9.97 15.64,10.71 15.07,11.25M13,19H11V17H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                        </svg>
+                    </span>
+                    <?php p($l->t('Help & Docs')); ?>
+                </a>
+            </li>
             <li class="app-navigation-entry" data-id="lock" id="lock-app-btn" style="display: none;">
                 <a href="#" class="nav-icon-lock svg">
                     <span class="app-navigation-entry-icon">
@@ -6059,6 +6069,22 @@ style('budget', 'budget-main');
             <button type="button" class="primary" id="bank-sync-connect-btn"><?php p($l->t('Connect')); ?></button>
             <button type="button" class="secondary cancel-btn"><?php p($l->t('Cancel')); ?></button>
         </div>
+    </div>
+</div>
+
+<!-- Help Panel -->
+<button id="help-fab" class="help-fab" title="<?php p($l->t('Help')); ?>" aria-label="<?php p($l->t('Help')); ?>">?</button>
+<div id="help-panel" class="help-panel" style="display: none;">
+    <div class="help-panel-header">
+        <h3><?php p($l->t('Help')); ?></h3>
+        <button id="help-panel-close" class="help-panel-close">&times;</button>
+    </div>
+    <div id="help-panel-content" class="help-panel-content">
+        <!-- Populated dynamically based on current view -->
+    </div>
+    <div class="help-panel-footer">
+        <a href="https://github.com/otherworld-dev/budget/tree/master/docs#readme" target="_blank" rel="noopener"><?php p($l->t('Full Documentation')); ?> &rarr;</a>
+        <a href="https://github.com/otherworld-dev/budget/issues" target="_blank" rel="noopener"><?php p($l->t('Report an Issue')); ?></a>
     </div>
 </div>
 </div>

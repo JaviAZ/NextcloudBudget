@@ -56131,6 +56131,9 @@ var BudgetApp = /*#__PURE__*/function () {
       // Dashboard customization
       this.setupDashboardCustomization();
 
+      // Help panel
+      this.setupHelpPanel();
+
       // Window resize handler for responsive dashboard layout
       var resizeTimeout;
       window.addEventListener('resize', function () {
@@ -56500,6 +56503,143 @@ var BudgetApp = /*#__PURE__*/function () {
       }
       return saveDashboardVisibility;
     }()
+  }, {
+    key: "setupHelpPanel",
+    value: function setupHelpPanel() {
+      var fab = document.getElementById('help-fab');
+      var panel = document.getElementById('help-panel');
+      var closeBtn = document.getElementById('help-panel-close');
+      var content = document.getElementById('help-panel-content');
+      if (!fab || !panel) return;
+      var helpTopics = {
+        dashboard: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Dashboard'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Your financial overview with customizable tiles. Unlock the dashboard to rearrange, add, or remove tiles. Click the gear icon on the Accounts tile to reorder or hide accounts.'),
+          doc: 'dashboard'
+        },
+        accounts: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Accounts'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Manage bank accounts, credit cards, cash, and crypto across 45+ currencies. Click an account to see its transaction history and balance details.'),
+          doc: 'accounts'
+        },
+        transactions: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Transactions'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Add, edit, filter, and bulk-manage transactions. Use the Filters button for advanced search. Split transactions across categories.'),
+          doc: 'transactions'
+        },
+        categories: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Categories'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Organise transactions with a hierarchical category tree. Drag to reorder. Click a category to see spending analytics.'),
+          doc: 'categories'
+        },
+        tags: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Tags'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Create tag sets per category for multi-dimensional tracking (e.g. store, project, payment method).'),
+          doc: 'tags'
+        },
+        budget: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Budget'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Set spending limits per category. Switch between weekly, monthly, quarterly, and yearly periods. Use "Adjust budgets from this month" to set different values for future months.'),
+          doc: 'budget'
+        },
+        income: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Income'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Track recurring income sources. Use "Detect Income" to auto-find patterns. Mark income as received to create transactions.'),
+          doc: 'income'
+        },
+        bills: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Bills'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Track recurring payments with auto-pay, custom frequencies, and notifications. View the bills calendar in Reports.'),
+          doc: 'bills'
+        },
+        transfers: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Transfers'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Set up recurring or one-time transfers between your accounts with auto-pay support.'),
+          doc: 'transfers'
+        },
+        'savings-goals': {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Savings Goals'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Set financial targets and track progress. Link goals to tags for automatic amount calculation.'),
+          doc: 'savings-goals'
+        },
+        'debt-payoff': {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Debt Payoff'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Plan debt repayment using avalanche (highest interest first) or snowball (smallest balance first) strategies.'),
+          doc: 'debt-payoff'
+        },
+        pensions: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Pensions'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Track retirement accounts with contributions and growth projections.'),
+          doc: 'pensions'
+        },
+        assets: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Assets'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Track non-liquid assets like property, vehicles, and collectibles with value snapshots over time.'),
+          doc: 'assets'
+        },
+        'shared-expenses': {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Shared Expenses'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Split expenses with contacts and track who owes whom. Record settlements to clear debts.'),
+          doc: 'shared-expenses'
+        },
+        forecast: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Forecast'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Predict future account balances using historical spending patterns and scenario modeling.'),
+          doc: 'forecast'
+        },
+        reports: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Reports'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Six report types: budget analysis, spending by category, income vs expenses, year-over-year, bills calendar, and net worth history.'),
+          doc: 'reports'
+        },
+        "import": {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Import'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Import bank statements from CSV, OFX, or QIF files. Auto-detects delimiters and supports European number formats.'),
+          doc: 'import'
+        },
+        rules: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Rules'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Auto-categorise transactions with pattern-based rules. Build complex criteria with AND/OR/NOT logic and preview matches.'),
+          doc: 'rules'
+        },
+        'exchange-rates': {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Exchange Rates'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'View and manage currency exchange rates. ECB rates for fiat, CoinGecko for crypto. Add manual overrides.'),
+          doc: 'exchange-rates'
+        },
+        sharing: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Sharing'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Share your budget data with other Nextcloud users for household or team financial management.'),
+          doc: 'sharing'
+        },
+        'bank-sync': {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Bank Sync'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Connect external bank accounts for automatic transaction imports via GoCardless (UK/EU) or SimpleFIN (US). Beta feature.'),
+          doc: 'bank-sync'
+        },
+        settings: {
+          title: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Settings'),
+          summary: (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Configure currency, date format, number format, notifications, import preferences, security, and data migration.'),
+          doc: 'settings'
+        }
+      };
+      fab.addEventListener('click', function () {
+        var isVisible = panel.style.display !== 'none';
+        if (isVisible) {
+          panel.style.display = 'none';
+          return;
+        }
+
+        // Determine current view from hash
+        var hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
+        var topic = helpTopics[hash] || helpTopics.dashboard;
+        content.innerHTML = "\n                <div class=\"help-topic\">\n                    <h4>".concat(topic.title, "</h4>\n                    <p>").concat(topic.summary, "</p>\n                    <a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/").concat(topic.doc, ".md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Read full guide'), " &rarr;</a>\n                </div>\n                <hr>\n                <div class=\"help-quick-links\">\n                    <h4>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Quick Links'), "</h4>\n                    <ul>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/getting-started.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Getting Started Guide'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/import.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Importing Bank Statements'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/budget.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Budget Tracking'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/rules.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Auto-Categorisation Rules'), "</a></li>\n                    </ul>\n                </div>\n            ");
+        panel.style.display = 'flex';
+      });
+      closeBtn === null || closeBtn === void 0 || closeBtn.addEventListener('click', function () {
+        panel.style.display = 'none';
+      });
+    }
   }, {
     key: "setupDashboardCustomization",
     value: function setupDashboardCustomization() {
