@@ -20662,6 +20662,11 @@ var Router = /*#__PURE__*/function () {
         view.classList.add('active');
         this.app.currentView = viewName;
 
+        // Update help panel if open
+        if (typeof this.app._updateHelpContent === 'function') {
+          this.app._updateHelpContent();
+        }
+
         // Load view-specific data
         switch (viewName) {
           case 'dashboard':
@@ -56506,6 +56511,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "setupHelpPanel",
     value: function setupHelpPanel() {
+      var _this4 = this;
       var fab = document.getElementById('help-fab');
       var panel = document.getElementById('help-panel');
       var closeBtn = document.getElementById('help-panel-close');
@@ -56624,8 +56630,8 @@ var BudgetApp = /*#__PURE__*/function () {
         }
       };
       var updateHelpContent = function updateHelpContent() {
-        var hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
-        var topic = helpTopics[hash] || helpTopics.dashboard;
+        var view = _this4.currentView || 'dashboard';
+        var topic = helpTopics[view] || helpTopics.dashboard;
         content.innerHTML = "\n                <div class=\"help-topic\">\n                    <h4>".concat(topic.title, "</h4>\n                    <p>").concat(topic.summary, "</p>\n                    <a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/").concat(topic.doc, ".md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Read full guide'), " &rarr;</a>\n                </div>\n                <hr>\n                <div class=\"help-quick-links\">\n                    <h4>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Quick Links'), "</h4>\n                    <ul>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/getting-started.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Getting Started Guide'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/import.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Importing Bank Statements'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/budget.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Budget Tracking'), "</a></li>\n                        <li><a href=\"https://github.com/otherworld-dev/budget/blob/master/docs/rules.md\" target=\"_blank\" rel=\"noopener\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Auto-Categorisation Rules'), "</a></li>\n                    </ul>\n                </div>\n            ");
       };
       fab.addEventListener('click', function () {
@@ -56638,12 +56644,12 @@ var BudgetApp = /*#__PURE__*/function () {
         panel.style.display = 'flex';
       });
 
-      // Update help content when navigating while panel is open
-      window.addEventListener('hashchange', function () {
+      // Store update function so Router can call it on navigation
+      this._updateHelpContent = function () {
         if (panel.style.display !== 'none') {
           updateHelpContent();
         }
-      });
+      };
       closeBtn === null || closeBtn === void 0 || closeBtn.addEventListener('click', function () {
         panel.style.display = 'none';
       });
@@ -57002,7 +57008,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "renderEnhancedTransactionsTable",
     value: function renderEnhancedTransactionsTable() {
-      var _this4 = this;
+      var _this5 = this;
       var tbody = document.querySelector('#transactions-table tbody');
       if (!tbody || !this.transactions) return;
 
@@ -57032,32 +57038,32 @@ var BudgetApp = /*#__PURE__*/function () {
         }
       }
       tbody.innerHTML = this.transactions.map(function (transaction) {
-        var _this4$accounts, _this4$categories, _this4$accounts2, _this4$sharedTransact, _this4$transactionsMo;
-        var account = (_this4$accounts = _this4.accounts) === null || _this4$accounts === void 0 ? void 0 : _this4$accounts.find(function (a) {
+        var _this5$accounts, _this5$categories, _this5$accounts2, _this5$sharedTransact, _this5$transactionsMo;
+        var account = (_this5$accounts = _this5.accounts) === null || _this5$accounts === void 0 ? void 0 : _this5$accounts.find(function (a) {
           return a.id === transaction.accountId;
         });
-        var category = (_this4$categories = _this4.categories) === null || _this4$categories === void 0 ? void 0 : _this4$categories.find(function (c) {
+        var category = (_this5$categories = _this5.categories) === null || _this5$categories === void 0 ? void 0 : _this5$categories.find(function (c) {
           return c.id === transaction.categoryId;
         });
-        var currency = transaction.accountCurrency || (account === null || account === void 0 ? void 0 : account.currency) || _this4.getPrimaryCurrency();
+        var currency = transaction.accountCurrency || (account === null || account === void 0 ? void 0 : account.currency) || _this5.getPrimaryCurrency();
         var typeClass = transaction.type === 'credit' ? 'positive' : 'negative';
-        var formattedAmount = _this4.formatCurrency(transaction.amount, currency);
+        var formattedAmount = _this5.formatCurrency(transaction.amount, currency);
         var isLinked = transaction.linkedTransactionId != null;
-        var linkedAccountName = transaction.linkedAccountName || ((_this4$accounts2 = _this4.accounts) === null || _this4$accounts2 === void 0 || (_this4$accounts2 = _this4$accounts2.find(function (a) {
+        var linkedAccountName = transaction.linkedAccountName || ((_this5$accounts2 = _this5.accounts) === null || _this5$accounts2 === void 0 || (_this5$accounts2 = _this5$accounts2.find(function (a) {
           return a.id === transaction.linkedAccountId;
-        })) === null || _this4$accounts2 === void 0 ? void 0 : _this4$accounts2.name) || '';
+        })) === null || _this5$accounts2 === void 0 ? void 0 : _this5$accounts2.name) || '';
         var linkedDirection = transaction.type === 'debit' ? '→' : '←';
-        var linkedLabel = linkedAccountName ? "".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Transfer'), " ").concat(linkedDirection, " ").concat(_this4.escapeHtml(linkedAccountName)) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Transfer');
+        var linkedLabel = linkedAccountName ? "".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Transfer'), " ").concat(linkedDirection, " ").concat(_this5.escapeHtml(linkedAccountName)) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Transfer');
         var linkedTitle = linkedAccountName ? (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Click to view linked transaction in {account}', {
-          account: _this4.escapeHtml(linkedAccountName)
+          account: _this5.escapeHtml(linkedAccountName)
         }) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Linked transfer');
         var linkedBadge = isLinked ? "<span class=\"linked-indicator\" data-transaction-id=\"".concat(transaction.id, "\" data-linked-id=\"").concat(transaction.linkedTransactionId, "\" data-linked-account-id=\"").concat(transaction.linkedAccountId || '', "\" title=\"").concat(linkedTitle, "\">&#x1F517; ").concat(linkedLabel, "</span>") : '';
         var isSplit = transaction.isSplit || transaction.is_split;
         var splitBadge = isSplit ? "<span class=\"split-indicator\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Split transaction'), "\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Split'), "</span>") : '';
-        var sharedStatus = (_this4$sharedTransact = _this4.sharedTransactionStatuses) === null || _this4$sharedTransact === void 0 ? void 0 : _this4$sharedTransact[transaction.id];
+        var sharedStatus = (_this5$sharedTransact = _this5.sharedTransactionStatuses) === null || _this5$sharedTransact === void 0 ? void 0 : _this5$sharedTransact[transaction.id];
         var sharedBadge = sharedStatus === 'shared' ? "<span class=\"shared-indicator\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Shared expense - unsettled'), "\">&#x1F91D; ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Shared'), "</span>") : sharedStatus === 'settled' ? "<span class=\"shared-settled-indicator\" title=\"".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Shared expense - settled'), "\">&#x2705; ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Settled'), "</span>") : '';
         var matchOption = !isLinked ? "<option value=\"match\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Match Transfer'), "</option>") : "<option value=\"unlink\">".concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Unlink Transfer'), "</option>");
-        return "\n                <tr class=\"transaction-row ".concat(isLinked ? 'is-linked' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"select-column\">\n                        <input type=\"checkbox\" class=\"transaction-checkbox\"\n                               data-transaction-id=\"").concat(transaction.id, "\"\n                               ").concat((_this4$transactionsMo = _this4.transactionsModule.selectedTransactions) !== null && _this4$transactionsMo !== void 0 && _this4$transactionsMo.has(transaction.id) ? 'checked' : '', ">\n                    </td>\n                    <td class=\"date-column editable-cell\"\n                        data-field=\"date\"\n                        data-value=\"").concat(transaction.date, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this4.formatDate(transaction.date), "</span>\n                    </td>\n                    <td class=\"description-column editable-cell\"\n                        data-field=\"description\"\n                        data-value=\"").concat(_this4.escapeHtml(transaction.description), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <div class=\"transaction-description\">\n                            <span class=\"primary-text cell-display\">").concat(_this4.escapeHtml(transaction.description) || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'No description'), "</span>\n                            ").concat(transaction.reference ? "<span class=\"secondary-text\">".concat(_this4.escapeHtml(transaction.reference), "</span>") : '', "\n                            ").concat(linkedBadge || splitBadge || sharedBadge ? "<div class=\"transaction-badges\">".concat(linkedBadge).concat(splitBadge).concat(sharedBadge, "</div>") : '', "\n                        </div>\n                    </td>\n                    <td class=\"vendor-column editable-cell\"\n                        data-field=\"vendor\"\n                        data-value=\"").concat(_this4.escapeHtml(transaction.vendor || ''), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this4.escapeHtml(transaction.vendor) || '-', "</span>\n                    </td>\n                    <td class=\"category-column editable-cell\"\n                        data-field=\"categoryId\"\n                        data-value=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"category-badge cell-display ").concat(category ? 'categorized' : 'uncategorized', "\">\n                            ").concat(category ? _this4.escapeHtml(category.name) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Uncategorized'), "\n                        </span>\n                    </td>\n                    <td class=\"tags-column editable-cell\"\n                        data-field=\"tags\"\n                        data-value=\"").concat(_this4.getTransactionTagIds(transaction.id).join(','), "\"\n                        data-category-id=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">\n                            ").concat(_this4.renderTransactionTags(transaction.id), "\n                        </span>\n                    </td>\n                    <td class=\"amount-column editable-cell\"\n                        data-field=\"amount\"\n                        data-value=\"").concat(transaction.amount, "\"\n                        data-type=\"").concat(transaction.type, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"amount cell-display ").concat(typeClass, "\">").concat(formattedAmount, "</span>\n                    </td>\n                    <td class=\"balance-column\">\n                        ").concat(balanceMap !== null && balanceMap[transaction.id] !== undefined ? "<span class=\"transaction-balance ".concat(balanceMap[transaction.id] >= 0 ? 'positive' : 'negative', "\">").concat(_this4.formatCurrency(balanceMap[transaction.id], currency), "</span>") : '', "\n                    </td>\n                    <td class=\"account-column editable-cell\"\n                        data-field=\"accountId\"\n                        data-value=\"").concat(transaction.accountId, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"account-name cell-display\">").concat(account ? _this4.escapeHtml(account.name) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Unknown Account'), "</span>\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"action-btn more-actions-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'More actions'), "\">\n                                <span aria-hidden=\"true\">&#x22EE;</span>\n                            </button>\n                            <button class=\"action-btn edit-btn transaction-edit-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Edit transaction'), "\">\n                                <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                            </button>\n                            <button class=\"action-btn delete-btn transaction-delete-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Delete transaction'), "\">\n                                <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                            </button>\n                        </div>\n                    </td>\n                </tr>\n            ");
+        return "\n                <tr class=\"transaction-row ".concat(isLinked ? 'is-linked' : '', "\" data-transaction-id=\"").concat(transaction.id, "\">\n                    <td class=\"select-column\">\n                        <input type=\"checkbox\" class=\"transaction-checkbox\"\n                               data-transaction-id=\"").concat(transaction.id, "\"\n                               ").concat((_this5$transactionsMo = _this5.transactionsModule.selectedTransactions) !== null && _this5$transactionsMo !== void 0 && _this5$transactionsMo.has(transaction.id) ? 'checked' : '', ">\n                    </td>\n                    <td class=\"date-column editable-cell\"\n                        data-field=\"date\"\n                        data-value=\"").concat(transaction.date, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this5.formatDate(transaction.date), "</span>\n                    </td>\n                    <td class=\"description-column editable-cell\"\n                        data-field=\"description\"\n                        data-value=\"").concat(_this5.escapeHtml(transaction.description), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <div class=\"transaction-description\">\n                            <span class=\"primary-text cell-display\">").concat(_this5.escapeHtml(transaction.description) || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'No description'), "</span>\n                            ").concat(transaction.reference ? "<span class=\"secondary-text\">".concat(_this5.escapeHtml(transaction.reference), "</span>") : '', "\n                            ").concat(linkedBadge || splitBadge || sharedBadge ? "<div class=\"transaction-badges\">".concat(linkedBadge).concat(splitBadge).concat(sharedBadge, "</div>") : '', "\n                        </div>\n                    </td>\n                    <td class=\"vendor-column editable-cell\"\n                        data-field=\"vendor\"\n                        data-value=\"").concat(_this5.escapeHtml(transaction.vendor || ''), "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">").concat(_this5.escapeHtml(transaction.vendor) || '-', "</span>\n                    </td>\n                    <td class=\"category-column editable-cell\"\n                        data-field=\"categoryId\"\n                        data-value=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"category-badge cell-display ").concat(category ? 'categorized' : 'uncategorized', "\">\n                            ").concat(category ? _this5.escapeHtml(category.name) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Uncategorized'), "\n                        </span>\n                    </td>\n                    <td class=\"tags-column editable-cell\"\n                        data-field=\"tags\"\n                        data-value=\"").concat(_this5.getTransactionTagIds(transaction.id).join(','), "\"\n                        data-category-id=\"").concat(transaction.categoryId || '', "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"cell-display\">\n                            ").concat(_this5.renderTransactionTags(transaction.id), "\n                        </span>\n                    </td>\n                    <td class=\"amount-column editable-cell\"\n                        data-field=\"amount\"\n                        data-value=\"").concat(transaction.amount, "\"\n                        data-type=\"").concat(transaction.type, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"amount cell-display ").concat(typeClass, "\">").concat(formattedAmount, "</span>\n                    </td>\n                    <td class=\"balance-column\">\n                        ").concat(balanceMap !== null && balanceMap[transaction.id] !== undefined ? "<span class=\"transaction-balance ".concat(balanceMap[transaction.id] >= 0 ? 'positive' : 'negative', "\">").concat(_this5.formatCurrency(balanceMap[transaction.id], currency), "</span>") : '', "\n                    </td>\n                    <td class=\"account-column editable-cell\"\n                        data-field=\"accountId\"\n                        data-value=\"").concat(transaction.accountId, "\"\n                        data-transaction-id=\"").concat(transaction.id, "\">\n                        <span class=\"account-name cell-display\">").concat(account ? _this5.escapeHtml(account.name) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Unknown Account'), "</span>\n                    </td>\n                    <td class=\"actions-column\">\n                        <div class=\"transaction-actions\">\n                            <button class=\"action-btn more-actions-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'More actions'), "\">\n                                <span aria-hidden=\"true\">&#x22EE;</span>\n                            </button>\n                            <button class=\"action-btn edit-btn transaction-edit-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Edit transaction'), "\">\n                                <span class=\"icon-rename\" aria-hidden=\"true\"></span>\n                            </button>\n                            <button class=\"action-btn delete-btn transaction-delete-btn\"\n                                    data-transaction-id=\"").concat(transaction.id, "\"\n                                    title=\"").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Delete transaction'), "\">\n                                <span class=\"icon-delete\" aria-hidden=\"true\"></span>\n                            </button>\n                        </div>\n                    </td>\n                </tr>\n            ");
       }).join('');
     }
 
@@ -57067,7 +57073,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "renderTransactionTags",
     value: function renderTransactionTags(transactionId) {
-      var _this5 = this;
+      var _this6 = this;
       // Ensure transactionTags is initialized
       if (!this.transactionTags) {
         this.transactionTags = {};
@@ -57077,7 +57083,7 @@ var BudgetApp = /*#__PURE__*/function () {
         return '<span style="color: var(--color-text-maxcontrast); font-size: 11px;">-</span>';
       }
       return tags.map(function (tag) {
-        return "\n            <span class=\"tag-chip\"\n                  style=\"display: inline-block; background-color: ".concat(_this5.escapeHtml(tag.color), "; color: white;\n                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin: 0 2px 2px 0;\n                         vertical-align: middle;\"\n                  title=\"").concat(_this5.escapeHtml(tag.name), "\">\n                ").concat(_this5.escapeHtml(tag.name), "\n            </span>\n        ");
+        return "\n            <span class=\"tag-chip\"\n                  style=\"display: inline-block; background-color: ".concat(_this6.escapeHtml(tag.color), "; color: white;\n                         padding: 2px 6px; border-radius: 10px; font-size: 10px; line-height: 14px; margin: 0 2px 2px 0;\n                         vertical-align: middle;\"\n                  title=\"").concat(_this6.escapeHtml(tag.name), "\">\n                ").concat(_this6.escapeHtml(tag.name), "\n            </span>\n        ");
       }).join('');
     }
 
@@ -57245,7 +57251,7 @@ var BudgetApp = /*#__PURE__*/function () {
      */
     function addSplitRow(container) {
       var _this$transactions3,
-        _this6 = this;
+        _this7 = this;
       var split = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var modal = document.getElementById('split-modal');
@@ -57270,12 +57276,12 @@ var BudgetApp = /*#__PURE__*/function () {
       }
       amountInput.addEventListener('input', function () {
         amountInput.dataset.userEdited = 'true';
-        _this6.autoFillSplitRemaining(amountInput);
+        _this7.autoFillSplitRemaining(amountInput);
       });
       row.querySelector('.split-remove-btn').addEventListener('click', function (e) {
         if (!e.currentTarget.classList.contains('disabled')) {
           row.remove();
-          _this6.updateSplitRemaining();
+          _this7.updateSplitRemaining();
         }
       });
       container.appendChild(row);
@@ -57503,7 +57509,7 @@ var BudgetApp = /*#__PURE__*/function () {
     key: "applyClientSideFilters",
     value: function applyClientSideFilters() {
       var _this$currentSort,
-        _this7 = this;
+        _this8 = this;
       if (!this.transactions || !this.transactionFilters) return;
       var filtered = _toConsumableArray(this.transactions);
 
@@ -57512,22 +57518,22 @@ var BudgetApp = /*#__PURE__*/function () {
       // Apply sorting
       if ((_this$currentSort = this.currentSort) !== null && _this$currentSort !== void 0 && _this$currentSort.field) {
         filtered.sort(function (a, b) {
-          var aVal = a[_this7.currentSort.field];
-          var bVal = b[_this7.currentSort.field];
+          var aVal = a[_this8.currentSort.field];
+          var bVal = b[_this8.currentSort.field];
 
           // Handle date sorting
-          if (_this7.currentSort.field === 'date') {
+          if (_this8.currentSort.field === 'date') {
             aVal = new Date(aVal);
             bVal = new Date(bVal);
           }
 
           // Handle amount sorting
-          if (_this7.currentSort.field === 'amount') {
+          if (_this8.currentSort.field === 'amount') {
             aVal = parseFloat(aVal);
             bVal = parseFloat(bVal);
           }
-          if (aVal < bVal) return _this7.currentSort.direction === 'asc' ? -1 : 1;
-          if (aVal > bVal) return _this7.currentSort.direction === 'asc' ? 1 : -1;
+          if (aVal < bVal) return _this8.currentSort.direction === 'asc' ? -1 : 1;
+          if (aVal > bVal) return _this8.currentSort.direction === 'asc' ? 1 : -1;
           return 0;
         });
       }
@@ -57536,7 +57542,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "updateTransactionsSummary",
     value: function updateTransactionsSummary(result) {
-      var _this8 = this;
+      var _this9 = this;
       var countElement = document.getElementById('transactions-count');
       var totalElement = document.getElementById('transactions-total');
       if (countElement && this.transactions) {
@@ -57556,7 +57562,7 @@ var BudgetApp = /*#__PURE__*/function () {
         // Determine most common currency from displayed transactions
         var currencyCounts = {};
         this.transactions.forEach(function (tx) {
-          var currency = tx.accountCurrency || _this8.getPrimaryCurrency();
+          var currency = tx.accountCurrency || _this9.getPrimaryCurrency();
           currencyCounts[currency] = (currencyCounts[currency] || 0) + 1;
         });
         var mostCommonCurrency = ((_Object$entries$sort$ = Object.entries(currencyCounts).sort(function (a, b) {
@@ -57720,13 +57726,13 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "setupSettingsEventListeners",
     value: function setupSettingsEventListeners() {
-      var _this9 = this;
+      var _this0 = this;
       // Save buttons (both top and bottom)
       var saveButtons = [document.getElementById('save-settings-btn'), document.getElementById('save-settings-btn-bottom')];
       saveButtons.forEach(function (btn) {
         if (btn) {
           btn.addEventListener('click', function () {
-            return _this9.saveSettings();
+            return _this0.saveSettings();
           });
         }
       });
@@ -57736,7 +57742,7 @@ var BudgetApp = /*#__PURE__*/function () {
       resetButtons.forEach(function (btn) {
         if (btn) {
           btn.addEventListener('click', function () {
-            return _this9.resetSettings();
+            return _this0.resetSettings();
           });
         }
       });
@@ -57747,7 +57753,7 @@ var BudgetApp = /*#__PURE__*/function () {
         var element = document.getElementById(id);
         if (element) {
           element.addEventListener('change', function () {
-            return _this9.updateNumberFormatPreview();
+            return _this0.updateNumberFormatPreview();
           });
         }
       });
@@ -57767,7 +57773,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "setupPasswordProtectionEventListeners",
     value: function setupPasswordProtectionEventListeners() {
-      var _this0 = this;
+      var _this1 = this;
       var passwordToggle = document.getElementById('setting-password-protection-enabled');
       var setupPasswordBtn = document.getElementById('setup-password-btn');
       var changePasswordBtn = document.getElementById('change-password-btn');
@@ -57782,7 +57788,7 @@ var BudgetApp = /*#__PURE__*/function () {
                   // Show password setup UI
                   if (passwordConfig) {
                     passwordConfig.style.display = 'block';
-                    _this0.updatePasswordButtons(false);
+                    _this1.updatePasswordButtons(false);
                   }
                 } else {
                   // Hide password config
@@ -57798,17 +57804,17 @@ var BudgetApp = /*#__PURE__*/function () {
       }
       if (setupPasswordBtn) {
         setupPasswordBtn.addEventListener('click', function () {
-          return _this0.showSetupPasswordModal();
+          return _this1.showSetupPasswordModal();
         });
       }
       if (changePasswordBtn) {
         changePasswordBtn.addEventListener('click', function () {
-          return _this0.showChangePasswordModal();
+          return _this1.showChangePasswordModal();
         });
       }
       if (disablePasswordBtn) {
         disablePasswordBtn.addEventListener('click', function () {
-          return _this0.showDisablePasswordModal();
+          return _this1.showDisablePasswordModal();
         });
       }
     }
@@ -57825,7 +57831,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "showSetupPasswordModal",
     value: function showSetupPasswordModal() {
-      var _this1 = this;
+      var _this10 = this;
       var modal = document.createElement('div');
       modal.id = 'setup-password-modal';
       modal.className = 'budget-modal-overlay';
@@ -57858,7 +57864,7 @@ var BudgetApp = /*#__PURE__*/function () {
                   method: 'POST',
                   headers: _objectSpread({
                     'Content-Type': 'application/json'
-                  }, _this1.getAuthHeaders()),
+                  }, _this10.getAuthHeaders()),
                   body: JSON.stringify({
                     password: newPassword
                   })
@@ -57871,13 +57877,13 @@ var BudgetApp = /*#__PURE__*/function () {
                 result = _context36.v;
                 if (response.ok && result.success) {
                   // Store session token
-                  _this1.sessionToken = result.sessionToken;
+                  _this10.sessionToken = result.sessionToken;
                   localStorage.setItem('budget_session_token', result.sessionToken);
                   (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_7__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Password protection enabled'));
                   modal.remove();
 
                   // Update UI
-                  _this1.updatePasswordButtons(true);
+                  _this10.updatePasswordButtons(true);
                 } else {
                   errorDiv.textContent = result.error || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Failed to set password');
                   errorDiv.style.display = 'block';
@@ -57914,7 +57920,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "showChangePasswordModal",
     value: function showChangePasswordModal() {
-      var _this10 = this;
+      var _this11 = this;
       var modal = document.createElement('div');
       modal.id = 'change-password-modal';
       modal.className = 'budget-modal-overlay';
@@ -57949,7 +57955,7 @@ var BudgetApp = /*#__PURE__*/function () {
                   method: 'PUT',
                   headers: _objectSpread({
                     'Content-Type': 'application/json'
-                  }, _this10.getAuthHeaders()),
+                  }, _this11.getAuthHeaders()),
                   body: JSON.stringify({
                     currentPassword: currentPassword,
                     newPassword: newPassword
@@ -58000,7 +58006,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "showDisablePasswordModal",
     value: function showDisablePasswordModal() {
-      var _this11 = this;
+      var _this12 = this;
       var modal = document.createElement('div');
       modal.id = 'disable-password-modal';
       modal.className = 'budget-modal-overlay';
@@ -58023,7 +58029,7 @@ var BudgetApp = /*#__PURE__*/function () {
                   method: 'DELETE',
                   headers: _objectSpread({
                     'Content-Type': 'application/json'
-                  }, _this11.getAuthHeaders()),
+                  }, _this12.getAuthHeaders()),
                   body: JSON.stringify({
                     password: password
                   })
@@ -58078,7 +58084,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "setupRecalculateBalancesListener",
     value: function setupRecalculateBalancesListener() {
-      var _this12 = this;
+      var _this13 = this;
       var btn = document.getElementById('recalculate-balances-btn');
       if (!btn) return;
       btn.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee39() {
@@ -58115,7 +58121,7 @@ var BudgetApp = /*#__PURE__*/function () {
                   updated: data.updated,
                   total: data.total
                 }));
-                _this12.loadAccounts();
+                _this13.loadAccounts();
               } else {
                 (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_7__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'All account balances are correct'));
               }
@@ -58142,7 +58148,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "setupFactoryResetEventListeners",
     value: function setupFactoryResetEventListeners() {
-      var _this13 = this;
+      var _this14 = this;
       var factoryResetBtn = document.getElementById('factory-reset-btn');
       var factoryResetModal = document.getElementById('factory-reset-modal');
       var factoryResetInput = document.getElementById('factory-reset-confirm-input');
@@ -58152,7 +58158,7 @@ var BudgetApp = /*#__PURE__*/function () {
       // Open modal
       if (factoryResetBtn) {
         factoryResetBtn.addEventListener('click', function () {
-          _this13.openFactoryResetModal();
+          _this14.openFactoryResetModal();
         });
       }
 
@@ -58167,14 +58173,14 @@ var BudgetApp = /*#__PURE__*/function () {
       // Confirm button
       if (factoryResetConfirmBtn) {
         factoryResetConfirmBtn.addEventListener('click', function () {
-          _this13.executeFactoryReset();
+          _this14.executeFactoryReset();
         });
       }
 
       // Close modal buttons
       modalCloseButtons.forEach(function (btn) {
         btn.addEventListener('click', function () {
-          _this13.closeFactoryResetModal();
+          _this14.closeFactoryResetModal();
         });
       });
 
@@ -58182,7 +58188,7 @@ var BudgetApp = /*#__PURE__*/function () {
       if (factoryResetModal) {
         factoryResetModal.addEventListener('click', function (e) {
           if (e.target === factoryResetModal) {
-            _this13.closeFactoryResetModal();
+            _this14.closeFactoryResetModal();
           }
         });
       }
@@ -58288,12 +58294,12 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "setupMigrationEventListeners",
     value: function setupMigrationEventListeners() {
-      var _this14 = this;
+      var _this15 = this;
       // Export button
       var exportBtn = document.getElementById('migration-export-btn');
       if (exportBtn) {
         exportBtn.addEventListener('click', function () {
-          return _this14.handleMigrationExport();
+          return _this15.handleMigrationExport();
         });
       }
 
@@ -58314,7 +58320,7 @@ var BudgetApp = /*#__PURE__*/function () {
           dropzone.classList.remove('dragover');
           var files = e.dataTransfer.files;
           if (files.length > 0) {
-            _this14.handleMigrationFileSelect(files[0]);
+            _this15.handleMigrationFileSelect(files[0]);
           }
         });
       }
@@ -58327,7 +58333,7 @@ var BudgetApp = /*#__PURE__*/function () {
         fileInput.addEventListener('change', function (e) {
           var file = e.target.files[0];
           if (file) {
-            _this14.handleMigrationFileSelect(file);
+            _this15.handleMigrationFileSelect(file);
           }
         });
       }
@@ -58338,17 +58344,17 @@ var BudgetApp = /*#__PURE__*/function () {
       var doneBtn = document.getElementById('migration-done-btn');
       if (cancelBtn) {
         cancelBtn.addEventListener('click', function () {
-          return _this14.cancelMigrationImport();
+          return _this15.cancelMigrationImport();
         });
       }
       if (confirmBtn) {
         confirmBtn.addEventListener('click', function () {
-          return _this14.confirmMigrationImport();
+          return _this15.confirmMigrationImport();
         });
       }
       if (doneBtn) {
         doneBtn.addEventListener('click', function () {
-          return _this14.resetMigrationUI();
+          return _this15.resetMigrationUI();
         });
       }
     }
@@ -59057,7 +59063,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "renderDebtList",
     value: function renderDebtList(debts) {
-      var _this15 = this;
+      var _this16 = this;
       var container = document.getElementById('debt-list');
       if (!container) return;
       if (!Array.isArray(debts) || debts.length === 0) {
@@ -59069,23 +59075,23 @@ var BudgetApp = /*#__PURE__*/function () {
         var balance = Math.abs(parseFloat(debt.balance) || 0);
         var rate = parseFloat(debt.interestRate) || 0;
         var minPayment = parseFloat(debt.minimumPayment) || 0;
-        return "\n                <div class=\"debt-item\" data-id=\"".concat(debt.id, "\">\n                    <div class=\"debt-item-header\">\n                        <div class=\"debt-item-name\">").concat(_this15.escapeHtml(debt.name), "</div>\n                        <div class=\"debt-item-type\">").concat(_this15.formatAccountType(debt.type), "</div>\n                    </div>\n                    <div class=\"debt-item-details\">\n                        <div class=\"debt-detail\">\n                            <span class=\"detail-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Balance'), "</span>\n                            <span class=\"detail-value debt-balance\">").concat(_this15.formatCurrency(balance, currency), "</span>\n                        </div>\n                        <div class=\"debt-detail\">\n                            <span class=\"detail-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Interest Rate'), "</span>\n                            <span class=\"detail-value\">").concat(rate > 0 ? rate.toFixed(1) + '%' : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'N/A'), "</span>\n                        </div>\n                        <div class=\"debt-detail\">\n                            <span class=\"detail-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Min Payment'), "</span>\n                            <span class=\"detail-value\">").concat(minPayment > 0 ? _this15.formatCurrency(minPayment, currency) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Not set'), "</span>\n                        </div>\n                    </div>\n                </div>\n            ");
+        return "\n                <div class=\"debt-item\" data-id=\"".concat(debt.id, "\">\n                    <div class=\"debt-item-header\">\n                        <div class=\"debt-item-name\">").concat(_this16.escapeHtml(debt.name), "</div>\n                        <div class=\"debt-item-type\">").concat(_this16.formatAccountType(debt.type), "</div>\n                    </div>\n                    <div class=\"debt-item-details\">\n                        <div class=\"debt-detail\">\n                            <span class=\"detail-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Balance'), "</span>\n                            <span class=\"detail-value debt-balance\">").concat(_this16.formatCurrency(balance, currency), "</span>\n                        </div>\n                        <div class=\"debt-detail\">\n                            <span class=\"detail-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Interest Rate'), "</span>\n                            <span class=\"detail-value\">").concat(rate > 0 ? rate.toFixed(1) + '%' : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'N/A'), "</span>\n                        </div>\n                        <div class=\"debt-detail\">\n                            <span class=\"detail-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Min Payment'), "</span>\n                            <span class=\"detail-value\">").concat(minPayment > 0 ? _this16.formatCurrency(minPayment, currency) : (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Not set'), "</span>\n                        </div>\n                    </div>\n                </div>\n            ");
       }).join('');
     }
   }, {
     key: "setupDebtPayoffControls",
     value: function setupDebtPayoffControls() {
-      var _this16 = this;
+      var _this17 = this;
       var calculateBtn = document.getElementById('calculate-payoff-btn');
       var compareBtn = document.getElementById('compare-strategies-btn');
       if (calculateBtn) {
         calculateBtn.onclick = function () {
-          return _this16.calculatePayoffPlan();
+          return _this17.calculatePayoffPlan();
         };
       }
       if (compareBtn) {
         compareBtn.onclick = function () {
-          return _this16.compareStrategies();
+          return _this17.compareStrategies();
         };
       }
     }
@@ -59144,7 +59150,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "displayPayoffPlan",
     value: function displayPayoffPlan(plan) {
-      var _this17 = this;
+      var _this18 = this;
       var resultsEl = document.getElementById('debt-payoff-results');
       if (!resultsEl) return;
       resultsEl.style.display = '';
@@ -59181,9 +59187,9 @@ var BudgetApp = /*#__PURE__*/function () {
       var orderEl = document.getElementById('debt-payoff-order');
       if (orderEl && plan.debts) {
         orderEl.innerHTML = plan.debts.map(function (debt, index) {
-          return "\n                <div class=\"payoff-order-item\">\n                    <span class=\"payoff-order-number\">".concat(index + 1, "</span>\n                    <div class=\"payoff-order-details\">\n                        <div class=\"payoff-order-name\">").concat(_this17.escapeHtml(debt.name), "</div>\n                        <div class=\"payoff-order-meta\">\n                            <span>").concat(_this17.formatCurrency(debt.originalBalance, currency), "</span>\n                            <span class=\"meta-separator\">\u2022</span>\n                            <span>").concat(debt.interestRate, "% ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'APR'), "</span>\n                            <span class=\"meta-separator\">\u2022</span>\n                            <span>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Paid off month {month}', {
+          return "\n                <div class=\"payoff-order-item\">\n                    <span class=\"payoff-order-number\">".concat(index + 1, "</span>\n                    <div class=\"payoff-order-details\">\n                        <div class=\"payoff-order-name\">").concat(_this18.escapeHtml(debt.name), "</div>\n                        <div class=\"payoff-order-meta\">\n                            <span>").concat(_this18.formatCurrency(debt.originalBalance, currency), "</span>\n                            <span class=\"meta-separator\">\u2022</span>\n                            <span>").concat(debt.interestRate, "% ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'APR'), "</span>\n                            <span class=\"meta-separator\">\u2022</span>\n                            <span>").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Paid off month {month}', {
             month: debt.payoffMonth
-          }), "</span>\n                        </div>\n                    </div>\n                    <div class=\"payoff-order-interest\">\n                        <span class=\"interest-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Interest'), "</span>\n                        <span class=\"interest-value\">").concat(_this17.formatCurrency(debt.interestPaid, currency), "</span>\n                    </div>\n                </div>\n            ");
+          }), "</span>\n                        </div>\n                    </div>\n                    <div class=\"payoff-order-interest\">\n                        <span class=\"interest-label\">").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Interest'), "</span>\n                        <span class=\"interest-value\">").concat(_this18.formatCurrency(debt.interestPaid, currency), "</span>\n                    </div>\n                </div>\n            ");
         }).join('');
       }
     }
@@ -59390,7 +59396,7 @@ var BudgetApp = /*#__PURE__*/function () {
       var _showMatchingModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee65(transactionId) {
         var _this$transactions4,
           _this$accounts,
-          _this18 = this;
+          _this19 = this;
         var transaction, modal, sourceDetails, loadingEl, emptyEl, listEl, account, currency, typeClass, result, _t17;
         return _regenerator().w(function (_context65) {
           while (1) switch (_context65.p = _context65.n) {
@@ -59441,13 +59447,13 @@ var BudgetApp = /*#__PURE__*/function () {
             case 4:
               // Render matches
               listEl.innerHTML = result.matches.map(function (match) {
-                var _this18$accounts;
-                var matchAccount = (_this18$accounts = _this18.accounts) === null || _this18$accounts === void 0 ? void 0 : _this18$accounts.find(function (a) {
+                var _this19$accounts;
+                var matchAccount = (_this19$accounts = _this19.accounts) === null || _this19$accounts === void 0 ? void 0 : _this19$accounts.find(function (a) {
                   return a.id === match.accountId;
                 });
-                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this18.getPrimaryCurrency();
+                var matchCurrency = match.accountCurrency || (matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.currency) || _this19.getPrimaryCurrency();
                 var matchTypeClass = match.type === 'credit' ? 'positive' : 'negative';
-                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this18.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this18.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this18.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Unknown'), "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Link as Transfer'), "\n                        </button>\n                    </div>\n                ");
+                return "\n                    <div class=\"match-item\" data-match-id=\"".concat(match.id, "\">\n                        <span class=\"match-date\">").concat(_this19.formatDate(match.date), "</span>\n                        <span class=\"match-description\">").concat(_this19.escapeHtml(match.description), "</span>\n                        <span class=\"match-amount ").concat(matchTypeClass, "\">").concat(_this19.formatCurrency(match.amount, matchCurrency), "</span>\n                        <span class=\"match-account\">").concat((matchAccount === null || matchAccount === void 0 ? void 0 : matchAccount.name) || (0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Unknown'), "</span>\n                        <button class=\"link-match-btn\" data-source-id=\"").concat(transactionId, "\" data-target-id=\"").concat(match.id, "\">\n                            ").concat((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_1__.translate)('budget', 'Link as Transfer'), "\n                        </button>\n                    </div>\n                ");
               }).join('');
               _context65.n = 6;
               break;
@@ -59601,7 +59607,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "applyPendingHighlight",
     value: function applyPendingHighlight() {
-      var _this19 = this;
+      var _this20 = this;
       if (!this.pendingHighlightTransactionId) return;
       var targetId = this.pendingHighlightTransactionId;
       this.pendingHighlightTransactionId = null;
@@ -59610,7 +59616,7 @@ var BudgetApp = /*#__PURE__*/function () {
       requestAnimationFrame(function () {
         var row = document.querySelector(".transaction-row[data-transaction-id=\"".concat(targetId, "\"]"));
         if (row) {
-          _this19.highlightTransactionRow(row);
+          _this20.highlightTransactionRow(row);
         }
       });
     }
@@ -59661,7 +59667,7 @@ var BudgetApp = /*#__PURE__*/function () {
       var _showSplitModal = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee69(transactionId) {
         var _this$transactions5,
           _this$accounts2,
-          _this20 = this;
+          _this21 = this;
         var transaction, modal, isSplit, titleEl, transactionInfoEl, splitsContainer, account, currency, splits, unsplitBtn, _t20;
         return _regenerator().w(function (_context69) {
           while (1) switch (_context69.p = _context69.n) {
@@ -59714,7 +59720,7 @@ var BudgetApp = /*#__PURE__*/function () {
             case 4:
               splits = _context69.v;
               splits.forEach(function (split, index) {
-                _this20.addSplitRow(splitsContainer, split, index === 0);
+                _this21.addSplitRow(splitsContainer, split, index === 0);
               });
               _context69.n = 6;
               break;
@@ -59738,7 +59744,7 @@ var BudgetApp = /*#__PURE__*/function () {
               if (unsplitBtn) {
                 unsplitBtn.style.display = isSplit ? '' : 'none';
                 unsplitBtn.onclick = function () {
-                  return _this20.unsplitTransaction();
+                  return _this21.unsplitTransaction();
                 };
               }
               this.updateSplitRemaining();
@@ -59756,7 +59762,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "getCategoryOptions",
     value: function getCategoryOptions() {
-      var _this21 = this;
+      var _this22 = this;
       var selectedId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var transactionType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       if (!this.categories) return '';
@@ -59767,7 +59773,7 @@ var BudgetApp = /*#__PURE__*/function () {
       return this.categories.filter(function (c) {
         return c.type === categoryType;
       }).map(function (c) {
-        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this21.escapeHtml(c.name), "</option>");
+        return "<option value=\"".concat(c.id, "\" ").concat(c.id === selectedId ? 'selected' : '', ">").concat(_this22.escapeHtml(c.name), "</option>");
       }).join('');
     }
 
@@ -60544,7 +60550,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "applyColumnVisibility",
     value: function applyColumnVisibility() {
-      var _this22 = this;
+      var _this23 = this;
       var table = document.getElementById('transactions-table');
       if (!table) return;
       var columnMap = {
@@ -60565,7 +60571,7 @@ var BudgetApp = /*#__PURE__*/function () {
 
         // Balance column auto-hides when data isn't available
         var isVisible = visible;
-        if (key === 'balance' && (_this22.balanceBeforePage === null || _this22.balanceBeforePage === undefined)) {
+        if (key === 'balance' && (_this23.balanceBeforePage === null || _this23.balanceBeforePage === undefined)) {
           isVisible = false;
         }
 
@@ -60919,12 +60925,12 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "flattenCategories",
     value: function flattenCategories(categories) {
-      var _this23 = this;
+      var _this24 = this;
       var result = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       categories.forEach(function (cat) {
         result.push(cat);
         if (cat.children && cat.children.length > 0) {
-          _this23.flattenCategories(cat.children, result);
+          _this24.flattenCategories(cat.children, result);
         }
       });
       return result;
@@ -60932,7 +60938,7 @@ var BudgetApp = /*#__PURE__*/function () {
   }, {
     key: "populateCurrencyDropdowns",
     value: function populateCurrencyDropdowns() {
-      var _this24 = this;
+      var _this25 = this;
       // Populate all currency dropdowns with options from backend
       if (!this.options.currencies || !Array.isArray(this.options.currencies)) {
         return;
@@ -60946,7 +60952,7 @@ var BudgetApp = /*#__PURE__*/function () {
         select.innerHTML = '';
 
         // Add all currency options
-        _this24.options.currencies.forEach(function (currency) {
+        _this25.options.currencies.forEach(function (currency) {
           var option = document.createElement('option');
           option.value = currency.code;
           option.textContent = "".concat(currency.code, " - ").concat(currency.name, " (").concat(currency.symbol, ")");

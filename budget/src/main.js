@@ -815,8 +815,8 @@ class BudgetApp {
         };
 
         const updateHelpContent = () => {
-            const hash = (window.location.hash || '#/dashboard').replace('#/', '').replace('#', '') || 'dashboard';
-            const topic = helpTopics[hash] || helpTopics.dashboard;
+            const view = this.currentView || 'dashboard';
+            const topic = helpTopics[view] || helpTopics.dashboard;
 
             content.innerHTML = `
                 <div class="help-topic">
@@ -847,12 +847,12 @@ class BudgetApp {
             panel.style.display = 'flex';
         });
 
-        // Update help content when navigating while panel is open
-        window.addEventListener('hashchange', () => {
+        // Store update function so Router can call it on navigation
+        this._updateHelpContent = () => {
             if (panel.style.display !== 'none') {
                 updateHelpContent();
             }
-        });
+        };
 
         closeBtn?.addEventListener('click', () => {
             panel.style.display = 'none';

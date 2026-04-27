@@ -115,6 +115,11 @@ export default class Router {
             view.classList.add('active');
             this.app.currentView = viewName;
 
+            // Update help panel if open
+            if (typeof this.app._updateHelpContent === 'function') {
+                this.app._updateHelpContent();
+            }
+
             // Load view-specific data
             switch (viewName) {
                 case 'dashboard':
