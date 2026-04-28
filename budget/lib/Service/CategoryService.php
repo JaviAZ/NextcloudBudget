@@ -409,7 +409,7 @@ class CategoryService extends AbstractCrudService {
         return $result;
     }
 
-    public function getBudgetAnalysis(string $userId, string $month = null): array {
+    public function getBudgetAnalysis(string $userId, ?string $month = null): array {
         if (!$month) {
             $month = date('Y-m');
         }

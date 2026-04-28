@@ -140,7 +140,38 @@ class BankSyncService {
             $this->connectionMapper->update($connection);
         }
 
+        // Auto-discover accounts if none have been mapped yet
+        $allMappings = $this->mappingMapper->findByConnection($connectionId);
+        if (empty($allMappings)) {
+            $this->refreshAccounts($userId, $connectionId);
+        }
+
         $enabledMappings = $this->mappingMapper->findEnabledByConnection($connectionId);
+        if (empty($enabledMappings)) {
+            // Return early with a helpful message — mappings exist but none are enabled/mapped
+            $allMappings = $this->mappingMapper->findByConnection($connectionId);
+            $discoveredCount = count($allMappings);
+
+            // Update connection sync timestamp
+            $connection->setLastSyncAt(date('Y-m-d H:i:s'));
+            $connection->setLastError($discoveredCount > 0
+                ? 'No accounts are enabled for sync. Open Account Mappings to enable and map your accounts.'
+                : null);
+            $connection->setUpdatedAt(date('Y-m-d H:i:s'));
+            $this->connectionMapper->update($connection);
+
+            return [
+                'imported' => 0,
+                'skipped' => 0,
+                'errors' => 0,
+                'accounts' => [],
+                'discovered' => $discoveredCount,
+                'message' => $discoveredCount > 0
+                    ? "Found {$discoveredCount} account(s). Please open Account Mappings to enable and map them, then sync again."
+                    : null,
+            ];
+        }
+
         $mappingsByExternalId = [];
         foreach ($enabledMappings as $m) {
             $mappingsByExternalId[$m->getExternalAccountId()] = $m;
@@ -309,6 +340,7 @@ class BankSyncService {
                 $mapping->setConnectionId($connectionId);
                 $mapping->setExternalAccountId($account['id']);
                 $mapping->setExternalAccountName($account['name']);
+                $mapping->setEnabled(false);
                 $mapping->setLastBalance($account['balance'] ?? null);
                 $mapping->setLastCurrency($account['currency'] ?? null);
                 $mapping->setCreatedAt($now);

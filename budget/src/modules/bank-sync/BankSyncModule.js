@@ -258,10 +258,17 @@ export default class BankSyncModule {
             }
 
             const result = await response.json();
-            showSuccess(t('budget', 'Sync complete: {imported} imported, {skipped} skipped', {
-                imported: result.imported,
-                skipped: result.skipped
-            }));
+
+            if (result.message) {
+                // Accounts discovered but not yet mapped
+                showError(result.message);
+                this.showMappings(connectionId);
+            } else {
+                showSuccess(t('budget', 'Sync complete: {imported} imported, {skipped} skipped', {
+                    imported: result.imported,
+                    skipped: result.skipped
+                }));
+            }
 
             await this.loadConnections();
         } catch (error) {

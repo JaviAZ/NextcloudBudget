@@ -66,8 +66,8 @@ class ForecastController extends Controller {
      */
     public function cashflow(
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null
+        ?string $startDate = null,
+        ?string $endDate = null
     ): DataResponse {
         try {
             if (!$startDate) {

@@ -315,7 +315,7 @@ class ValidationService {
     /**
      * Validate account number format
      */
-    public function validateAccountNumber(string $accountNumber, string $accountType = null): array {
+    public function validateAccountNumber(string $accountNumber, ?string $accountType = null): array {
         $accountNumber = trim($accountNumber);
 
         if (empty($accountNumber)) {

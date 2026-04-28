@@ -165,13 +165,13 @@ class GoalsController extends Controller {
     #[UserRateLimit(limit: 30, period: 60)]
     public function update(
         int $id,
-        string $name = null,
-        float $targetAmount = null,
-        int $targetMonths = null,
-        float $currentAmount = null,
-        string $description = null,
-        string $targetDate = null,
-        int $tagId = null
+        ?string $name = null,
+        ?float $targetAmount = null,
+        ?int $targetMonths = null,
+        ?float $currentAmount = null,
+        ?string $description = null,
+        ?string $targetDate = null,
+        ?int $tagId = null
     ): DataResponse {
         try {
             $this->requireWriteAccess('savings_goal', $id);

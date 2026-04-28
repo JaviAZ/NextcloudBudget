@@ -46,8 +46,8 @@ class ReportController extends Controller {
      */
     public function summary(
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?array $tagIds = null,
         ?bool $includeUntagged = null
     ): DataResponse {
@@ -78,8 +78,8 @@ class ReportController extends Controller {
      */
     public function spending(
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         string $groupBy = 'category',
         ?int $tagSetId = null,
         ?int $categoryId = null
@@ -112,8 +112,8 @@ class ReportController extends Controller {
      */
     public function income(
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         string $groupBy = 'month',
         ?int $tagSetId = null,
         ?int $categoryId = null
@@ -148,8 +148,8 @@ class ReportController extends Controller {
         string $type,
         string $format = 'csv',
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null
+        ?string $startDate = null,
+        ?string $endDate = null
     ): DataDownloadResponse|DataResponse {
         try {
             if (!$startDate) {
@@ -182,8 +182,8 @@ class ReportController extends Controller {
      * @NoAdminRequired
      */
     public function budget(
-        string $startDate = null,
-        string $endDate = null
+        ?string $startDate = null,
+        ?string $endDate = null
     ): DataResponse {
         try {
             if (!$startDate) {
@@ -209,8 +209,8 @@ class ReportController extends Controller {
      */
     public function summaryWithComparison(
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?array $tagIds = null,
         ?bool $includeUntagged = null
     ): DataResponse {
@@ -241,8 +241,8 @@ class ReportController extends Controller {
      */
     public function cashflow(
         ?int $accountId = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?array $tagIds = null,
         ?bool $includeUntagged = null
     ): DataResponse {
@@ -273,8 +273,8 @@ class ReportController extends Controller {
      * Get tag dimensions for spending across categories
      */
     public function tagDimensions(
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?int $accountId = null,
         ?int $categoryId = null
     ): DataResponse {
@@ -304,8 +304,8 @@ class ReportController extends Controller {
      * Get tag combination report
      */
     public function tagCombinations(
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?int $accountId = null,
         ?int $categoryId = null,
         int $minCombinationSize = 2,
@@ -341,8 +341,8 @@ class ReportController extends Controller {
     public function tagCrossTab(
         int $tagSetId1,
         int $tagSetId2,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?int $accountId = null,
         ?int $categoryId = null
     ): DataResponse {
@@ -375,8 +375,8 @@ class ReportController extends Controller {
      */
     public function tagTrends(
         ?array $tagIds = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?int $accountId = null
     ): DataResponse {
         try {
@@ -406,8 +406,8 @@ class ReportController extends Controller {
      */
     public function tagSetBreakdown(
         int $tagSetId,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         ?int $accountId = null,
         ?int $categoryId = null
     ): DataResponse {

@@ -25932,10 +25932,16 @@ var BankSyncModule = /*#__PURE__*/function () {
               return response.json();
             case 4:
               result = _context6.v;
-              (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Sync complete: {imported} imported, {skipped} skipped', {
-                imported: result.imported,
-                skipped: result.skipped
-              }));
+              if (result.message) {
+                // Accounts discovered but not yet mapped
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showError)(result.message);
+                this.showMappings(connectionId);
+              } else {
+                (0,_utils_notifications_js__WEBPACK_IMPORTED_MODULE_1__.showSuccess)((0,_nextcloud_l10n__WEBPACK_IMPORTED_MODULE_0__.translate)('budget', 'Sync complete: {imported} imported, {skipped} skipped', {
+                  imported: result.imported,
+                  skipped: result.skipped
+                }));
+              }
               _context6.n = 5;
               return this.loadConnections();
             case 5:
