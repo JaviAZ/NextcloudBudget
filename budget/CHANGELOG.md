@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.0] - 2026-04-28
+
+### Added
+- **Multi-currency shared expenses** ([#168](https://github.com/otherworld-dev/budget/issues/168)): Shared expenses now track the transaction's account currency. Balances display per-currency lines (e.g., "Owes you ¥5,000" and "Owes you $50" separately). Settlements are created per-currency.
+- **Data Repair tool**: New "Scan for Issues" button in Settings → Maintenance detects and fixes duplicate auto-generated transactions, stuck bill due dates, and balance inconsistencies
+- **Bill payment duplicate detection**: When marking a bill as paid, the app checks for existing transactions that may already represent the payment and lets you link them instead of creating duplicates
+- **In-app documentation**: Help panel and sidebar with searchable user documentation for all features
+
+### Fixed
+- **Bills not advancing due date when paid early** ([#163](https://github.com/otherworld-dev/budget/issues/163)): Paying a bill before its due date now correctly advances to the next cycle. Previously this caused balance corruption through duplicate auto-generated transactions.
+- **Bank sync shows 0 imports** ([#166](https://github.com/otherworld-dev/budget/issues/166)): Fixed bank sync import count and PHP 8.4 nullable parameter deprecations
+- **Mobile responsive layout**: Improved view header layout on mobile devices
+- **Help panel navigation**: Help panel now updates content when navigating between pages
+
 ## [2.15.1] - 2026-04-27
 
 ### Fixed
