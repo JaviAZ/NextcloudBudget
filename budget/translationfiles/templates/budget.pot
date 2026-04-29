@@ -1596,10 +1596,6 @@ msgstr ""
 msgid "Split"
 msgstr ""
 
-#: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:702
-msgid "tagIds array is required"
-msgstr ""
-
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:713
 msgid "Failed to set transaction tags"
 msgstr ""

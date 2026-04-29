@@ -699,7 +699,7 @@ class TransactionController extends Controller {
             $data = json_decode($rawInput, true);
 
             if (!isset($data['tagIds']) || !is_array($data['tagIds'])) {
-                return new DataResponse(['error' => $this->l->t('tagIds array is required')], Http::STATUS_BAD_REQUEST);
+                return new DataResponse(['error' => 'tagIds array is required'], Http::STATUS_BAD_REQUEST);
             }
 
             $tagIds = array_map('intval', $data['tagIds']);
