@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.1] - 2026-04-29
+
+### Fixed
+- **Factory reset fails** with JSON parse error — `BudgetSnapshotMapper.deleteAll()` returned void instead of int, causing a TypeError in the factory reset flow
+
 ## [2.16.0] - 2026-04-28
 
 ### Added
