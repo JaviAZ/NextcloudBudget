@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
-"PO-Revision-Date: 2026-04-28 18:09+0000\n"
+"PO-Revision-Date: 2026-04-29 19:45+0000\n"
 "Last-Translator: SGiersch <Stephan@sgiersch.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
@@ -741,7 +741,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:143
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:222
 msgid "Invalid tag ID"
-msgstr ""
+msgstr "Ungültige Schlagwort ID"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:158
 msgid "Failed to create goal"
@@ -1102,11 +1102,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ReportController.php:298
 msgid "Failed to generate tag dimensions"
-msgstr ""
+msgstr "Fehler beim Erstellen der Schlagwort Dimensionen"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ReportController.php:333
 msgid "Failed to generate tag combination report"
-msgstr ""
+msgstr "Fehler beim Erstellen des Schlagwort Kombinationsberichts"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ReportController.php:368
 msgid "Failed to generate cross-tabulation"
@@ -1114,11 +1114,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ReportController.php:399
 msgid "Failed to generate tag trend report"
-msgstr ""
+msgstr "Fehler beim Erstellen des Schlagwort Trendberichts"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/ReportController.php:432
 msgid "Failed to generate tag set breakdown"
-msgstr ""
+msgstr "Fehler beim Erstellen der Aufschlüsselung der Schlagwort Gruppe"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/SettingController.php:87
 msgid "Failed to retrieve settings"
@@ -1416,11 +1416,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:64
 msgid "Failed to retrieve tag sets"
-msgstr ""
+msgstr "Fehler beim Abrufen der Schlagwort Gruppe"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:76
 msgid "Tag set"
-msgstr ""
+msgstr "Schlagwort Gruppe"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:90
 msgid "Category ID and name are required"
@@ -1431,24 +1431,24 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:561
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:920
 msgid "Failed to create tag set"
-msgstr ""
+msgstr "Fehler beim Erstellen des Schlagwort Gruppe"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:152
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:938
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:997
 msgid "Failed to update tag set"
-msgstr ""
+msgstr "Fehler beim Aktualisieren des Schlagwort Gruppe"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:165
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:477
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:579
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:854
 msgid "Failed to delete tag set"
-msgstr ""
+msgstr "Fehler beim löschen der Schlagwort Gruppe"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:177
 msgid "Failed to retrieve tags"
-msgstr ""
+msgstr "Fehler beim Abrufen der Schlagwörter"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:191
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:309
@@ -1461,13 +1461,13 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:602
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:1141
 msgid "Failed to create tag"
-msgstr ""
+msgstr "Fehler beim Erstellen des Schlagwortes"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:267
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:1159
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:1223
 msgid "Failed to update tag"
-msgstr ""
+msgstr "Fehler beim Aktualisieren des Schlagworts"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:280
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:267
@@ -1475,23 +1475,23 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:620
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:887
 msgid "Failed to delete tag"
-msgstr ""
+msgstr "Fehler beim Löschen des Schlagwortes"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:296
 msgid "Failed to retrieve global tags"
-msgstr ""
+msgstr "Fehler beim Abrufen der globalen Schlagwörter"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:329
 msgid "Failed to create global tag"
-msgstr ""
+msgstr "Fehler beim Erstellen des globalen Schlagwortes"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:365
 msgid "Failed to update global tag"
-msgstr ""
+msgstr "Fehler beim update des globalen Schlagwortes"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TagSetController.php:378
 msgid "Failed to delete global tag"
-msgstr ""
+msgstr "Fehler beim löschen des globalen Schlagwortes"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/TransactionController.php:116
 msgid "Failed to retrieve transactions"
@@ -1984,7 +1984,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/lib/Service/ValidationService.php:290
 msgid "Sort code must be 6 digits"
-msgstr ""
+msgstr "Die Bankleitzahl muss 6-stellig sein"
 
 #: /tmp/budget-v2.11.0/budget/lib/Service/ValidationService.php:305
 msgid "Invalid SWIFT/BIC format"
@@ -2460,14 +2460,14 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1328
 msgid "{displayed} of {total} transactions"
-msgstr ""
+msgstr "{displayed} von {total} buchungen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1329
 #: /tmp/budget-v2.11.0/budget/src/modules/import/ImportModule.js:684
 msgid "%n transaction"
 msgid_plural "%n transactions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%n buchung"
+msgstr[1] "%n buchungen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1346
 msgid "Total: {amount}"
@@ -2476,7 +2476,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/main.js:1365
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:821
 msgid "Page {current} of {total}"
-msgstr ""
+msgstr "Seite {current} von {total}"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:1550
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:237
@@ -2763,7 +2763,7 @@ msgstr "konten"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2217
 msgid "transactions"
-msgstr "Transaktionen"
+msgstr "buchungen"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2218
 msgid "bills"
@@ -2893,7 +2893,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/main.js:2793
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1750
 msgid "Transactions linked as transfer"
-msgstr ""
+msgstr "Buchung als Transfer verknüpft"
 
 #: /tmp/budget-v2.11.0/budget/src/main.js:2799
 #: /tmp/budget-v2.11.0/budget/src/modules/transactions/TransactionsModule.js:1756
@@ -3088,7 +3088,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1126
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1134
 msgid "Not provided"
-msgstr ""
+msgstr "Nicht angegeben"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:576
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1138
@@ -3340,7 +3340,7 @@ msgstr "Gültig"
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2139
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4667
 msgid "Checking Account"
-msgstr ""
+msgstr "Girokonto"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/accounts/AccountsModule.js:2144
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4668
@@ -4166,7 +4166,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:684
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2534
 msgid "No savings goals yet"
-msgstr ""
+msgstr "Noch keine Sparziele"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:892
 msgid "Target: {amount}"
@@ -4390,7 +4390,7 @@ msgstr "Prognostik"
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2972
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4476
 msgid "Transactions"
-msgstr "Transaktionen"
+msgstr "Buchungen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/dashboard/DashboardModule.js:2450
 msgid "Debts"
@@ -5859,7 +5859,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/savings/SavingsModule.js:301
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2549
 msgid "Add Savings Goal"
-msgstr ""
+msgstr "Sparziel hinzufügen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/savings/SavingsModule.js:368
 #: /tmp/budget-v2.11.0/budget/src/modules/savings/SavingsModule.js:377
@@ -5889,11 +5889,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/savings/SavingsModule.js:461
 msgid "Added {amount} to goal"
-msgstr ""
+msgstr "{amount} zum Ziel hinzugefügt"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/savings/SavingsModule.js:465
 msgid "Failed to add money to goal"
-msgstr ""
+msgstr "Geld konnte nicht zum Ziel hinzugefügt werden"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:28
 #: /tmp/budget-v2.11.0/budget/src/modules/settings/SettingsModule.js:36
@@ -6156,7 +6156,7 @@ msgstr "Kategorien"
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:242
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2377
 msgid "Recurring Income"
-msgstr ""
+msgstr "Wiederkehrende Einnahmen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:259
 #: /tmp/budget-v2.11.0/budget/src/modules/sharing/SharingModule.js:303
@@ -6288,7 +6288,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:385
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1721
 msgid "Tag Sets"
-msgstr ""
+msgstr "Schlagwort-Sammlungen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:387
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5350
@@ -6370,7 +6370,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:740
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1728
 msgid "No tag sets yet."
-msgstr ""
+msgstr "Keine Schlagwort-Gruppen vorhanden."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/tagsets/TagSetsModule.js:772
 msgid "Delete tag"
@@ -6929,17 +6929,19 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:124
 msgid "No recurring transfers yet"
-msgstr ""
+msgstr "Noch keine wiederkehrenden Überweisungen"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:125
 msgid ""
 "Set up automatic transfers between your accounts to automate savings or bill "
 "payments."
 msgstr ""
+"Richten Sie automatische Überweisungen zwischen Ihren Konten ein, um das "
+"Sparen oder die Rechnungszahlungen zu automatisieren."
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:128
 msgid "Add Your First Transfer"
-msgstr ""
+msgstr "Fügen Sie Ihre erste Überweisung hinzu"
 
 #: /tmp/budget-v2.11.0/budget/src/modules/transfers/TransfersModule.js:289
 msgid "Edit transfer"
@@ -7332,7 +7334,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:959
 msgid "Total Liabilities"
-msgstr ""
+msgstr "Summe der Verbindlichkeiten"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1007
 msgid "Account Details"
@@ -7363,7 +7365,7 @@ msgstr "Kontoart"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1048
 msgid "Available Balance"
-msgstr ""
+msgstr "Verfügbares Guthaben"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1052
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4775
@@ -7372,7 +7374,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1071
 msgid "Total Transactions"
-msgstr ""
+msgstr "Anzahl der Buchungen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1080
 msgid "This Month Income"
@@ -7408,7 +7410,7 @@ msgstr "IBAN"
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1121
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4740
 msgid "Sort Code"
-msgstr ""
+msgstr "Bankleitzahl"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1125
 msgid "SWIFT/BIC"
@@ -7427,7 +7429,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1137
 msgid "Last Reconciled"
-msgstr ""
+msgstr "Letzter Abgleich"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1146
 msgid "Transaction History"
@@ -7538,11 +7540,11 @@ msgstr "Weiter"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1288
 msgid "Bulk actions"
-msgstr ""
+msgstr "Sammelaktionen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1290
 msgid "Bulk Actions"
-msgstr ""
+msgstr "Massenaktionen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1292
 msgid "Reconciliation mode"
@@ -7554,7 +7556,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1298
 msgid "Find Duplicates"
-msgstr ""
+msgstr "Duplikate finden"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1300
 msgid "Auto-match transfer transactions"
@@ -7562,7 +7564,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1302
 msgid "Match All"
-msgstr ""
+msgstr "Alle zuordnen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1304
 msgid "Add new transaction"
@@ -7610,19 +7612,19 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1485
 msgid "25 per page"
-msgstr ""
+msgstr "25 pro Seite"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1486
 msgid "50 per page"
-msgstr ""
+msgstr "50 pro Seite"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1487
 msgid "100 per page"
-msgstr ""
+msgstr "100 pro Seite"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1488
 msgid "250 per page"
-msgstr ""
+msgstr "250 pro Seite"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1502
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5719
@@ -7639,7 +7641,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1578
 msgid "Search categories..."
-msgstr ""
+msgstr "Kategorien durchsuchen …"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1582
 msgid "Expand all"
@@ -7666,7 +7668,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1634
 msgid "Category Details"
-msgstr ""
+msgstr "Kategoriedetails"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1636
 msgid "Edit category"
@@ -7684,7 +7686,7 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1661
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1858
 msgid "Total Spent"
-msgstr ""
+msgstr "Insgesamt ausgegeben"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1668
 msgid "Analytics"
@@ -7700,11 +7702,11 @@ msgstr "Trend"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1699
 msgid "Monthly Spending"
-msgstr ""
+msgstr "Monatliche Ausgaben"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1714
 msgid "View All Transactions"
-msgstr ""
+msgstr "Alle Buchungen anzeigen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:1722
 msgid "Add new tag set"
@@ -7955,7 +7957,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2090
 msgid "Total Transactions:"
-msgstr ""
+msgstr "Anzahl der Buchungen:"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2094
 msgid "New Transactions:"
@@ -8080,11 +8082,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2379
 msgid "Auto-detect recurring income from transactions"
-msgstr ""
+msgstr "Wiederkehrende Einnahmen automatisch aus Transaktionen erkennen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2383
 msgid "Add recurring income"
-msgstr ""
+msgstr "Wiederkehrende Einnahmen hinzufügen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2385
 msgid "Add Income"
@@ -8108,7 +8110,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2446
 msgid "No recurring income yet"
-msgstr ""
+msgstr "Noch keine wiederkehrenden Einnahmen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2447
 msgid ""
@@ -8121,12 +8123,14 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2459
 msgid "Detected Recurring Income"
-msgstr ""
+msgstr "Erkannte wiederkehrende Einnahmen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2460
 msgid ""
 "We found these potential recurring income sources in your transaction history"
 msgstr ""
+"Wir haben in deiner Transaktionshistorie mögliche Quellen für wiederkehrende "
+"Einnahmen gefunden"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2469
 msgid "Add Selected Income"
@@ -8134,11 +8138,11 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2479
 msgid "Add new savings goal"
-msgstr ""
+msgstr "Neues Sparziel hinzufügen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2481
 msgid "Add Goal"
-msgstr ""
+msgstr "Ziel hinzufügen"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2493
 msgid "Active Goals"
@@ -8157,10 +8161,12 @@ msgid ""
 "Set up savings goals to track your progress towards financial milestones "
 "like an emergency fund, vacation, or new car."
 msgstr ""
+"Erstelle Sparziele, um Fortschritte bei finanziellen Meilensteinen wie "
+"Notgroschen, Urlaub oder einem neuen Auto zu verfolgen."
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2538
 msgid "Create Your First Goal"
-msgstr ""
+msgstr "Erstellen Sie Ihr erstes Ziel"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2553
 msgid "Goal Name"
@@ -9518,7 +9524,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4742
 msgid "6-digit sort code (UK banks)"
-msgstr ""
+msgstr "6-stellige Bankleitzahl (britische Banken)"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4748
 msgid "International Bank Account Number"
@@ -9737,7 +9743,7 @@ msgstr "Erhalten Sie eine Benachrichtigung, bevor die Rechnung fällig ist"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4957
 msgid "Create future transaction for this bill"
-msgstr "Erstelle zukünftige Transaktionen für diese Rechnung"
+msgstr "Erstelle zukünftige Buchung für diese Rechnung"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:4959
 msgid "Automatically creates a transaction on the bill's due date"
@@ -9911,7 +9917,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5201
 msgid "Add/Edit Recurring Income"
-msgstr ""
+msgstr "Wiederkehrende Einnahmen hinzufügen/bearbeiten"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5206
 msgid "Income Name"
@@ -9923,7 +9929,7 @@ msgstr ""
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5208
 msgid "Name of the recurring income"
-msgstr ""
+msgstr "Bezeichnung der wiederkehrenden Einnahme"
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:5212
 msgid "Expected Amount"
