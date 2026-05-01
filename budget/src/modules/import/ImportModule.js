@@ -803,6 +803,9 @@ export default class ImportModule {
                 this.resetImportWizard();
                 this.loadTransactions();
                 this.app.loadAccounts();
+
+                // Auto-match transfers in the background
+                this.autoMatchTransfers();
             } else {
                 throw new Error(result.error || t('budget', 'Import failed'));
             }
@@ -813,6 +816,32 @@ export default class ImportModule {
             // Restore button state
             importBtn.disabled = false;
             importBtn.textContent = originalText;
+        }
+    }
+
+    async autoMatchTransfers() {
+        try {
+            const response = await fetch(OC.generateUrl('/apps/budget/api/transactions/bulk-match'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({ dateWindow: 3 })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const matched = result.autoMatched?.length || 0;
+                if (matched > 0) {
+                    showSuccess(t('budget', 'Auto-linked {count} transfer pairs', { count: matched }));
+                    this.loadTransactions();
+                    this.app.loadAccounts();
+                }
+            }
+        } catch (error) {
+            // Silent failure — auto-matching is best-effort
+            console.error('Auto-match transfers failed:', error);
         }
     }
 
