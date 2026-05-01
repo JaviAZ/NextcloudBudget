@@ -1111,10 +1111,40 @@ export default class TransactionsModule {
         this.app.loadTransactions();
     }
 
-    finishReconciliation() {
-        this.cancelReconciliation();
-        this.app.loadAccounts();
-        showSuccess(t('budget', 'Reconciliation completed successfully'));
+    async finishReconciliation() {
+        const accountId = document.getElementById('reconcile-account')?.value;
+        if (!accountId) {
+            showError(t('budget', 'No account selected'));
+            return;
+        }
+
+        // Collect all checked reconcile checkboxes
+        const checkedBoxes = document.querySelectorAll('.reconcile-checkbox:checked');
+        const transactionIds = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-transaction-id')));
+
+        try {
+            const response = await fetch(OC.generateUrl(`/apps/budget/api/accounts/${accountId}/reconcile/complete`), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'requesttoken': OC.requestToken
+                },
+                body: JSON.stringify({ transactionIds })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to complete reconciliation');
+            }
+
+            const result = await response.json();
+            this.cancelReconciliation();
+            this.app.loadAccounts();
+            this.loadTransactions();
+            showSuccess(t('budget', 'Reconciliation completed — {count} transactions marked as reconciled', { count: result.reconciledCount }));
+        } catch (error) {
+            showError(t('budget', 'Failed to complete reconciliation: {error}', { error: error.message }));
+        }
     }
 
     async createReconciliationAdjustment(reconcileData, type, amount) {
@@ -1170,9 +1200,9 @@ export default class TransactionsModule {
     }
 
     async toggleTransactionReconciliation(transactionId, checked) {
-        // Implementation would update transaction reconciliation status
-        // This is a placeholder for the actual API call
-        console.log('Toggle reconciliation for transaction:', transactionId, checked);
+        // Reconcile checkboxes are tracked locally during reconciliation mode.
+        // The actual API call happens in finishReconciliation() when the user confirms.
+        // No immediate backend call needed here.
     }
 
     // Rendering

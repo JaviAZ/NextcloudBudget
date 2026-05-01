@@ -98,6 +98,7 @@ class Account extends Entity implements JsonSerializable {
     protected $accruedInterest;
     protected $createdAt;
     protected $updatedAt;
+    protected $lastReconciled;
 
     public function __construct() {
         $this->addType('id', 'integer');
@@ -168,6 +169,7 @@ class Account extends Entity implements JsonSerializable {
             'accruedInterest' => $this->getAccruedInterest() ?? 0.0,
             'createdAt' => $this->getCreatedAt(),
             'updatedAt' => $this->getUpdatedAt(),
+            'lastReconciled' => $this->getLastReconciled(),
             'hasSensitiveData' => $this->hasSensitiveData(),
         ];
     }
@@ -203,6 +205,7 @@ class Account extends Entity implements JsonSerializable {
             'accruedInterest' => $this->getAccruedInterest() ?? 0.0,
             'createdAt' => $this->getCreatedAt(),
             'updatedAt' => $this->getUpdatedAt(),
+            'lastReconciled' => $this->getLastReconciled(),
         ];
     }
 

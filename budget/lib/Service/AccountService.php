@@ -320,6 +320,30 @@ class AccountService extends AbstractCrudService {
     }
 
     /**
+     * Complete reconciliation: mark transactions as reconciled and update lastReconciled.
+     */
+    public function completeReconciliation(int $accountId, string $userId, array $transactionIds): array {
+        $account = $this->find($accountId, $userId);
+
+        // Mark transactions as reconciled
+        $reconciled = 0;
+        if (!empty($transactionIds)) {
+            $reconciled = $this->transactionMapper->bulkSetReconciled($accountId, $transactionIds, true);
+        }
+
+        // Update lastReconciled timestamp on account
+        $now = date('Y-m-d H:i:s');
+        $account->setLastReconciled($now);
+        $account->setUpdatedAt($now);
+        $this->mapper->update($account);
+
+        return [
+            'reconciledCount' => $reconciled,
+            'lastReconciled' => $now,
+        ];
+    }
+
+    /**
      * Recalculate all account balances from opening_balance + transaction history.
      *
      * @return array{updated: int, accounts: array}

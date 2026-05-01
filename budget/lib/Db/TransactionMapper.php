@@ -103,6 +103,23 @@ class TransactionMapper extends QBMapper {
     }
 
     /**
+     * Bulk set reconciled flag for transactions in a specific account.
+     */
+    public function bulkSetReconciled(int $accountId, array $transactionIds, bool $reconciled): int {
+        if (empty($transactionIds)) {
+            return 0;
+        }
+
+        $qb = $this->db->getQueryBuilder();
+        $qb->update($this->getTableName())
+            ->set('reconciled', $qb->createNamedParameter($reconciled, IQueryBuilder::PARAM_BOOL))
+            ->where($qb->expr()->eq('account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->in('id', $qb->createNamedParameter($transactionIds, IQueryBuilder::PARAM_INT_ARRAY)));
+
+        return $qb->executeStatement();
+    }
+
+    /**
      * Find a transaction by ID scoped to visible account IDs (for shared access).
      *
      * @param int[] $visibleAccountIds

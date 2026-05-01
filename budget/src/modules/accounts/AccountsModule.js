@@ -1432,20 +1432,14 @@ export default class AccountsModule {
     }
 
     toggleTransactionReconciliation(transactionId, reconciled) {
-        // This would update the transaction's reconciliation status
-        // Implementation depends on backend API
-        console.log(`Toggle reconciliation for transaction ${transactionId}: ${reconciled}`);
+        // Reconcile checkboxes are tracked locally; actual save happens on finish.
     }
 
     finishReconciliation() {
-        if (!this.reconcileData || !this.reconcileData.isBalanced) {
-            showWarning(t('budget', 'Cannot finish reconciliation - balances do not match'));
-            return;
+        // Delegated to TransactionsModule where the reconcile panel lives.
+        if (this.app.transactionsModule) {
+            this.app.transactionsModule.finishReconciliation();
         }
-
-        // Mark all checked transactions as reconciled and finish reconciliation
-        this.cancelReconciliation();
-        showSuccess(t('budget', 'Reconciliation completed successfully'));
     }
 
     async loadCategories() {

@@ -177,6 +177,7 @@ class AccountMapper extends QBMapper {
                 $entity->getAccruedInterest() !== null ? sprintf('%.2f', $entity->getAccruedInterest()) : '0.00'
             ))
             ->set('wallet_address', $qb->createNamedParameter($this->getEncryptedValue($entity, 'walletAddress')))
+            ->set('last_reconciled', $qb->createNamedParameter($entity->getLastReconciled()))
             ->set('updated_at', $qb->createNamedParameter($entity->getUpdatedAt()))
             ->where($qb->expr()->eq('id', $qb->createNamedParameter($entity->getId(), IQueryBuilder::PARAM_INT)));
 

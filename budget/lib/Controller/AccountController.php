@@ -612,6 +612,25 @@ class AccountController extends Controller {
         }
     }
 
+    /**
+     * Complete reconciliation: mark transactions as reconciled and update lastReconciled.
+     * @NoAdminRequired
+     */
+    #[UserRateLimit(limit: 10, period: 60)]
+    public function completeReconciliation(int $id): DataResponse {
+        try {
+            $this->requireWriteAccess('account', $id);
+            $data = $this->request->getParams();
+            $transactionIds = $data['transactionIds'] ?? [];
+            $transactionIds = array_map('intval', $transactionIds);
+
+            $result = $this->service->completeReconciliation($id, $this->getEffectiveUserId(), $transactionIds);
+            return new DataResponse($result);
+        } catch (\Exception $e) {
+            return $this->handleError($e, $this->l->t('Failed to complete reconciliation'), Http::STATUS_BAD_REQUEST, ['accountId' => $id]);
+        }
+    }
+
     // ── Interest Accrual ────────────────────────────────────────
 
     /**
