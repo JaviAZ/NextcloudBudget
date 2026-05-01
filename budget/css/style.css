@@ -1643,7 +1643,6 @@
 .transactions-table th {
     background: var(--color-background-dark);
     padding: 10px;
-    text-align: left;
     font-weight: bold;
     color: var(--color-text-maxcontrast);
     min-height: 44px;
@@ -3493,7 +3492,6 @@ button.danger:hover {
 .transactions-table.enhanced th {
     background: var(--color-background-hover);
     padding: 2px 4px;
-    text-align: left;
     font-weight: 600;
     color: var(--color-main-text);
     border-bottom: 1px solid var(--color-border);
