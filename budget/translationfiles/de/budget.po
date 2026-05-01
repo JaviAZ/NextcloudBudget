@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-04-15 23:25+0000\n"
-"PO-Revision-Date: 2026-05-01 07:09+0000\n"
+"PO-Revision-Date: 2026-05-02 00:25+0000\n"
 "Last-Translator: SGiersch <Stephan@sgiersch.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
@@ -711,7 +711,7 @@ msgstr "Prognose konnte nicht exportiert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:70
 msgid "Failed to retrieve goals"
-msgstr ""
+msgstr "Fehler beim Laden der Ziele"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:82
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2620
@@ -726,17 +726,17 @@ msgstr "Fälligkeitsdatum"
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:128
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:207
 msgid "Target amount must be greater than zero"
-msgstr ""
+msgstr "Der Zielbetrag muss größer als null sein"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:133
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:212
 msgid "Target months must be greater than zero"
-msgstr ""
+msgstr "Die Zielmonate müssen größer als null sein"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:138
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:217
 msgid "Current amount cannot be negative"
-msgstr ""
+msgstr "Der aktuelle Betrag darf nicht negativ sein"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:143
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:222
@@ -745,24 +745,24 @@ msgstr "Ungültige Schlagwort ID"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:158
 msgid "Failed to create goal"
-msgstr ""
+msgstr "Fehler beim Anlegen des Ziels"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:243
 msgid "Failed to update goal"
-msgstr ""
+msgstr "Ziel konnte nicht aktualisiert werden"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:255
 msgid "Goal deleted successfully"
-msgstr ""
+msgstr "Ziel erfolgreich gelöscht"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:257
 #: /tmp/budget-v2.11.0/budget/src/modules/savings/SavingsModule.js:405
 msgid "Failed to delete goal"
-msgstr ""
+msgstr "Fehler beim Löschen des Ziels"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:269
 msgid "Failed to retrieve goal progress"
-msgstr ""
+msgstr "Fehler beim Laden des Zielverlaufs"
 
 #: /tmp/budget-v2.11.0/budget/lib/Controller/GoalsController.php:281
 msgid "Failed to retrieve goal forecast"
@@ -8041,6 +8041,8 @@ msgstr ""
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2271
 msgid "Add your recurring bills to track due dates and never miss a payment."
 msgstr ""
+"Fügen Sie Ihre wiederkehrenden Rechnungen hinzu, um Fälligkeitstermine zu "
+"verfolgen und keine Zahlung zu verpassen."
 
 #: /tmp/budget-v2.11.0/budget/templates/index.php:2274
 msgid "Add Your First Bill"
