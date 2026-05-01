@@ -1979,8 +1979,9 @@ class BudgetApp {
         const dupCount = findings.duplicateTransactions?.length || 0;
         const stuckCount = findings.stuckBills?.length || 0;
         const futureCount = findings.futureClearedTransactions?.length || 0;
+        const transferCatCount = findings.transferCreditCategories?.length || 0;
         const driftCount = findings.balanceDrift?.length || 0;
-        const totalIssues = dupCount + stuckCount + futureCount + driftCount;
+        const totalIssues = dupCount + stuckCount + futureCount + transferCatCount + driftCount;
 
         const modal = document.createElement('div');
         modal.id = 'repair-data-modal';
@@ -1997,7 +1998,7 @@ class BudgetApp {
         if (totalIssues === 0) {
             findingsHtml = `<div class="repair-summary"><p>${t('budget', 'No data integrity issues found. Everything looks good!')}</p></div>`;
         } else {
-            findingsHtml = `<div class="repair-summary"><p>${t('budget', 'Found {count} issue(s) across {categories} categories.', { count: totalIssues, categories: (dupCount > 0 ? 1 : 0) + (stuckCount > 0 ? 1 : 0) + (futureCount > 0 ? 1 : 0) + (driftCount > 0 ? 1 : 0) })}</p></div>`;
+            findingsHtml = `<div class="repair-summary"><p>${t('budget', 'Found {count} issue(s) across {categories} categories.', { count: totalIssues, categories: (dupCount > 0 ? 1 : 0) + (stuckCount > 0 ? 1 : 0) + (futureCount > 0 ? 1 : 0) + (transferCatCount > 0 ? 1 : 0) + (driftCount > 0 ? 1 : 0) })}</p></div>`;
 
             // Duplicate transactions
             if (dupCount > 0) {
@@ -2058,6 +2059,27 @@ class BudgetApp {
                             <span class="repair-category-count">${futureCount}</span>
                         </div>
                         <div class="repair-category-details">${futureItems}${futureCount > 20 ? `<p>... ${t('budget', 'and {more} more', { more: futureCount - 20 })}</p>` : ''}</div>
+                    </div>`;
+            }
+
+            // Transfer credits with categories
+            if (transferCatCount > 0) {
+                const transferItems = findings.transferCreditCategories.slice(0, 20).map(tc =>
+                    `<div class="repair-item">
+                        <span>${tc.vendor || t('budget', '(unnamed)')}</span>
+                        <span>${formatCurrency(tc.amount)}</span>
+                        <span>${tc.date}</span>
+                        <span class="repair-item-note">${tc.accountName}</span>
+                    </div>`
+                ).join('');
+
+                findingsHtml += `
+                    <div class="repair-category" data-category="transferCreditCategories">
+                        <div class="repair-category-header">
+                            <h4><input type="checkbox" class="repair-checkbox" checked> ${t('budget', 'Transfer Credits with Category Assigned')}</h4>
+                            <span class="repair-category-count">${transferCatCount}</span>
+                        </div>
+                        <div class="repair-category-details">${transferItems}${transferCatCount > 20 ? `<p>... ${t('budget', 'and {more} more', { more: transferCatCount - 20 })}</p>` : ''}</div>
                     </div>`;
             }
 
@@ -2166,6 +2188,9 @@ class BudgetApp {
                     }
                     if (result.futureClearedTransactions) {
                         parts.push(t('budget', '{count} future transactions set to scheduled', { count: result.futureClearedTransactions.fixed }));
+                    }
+                    if (result.transferCreditCategories) {
+                        parts.push(t('budget', '{count} transfer categories cleared', { count: result.transferCreditCategories.fixed }));
                     }
                     if (result.balanceDrift) {
                         parts.push(t('budget', '{count} account balances corrected', { count: result.balanceDrift.updated }));

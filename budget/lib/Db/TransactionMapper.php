@@ -88,6 +88,21 @@ class TransactionMapper extends QBMapper {
     }
 
     /**
+     * Find credit-side transfer transactions that have a category assigned.
+     */
+    public function findLinkedCreditsWithCategory(int $accountId): array {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->eq('account_id', $qb->createNamedParameter($accountId, IQueryBuilder::PARAM_INT)))
+            ->andWhere($qb->expr()->eq('type', $qb->createNamedParameter('credit')))
+            ->andWhere($qb->expr()->isNotNull('linked_transaction_id'))
+            ->andWhere($qb->expr()->isNotNull('category_id'));
+
+        return $this->findEntities($qb);
+    }
+
+    /**
      * Find a transaction by ID scoped to visible account IDs (for shared access).
      *
      * @param int[] $visibleAccountIds
@@ -808,7 +823,11 @@ class TransactionMapper extends QBMapper {
         bool $includeUntagged = true
     ): array {
         $qb = $this->db->getQueryBuilder();
+        $liabilityTypes = ['credit_card', 'loan', 'mortgage', 'line_of_credit'];
 
+        // Only count transfers between non-liability accounts (true internal moves).
+        // Transfers involving a liability account (debt payments) are real expenses
+        // and should remain in the income/expense totals.
         $qb->selectAlias(
                 $qb->createFunction('SUM(CASE WHEN t.type = \'credit\' THEN t.amount ELSE 0 END)'),
                 'income'
@@ -819,10 +838,16 @@ class TransactionMapper extends QBMapper {
             )
             ->from($this->getTableName(), 't')
             ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
+            // Join to the linked transaction's account to check its type
+            ->innerJoin('t', $this->getTableName(), 'lt', $qb->expr()->eq('t.linked_transaction_id', 'lt.id'))
+            ->innerJoin('lt', 'budget_accounts', 'la', $qb->expr()->eq('lt.account_id', 'la.id'))
             ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)))
             ->andWhere($qb->expr()->gte('t.date', $qb->createNamedParameter($startDate)))
             ->andWhere($qb->expr()->lte('t.date', $qb->createNamedParameter($endDate)))
-            ->andWhere($qb->expr()->isNotNull('t.linked_transaction_id'));
+            ->andWhere($qb->expr()->isNotNull('t.linked_transaction_id'))
+            // Exclude if either this account or the linked account is a liability
+            ->andWhere($qb->expr()->notIn('a.type', $qb->createNamedParameter($liabilityTypes, IQueryBuilder::PARAM_STR_ARRAY)))
+            ->andWhere($qb->expr()->notIn('la.type', $qb->createNamedParameter($liabilityTypes, IQueryBuilder::PARAM_STR_ARRAY)));
 
         $this->excludeScheduledFuture($qb);
         $this->applyTagFilter($qb, $tagIds, $includeUntagged);
@@ -853,7 +878,9 @@ class TransactionMapper extends QBMapper {
         bool $includeUntagged = true
     ): array {
         $qb = $this->db->getQueryBuilder();
+        $liabilityTypes = ['credit_card', 'loan', 'mortgage', 'line_of_credit'];
 
+        // Only count transfers between non-liability accounts (see getTransferTotals)
         $qb->select('t.account_id')
             ->selectAlias(
                 $qb->createFunction('SUM(CASE WHEN t.type = \'credit\' THEN t.amount ELSE 0 END)'),
@@ -865,10 +892,14 @@ class TransactionMapper extends QBMapper {
             )
             ->from($this->getTableName(), 't')
             ->innerJoin('t', 'budget_accounts', 'a', $qb->expr()->eq('t.account_id', 'a.id'))
+            ->innerJoin('t', $this->getTableName(), 'lt', $qb->expr()->eq('t.linked_transaction_id', 'lt.id'))
+            ->innerJoin('lt', 'budget_accounts', 'la', $qb->expr()->eq('lt.account_id', 'la.id'))
             ->where($qb->expr()->eq('a.user_id', $qb->createNamedParameter($userId)))
             ->andWhere($qb->expr()->gte('t.date', $qb->createNamedParameter($startDate)))
             ->andWhere($qb->expr()->lte('t.date', $qb->createNamedParameter($endDate)))
-            ->andWhere($qb->expr()->isNotNull('t.linked_transaction_id'));
+            ->andWhere($qb->expr()->isNotNull('t.linked_transaction_id'))
+            ->andWhere($qb->expr()->notIn('a.type', $qb->createNamedParameter($liabilityTypes, IQueryBuilder::PARAM_STR_ARRAY)))
+            ->andWhere($qb->expr()->notIn('la.type', $qb->createNamedParameter($liabilityTypes, IQueryBuilder::PARAM_STR_ARRAY)));
 
         $this->excludeScheduledFuture($qb);
         $this->applyTagFilter($qb, $tagIds, $includeUntagged);

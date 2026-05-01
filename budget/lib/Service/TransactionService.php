@@ -176,7 +176,8 @@ class TransactionService {
                 status: $status
             );
 
-            // Create deposit to destination account
+            // Create deposit to destination account (no category — the debit side
+            // carries the category for spending aggregation purposes)
             $deposit = $this->create(
                 userId: $userId,
                 accountId: $bill->getDestinationAccountId(),
@@ -184,7 +185,7 @@ class TransactionService {
                 description: '',
                 amount: $bill->getAmount(),
                 type: 'credit',
-                categoryId: $bill->getCategoryId(),
+                categoryId: null,
                 vendor: $bill->getName(),
                 reference: null,
                 notes: "Auto-generated transfer: {$bill->getName()}",
@@ -704,6 +705,14 @@ class TransactionService {
         }
 
         $this->mapper->linkTransactions($transactionId, $targetId);
+
+        // Clear category on the credit side — only the debit carries the
+        // category for spending aggregation purposes
+        $creditSide = $transaction->getType() === 'credit' ? $transaction : $target;
+        if ($creditSide->getCategoryId() !== null) {
+            $creditSide->setCategoryId(null);
+            $this->mapper->update($creditSide);
+        }
 
         // Return updated transactions
         return [
