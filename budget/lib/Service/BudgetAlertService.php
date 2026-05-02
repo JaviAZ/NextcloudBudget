@@ -47,9 +47,12 @@ class BudgetAlertService {
         $currentMonth = date('Y-m');
         $snapshotOverrides = $this->budgetSnapshotMapper->findEffectiveBatch($userId, $currentMonth);
 
-        // Filter to categories with effective budgets > 0
+        // Filter to categories with effective budgets > 0 (excluding excluded categories)
         $categoriesWithBudgets = [];
         foreach ($categories as $category) {
+            if ($category->getExcludedFromReports()) {
+                continue;
+            }
             $catId = $category->getId();
             $amount = isset($snapshotOverrides[$catId])
                 ? (float) ($snapshotOverrides[$catId]['amount'] ?? 0)
@@ -137,9 +140,12 @@ class BudgetAlertService {
         $currentMonth = date('Y-m');
         $snapshotOverrides = $this->budgetSnapshotMapper->findEffectiveBatch($userId, $currentMonth);
 
-        // Filter to categories with effective budgets > 0
+        // Filter to categories with effective budgets > 0 (excluding excluded categories)
         $categoriesWithBudgets = [];
         foreach ($categories as $category) {
+            if ($category->getExcludedFromReports()) {
+                continue;
+            }
             $catId = $category->getId();
             $amount = isset($snapshotOverrides[$catId])
                 ? (float) ($snapshotOverrides[$catId]['amount'] ?? 0)

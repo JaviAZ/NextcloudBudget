@@ -5524,6 +5524,14 @@ style('budget', 'budget-main');
                 <small id="category-color-help" class="form-text"><?php p($l->t('Color for charts and display')); ?></small>
             </div>
 
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="category-excluded-from-reports">
+                    <?php p($l->t('Exclude from reports')); ?>
+                </label>
+                <small class="form-text"><?php p($l->t('Transactions in this category will not count toward budgets, spending reports, or dashboard totals.')); ?></small>
+            </div>
+
             <!-- Tag Sets Container -->
             <div id="category-tag-sets-container"></div>
 

@@ -207,8 +207,8 @@ class ReportAggregator {
 
         $excludeTransfers = $accountId === null;
 
-        // Get spending breakdown
-        $summary['spending'] = $this->transactionMapper->getSpendingSummary(
+        // Get spending breakdown (filter out excluded categories)
+        $spending = $this->transactionMapper->getSpendingSummary(
             $userId,
             $startDate,
             $endDate,
@@ -217,6 +217,20 @@ class ReportAggregator {
             $includeUntagged,
             $excludeTransfers
         );
+
+        $allCategories = $this->categoryMapper->findAll($userId);
+        $excludedCategoryIds = [];
+        foreach ($allCategories as $cat) {
+            if ($cat->getExcludedFromReports()) {
+                $excludedCategoryIds[$cat->getId()] = true;
+            }
+        }
+        if (!empty($excludedCategoryIds)) {
+            $spending = array_values(array_filter($spending, function ($item) use ($excludedCategoryIds) {
+                return !isset($excludedCategoryIds[$item['categoryId'] ?? 0]);
+            }));
+        }
+        $summary['spending'] = $spending;
 
         // Generate trend data (with currency conversion for multi-account view)
         $summary['trends'] = $this->generateTrendData($userId, $accountId, $startDate, $endDate, $tagIds, $includeUntagged);
@@ -302,10 +316,13 @@ class ReportAggregator {
         $reportMonth = substr($startDate, 0, 7); // YYYY-MM from startDate
         $snapshotOverrides = $this->budgetSnapshotMapper->findEffectiveBatch($userId, $reportMonth);
 
-        // Collect category IDs that have budgets (considering snapshots)
+        // Collect category IDs that have budgets (considering snapshots, excluding excluded)
         $categoryIds = [];
         $resolvedBudgets = [];
         foreach ($categories as $category) {
+            if ($category->getExcludedFromReports()) {
+                continue;
+            }
             $catId = $category->getId();
             $budgeted = isset($snapshotOverrides[$catId])
                 ? (float) ($snapshotOverrides[$catId]['amount'] ?? 0)

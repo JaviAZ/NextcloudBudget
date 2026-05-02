@@ -32,6 +32,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setCreatedAt(string $createdAt)
  * @method string|null getUpdatedAt()
  * @method void setUpdatedAt(string $updatedAt)
+ * @method bool|null getExcludedFromReports()
+ * @method void setExcludedFromReports(?bool $excludedFromReports)
  */
 class Category extends Entity implements JsonSerializable {
     protected $userId;
@@ -43,6 +45,7 @@ class Category extends Entity implements JsonSerializable {
     protected $budgetAmount;
     protected $budgetPeriod;  // monthly, weekly, yearly, quarterly
     protected $sortOrder;
+    protected $excludedFromReports;
     protected $createdAt;
     protected $updatedAt;
 
@@ -51,6 +54,7 @@ class Category extends Entity implements JsonSerializable {
         $this->addType('parentId', 'integer');
         $this->addType('budgetAmount', 'float');
         $this->addType('sortOrder', 'integer');
+        $this->addType('excludedFromReports', 'boolean');
     }
 
     /**
@@ -69,6 +73,7 @@ class Category extends Entity implements JsonSerializable {
             'budgetAmount' => $this->getBudgetAmount(),
             'budgetPeriod' => $this->getBudgetPeriod() ?? 'monthly',
             'sortOrder' => $this->getSortOrder(),
+            'excludedFromReports' => $this->getExcludedFromReports() ?? false,
             'createdAt' => $this->getCreatedAt(),
             'updatedAt' => $this->getUpdatedAt(),
         ];

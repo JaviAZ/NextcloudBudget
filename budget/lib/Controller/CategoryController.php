@@ -149,7 +149,8 @@ class CategoryController extends Controller {
         ?string $icon = null,
         ?string $color = null,
         ?float $budgetAmount = null,
-        int $sortOrder = 0
+        int $sortOrder = 0,
+        bool $excludedFromReports = false
     ): DataResponse {
         try {
             // Validate name (required)
@@ -190,7 +191,8 @@ class CategoryController extends Controller {
                 $icon,
                 $color,
                 $budgetAmount,
-                $sortOrder
+                $sortOrder,
+                $excludedFromReports
             );
             return new DataResponse($category, Http::STATUS_CREATED);
         } catch (\Exception $e) {
@@ -273,6 +275,9 @@ class CategoryController extends Controller {
             }
             if ($sortOrder !== null) {
                 $updates['sortOrder'] = $sortOrder;
+            }
+            if (array_key_exists('excludedFromReports', $params)) {
+                $updates['excludedFromReports'] = (bool) $params['excludedFromReports'];
             }
 
             if (empty($updates)) {

@@ -948,6 +948,9 @@ export default class CategoriesModule {
 
         const colorInput = document.getElementById('category-color');
         if (colorInput) colorInput.value = '#3b82f6';
+
+        const excludedCheckbox = document.getElementById('category-excluded-from-reports');
+        if (excludedCheckbox) excludedCheckbox.checked = false;
     }
 
     loadCategoryData(category) {
@@ -956,6 +959,11 @@ export default class CategoriesModule {
         document.getElementById('category-type').value = category.type;
         document.getElementById('category-parent').value = category.parentId || '';
         document.getElementById('category-color').value = category.color || '#3b82f6';
+
+        const excludedCheckbox = document.getElementById('category-excluded-from-reports');
+        if (excludedCheckbox) {
+            excludedCheckbox.checked = category.excludedFromReports || false;
+        }
 
         // Load tag sets for this category
         this.app.renderCategoryTagSetsUI(category.id);
@@ -991,11 +999,14 @@ export default class CategoriesModule {
             return;
         }
 
+        const excludedFromReports = document.getElementById('category-excluded-from-reports')?.checked || false;
+
         const categoryData = {
             name,
             type,
             parentId: parentId ? parseInt(parentId) : null,
-            color
+            color,
+            excludedFromReports
         };
 
         try {

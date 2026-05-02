@@ -64,7 +64,8 @@ class CategoryService extends AbstractCrudService {
         ?string $icon = null,
         ?string $color = null,
         ?float $budgetAmount = null,
-        int $sortOrder = 0
+        int $sortOrder = 0,
+        bool $excludedFromReports = false
     ): Category {
         // Validate parent if provided
         if ($parentId !== null) {
@@ -85,6 +86,7 @@ class CategoryService extends AbstractCrudService {
         $category->setColor($color ?: $this->generateRandomColor());
         $category->setBudgetAmount($budgetAmount);
         $category->setSortOrder($sortOrder);
+        $category->setExcludedFromReports($excludedFromReports);
         $this->setTimestamps($category, true);
 
         return $this->mapper->insert($category);
@@ -426,6 +428,9 @@ class CategoryService extends AbstractCrudService {
         $expenseCategoryIds = [];
         $incomeCategoryIds = [];
         foreach ($categories as $category) {
+            if ($category->getExcludedFromReports()) {
+                continue;
+            }
             $catId = $category->getId();
             $budget = $effectiveBudgets[$catId]['amount'] ?? 0;
             if ($budget > 0) {
@@ -448,6 +453,9 @@ class CategoryService extends AbstractCrudService {
 
         $analysis = [];
         foreach ($categories as $category) {
+            if ($category->getExcludedFromReports()) {
+                continue;
+            }
             $catId = $category->getId();
             $budget = (float) ($effectiveBudgets[$catId]['amount'] ?? 0);
             if ($budget > 0) {
