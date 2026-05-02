@@ -8,11 +8,15 @@ A comprehensive financial management app for Nextcloud. Track spending habits, m
 
 ![Dashboard Screenshot](screenshots/dashboard.png)
 
-## What's New in v2.15
+## What's New in v2.17
 
-- **Accounts Tile Customisation** - Unlock dashboard to reorder and hide accounts on the Accounts tile via a new config panel
-- **Projected Balance** - Account detail shows both current and projected balance when scheduled transactions exist
-- **Bills Calendar History** - Paid bills remain visible in the calendar with strikethrough styling for a complete annual overview
+- **Exclude from Reports** - Flag categories to hide from budgets, spending reports, and dashboard totals (ideal for investment adjustments or internal bookkeeping)
+- **Auto-Match Transfers After Import** - Automatically links transfer pairs across accounts after importing bank statements
+- **Pension Projections from Profile** - Reads your date of birth from your Nextcloud profile for accurate retirement calculations
+- **Reconciliation Completion** - Finishing reconciliation now persists the "Last Reconciled" date and marks transactions
+- **Category Net Spending** - Refunds/credits now reduce category totals instead of inflating them
+- **Debt Payments as Expenses** - Transfers to credit cards, loans, and mortgages correctly count as expenses in dashboard totals
+- **Security Fixes** - XSS output encoding improvements in account detail and import views
 
 See the [full changelog](budget/CHANGELOG.md) for details.
 
@@ -21,7 +25,7 @@ See the [full changelog](budget/CHANGELOG.md) for details.
 Full user documentation is available in the [docs/](docs/index.md) directory:
 
 - **[Quick Start Guide](docs/getting-started.md)** — Set up in 10 minutes
-- **[Full Documentation Index](docs/index.md)** — All 23 features documented
+- **[Full Documentation Index](docs/index.md)** — All features documented
 
 Popular topics:
 - [Importing bank statements](docs/import.md)
