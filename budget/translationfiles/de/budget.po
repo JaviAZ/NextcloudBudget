@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-12 13:22+0000\n"
-"PO-Revision-Date: 2026-09-12 01:18+0000\n"
+"PO-Revision-Date: 2026-09-15 17:51+0000\n"
 "Last-Translator: SGiersch <Forum@SGiersch.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
@@ -1086,18 +1086,14 @@ msgstr "Kategorien konnten nicht exportiert werden"
 #: /app/lib/Controller/CategoryTransferController.php:89
 #: /app/src/modules/categories/CategoriesModule.js:1529
 #: /app/src/modules/categories/CategoriesModule.js:1535
-#, fuzzy
-#| msgid "Failed to reorder category"
 msgid "Failed to read the category file"
-msgstr "Kategorie konnte nicht neu angeordnet werden"
+msgstr "Die Kategoriedatei konnte nicht gelesen werden"
 
 #: /app/lib/Controller/CategoryTransferController.php:109
 #: /app/src/modules/categories/CategoriesModule.js:1607
 #: /app/src/modules/categories/CategoriesModule.js:1615
-#, fuzzy
-#| msgid "Failed to retrieve categories"
 msgid "Failed to import categories"
-msgstr "Kategorien konnten nicht abgefragt werden"
+msgstr "Kategorien konnten nicht importiert werden"
 
 #: /app/lib/Controller/DebtController.php:58
 msgid "Failed to retrieve debts"
@@ -1378,7 +1374,7 @@ msgstr "Fehler beim Verarbeiten des Imports"
 
 #: /app/lib/Controller/ImportController.php:265
 msgid "CSV delimiter must be a single character"
-msgstr ""
+msgstr "Das CSV-Trennzeichen muss aus einem einzelnen Zeichen bestehen"
 
 #: /app/lib/Controller/ImportController.php:272
 msgid "Unsupported character encoding"
@@ -3240,7 +3236,7 @@ msgstr "Speichern Sie zuerst die Kategorie, um Tag-Gruppen zu verwalten"
 #: /app/lib/Service/CategoryTransferService.php:310
 #, php-format
 msgid "\"%1$s\" is listed more than once; the entries were merged"
-msgstr ""
+msgstr "\"%1$s\" ist mehrfach aufgeführt; die Einträge wurden zusammengeführt"
 
 #: /app/lib/Service/CategoryTransferService.php:321
 #, php-format
@@ -3251,26 +3247,32 @@ msgstr "Die Datei enthält mehr als %1$d Kategorien"
 #, php-format
 msgid "\"%1$s\" must have the same type as its parent; imported as %2$s"
 msgstr ""
+"\"%1$s\" muss denselben Typ wie die übergeordnete Kategorie haben; wurde als "
+"%2$s importiert"
 
 #: /app/lib/Service/CategoryTransferService.php:338
 #, php-format
 msgid "\"%1$s\" has no type; imported as an expense category"
-msgstr ""
+msgstr "\"%1$s\" hat keinen Typ; wurde als Ausgabenkategorie importiert"
 
 #: /app/lib/Service/CategoryTransferService.php:339
 #, php-format
 msgid "\"%1$s\" has the unknown type \"%2$s\"; imported as an expense category"
 msgstr ""
+"\"%1$s\" hat den unbekannten Typ \"%2$s\"; wurde als Ausgabenkategorie "
+"importiert"
 
 #: /app/lib/Service/CategoryTransferService.php:352
 #, php-format
 msgid "\"%1$s\": the colour \"%2$s\" is not a hex code and was ignored"
 msgstr ""
+"\"%1$s\": Die Farbe \"%2$s\" ist kein gültiger Hex-Farbcode und wurde "
+"ignoriert"
 
 #: /app/lib/Service/CategoryTransferService.php:362
 #, php-format
 msgid "\"%1$s\": the budget \"%2$s\" is not a number and was ignored"
-msgstr ""
+msgstr "\"%1$s\": Das Budget \"%2$s\" ist keine Zahl und wurde ignoriert"
 
 #: /app/lib/Service/DigestService.php:132
 #, php-format
@@ -3498,6 +3500,8 @@ msgid ""
 "File does not appear to be a camt.053 bank statement. Only ISO 20022 "
 "camt.053/camt.052 XML is supported."
 msgstr ""
+"Die Datei scheint kein camt.053-Kontoauszug zu sein. Es werden nur XML-"
+"Dateien im ISO-20022-Format camt.053/camt.052 unterstützt."
 
 #: /app/lib/Service/ImportService.php:137
 #, php-format
@@ -3517,6 +3521,7 @@ msgstr "Eine Konto-ID wird für Einzelkontenimporte benötigt"
 #: /app/lib/Service/ImportService.php:1355
 msgid "This row has no account, and no account was chosen for the import"
 msgstr ""
+"Diese Zeile enthält kein Konto und für den Import wurde kein Konto ausgewählt"
 
 #: /app/lib/Service/ImportService.php:1112
 #, php-format
@@ -8122,13 +8127,11 @@ msgstr "Keine Dateidaten verfügbar"
 
 #: /app/src/modules/dashboard/DashboardModule.js:2380
 msgid "Per day"
-msgstr ""
+msgstr "Pro Tag"
 
 #: /app/src/modules/dashboard/DashboardModule.js:2384
-#, fuzzy
-#| msgid "Projected Growth"
 msgid "Projected monthly"
-msgstr "Prognostiziertes Wachstum"
+msgstr "Hochgerechnet pro Monat"
 
 #: /app/src/modules/dashboard/DashboardModule.js:2399
 #, fuzzy
