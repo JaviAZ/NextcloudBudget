@@ -46,6 +46,26 @@ afterEach(() => {
     delete global.fetch;
 });
 
+describe('Budget Progress', () => {
+    it('uses the cycle month for snapshots when the period crosses months', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(at(2026, 9, 15));
+        const dash = makeDashboard({ budgetProgress: { dateRange: 'period' } });
+        dash.app.settings.budget_start_day = '28';
+        dash.updateBudgetProgressWidget = vi.fn();
+        global.fetch = vi.fn(async (url) => {
+            requested.push(url);
+            return { ok: true, json: async () => ({ categories: [] }) };
+        });
+
+        await dash.refreshBudgetProgressWidget();
+
+        expect(requested[0]).toContain('startDate=2026-08-28');
+        expect(requested[0]).toContain('endDate=2026-09-27');
+        expect(requested[0]).toContain('snapshotMonth=2026-09');
+    });
+});
+
 describe('Large Transactions', () => {
     it('scopes the fetch to the tile date range', async () => {
         vi.useFakeTimers();

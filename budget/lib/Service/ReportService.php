@@ -252,8 +252,8 @@ class ReportService {
     /**
      * Generate a budget report with category-by-category breakdown.
      */
-    public function getBudgetReport(string $userId, string $startDate, string $endDate, ?int $accountId = null, ?array $visibleAccountIds = null): array {
-        return $this->aggregator->getBudgetReport($userId, $startDate, $endDate, $accountId, $visibleAccountIds);
+    public function getBudgetReport(string $userId, string $startDate, string $endDate, ?int $accountId = null, ?array $visibleAccountIds = null, ?string $snapshotMonth = null): array {
+        return $this->aggregator->getBudgetReport($userId, $startDate, $endDate, $accountId, $visibleAccountIds, $snapshotMonth);
     }
 
     /**

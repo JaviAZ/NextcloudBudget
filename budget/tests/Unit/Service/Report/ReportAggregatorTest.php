@@ -21,6 +21,7 @@ class ReportAggregatorTest extends TestCase {
 	private CategoryMapper $categoryMapper;
 	private ReportCalculator $calculator;
 	private CurrencyConversionService $conversionService;
+	private BudgetSnapshotMapper $budgetSnapshotMapper;
 	private $splitMapper;
 	private $granularShareService;
 	private $categoryMuteMapper;
@@ -32,7 +33,7 @@ class ReportAggregatorTest extends TestCase {
 		$this->calculator = $this->createMock(ReportCalculator::class);
 		$this->conversionService = $this->createMock(CurrencyConversionService::class);
 
-		$budgetSnapshotMapper = $this->createMock(BudgetSnapshotMapper::class);
+		$this->budgetSnapshotMapper = $this->createMock(BudgetSnapshotMapper::class);
 
 		$recurringBudgetService = $this->createMock(\OCA\Budget\Service\RecurringBudgetService::class);
 		$recurringBudgetService->method('getMonthlyBudgetsByCategory')->willReturn([]);
@@ -51,7 +52,7 @@ class ReportAggregatorTest extends TestCase {
 			$this->accountMapper,
 			$this->transactionMapper,
 			$this->categoryMapper,
-			$budgetSnapshotMapper,
+			$this->budgetSnapshotMapper,
 			$this->calculator,
 			$this->conversionService,
 			$recurringBudgetService,
@@ -472,6 +473,25 @@ class ReportAggregatorTest extends TestCase {
 		$this->assertArrayHasKey('currencyConverted', $result);
 		$this->assertArrayHasKey('unconvertedCurrencies', $result);
 		$this->assertEquals('USD', $result['baseCurrency']);
+	}
+
+	// ===== Budget report =====
+
+	public function testBudgetReportUsesExplicitSnapshotMonthForCrossMonthCycle(): void {
+		$this->categoryMapper->method('findAll')->willReturn([]);
+		$this->budgetSnapshotMapper->expects($this->once())
+			->method('findEffectiveBatch')
+			->with('user1', '2026-09')
+			->willReturn([]);
+
+		$this->aggregator->getBudgetReport(
+			'user1',
+			'2026-08-28',
+			'2026-09-27',
+			null,
+			null,
+			'2026-09'
+		);
 	}
 
 	// ===== getCategoryMonthlyReport (#288) =====

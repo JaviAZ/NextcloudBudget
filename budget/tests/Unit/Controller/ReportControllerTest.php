@@ -149,9 +149,11 @@ class ReportControllerTest extends TestCase {
 
 	public function testBudgetReturnsData(): void {
 		$budget = ['categories' => [], 'totalBudget' => 2000];
-		$this->service->method('getBudgetReport')->willReturn($budget);
+		$this->service->expects($this->once())->method('getBudgetReport')
+			->with('user1', '2026-01-01', '2026-01-31', null, [], '2026-01')
+			->willReturn($budget);
 
-		$response = $this->controller->budget('2026-01-01', '2026-01-31');
+		$response = $this->controller->budget('2026-01-01', '2026-01-31', null, null, '2026-01');
 
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 		$this->assertSame($budget, $response->getData());

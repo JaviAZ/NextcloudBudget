@@ -136,10 +136,10 @@ class ReportServiceTest extends TestCase {
     public function testGetBudgetReportDelegatesToAggregator(): void {
         $expected = ['categories' => []];
         $this->aggregator->expects($this->once())->method('getBudgetReport')
-            ->with('user1', '2025-01-01', '2025-12-31')
+            ->with('user1', '2025-01-01', '2025-12-31', null, null, '2025-12')
             ->willReturn($expected);
 
-        $result = $this->service->getBudgetReport('user1', '2025-01-01', '2025-12-31');
+        $result = $this->service->getBudgetReport('user1', '2025-01-01', '2025-12-31', null, null, '2025-12');
         $this->assertSame($expected, $result);
     }
 
