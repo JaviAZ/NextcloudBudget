@@ -40,6 +40,31 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 
+describe('calculateCategorySpending', () => {
+    it('ignores an older month request that finishes last', async () => {
+        const mod = Object.create(CategoriesModule.prototype);
+        mod.app = {
+            settings: {},
+            categoryTree: [{ id: 7, type: 'expense', budgetPeriod: 'monthly', children: [] }],
+        };
+        mod.budgetMonth = '2026-05';
+
+        const pending = [];
+        global.fetch = vi.fn(() => new Promise(resolve => pending.push(resolve)));
+
+        const may = mod.calculateCategorySpending();
+        mod.budgetMonth = '2026-06';
+        const june = mod.calculateCategorySpending();
+
+        pending[1]({ ok: true, json: async () => [{ categoryId: 7, spent: 20 }] });
+        await june;
+        pending[0]({ ok: true, json: async () => [{ categoryId: 7, spent: 10 }] });
+        await may;
+
+        expect(mod.categorySpending[7]).toBe(20);
+    });
+});
+
 describe('recalculateCategorySpending', () => {
     it('asks for the credit direction for an income category', async () => {
         const mod = makeModule([{ id: 3, type: 'income' }], [{ categoryId: 3, spent: 3000 }]);

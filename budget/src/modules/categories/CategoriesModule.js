@@ -2016,20 +2016,17 @@ export default class CategoriesModule {
     }
 
     async calculateCategorySpending() {
-        // Initialize spending object and reset own-spending baseline
-        this.categorySpending = {};
-        this._ownSpending = {};
+        // Month changes can overlap; only the newest request may replace the view.
+        const generation = (this._spendingGeneration || 0) + 1;
+        this._spendingGeneration = generation;
+        const categorySpending = {};
 
         // Budget view excludes categories flagged "excluded from reports" or
         // "excluded from budgeting".
-        this._budgetTree = this.filterBudgetCategories(this.categoryTree || []);
+        const budgetTree = this.filterBudgetCategories(this.categoryTree || []);
 
         // Get all categories (not just ones with budgets — parents need children's spending)
-        const allCategories = this.flattenCategories(this._budgetTree);
-
-        if (allCategories.length === 0) {
-            return;
-        }
+        const allCategories = this.flattenCategories(budgetTree);
 
         // Group categories by period and type to minimize API calls
         // Income categories need credit transactions, expense categories need debit
@@ -2069,19 +2066,23 @@ export default class CategoriesModule {
                     // Map spending to categories
                     spendingData.forEach(item => {
                         if (categoryIds.includes(item.categoryId)) {
-                            this.categorySpending[item.categoryId] = parseFloat(item.spent) || 0;
+                            categorySpending[item.categoryId] = parseFloat(item.spent) || 0;
                         }
                     });
                 }
             }
         } catch (error) {
             console.error('Failed to fetch category spending:', error);
-            this.categorySpending = {};
         }
+
+        if (generation !== this._spendingGeneration) return;
+        this.categorySpending = categorySpending;
+        this._ownSpending = {};
+        this._budgetTree = budgetTree;
 
         // Aggregate children's spending into parent categories (excluded-from-
         // reports categories are already removed from the budget tree).
-        this.aggregateParentSpending(this._budgetTree || []);
+        this.aggregateParentSpending(this._budgetTree);
     }
 
     /**
