@@ -1675,33 +1675,49 @@ export default class CategoriesModule {
     }
 
     async fetchEffectiveBudgets() {
+        // Month changes can overlap; only the newest request may replace the
+        // budgets, or a slow load for the old month lands on the new one.
+        const generation = (this._budgetsGeneration || 0) + 1;
+        this._budgetsGeneration = generation;
+        const month = this.budgetMonth;
+
+        // A failed load clears the budgets rather than leaving another
+        // month's in place.
+        let budgets = null;
+        let hasSnapshot = false;
         try {
             const response = await fetch(
-                OC.generateUrl(`/apps/budget/api/budget-snapshots/${this.budgetMonth}/budgets`),
+                OC.generateUrl(`/apps/budget/api/budget-snapshots/${month}/budgets`),
                 { headers: this.app.getAuthHeaders() }
             );
             if (response.ok) {
                 const data = await response.json();
-                this._effectiveBudgets = data.budgets || {};
-                this._currentMonthHasSnapshot = data.hasSnapshot || false;
+                budgets = data.budgets || {};
+                hasSnapshot = data.hasSnapshot || false;
             }
         } catch (error) {
             console.error('Failed to fetch effective budgets:', error);
-            this._effectiveBudgets = null;
-            this._currentMonthHasSnapshot = false;
         }
 
         // Also fetch snapshot months list
+        let snapshotMonths = null;
         try {
             const response = await fetch(
                 OC.generateUrl('/apps/budget/api/budget-snapshots'),
                 { headers: this.app.getAuthHeaders() }
             );
             if (response.ok) {
-                this._snapshotMonths = await response.json();
+                snapshotMonths = await response.json();
             }
         } catch (error) {
-            this._snapshotMonths = [];
+            snapshotMonths = [];
+        }
+
+        if (generation !== this._budgetsGeneration) return;
+        this._effectiveBudgets = budgets;
+        this._currentMonthHasSnapshot = hasSnapshot;
+        if (snapshotMonths !== null) {
+            this._snapshotMonths = snapshotMonths;
         }
     }
 
@@ -1941,9 +1957,14 @@ export default class CategoriesModule {
         const monthSelect = document.getElementById('budget-month');
         if (monthSelect) {
             monthSelect.addEventListener('change', async (e) => {
-                this.budgetMonth = e.target.value;
+                const month = e.target.value;
+                this.budgetMonth = month;
+                // If the month changes again mid-load, the newer change
+                // loads and renders its own month; this one stops.
                 await this.fetchEffectiveBudgets();
+                if (this.budgetMonth !== month) return;
                 await this.calculateCategorySpending();
+                if (this.budgetMonth !== month) return;
                 this.renderBudgetTree();
                 this.updateBudgetSummary();
                 this.renderSnapshotControls();
@@ -2020,6 +2041,9 @@ export default class CategoriesModule {
         const generation = (this._spendingGeneration || 0) + 1;
         this._spendingGeneration = generation;
         const categorySpending = {};
+        // Read once: every group must measure the same month, even if the
+        // selection changes while earlier groups are loading.
+        const budgetMonth = this.budgetMonth;
 
         // Budget view excludes categories flagged "excluded from reports" or
         // "excluded from budgeting".
@@ -2049,8 +2073,8 @@ export default class CategoriesModule {
 
                 // Get date range for this period
                 const startDay = period === 'monthly' ? parseInt(this.app.settings?.budget_start_day || '1', 10) : 1;
-                // Use selected budget month as reference date (1st of month)
-                const referenceDate = this.budgetMonth ? `${this.budgetMonth}-15` : null;
+                // The selected month is the cycle holding its 15th
+                const referenceDate = budgetMonth ? `${budgetMonth}-15` : null;
                 const dateRange = formatters.getPeriodDateRange(period, startDay, referenceDate);
 
                 // Fetch spending for this period and transaction type
