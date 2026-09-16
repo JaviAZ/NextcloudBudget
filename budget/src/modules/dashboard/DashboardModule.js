@@ -39,6 +39,12 @@ const MAX_SPLIT_CATEGORY_DOTS = 3;
  */
 const PERIOD_INDICATOR_WIDGETS = ['trendChart', 'spendingChart', 'netWorthHistory', 'assetValueHistory'];
 
+// Hero tiles whose figures cover the current budget period
+const PERIOD_HERO_WIDGETS = [
+    'income', 'expenses', 'savings', 'savingsRate', 'cashFlow',
+    'budgetRemaining', 'budgetHealth', 'accountIncome', 'accountExpenses',
+];
+
 export default class DashboardModule {
     constructor(app) {
         this.app = app;
@@ -173,11 +179,8 @@ export default class DashboardModule {
         try {
             // Hero stats follow the configured budget cycle, not the calendar month.
             const now = new Date();
-            const currentPeriod = formatters.getPeriodDateRange(
-                'monthly',
-                parseInt(this.settings?.budget_start_day || '1', 10),
-                now,
-            );
+            const budgetStartDay = parseInt(this.settings?.budget_start_day || '1', 10);
+            const currentPeriod = formatters.getPeriodDateRange('monthly', budgetStartDay, now);
             const periodStart = currentPeriod.start;
             const periodEnd = currentPeriod.end;
             const periodMonth = formatters.budgetMonthForCycle(periodStart, periodEnd);
@@ -250,6 +253,7 @@ export default class DashboardModule {
 
             // Update Hero Section (current month data)
             this.updateDashboardHero(summary, pensionSummary, assetSummary);
+            this.updateHeroPeriodHints(budgetStartDay > 1 ? currentPeriod.label : null);
 
             // Reveal hero section after data is loaded
             const heroEl = document.querySelector('.dashboard-hero');
@@ -456,6 +460,35 @@ export default class DashboardModule {
                 savingsRateEl.textContent = `${savingsRate >= 0 ? '' : '-'}${t('budget', '{percent}% savings rate', { percent: Math.abs(savingsRate).toFixed(1) })}`;
             }
         }
+    }
+
+    /**
+     * Show the days the period-based hero tiles cover when a budget start
+     * day is set. Their labels say "This Month", which only holds literally
+     * for a start day of the 1st (#386).
+     *
+     * @param {string|null} label - The period's date span, or null to remove the hints
+     */
+    updateHeroPeriodHints(label) {
+        document.querySelectorAll('.hero-card[data-widget-id]').forEach(card => {
+            if (!PERIOD_HERO_WIDGETS.includes(this.getWidgetType(card.getAttribute('data-widget-id')))) return;
+            const content = card.querySelector('.hero-content');
+            if (!content) return;
+
+            let hint = content.querySelector('.hero-period');
+            if (!label) {
+                if (hint) hint.remove();
+                return;
+            }
+            if (!hint) {
+                const anchor = content.querySelector('.hero-label-row') || content.querySelector('.hero-label');
+                if (!anchor) return;
+                hint = document.createElement('span');
+                hint.className = 'hero-period';
+                anchor.after(hint);
+            }
+            hint.textContent = label;
+        });
     }
 
     updateSavingsRateHero(summary) {

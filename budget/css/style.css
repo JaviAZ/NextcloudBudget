@@ -562,6 +562,13 @@
     margin-top: 4px;
 }
 
+/* The days a period-based hero tile covers when a budget start day is set */
+.hero-period {
+    font-size: 11px;
+    color: var(--color-text-maxcontrast);
+    margin: -2px 0 4px;
+}
+
 /* Currency Conversion Indicator (inside hero tile) */
 .conversion-info {
     opacity: 0.8;
