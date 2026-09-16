@@ -22,6 +22,7 @@ class ReportAggregatorTest extends TestCase {
 	private ReportCalculator $calculator;
 	private CurrencyConversionService $conversionService;
 	private BudgetSnapshotMapper $budgetSnapshotMapper;
+	private $carryoverService;
 	private $splitMapper;
 	private $granularShareService;
 	private $categoryMuteMapper;
@@ -38,8 +39,7 @@ class ReportAggregatorTest extends TestCase {
 		$recurringBudgetService = $this->createMock(\OCA\Budget\Service\RecurringBudgetService::class);
 		$recurringBudgetService->method('getMonthlyBudgetsByCategory')->willReturn([]);
 
-		$carryoverService = $this->createMock(\OCA\Budget\Service\BudgetCarryoverService::class);
-		$carryoverService->method('getCarryovers')->willReturn([]);
+		$this->carryoverService = $this->createMock(\OCA\Budget\Service\BudgetCarryoverService::class);
 
 		$this->splitMapper = $this->createMock(\OCA\Budget\Db\TransactionSplitMapper::class);
 
@@ -56,7 +56,7 @@ class ReportAggregatorTest extends TestCase {
 			$this->calculator,
 			$this->conversionService,
 			$recurringBudgetService,
-			$carryoverService,
+			$this->carryoverService,
 			$this->splitMapper,
 			$this->granularShareService,
 			$this->categoryMuteMapper
@@ -492,6 +492,59 @@ class ReportAggregatorTest extends TestCase {
 			null,
 			'2026-09'
 		);
+	}
+
+	/**
+	 * With a custom start day the dashboard asks for the budget period, not a
+	 * calendar month, so the envelope carryover has to recognise it (#386).
+	 */
+	public function testBudgetReportAppliesCarryoverForTheBudgetPeriod(): void {
+		$this->categoryMapper->method('findAll')->willReturn([]);
+		$this->carryoverService->method('budgetMonthRange')
+			->with('user1', '2026-09')
+			->willReturn(['2026-08-28', '2026-09-27']);
+		$this->carryoverService->expects($this->once())
+			->method('getCarryovers')
+			->with('user1', '2026-09')
+			->willReturn([]);
+
+		$this->aggregator->getBudgetReport('user1', '2026-08-28', '2026-09-27', null, null, '2026-09');
+	}
+
+	public function testBudgetReportKeepsCarryoverForACalendarMonth(): void {
+		$this->categoryMapper->method('findAll')->willReturn([]);
+		$this->carryoverService->method('budgetMonthRange')->willReturn(['2026-08-28', '2026-09-27']);
+		$this->carryoverService->expects($this->once())
+			->method('getCarryovers')
+			->with('user1', '2026-09')
+			->willReturn([]);
+
+		$this->aggregator->getBudgetReport('user1', '2026-09-01', '2026-09-30');
+	}
+
+	public function testBudgetReportSkipsCarryoverForARangeThatIsNoMonth(): void {
+		$this->categoryMapper->method('findAll')->willReturn([]);
+		$this->carryoverService->method('budgetMonthRange')->willReturn(['2026-08-28', '2026-09-27']);
+		$this->carryoverService->expects($this->never())->method('getCarryovers');
+
+		$this->aggregator->getBudgetReport('user1', '2026-08-28', '2026-09-15', null, null, '2026-09');
+	}
+
+	public function testBudgetReportAddsTheCarryoverToABudgetPeriodBudget(): void {
+		$category = new \OCA\Budget\Db\Category();
+		$category->setId(5);
+		$category->setName('Groceries');
+		$category->setType('expense');
+		$category->setBudgetAmount(300.0);
+		$category->setBudgetPeriod('monthly');
+		$this->categoryMapper->method('findAll')->willReturn([$category]);
+		$this->budgetSnapshotMapper->method('findEffectiveBatch')->willReturn([]);
+		$this->carryoverService->method('budgetMonthRange')->willReturn(['2026-08-28', '2026-09-27']);
+		$this->carryoverService->method('getCarryovers')->willReturn([5 => 40.0]);
+
+		$result = $this->aggregator->getBudgetReport('user1', '2026-08-28', '2026-09-27', null, null, '2026-09');
+
+		$this->assertSame(340.0, $result['categories'][0]['budgeted']);
 	}
 
 	// ===== getCategoryMonthlyReport (#288) =====

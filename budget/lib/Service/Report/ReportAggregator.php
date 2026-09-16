@@ -419,10 +419,13 @@ class ReportAggregator {
             : [];
 
         // Envelope carryover is a monthly concept: apply it only when the
-        // requested range is exactly one calendar month (the budget surfaces
-        // always request whole months); arbitrary ranges get base budgets.
-        $isSingleMonth = $startDate === $reportMonth . '-01'
-            && $endDate === date('Y-m-t', strtotime($startDate));
+        // requested range is exactly one month - a calendar month, or the
+        // user's budget period for the report month, which is what the
+        // dashboard asks for with a custom start day (#386). Arbitrary ranges
+        // get base budgets.
+        $isSingleMonth = ($startDate === $reportMonth . '-01'
+                && $endDate === date('Y-m-t', strtotime($startDate)))
+            || [$startDate, $endDate] === $this->carryoverService->budgetMonthRange($userId, $reportMonth);
         $carryovers = $isSingleMonth
             ? $this->carryoverService->getCarryovers($userId, $reportMonth, $categories, $visibleAccountIds)
             : [];

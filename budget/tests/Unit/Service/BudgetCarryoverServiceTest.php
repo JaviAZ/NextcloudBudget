@@ -342,6 +342,49 @@ class BudgetCarryoverServiceTest extends TestCase {
         $this->assertSame(450.0, $result[1]);
     }
 
+    // ── budgetMonthRange (#386) ─────────────────────────────────────
+
+    private function serviceWithStartDay(?string $startDay): TestableBudgetCarryoverService {
+        $settingService = $this->createMock(SettingService::class);
+        $settingService->method('get')->willReturn($startDay);
+        return new TestableBudgetCarryoverService(
+            $this->createMock(CategoryMapper::class),
+            $this->snapshotMapper,
+            $this->transactionMapper,
+            $this->splitMapper,
+            $this->recurringBudgetService,
+            $settingService
+        );
+    }
+
+    public function testBudgetMonthRangeIsTheCalendarMonthWithoutAStartDay(): void {
+        $this->assertSame(
+            ['2026-02-01', '2026-02-28'],
+            $this->serviceWithStartDay(null)->budgetMonthRange('alice', '2026-02')
+        );
+    }
+
+    public function testBudgetMonthRangeStartsInTheMonthForAnEarlyStartDay(): void {
+        $this->assertSame(
+            ['2026-09-10', '2026-10-09'],
+            $this->serviceWithStartDay('10')->budgetMonthRange('alice', '2026-09')
+        );
+    }
+
+    public function testBudgetMonthRangeEndsInTheMonthForALateStartDay(): void {
+        $this->assertSame(
+            ['2026-08-28', '2026-09-27'],
+            $this->serviceWithStartDay('28')->budgetMonthRange('alice', '2026-09')
+        );
+    }
+
+    public function testBudgetMonthRangeClampsAStartDayOf31(): void {
+        $this->assertSame(
+            ['2026-01-31', '2026-02-27'],
+            $this->serviceWithStartDay('31')->budgetMonthRange('alice', '2026-02')
+        );
+    }
+
     // ── the envelope covers the whole branch (#341) ─────────────────
 
     /**

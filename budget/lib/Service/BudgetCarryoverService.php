@@ -434,6 +434,21 @@ class BudgetCarryoverService {
         return [$start, $end];
     }
 
+    /**
+     * The dates [start, end] (Y-m-d) budget month $month covers for this
+     * user: the calendar month, or with a custom start day the period
+     * containing $month's 15th (see periodRange()).
+     *
+     * @return array{0: string, 1: string}
+     */
+    public function budgetMonthRange(string $userId, string $month): array {
+        $startDay = $this->getBudgetStartDay($userId);
+        if ($startDay === 1) {
+            return [$month . '-01', date('Y-m-t', strtotime($month . '-01'))];
+        }
+        return $this->periodRange($month, $startDay);
+    }
+
     private function clampedDay(\DateTime $monthStart, int $startDay): \DateTime {
         $day = min($startDay, (int) $monthStart->format('t'));
         return (clone $monthStart)->setDate(
