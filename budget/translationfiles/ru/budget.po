@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-09-16 22:09+0000\n"
+"POT-Creation-Date: 2026-09-16 23:01+0000\n"
 "PO-Revision-Date: 2026-09-12 15:13+0000\n"
 "Last-Translator: Leonid Zaliubovskyi <la399fox@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/nextcloud-budget/"
@@ -861,7 +861,7 @@ msgstr "Итого за год"
 #: /app/lib/Service/Report/ReportExporter.php:512
 #: /app/lib/Service/Report/ReportExporter.php:583
 #: /app/lib/Service/Report/ReportExporter.php:658
-#: /app/src/modules/categories/CategoriesModule.js:2255
+#: /app/src/modules/categories/CategoriesModule.js:2256
 #: /app/src/modules/reports/ReportsModule.js:1926 /app/templates/index.php:7116
 msgid "Total"
 msgstr "Всего"
@@ -1876,7 +1876,7 @@ msgstr "Понедельник"
 
 #: /app/lib/Controller/SettingController.php:319
 #: /app/src/modules/bills/BillsModule.js:327
-#: /app/src/modules/categories/CategoriesModule.js:2260
+#: /app/src/modules/categories/CategoriesModule.js:2261
 #: /app/src/modules/income/IncomeModule.js:117
 #: /app/src/modules/transfers/TransfersModule.js:297
 #: /app/src/modules/transfers/TransfersModule.js:464
@@ -1889,7 +1889,7 @@ msgstr "Еженедельно"
 #: /app/lib/Controller/SettingController.php:320
 #: /app/src/modules/accounts/AccountsModule.js:1398
 #: /app/src/modules/bills/BillsModule.js:330
-#: /app/src/modules/categories/CategoriesModule.js:2259
+#: /app/src/modules/categories/CategoriesModule.js:2260
 #: /app/src/modules/income/IncomeModule.js:120
 #: /app/src/modules/pensions/PensionsModule.js:1075
 #: /app/src/modules/transfers/TransfersModule.js:300
@@ -1903,7 +1903,7 @@ msgstr "Ежемесячно"
 
 #: /app/lib/Controller/SettingController.php:321
 #: /app/src/modules/bills/BillsModule.js:331
-#: /app/src/modules/categories/CategoriesModule.js:2261
+#: /app/src/modules/categories/CategoriesModule.js:2262
 #: /app/src/modules/income/IncomeModule.js:121
 #: /app/src/modules/pensions/PensionsModule.js:1076
 #: /app/src/modules/transfers/TransfersModule.js:301
@@ -1917,7 +1917,7 @@ msgstr "Ежеквартально"
 #: /app/lib/Controller/SettingController.php:322
 #: /app/src/modules/accounts/AccountsModule.js:1399
 #: /app/src/modules/bills/BillsModule.js:333
-#: /app/src/modules/categories/CategoriesModule.js:2262
+#: /app/src/modules/categories/CategoriesModule.js:2263
 #: /app/src/modules/income/IncomeModule.js:123
 #: /app/src/modules/pensions/PensionsModule.js:1077
 #: /app/src/modules/transfers/TransfersModule.js:303
@@ -2448,7 +2448,7 @@ msgstr "Год"
 #: /app/src/modules/reports/ReportsModule.js:1504
 #: /app/src/modules/reports/ReportsModule.js:1520
 #: /app/src/modules/reports/ReportsModule.js:1565
-#: /app/src/modules/rules/components/ActionBuilder.js:306
+#: /app/src/modules/rules/components/ActionBuilder.js:327
 #: /app/src/modules/rules/components/CriteriaBuilder.js:182
 #: /app/templates/index.php:103 /app/templates/index.php:1017
 #: /app/templates/index.php:1442 /app/templates/index.php:1599
@@ -2632,7 +2632,7 @@ msgstr[2] "срок оплаты через %n дней"
 #: /app/specialAppInfoFakeDummyForL10nScript.php:2
 #: /app/src/core/KeyboardShortcuts.js:337
 #: /app/src/modules/categories/CategoriesModule.js:869
-#: /app/src/modules/categories/CategoriesModule.js:2242
+#: /app/src/modules/categories/CategoriesModule.js:2243
 #: /app/src/modules/dashboard/DashboardModule.js:1917
 #: /app/src/modules/help/HelpModule.js:27 /app/templates/index.php:93
 #: /app/templates/index.php:2109 /app/templates/index.php:2180
@@ -3187,7 +3187,7 @@ msgstr "Часть транзакции"
 #: /app/lib/Service/Export/TransactionCsvExporter.php:144
 #: /app/src/modules/categories/CategoriesModule.js:708
 #: /app/src/modules/categories/CategoriesModule.js:1581
-#: /app/src/modules/rules/components/ActionBuilder.js:301
+#: /app/src/modules/rules/components/ActionBuilder.js:322
 #: /app/src/modules/rules/components/CriteriaBuilder.js:181
 #: /app/templates/index.php:1016 /app/templates/index.php:1443
 #: /app/templates/index.php:1600 /app/templates/index.php:5619
@@ -3669,7 +3669,7 @@ msgid "Source"
 msgstr "Источник"
 
 #: /app/lib/Service/Report/ReportExporter.php:356
-#: /app/src/modules/categories/CategoriesModule.js:2257
+#: /app/src/modules/categories/CategoriesModule.js:2258
 #: /app/templates/index.php:2181 /app/templates/index.php:3080
 msgid "Period"
 msgstr "Период"
@@ -3685,7 +3685,7 @@ msgstr "Заложено в бюджет"
 
 #: /app/lib/Service/Report/ReportExporter.php:401
 #: /app/lib/Service/Report/ReportExporter.php:640
-#: /app/src/modules/categories/CategoriesModule.js:2265
+#: /app/src/modules/categories/CategoriesModule.js:2266
 #: /app/src/modules/dashboard/DashboardModule.js:1918
 #: /app/templates/index.php:2182
 msgid "Spent"
@@ -3693,7 +3693,7 @@ msgstr "Потрачено"
 
 #: /app/lib/Service/Report/ReportExporter.php:402
 #: /app/lib/Service/Report/ReportExporter.php:641
-#: /app/src/modules/categories/CategoriesModule.js:2268
+#: /app/src/modules/categories/CategoriesModule.js:2269
 #: /app/src/modules/dashboard/DashboardModule.js:1919
 #: /app/templates/index.php:2150 /app/templates/index.php:2183
 msgid "Remaining"
@@ -7178,7 +7178,7 @@ msgstr "Корректировка бюджета удалена"
 msgid "Failed to remove budget adjustment"
 msgstr "Не удалось удалить корректировку бюджета"
 
-#: /app/src/modules/categories/CategoriesModule.js:2239
+#: /app/src/modules/categories/CategoriesModule.js:2240
 msgid ""
 "Envelope budgeting on: unspent budget carries to next month. Click to turn "
 "off."
@@ -7186,67 +7186,67 @@ msgstr ""
 "Конвертный метод включён: неиспользованный бюджет переносится на следующий "
 "месяц. Нажмите, чтобы отключить."
 
-#: /app/src/modules/categories/CategoriesModule.js:2239
+#: /app/src/modules/categories/CategoriesModule.js:2240
 msgid "Turn on envelope budgeting: unspent budget carries to next month"
 msgstr ""
 "Включить конвертный метод: неиспользованный бюджет переносится на следующий "
 "месяц"
 
-#: /app/src/modules/categories/CategoriesModule.js:2250
+#: /app/src/modules/categories/CategoriesModule.js:2251
 msgid "Auto-calculated from recurring bills/income. Enter a value to override."
 msgstr ""
 "Автоматически рассчитано по регулярным платежам и доходам. Введите значение, "
 "чтобы заменить расчёт."
 
-#: /app/src/modules/categories/CategoriesModule.js:2250
+#: /app/src/modules/categories/CategoriesModule.js:2251
 #: /app/src/modules/pensions/PensionsModule.js:1083
 msgid "auto"
 msgstr "авто"
 
-#: /app/src/modules/categories/CategoriesModule.js:2252
+#: /app/src/modules/categories/CategoriesModule.js:2253
 msgid "{base} − {over} overspent = {available} available"
 msgstr "{base} − перерасход {over} = доступно {available}"
 
-#: /app/src/modules/categories/CategoriesModule.js:2253
+#: /app/src/modules/categories/CategoriesModule.js:2254
 msgid "{base} + {carried} carried = {available} available"
 msgstr "{base} + перенесено {carried} = доступно {available}"
 
-#: /app/src/modules/categories/CategoriesModule.js:2254
+#: /app/src/modules/categories/CategoriesModule.js:2255
 msgid "(projected)"
 msgstr "(прогноз)"
 
-#: /app/src/modules/categories/CategoriesModule.js:2271
+#: /app/src/modules/categories/CategoriesModule.js:2272
 #: /app/templates/index.php:2184
 msgid "Progress"
 msgstr "Выполнение"
 
-#: /app/src/modules/categories/CategoriesModule.js:2277
+#: /app/src/modules/categories/CategoriesModule.js:2278
 msgid "No budget set"
 msgstr "Бюджет не установлен"
 
-#: /app/src/modules/categories/CategoriesModule.js:2355
+#: /app/src/modules/categories/CategoriesModule.js:2356
 msgid "Envelope budgeting enabled — unspent budget now carries to next month"
 msgstr ""
 "Конвертный метод включён — неиспользованный бюджет теперь переносится на "
 "следующий месяц"
 
-#: /app/src/modules/categories/CategoriesModule.js:2356
+#: /app/src/modules/categories/CategoriesModule.js:2357
 msgid "Envelope budgeting disabled"
 msgstr "Конвертный метод отключён"
 
-#: /app/src/modules/categories/CategoriesModule.js:2359
+#: /app/src/modules/categories/CategoriesModule.js:2360
 msgid "Failed to update envelope setting"
 msgstr "Не удалось обновить настройку конвертного метода"
 
-#: /app/src/modules/categories/CategoriesModule.js:2481
+#: /app/src/modules/categories/CategoriesModule.js:2482
 msgid "Budget updated"
 msgstr "Бюджет обновлён"
 
-#: /app/src/modules/categories/CategoriesModule.js:2484
+#: /app/src/modules/categories/CategoriesModule.js:2485
 msgid "Failed to update budget"
 msgstr "Не удалось обновить бюджет"
 
-#: /app/src/modules/categories/CategoriesModule.js:2497
+#: /app/src/modules/categories/CategoriesModule.js:2498
 msgid "Failed to update budget: {message}"
 msgstr "Не удалось обновить бюджет: {message}"
 
@@ -9614,193 +9614,213 @@ msgid "+ Add Action"
 msgstr "+ Добавить действие"
 
 #: /app/src/modules/rules/components/ActionBuilder.js:91
-#: /app/src/modules/rules/components/ActionBuilder.js:123
+#: /app/src/modules/rules/components/ActionBuilder.js:124
 msgid "Set Category"
 msgstr "Задать категорию"
 
 #: /app/src/modules/rules/components/ActionBuilder.js:92
-#: /app/src/modules/rules/components/ActionBuilder.js:124
+#: /app/src/modules/rules/components/ActionBuilder.js:125
 msgid "Set Vendor"
 msgstr "Задать продавца"
 
 #: /app/src/modules/rules/components/ActionBuilder.js:93
-#: /app/src/modules/rules/components/ActionBuilder.js:125
+#: /app/src/modules/rules/components/ActionBuilder.js:126
+#, fuzzy
+#| msgid "Description"
+msgid "Set Description"
+msgstr "Описание"
+
+#: /app/src/modules/rules/components/ActionBuilder.js:94
+#: /app/src/modules/rules/components/ActionBuilder.js:127
 msgid "Set Notes"
 msgstr "Задать заметки"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:94
-#: /app/src/modules/rules/components/ActionBuilder.js:126
+#: /app/src/modules/rules/components/ActionBuilder.js:95
+#: /app/src/modules/rules/components/ActionBuilder.js:128
 msgid "Add Tags"
 msgstr "Добавить теги"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:95
-#: /app/src/modules/rules/components/ActionBuilder.js:127
+#: /app/src/modules/rules/components/ActionBuilder.js:96
+#: /app/src/modules/rules/components/ActionBuilder.js:129
 msgid "Set Account"
 msgstr "Задать счёт"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:96
-#: /app/src/modules/rules/components/ActionBuilder.js:128
+#: /app/src/modules/rules/components/ActionBuilder.js:97
+#: /app/src/modules/rules/components/ActionBuilder.js:130
 msgid "Set Transaction Type"
 msgstr "Задать тип транзакции"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:97
-#: /app/src/modules/rules/components/ActionBuilder.js:129
+#: /app/src/modules/rules/components/ActionBuilder.js:98
+#: /app/src/modules/rules/components/ActionBuilder.js:131
 msgid "Set Reference"
 msgstr "Задать идентификатор"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:98
-#: /app/src/modules/rules/components/ActionBuilder.js:130
+#: /app/src/modules/rules/components/ActionBuilder.js:99
+#: /app/src/modules/rules/components/ActionBuilder.js:132
 msgid "Exclude from Forecast"
 msgstr "Исключить из прогноза"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:99
-#: /app/src/modules/rules/components/ActionBuilder.js:131
+#: /app/src/modules/rules/components/ActionBuilder.js:100
+#: /app/src/modules/rules/components/ActionBuilder.js:133
 msgid "Auto-Link as Transfer"
 msgstr "Автоматически связать как перевод"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:103
+#: /app/src/modules/rules/components/ActionBuilder.js:104
 msgid "Stop processing after this rule"
 msgstr "Остановить обработку после этого правила"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:104
+#: /app/src/modules/rules/components/ActionBuilder.js:105
 msgid "If checked, no rules with lower priority will run if this rule matches"
 msgstr ""
 "Если включено, правила с меньшим приоритетом не будут выполняться после "
 "совпадения этого правила"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:115
+#: /app/src/modules/rules/components/ActionBuilder.js:116
 msgid "No actions yet. Use the dropdown below to add actions."
 msgstr "Действий пока нет. Используйте список ниже, чтобы добавить действия."
 
-#: /app/src/modules/rules/components/ActionBuilder.js:142
+#: /app/src/modules/rules/components/ActionBuilder.js:144
 msgid "Move up"
 msgstr "Переместить вверх"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:143
+#: /app/src/modules/rules/components/ActionBuilder.js:145
 msgid "Move down"
 msgstr "Переместить вниз"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:144
+#: /app/src/modules/rules/components/ActionBuilder.js:146
 msgid "Remove action"
 msgstr "Удалить действие"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:175
+#: /app/src/modules/rules/components/ActionBuilder.js:179
 msgid "Unknown action type"
 msgstr "Неизвестный тип действия"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:183
+#: /app/src/modules/rules/components/ActionBuilder.js:187
 msgid "Category:"
 msgstr "Категория:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:185
+#: /app/src/modules/rules/components/ActionBuilder.js:189
 msgid "-- Select Category --"
 msgstr "-- Выберите категорию --"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:190
-#: /app/src/modules/rules/components/ActionBuilder.js:207
-#: /app/src/modules/rules/components/ActionBuilder.js:224
-#: /app/src/modules/rules/components/ActionBuilder.js:265
-#: /app/src/modules/rules/components/ActionBuilder.js:321
+#: /app/src/modules/rules/components/ActionBuilder.js:194
+#: /app/src/modules/rules/components/ActionBuilder.js:211
+#: /app/src/modules/rules/components/ActionBuilder.js:228
+#: /app/src/modules/rules/components/ActionBuilder.js:245
+#: /app/src/modules/rules/components/ActionBuilder.js:286
+#: /app/src/modules/rules/components/ActionBuilder.js:342
 msgid "Behavior:"
 msgstr "Поведение:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:192
-#: /app/src/modules/rules/components/ActionBuilder.js:209
-#: /app/src/modules/rules/components/ActionBuilder.js:323
+#: /app/src/modules/rules/components/ActionBuilder.js:196
+#: /app/src/modules/rules/components/ActionBuilder.js:213
+#: /app/src/modules/rules/components/ActionBuilder.js:230
+#: /app/src/modules/rules/components/ActionBuilder.js:344
 msgid "Always set"
 msgstr "Всегда задавать"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:193
-#: /app/src/modules/rules/components/ActionBuilder.js:210
-#: /app/src/modules/rules/components/ActionBuilder.js:324
+#: /app/src/modules/rules/components/ActionBuilder.js:197
+#: /app/src/modules/rules/components/ActionBuilder.js:214
+#: /app/src/modules/rules/components/ActionBuilder.js:231
+#: /app/src/modules/rules/components/ActionBuilder.js:345
 msgid "Only if empty"
 msgstr "Только если пусто"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:202
+#: /app/src/modules/rules/components/ActionBuilder.js:206
 msgid "Vendor Name:"
 msgstr "Название продавца:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:204
+#: /app/src/modules/rules/components/ActionBuilder.js:208
 msgid "e.g., Amazon, Starbucks"
 msgstr "напр., Amazon, Starbucks"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:219
+#: /app/src/modules/rules/components/ActionBuilder.js:223
+#: /app/src/modules/transactions/TransactionsModule.js:3800
+#: /app/templates/index.php:6891
+msgid "Description:"
+msgstr "Описание:"
+
+#: /app/src/modules/rules/components/ActionBuilder.js:225
+msgid "e.g., Grocery purchase, Salary"
+msgstr ""
+
+#: /app/src/modules/rules/components/ActionBuilder.js:240
 msgid "Notes Text:"
 msgstr "Текст заметок:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:221
+#: /app/src/modules/rules/components/ActionBuilder.js:242
 msgid "Text to add to transaction notes"
 msgstr "Текст для добавления в заметки транзакции"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:226
+#: /app/src/modules/rules/components/ActionBuilder.js:247
 msgid "Replace notes"
 msgstr "Заменить заметки"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:227
+#: /app/src/modules/rules/components/ActionBuilder.js:248
 msgid "Append to notes"
 msgstr "Добавить к заметкам"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:232
+#: /app/src/modules/rules/components/ActionBuilder.js:253
 msgid "Separator:"
 msgstr "Разделитель:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:234
+#: /app/src/modules/rules/components/ActionBuilder.js:255
 msgid "e.g., | or -"
 msgstr "напр., | или -"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:247
+#: /app/src/modules/rules/components/ActionBuilder.js:268
 msgid "Tags to Add:"
 msgstr "Теги для добавления:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:249
+#: /app/src/modules/rules/components/ActionBuilder.js:270
 msgid "No tag sets available"
 msgstr "Наборы тегов недоступны"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:267
+#: /app/src/modules/rules/components/ActionBuilder.js:288
 msgid "Merge with existing tags"
 msgstr "Объединить с существующими тегами"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:268
+#: /app/src/modules/rules/components/ActionBuilder.js:289
 msgid "Replace all tags"
 msgstr "Заменить все теги"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:279
+#: /app/src/modules/rules/components/ActionBuilder.js:300
 msgid "Account:"
 msgstr "Счёт:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:281
+#: /app/src/modules/rules/components/ActionBuilder.js:302
 msgid "-- Select Account --"
 msgstr "-- Выберите счёт --"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:288
+#: /app/src/modules/rules/components/ActionBuilder.js:309
 msgid "This will reassign the transaction to a different account"
 msgstr "Транзакция будет перенесена на другой счёт"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:296
+#: /app/src/modules/rules/components/ActionBuilder.js:317
 msgid "Transaction Type:"
 msgstr "Тип транзакции:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:316
+#: /app/src/modules/rules/components/ActionBuilder.js:337
 msgid "Reference Value:"
 msgstr "Значение идентификатора:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:318
+#: /app/src/modules/rules/components/ActionBuilder.js:339
 msgid "e.g., CHECK-1234, AUTO"
 msgstr "например, CHECK-1234, AUTO"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:334
+#: /app/src/modules/rules/components/ActionBuilder.js:355
 msgid "Forecast:"
 msgstr "Прогноз:"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:336
+#: /app/src/modules/rules/components/ActionBuilder.js:357
 msgid "Exclude from forecast"
 msgstr "Исключить из прогноза"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:337
+#: /app/src/modules/rules/components/ActionBuilder.js:358
 msgid "Include in forecast"
 msgstr "Учитывать в прогнозе"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:341
+#: /app/src/modules/rules/components/ActionBuilder.js:362
 msgid ""
 "Extraordinary one-time amounts are left out of the forecast averages (they "
 "still affect your real balance)."
@@ -9808,7 +9828,7 @@ msgstr ""
 "Внеплановые разовые суммы не учитываются при расчёте средних значений "
 "прогноза, но по-прежнему влияют на фактический остаток."
 
-#: /app/src/modules/rules/components/ActionBuilder.js:349
+#: /app/src/modules/rules/components/ActionBuilder.js:370
 msgid ""
 "After import, automatically find and link a matching transaction from "
 "another account as a transfer pair. Matches by amount, opposite type, and "
@@ -9818,35 +9838,41 @@ msgstr ""
 "другого счёта как парный перевод. Совпадения определяются по сумме, "
 "противоположному типу и близости дат (не более 3 дней)."
 
-#: /app/src/modules/rules/components/ActionBuilder.js:507
+#: /app/src/modules/rules/components/ActionBuilder.js:529
 msgid "Action {number}: Missing type"
 msgstr "Действие {number}: отсутствует тип"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:514
+#: /app/src/modules/rules/components/ActionBuilder.js:536
 msgid "Action {number}: Category not selected"
 msgstr "Действие {number}: категория не выбрана"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:519
+#: /app/src/modules/rules/components/ActionBuilder.js:541
 msgid "Action {number}: Vendor name is empty"
 msgstr "Действие {number}: имя продавца не указано"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:524
+#: /app/src/modules/rules/components/ActionBuilder.js:546
+#, fuzzy
+#| msgid "Action {number}: Notes text is empty"
+msgid "Action {number}: Description is empty"
+msgstr "Действие {number}: текст заметки не указан"
+
+#: /app/src/modules/rules/components/ActionBuilder.js:551
 msgid "Action {number}: Notes text is empty"
 msgstr "Действие {number}: текст заметки не указан"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:529
+#: /app/src/modules/rules/components/ActionBuilder.js:556
 msgid "Action {number}: No tags selected"
 msgstr "Действие {number}: теги не выбраны"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:534
+#: /app/src/modules/rules/components/ActionBuilder.js:561
 msgid "Action {number}: Account not selected"
 msgstr "Действие {number}: счёт не выбран"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:539
+#: /app/src/modules/rules/components/ActionBuilder.js:566
 msgid "Action {number}: Invalid transaction type"
 msgstr "Действие {number}: недопустимый тип транзакции"
 
-#: /app/src/modules/rules/components/ActionBuilder.js:544
+#: /app/src/modules/rules/components/ActionBuilder.js:571
 msgid "Action {number}: Reference value is empty"
 msgstr "Действие {number}: идентификатор не указан"
 
@@ -11352,11 +11378,6 @@ msgstr "Сумма назначения ({currency})"
 #: /app/templates/index.php:6899
 msgid "Date:"
 msgstr "Дата:"
-
-#: /app/src/modules/transactions/TransactionsModule.js:3800
-#: /app/templates/index.php:6891
-msgid "Description:"
-msgstr "Описание:"
 
 #: /app/src/modules/transactions/TransactionsModule.js:3804
 msgid "Total Amount:"
