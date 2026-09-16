@@ -465,13 +465,13 @@ export class ActionBuilder {
 
 	getDefaultBehaviorForType(type) {
 		switch (type) {
-			case 'set_description':
 			case 'set_notes':
 				return 'replace';
 			case 'add_tags':
 				return 'merge';
 			case 'set_category':
 			case 'set_vendor':
+			case 'set_description':
 			case 'set_reference':
 			case 'set_account':
 			case 'set_type':
