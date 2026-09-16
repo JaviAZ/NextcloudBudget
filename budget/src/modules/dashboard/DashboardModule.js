@@ -180,22 +180,26 @@ export default class DashboardModule {
             );
             const periodStart = currentPeriod.start;
             const periodEnd = currentPeriod.end;
+            const periodMonth = formatters.budgetMonthForCycle(periodStart, periodEnd);
 
-            // Calculate 6-month range for trend charts
+            // The trend and spending charts are calendar-month series, so they
+            // stop at this month's end; a cycle ending next month would add an
+            // empty bar for it.
             const sixMonthsAgoDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
             const sixMonthsAgo = formatters.getMonthStart(sixMonthsAgoDate.getFullYear(), sixMonthsAgoDate.getMonth() + 1);
+            const endOfMonth = formatters.getMonthEnd(now.getFullYear(), now.getMonth() + 1);
 
             // Cache-busting timestamp to ensure fresh data
             const cacheBuster = Date.now();
 
             // Load all dashboard data in parallel for better performance
             const [summaryResponse, trendResponse, transResponse, billsResponse, budgetResponse, goalsResponse, pensionResponse, assetResponse, netWorthResponse, alertsResponse, debtResponse, assetHistoryResponse] = await Promise.all([
-                // Current month summary for hero stats
+                // Current budget cycle summary for hero stats
                 fetch(OC.generateUrl(`/apps/budget/api/reports/summary?startDate=${periodStart}&endDate=${periodEnd}&_=${cacheBuster}`), {
                     headers: { 'requesttoken': OC.requestToken }
                 }),
                 // 6-month summary for trend charts
-                fetch(OC.generateUrl(`/apps/budget/api/reports/summary?startDate=${sixMonthsAgo}&endDate=${periodEnd}&_=${cacheBuster}`), {
+                fetch(OC.generateUrl(`/apps/budget/api/reports/summary?startDate=${sixMonthsAgo}&endDate=${endOfMonth}&_=${cacheBuster}`), {
                     headers: { 'requesttoken': OC.requestToken }
                 }),
                 fetch(OC.generateUrl(`/apps/budget/api/transactions?limit=${this._recentTxLimit()}`), {
@@ -204,7 +208,7 @@ export default class DashboardModule {
                 fetch(OC.generateUrl('/apps/budget/api/bills/upcoming'), {
                     headers: { 'requesttoken': OC.requestToken }
                 }).catch(() => ({ ok: false })),
-                fetch(OC.generateUrl(`/apps/budget/api/reports/budget?startDate=${periodStart}&endDate=${periodEnd}&snapshotMonth=${periodEnd.slice(0, 7)}`), {
+                fetch(OC.generateUrl(`/apps/budget/api/reports/budget?startDate=${periodStart}&endDate=${periodEnd}&snapshotMonth=${periodMonth}`), {
                     headers: { 'requesttoken': OC.requestToken }
                 }).catch(() => ({ ok: false })),
                 fetch(OC.generateUrl('/apps/budget/api/savings-goals'), {
@@ -314,7 +318,7 @@ export default class DashboardModule {
 
             // Update Charts (using 6-month trend data)
             if (trendData.spending) {
-                this.updateSpendingChart(trendData.spending, 'spendingChart', { dateFrom: sixMonthsAgo, dateTo: periodEnd });
+                this.updateSpendingChart(trendData.spending, 'spendingChart', { dateFrom: sixMonthsAgo, dateTo: endOfMonth });
             }
             if (trendData.trends) {
                 this.updateTrendChart(trendData.trends);
@@ -1661,7 +1665,7 @@ export default class DashboardModule {
 
             let url = `/apps/budget/api/reports/budget?startDate=${startDate}&endDate=${endDate}`;
             if (settings.dateRange === 'period') {
-                url += `&snapshotMonth=${endDate.slice(0, 7)}`;
+                url += `&snapshotMonth=${formatters.budgetMonthForCycle(startDate, endDate)}`;
             }
             if (settings.accountId) {
                 url += `&accountId=${settings.accountId}`;

@@ -358,7 +358,16 @@ export function daysBetweenDates(dateStr1, dateStr2) {
  * @returns {object} Object with {start, end, label} date strings
  */
 export function getPeriodDateRange(period, startDay = 1, referenceDate = null) {
-    const now = referenceDate ? new Date(referenceDate) : new Date();
+    // A bare YYYY-MM-DD is a calendar day: new Date() would read it as UTC
+    // midnight, which is the day before anywhere west of UTC.
+    let now;
+    if (!referenceDate) {
+        now = new Date();
+    } else if (typeof referenceDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(referenceDate)) {
+        now = parseLocalDate(referenceDate);
+    } else {
+        now = new Date(referenceDate);
+    }
 
     switch (period) {
         case 'weekly': {
@@ -461,6 +470,24 @@ export function getPeriodDateRange(period, startDay = 1, referenceDate = null) {
             // Default to monthly
             return getPeriodDateRange('monthly', startDay, referenceDate);
     }
+}
+
+/**
+ * The budget month a monthly cycle belongs to.
+ *
+ * The Budget page shows month M as the cycle containing M's 15th (it asks
+ * getPeriodDateRange for `${budgetMonth}-15`), and a cycle holds exactly one
+ * 15th: one that starts on or before the 15th is named after the month it
+ * starts in, a later one after the month it ends in. Anything loading a
+ * month's budget snapshot for a cycle must name it the same way, or a cycle
+ * starting on the 10th would be paired with the following month's budgets.
+ *
+ * @param {string} start - Cycle start (YYYY-MM-DD)
+ * @param {string} end - Cycle end (YYYY-MM-DD)
+ * @returns {string} YYYY-MM
+ */
+export function budgetMonthForCycle(start, end) {
+    return parseInt(start.slice(8, 10), 10) <= 15 ? start.slice(0, 7) : end.slice(0, 7);
 }
 
 /** The date-range values a dashboard tile's settings can hold. */

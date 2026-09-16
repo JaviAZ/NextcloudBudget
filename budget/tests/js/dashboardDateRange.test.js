@@ -21,7 +21,7 @@ vi.mock('@nextcloud/l10n', () => ({
     translatePlural: (_app, singular, plural, count) => (count === 1 ? singular : plural),
 }));
 
-import { resolveTileDateRange, getPeriodDateRange } from '../../src/utils/formatters.js';
+import { resolveTileDateRange, getPeriodDateRange, budgetMonthForCycle, formatDateForAPI } from '../../src/utils/formatters.js';
 import DashboardModule from '../../src/modules/dashboard/DashboardModule.js';
 import { DASHBOARD_WIDGETS } from '../../src/config/dashboardWidgets.js';
 
@@ -129,6 +129,78 @@ describe('resolveTileDateRange -- current budget period', () => {
 
         expect(range.label).toEqual(expect.any(String));
         expect(range.label.length).toBeGreaterThan(0);
+    });
+});
+
+/**
+ * The dashboard loads a budget snapshot for the cycle it shows (#386), so it
+ * has to name that cycle the way the Budget page does: month M is the cycle
+ * holding M's 15th. Naming it after the month the cycle ends in only agrees
+ * for start days from the 16th on.
+ */
+describe('budgetMonthForCycle', () => {
+    it('names a cycle starting on the 10th after the month it starts in', () => {
+        expect(budgetMonthForCycle('2026-09-10', '2026-10-09')).toBe('2026-09');
+    });
+
+    it('names a cycle starting on the 15th after the month it starts in', () => {
+        expect(budgetMonthForCycle('2026-09-15', '2026-10-14')).toBe('2026-09');
+    });
+
+    it('names a cycle starting on the 16th after the month it ends in', () => {
+        expect(budgetMonthForCycle('2026-09-16', '2026-10-15')).toBe('2026-10');
+    });
+
+    it('names a cycle starting on the 28th after the month it ends in', () => {
+        expect(budgetMonthForCycle('2026-08-28', '2026-09-27')).toBe('2026-09');
+    });
+
+    it('names a calendar month after itself', () => {
+        expect(budgetMonthForCycle('2026-09-01', '2026-09-30')).toBe('2026-09');
+    });
+
+    it('agrees with the Budget page on every day of the year', () => {
+        // The start days either side of the 15th, and the ones a short
+        // month clamps. December 2027 to March 2028 adds a leap February.
+        const startDays = [1, 2, 14, 15, 16, 17, 28, 29, 30, 31];
+        const spans = [[at(2026, 1, 1), at(2026, 12, 31)], [at(2027, 12, 1), at(2028, 3, 31)]];
+        const mismatches = [];
+        for (const startDay of startDays) {
+            for (const [from, to] of spans) {
+                for (const day = new Date(from); day <= to; day.setDate(day.getDate() + 1)) {
+                    const cycle = getPeriodDateRange('monthly', startDay, new Date(day));
+                    const month = budgetMonthForCycle(cycle.start, cycle.end);
+                    const page = getPeriodDateRange('monthly', startDay, `${month}-15`);
+                    if (page.start !== cycle.start || page.end !== cycle.end) {
+                        mismatches.push(`start ${startDay}, ${formatDateForAPI(day)}: ${cycle.start}..${cycle.end} named ${month}`);
+                    }
+                }
+            }
+        }
+
+        expect(mismatches).toEqual([]);
+    });
+});
+
+describe('getPeriodDateRange -- date string reference', () => {
+    const originalTz = process.env.TZ;
+    afterEach(() => {
+        if (originalTz === undefined) {
+            delete process.env.TZ;
+        } else {
+            process.env.TZ = originalTz;
+        }
+    });
+
+    it('reads YYYY-MM-DD as that calendar day west of UTC', () => {
+        process.env.TZ = 'America/Los_Angeles';
+        // Precondition: the zone switch took effect, so a UTC-midnight parse
+        // would land on the 14th.
+        expect(new Date('2026-09-15').getDate()).toBe(14);
+
+        const range = getPeriodDateRange('monthly', 15, '2026-09-15');
+
+        expect(range).toMatchObject({ start: '2026-09-15', end: '2026-10-14' });
     });
 });
 

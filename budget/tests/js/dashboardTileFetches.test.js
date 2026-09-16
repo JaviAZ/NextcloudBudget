@@ -64,6 +64,53 @@ describe('Budget Progress', () => {
         expect(requested[0]).toContain('endDate=2026-09-27');
         expect(requested[0]).toContain('snapshotMonth=2026-09');
     });
+
+    it('names a cycle starting on the 10th after the month it starts in', async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(at(2026, 9, 20));
+        const dash = makeDashboard({ budgetProgress: { dateRange: 'period' } });
+        dash.app.settings.budget_start_day = '10';
+        dash.updateBudgetProgressWidget = vi.fn();
+
+        await dash.refreshBudgetProgressWidget();
+
+        // The Budget page calls 10 Sep - 9 Oct "September", so that is the
+        // snapshot to load, not October's.
+        expect(requested[0]).toContain('startDate=2026-09-10');
+        expect(requested[0]).toContain('endDate=2026-10-09');
+        expect(requested[0]).toContain('snapshotMonth=2026-09');
+    });
+});
+
+describe('initial dashboard load', () => {
+    async function loadWithStartDay(startDay, today) {
+        vi.useFakeTimers();
+        vi.setSystemTime(today);
+        const dash = makeDashboard();
+        dash.app.settings.budget_start_day = startDay;
+        await dash.loadDashboard();
+        return dash;
+    }
+
+    it('asks for the budget cycle and its snapshot month for the hero stats', async () => {
+        await loadWithStartDay('10', at(2026, 9, 20));
+
+        const summary = requested.find(u => u.includes('/reports/summary?startDate=2026-09-10'));
+        const budget = requested.find(u => u.includes('/reports/budget'));
+        expect(summary).toContain('endDate=2026-10-09');
+        expect(budget).toContain('startDate=2026-09-10');
+        expect(budget).toContain('endDate=2026-10-09');
+        expect(budget).toContain('snapshotMonth=2026-09');
+    });
+
+    it('keeps the six-month trend on calendar months when the cycle runs into next month', async () => {
+        await loadWithStartDay('10', at(2026, 9, 20));
+
+        // The trend request is the one starting on a 1st; ending it at the
+        // cycle end (9 Oct) would chart an empty October.
+        const trend = requested.find(u => u.includes('/reports/summary?startDate=2026-04-01'));
+        expect(trend).toContain('endDate=2026-09-30');
+    });
 });
 
 describe('Large Transactions', () => {
