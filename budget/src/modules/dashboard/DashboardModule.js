@@ -1648,8 +1648,11 @@ export default class DashboardModule {
             catData = this.aggregateToTopLevel(categories);
         }
 
-        // Filter to only categories with budgets
-        const budgetedCategories = catData.filter(c => c.budgeted > 0 || c.budget > 0);
+        // Filter to only categories with budgets. An envelope whose carried
+        // overspend has used up this month's budget stays: it is over budget,
+        // not unbudgeted.
+        const overdrawn = c => (c.budgeted || c.budget || 0) <= 0 && Math.abs(c.carried || 0) >= 0.005;
+        const budgetedCategories = catData.filter(c => c.budgeted > 0 || c.budget > 0 || overdrawn(c));
 
         if (budgetedCategories.length === 0) {
             container.innerHTML = `<div class="empty-state-small">${t('budget', 'No budgets configured')}</div>`;
@@ -1662,11 +1665,14 @@ export default class DashboardModule {
             // spent is netted and can be negative (refunds exceeded spending,
             // #361); a negative width is invalid CSS and the fill would paint
             // FULL, so clamp at zero like the Budget page does
-            const percentage = budgeted > 0 ? Math.min(Math.max((spent / budgeted) * 100, 0), 100) : 0;
+            // Nothing is left in an overdrawn envelope, so any spending is over
+            const percentage = budgeted > 0
+                ? Math.min(Math.max((spent / budgeted) * 100, 0), 100)
+                : (spent > 0 ? 100 : 0);
             const actualPercentage = budgeted > 0 ? (spent / budgeted) * 100 : 0;
 
             let statusClass = 'good';
-            if (actualPercentage > 100) statusClass = 'over';
+            if (actualPercentage > 100 || (budgeted <= 0 && spent > 0)) statusClass = 'over';
             else if (actualPercentage > 80) statusClass = 'danger';
             else if (actualPercentage > 50) statusClass = 'warning';
 
@@ -5027,6 +5033,7 @@ export default class DashboardModule {
                     budgeted: 0,
                     budget: 0,
                     spent: 0,
+                    carried: 0,
                 };
             }
             aggregated[topId].total += Math.abs(parseFloat(item.total || item.amount || 0));
@@ -5035,6 +5042,7 @@ export default class DashboardModule {
             aggregated[topId].budgeted += parseFloat(item.budgeted || item.budget || 0);
             aggregated[topId].budget += parseFloat(item.budgeted || item.budget || 0);
             aggregated[topId].spent += parseFloat(item.spent || 0);
+            aggregated[topId].carried += parseFloat(item.carried || 0);
         }
 
         return Object.values(aggregated);

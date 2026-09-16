@@ -51,3 +51,39 @@ describe('updateBudgetProgressWidget', () => {
         expect(document.getElementById('budget-progress').innerHTML).toContain('width: 25%');
     });
 });
+
+/**
+ * An envelope whose carried overspend has used up this month's budget arrives
+ * with budgeted <= 0. It is over budget, not unbudgeted, so the tile keeps it.
+ */
+describe('updateBudgetProgressWidget -- overdrawn envelope', () => {
+    const overdrawn = { categoryName: 'Cigarettes', budgeted: -504.65, carried: -704.65, spent: 73.6, color: '#123456' };
+
+    it('keeps the category and shows it as over budget', () => {
+        makeDashboard().updateBudgetProgressWidget([overdrawn]);
+
+        const fill = document.querySelector('#budget-progress .budget-progress-fill');
+        expect(document.getElementById('budget-progress').textContent).toContain('Cigarettes');
+        expect(fill.className).toContain('over');
+        expect(fill.getAttribute('style')).toContain('width: 100%');
+    });
+
+    it('shows an empty bar until something is spent', () => {
+        makeDashboard().updateBudgetProgressWidget([{ ...overdrawn, spent: 0 }]);
+
+        const fill = document.querySelector('#budget-progress .budget-progress-fill');
+        expect(fill.className).not.toContain('over');
+        expect(fill.getAttribute('style')).toContain('width: 0%');
+    });
+
+    it('still leaves out a category with no budget and nothing carried', () => {
+        makeDashboard().updateBudgetProgressWidget([
+            { categoryName: 'Misc', budgeted: 0, carried: 0, spent: 12 },
+            { categoryName: 'Phone', budgeted: 200, spent: 50 },
+        ]);
+
+        const text = document.getElementById('budget-progress').textContent;
+        expect(text).not.toContain('Misc');
+        expect(text).toContain('Phone');
+    });
+});

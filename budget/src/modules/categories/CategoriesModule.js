@@ -2234,6 +2234,10 @@ export default class CategoriesModule {
                 : effectiveBudgetAmount;
 
             const remaining = budget - spent;
+            // An envelope whose overspend has used up this month's budget has
+            // nothing left, not no budget: it still shows what it owes and
+            // counts as over once anything more is spent.
+            const hasBudget = budget > 0 || (rolloverEnabled && Math.abs(carried) >= 0.005);
             // Spent is netted and can be negative (refunds exceeded spending,
             // #361). A negative width is invalid CSS — the declaration would
             // be dropped and the fill would paint FULL — so clamp at zero.
@@ -2299,10 +2303,10 @@ export default class CategoriesModule {
                         ${this.formatCurrency(spent)}
                     </div>
                     <div class="budget-remaining ${remainingClass}" data-label="${t('budget', 'Remaining')}">
-                        ${budget > 0 ? this.formatCurrency(remaining) : '<span class="no-budget">—</span>'}
+                        ${hasBudget ? this.formatCurrency(remaining) : '<span class="no-budget">—</span>'}
                     </div>
                     <div class="budget-progress-wrapper" data-label="${t('budget', 'Progress')}">
-                        ${budget > 0 ? `
+                        ${hasBudget ? `
                             <div class="budget-progress-bar">
                                 <div class="budget-progress-fill ${progressStatus}" style="width: ${percentage}%"></div>
                             </div>
