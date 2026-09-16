@@ -293,7 +293,10 @@ export default class BillsModule {
         emptyBills.style.display = 'none';
 
         billsList.innerHTML = bills.map(bill => {
-            const dueDate = bill.nextDueDate || bill.next_due_date;
+            // A paid one-time bill has no next occurrence, but it still has
+            // the date it was due - kept as its start date (#333, #375)
+            const dueDate = bill.nextDueDate || bill.next_due_date
+                || ((bill.frequency || 'monthly') === 'one-time' ? (bill.startDate || bill.start_date || null) : null);
             // An inactive bill only stays in this list to be reverted (#365):
             // it has no next occurrence, so it renders as paid — never as
             // due/overdue, and never with actionable Mark Paid / Skip buttons
@@ -833,7 +836,15 @@ export default class BillsModule {
             customMonthsGroup.style.display = 'block';
             dueDayGroup.style.display = 'block';
             dueMonthGroup.style.display = 'none';
-        } else if (frequency === 'yearly' || frequency === 'one-time') {
+        } else if (frequency === 'one-time') {
+            // The Due Date below is the whole schedule (#375): day and month
+            // are derived from it on save. Offering them as well left a bill
+            // showing "Due Day 31, Due Month August" beside an empty Due Date,
+            // and nothing to say which one counted (#333)
+            customMonthsGroup.style.display = 'none';
+            dueDayGroup.style.display = 'none';
+            dueMonthGroup.style.display = 'none';
+        } else if (frequency === 'yearly') {
             customMonthsGroup.style.display = 'none';
             dueDayGroup.style.display = 'block';
             dueMonthGroup.style.display = 'block';
@@ -861,6 +872,10 @@ export default class BillsModule {
                     ? t('budget', 'The date this bill is due. It can be in the past - an invoice you are entering late stays due on its own date.')
                     : t('budget', 'Bill only occurs on or after this date (optional)');
             }
+            // With day and month hidden, the date is the only schedule a
+            // one-time bill has, so it cannot be left blank
+            const startInput = document.getElementById('bill-start-date');
+            if (startInput) startInput.required = isOneTime;
         }
         if (endDateGroup) endDateGroup.style.display = isOneTime ? 'none' : 'block';
         if (remainingPaymentsGroup) remainingPaymentsGroup.style.display = isOneTime ? 'none' : 'block';
@@ -1058,6 +1073,16 @@ export default class BillsModule {
             remainingPayments: document.getElementById('bill-remaining-payments').value ? parseInt(document.getElementById('bill-remaining-payments').value) : null,
             splitTemplate: this.getBillSplitTemplate()
         };
+
+        // A one-time bill's day and month follow its date (#375). The inputs
+        // are hidden for it and may still hold a previous frequency's values
+        if (frequency === 'one-time' && billData.startDate) {
+            const [, month, day] = billData.startDate.split('-').map(Number);
+            if (month && day) {
+                billData.dueDay = day;
+                billData.dueMonth = month;
+            }
+        }
 
         // When splits are defined, clear categoryId (splits define their own)
         if (billData.splitTemplate) {

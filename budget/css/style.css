@@ -19065,6 +19065,11 @@ button.secondary.compact {
     text-decoration: line-through;
 }
 
+/* Moved past without a recorded payment: struck through, but visibly not a payment (#333) */
+.bills-calendar-table .month-cell.has-bill.paid.unrecorded {
+    text-decoration-style: dashed;
+}
+
 .bills-calendar-table .total-cell {
     text-align: right;
     padding-right: 8px;

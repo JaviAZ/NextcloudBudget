@@ -802,6 +802,14 @@ class BillService {
 
         // Auto-deactivate one-time bills after payment
         if ($bill->getFrequency() === 'one-time') {
+            // The date it was due is all a paid invoice has left to show, and
+            // clearing next_due_date threw it away: a bill created before the
+            // date field existed then read "No due date" in the list and
+            // opened with an empty Due Date (#333). It is kept as the start
+            // date, which is where a one-time bill's date lives (#375).
+            if (($bill->getStartDate() === null || $bill->getStartDate() === '') && $bill->getNextDueDate()) {
+                $bill->setStartDate($bill->getNextDueDate());
+            }
             $bill->setIsActive(false);
             $bill->setNextDueDate(null);
         } else {
@@ -1587,12 +1595,19 @@ class BillService {
 
         foreach ($bills as $bill) {
             $occurrences = $this->calculateMonthlyOccurrences($bill, $year);
-            [$occurrences, $paidMonths, $paidAmounts] = $this->attributePayments(
+            [$occurrences, $paidMonths, $paidAmounts, $unrecordedMonths] = $this->attributePayments(
                 $occurrences,
                 $bill,
                 $paymentsByBill[$bill->getId()] ?? [],
                 $year
             );
+
+            // A bill with nothing in this year - created after its only date
+            // came round, or started next year - has no cell to draw, and an
+            // empty row says nothing (#333)
+            if (array_filter($occurrences) === []) {
+                continue;
+            }
 
             $billCurrency = ($bill->getAccountId() !== null && isset($currencyMap[$bill->getAccountId()]))
                 ? $currencyMap[$bill->getAccountId()]
@@ -1617,6 +1632,10 @@ class BillService {
                 // the months still to come (#375)
                 'paidMonths' => $paidMonths,
                 'paidAmounts' => $paidAmounts,
+                // Occurrences the bill has moved past without a recorded
+                // payment - marked paid with no transaction, or skipped. Not
+                // paid, but not owed either, so they must not read as due (#333)
+                'unrecordedMonths' => $unrecordedMonths,
                 // What each occurring month is expected to cost. One per month
                 // so that one-time bills sharing a name can be shown as one
                 // row without losing each invoice's own amount (#375)
@@ -1668,6 +1687,7 @@ class BillService {
                 continue;
             }
             $key = mb_strtolower(trim((string) $row['name'])) . '|' . ($row['currency'] ?? '');
+            $row['unrecordedMonths'] = $row['unrecordedMonths'] ?? [];
             if (!isset($byName[$key])) {
                 $row['billIds'] = [$row['id']];
                 $byName[$key] = count($grouped);
@@ -1682,6 +1702,9 @@ class BillService {
                     $grouped[$index]['occurrences'][$month] = true;
                 }
             }
+            $unrecorded = array_unique(array_merge($grouped[$index]['unrecordedMonths'], $row['unrecordedMonths']));
+            sort($unrecorded);
+            $grouped[$index]['unrecordedMonths'] = array_values($unrecorded);
             foreach ($row['expectedAmounts'] as $month => $amount) {
                 $grouped[$index]['expectedAmounts'][$month] = ($grouped[$index]['expectedAmounts'][$month] ?? 0.0) + $amount;
             }
@@ -1737,10 +1760,18 @@ class BillService {
      * month is itself before the next due date. A bill with a single
      * occurrence takes any payment, whenever it was made.
      *
+     * A closed occurrence that ends up with no payment is reported too. The
+     * bill was marked paid with "Don't create any transaction", or the
+     * occurrence was skipped: either way the bill has moved past it, so it is
+     * neither paid nor owed, and drawing it as due - which is what a cell
+     * without a payment used to mean - had a yearly premium paid in
+     * February still showing as outstanding in September (#333).
+     *
      * @param array<int, bool> $occurrences month => occurs, 1..12
      * @param array<int, array{date: string, amount: float}> $payments in date order
-     * @return array{0: array<int, bool>, 1: int[], 2: array<int, float>}
-     *         occurrences (with extras), paid months, paid amount per month
+     * @return array{0: array<int, bool>, 1: int[], 2: array<int, float>, 3: int[]}
+     *         occurrences (with extras), paid months, paid amount per month,
+     *         months the bill has moved past with no payment recorded
      */
     private function attributePayments(array $occurrences, Bill $bill, array $payments, int $year): array {
         $paidAmounts = [];
@@ -1761,6 +1792,19 @@ class BillService {
             $slots,
             fn(int $slot): bool => $boundary === null || $slotDates[$slot] < $boundary
         ));
+
+        // What the bill has definitely moved past. An inactive bill owes
+        // nothing; an active one-time bill owes its only occurrence, and an
+        // active recurring bill owes everything from next_due_date on. Kept
+        // apart from $closedSlots, which is deliberately wider for an active
+        // one-time bill so that its payment can land whenever it was made.
+        if (!$bill->getIsActive()) {
+            $settledSlots = $slots;
+        } elseif ($boundary === null) {
+            $settledSlots = [];
+        } else {
+            $settledSlots = $closedSlots;
+        }
 
         $nearest = function (\DateTimeImmutable $paidOn, array $candidates, ?int $window) use (&$slotDates): ?int {
             $best = null;
@@ -1810,8 +1854,9 @@ class BillService {
         }
 
         ksort($paidAmounts);
+        $unrecorded = array_values(array_filter($settledSlots, fn(int $slot): bool => !isset($paidAmounts[$slot])));
 
-        return [$occurrences, array_keys($paidAmounts), $paidAmounts];
+        return [$occurrences, array_keys($paidAmounts), $paidAmounts, $unrecorded];
     }
 
     /**
@@ -1920,6 +1965,30 @@ class BillService {
 
             for ($month = 1; $month <= 12; $month++) {
                 if ($year < $startYear || ($year === $startYear && $month < $startMonth)) {
+                    $occurrences[$month] = false;
+                }
+            }
+        } elseif ($bill->getCreatedAt()) {
+            // Nothing was due before the bill existed. Without a start date the
+            // schedule was projected across the whole year, and once the cells
+            // came from payments (#375) a monthly bill created on 8 September
+            // read as owed from January - the old guess had struck those months
+            // through as paid, which was no truer (#333). Compared by date, so
+            // that a bill created on the 8th and due on the 5th first falls due
+            // next month, the way its next due date already does. A start date
+            // is the user's word on when the schedule began and governs instead
+            // (above); a one-time bill dated in the past on purpose has one.
+            // Frequencies the calendar pins mid-month keep their whole month.
+            $createdOn = substr((string) $bill->getCreatedAt(), 0, 10);
+            $wholeMonth = in_array($frequency, ['daily', 'weekly', 'biweekly'], true);
+            for ($month = 1; $month <= 12; $month++) {
+                if (!$occurrences[$month]) {
+                    continue;
+                }
+                $notBefore = $wholeMonth
+                    ? sprintf('%04d-%02d-%02d', $year, $month, (int) date('t', mktime(0, 0, 0, $month, 1, $year)))
+                    : $this->occurrenceDate($bill, $year, $month);
+                if ($notBefore < $createdOn) {
                     $occurrences[$month] = false;
                 }
             }

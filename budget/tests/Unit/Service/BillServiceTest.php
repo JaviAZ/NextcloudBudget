@@ -77,6 +77,7 @@ class BillServiceTest extends TestCase {
 		$bill->setIsTransfer($overrides['isTransfer'] ?? false);
 		$bill->setDestinationAccountId($overrides['destinationAccountId'] ?? null);
 		$bill->setAutoDetectPattern($overrides['autoDetectPattern'] ?? null);
+		$bill->setStartDate($overrides['startDate'] ?? null);
 		$bill->setCreatedAt($overrides['createdAt'] ?? '2024-01-01 00:00:00');
 		if (array_key_exists('createTransaction', $overrides)) {
 			$bill->setCreateTransaction($overrides['createTransaction']);
@@ -194,6 +195,13 @@ class BillServiceTest extends TestCase {
 			$occ[$m] = true;
 		}
 		return $occ;
+	}
+
+	/** Months the schedule puts a bill in, as the calendar projects them. */
+	private function occurringMonths(array $billOverrides, int $year = 2026): array {
+		$method = new \ReflectionMethod($this->service, 'calculateMonthlyOccurrences');
+		$method->setAccessible(true);
+		return array_keys(array_filter($method->invoke($this->service, $this->makeBill($billOverrides), $year)));
 	}
 
 	/** The old heuristic marked every month up to last_paid_date paid. Only months with a payment are. */
@@ -349,6 +357,156 @@ class BillServiceTest extends TestCase {
 		$this->assertSame($occ, $after);
 		$this->assertSame([], $paid);
 		$this->assertSame([], $amounts);
+	}
+
+	// ── occurrences the bill has moved past without a recorded payment (#333) ──
+
+	/**
+	 * A yearly bill marked paid with "Don't create any transaction" has no
+	 * payment for the calendar to find, but its next due date is a year on,
+	 * so the bill itself no longer owes that month. It must not read as due.
+	 */
+	public function testAClosedOccurrenceWithoutAPaymentIsReportedAsUnrecorded(): void {
+		[, $paid, , $unrecorded] = $this->attribute($this->monthly([2]), [], [
+			'frequency' => 'yearly', 'dueDay' => 24, 'dueMonth' => 2,
+			'lastPaidDate' => '2026-02-25', 'nextDueDate' => '2027-02-24',
+		]);
+
+		$this->assertSame([], $paid);
+		$this->assertSame([2], $unrecorded);
+	}
+
+	/** Only occurrences before the next due date are closed; the owed ones stay due. */
+	public function testOwedOccurrencesAreNeverUnrecorded(): void {
+		[, $paid, , $unrecorded] = $this->attribute($this->monthly([7, 8, 9, 10, 11, 12]), [
+			['date' => '2026-09-08', 'amount' => 355.0],
+		], ['dueDay' => 8, 'nextDueDate' => '2026-10-08']);
+
+		$this->assertSame([9], $paid);
+		$this->assertSame([7, 8], $unrecorded, 'closed and unpaid');
+	}
+
+	/** A one-time bill that is still active owes its only occurrence: never closed. */
+	public function testAnActiveOneTimeBillStillOwesItsOccurrence(): void {
+		[, $paid, , $unrecorded] = $this->attribute($this->monthly([9]), [], [
+			'frequency' => 'one-time', 'dueDay' => 30, 'dueMonth' => 9, 'nextDueDate' => '2026-09-30',
+		]);
+
+		$this->assertSame([], $paid);
+		$this->assertSame([], $unrecorded);
+	}
+
+	/** An inactive bill owes nothing, so an unpaid occurrence of it is closed. */
+	public function testAnInactiveBillsUnpaidOccurrenceIsUnrecorded(): void {
+		[, , , $unrecorded] = $this->attribute($this->monthly([8]), [], [
+			'frequency' => 'one-time', 'dueDay' => 31, 'dueMonth' => 8, 'isActive' => false, 'nextDueDate' => null,
+		]);
+
+		$this->assertSame([8], $unrecorded);
+	}
+
+	/** A paid occurrence is paid, not unrecorded, even when it is closed. */
+	public function testAPaidOccurrenceIsNotAlsoUnrecorded(): void {
+		[, $paid, , $unrecorded] = $this->attribute($this->monthly([2]), [
+			['date' => '2026-02-27', 'amount' => 672.30],
+		], ['frequency' => 'custom', 'dueDay' => 27, 'customRecurrencePattern' => '{"months":[2]}', 'nextDueDate' => '2027-02-27']);
+
+		$this->assertSame([2], $paid);
+		$this->assertSame([], $unrecorded);
+	}
+
+	// ── months before the bill existed are not drawn (#333) ──────────
+
+	/**
+	 * A monthly bill created on 8 September was projected back to January,
+	 * and once the cells came from payments those eight months read as owed.
+	 * The old heuristic had struck them through as paid, which was no truer.
+	 * Nothing was due before the bill existed, so nothing is drawn.
+	 */
+	public function testOccurrencesBeforeTheBillExistedAreNotDrawn(): void {
+		$this->assertSame([9, 10, 11, 12], $this->occurringMonths(['dueDay' => 8, 'createdAt' => '2026-09-08 19:57:17']));
+	}
+
+	/** The comparison is by date, not month: created on the 8th, a bill due on the 5th first falls due in October. */
+	public function testAnOccurrenceEarlierInTheCreationMonthIsNotDrawn(): void {
+		$this->assertSame([10, 11, 12], $this->occurringMonths(['dueDay' => 5, 'createdAt' => '2026-09-08 19:57:17']));
+	}
+
+	public function testAYearlyBillCreatedAfterItsDateFirstOccursNextYear(): void {
+		$overrides = ['frequency' => 'yearly', 'dueDay' => 27, 'dueMonth' => 1, 'createdAt' => '2026-02-01 20:01:06'];
+
+		$this->assertSame([], $this->occurringMonths($overrides, 2026));
+		$this->assertSame([1], $this->occurringMonths($overrides, 2027));
+	}
+
+	/** Weekly bills are pinned mid-month in the calendar, so the creation month is kept whole. */
+	public function testAWeeklyBillKeepsItsWholeCreationMonth(): void {
+		$this->assertSame([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], $this->occurringMonths(['frequency' => 'weekly', 'dueDay' => 3, 'createdAt' => '2026-02-20 10:00:00']));
+	}
+
+	/** A one-time bill dated in the past on purpose (#375) keeps its month: the date is the schedule. */
+	public function testAOneTimeBillDatedBeforeItsCreationKeepsItsMonth(): void {
+		$this->assertSame([8], $this->occurringMonths([
+			'frequency' => 'one-time', 'dueDay' => 31, 'dueMonth' => 8, 'startDate' => '2026-08-31', 'createdAt' => '2026-09-05 21:48:43',
+		]));
+	}
+
+	/** A start date is the user's word on when the schedule began, and it beats the creation date. */
+	public function testAStartDateBeforeCreationGoverns(): void {
+		$this->assertSame([3, 4, 5, 6, 7, 8, 9, 10, 11, 12], $this->occurringMonths([
+			'dueDay' => 8, 'startDate' => '2026-03-01', 'createdAt' => '2026-09-08 19:57:17',
+		]));
+	}
+
+	/** A yearly bill created after its date came round has nothing this year: no row, rather than a row of blanks. */
+	public function testABillWithNothingInTheYearHasNoRow(): void {
+		$water = $this->makeBill(['id' => 1, 'name' => 'Water', 'amount' => 1281.10, 'frequency' => 'yearly', 'dueDay' => 27, 'dueMonth' => 1, 'createdAt' => '2026-02-01 20:01:06', 'nextDueDate' => '2027-01-27']);
+		$gas = $this->makeBill(['id' => 2, 'name' => 'Gas', 'amount' => 80.0, 'createdAt' => '2026-02-01 20:01:06', 'nextDueDate' => '2026-10-15']);
+		$this->mapper->method('findByType')->willReturn([$water, $gas]);
+		$this->transactionService->method('findBillPaymentsInYear')->willReturn([]);
+
+		$names = fn(array $result) => array_column($result['bills'], 'name');
+
+		$this->assertSame(['Gas'], $names($this->service->getAnnualOverview('user1', 2026)));
+		$this->assertSame(['Water', 'Gas'], $names($this->service->getAnnualOverview('user1', 2027)));
+	}
+
+	public function testABillWithoutACreationDateIsProjectedAcrossTheYear(): void {
+		$this->assertSame(range(1, 12), $this->occurringMonths(['dueDay' => 8, 'createdAt' => null]));
+	}
+
+	/** A transaction linked from before the bill existed is still real money: it shows as an extra paid month. */
+	public function testAPaymentBeforeTheBillExistedStillShowsAsPaid(): void {
+		[$occ, $paid, $amounts] = $this->attribute($this->monthly([9, 10, 11, 12]), [
+			['date' => '2026-03-08', 'amount' => 355.0],
+			['date' => '2026-09-08', 'amount' => 355.0],
+		], ['dueDay' => 8, 'nextDueDate' => '2026-10-08', 'createdAt' => '2026-09-08 19:57:17']);
+
+		$this->assertTrue($occ[3]);
+		$this->assertSame([3, 9], $paid);
+		$this->assertEqualsWithDelta(355.0, $amounts[3], 0.001);
+	}
+
+	public function testGroupingOneTimeBillsMergesUnrecordedMonths(): void {
+		$method = new \ReflectionMethod($this->service, 'groupOneTimeBillsByName');
+		$method->setAccessible(true);
+		$row = fn(int $id, int $month, bool $paid, bool $unrecorded) => [
+			'id' => $id, 'name' => 'Garage', 'frequency' => 'one-time', 'currency' => 'CHF', 'amount' => 100.0, 'isActive' => false,
+			'occurrences' => array_replace(array_fill(1, 12, false), [$month => true]),
+			'paidMonths' => $paid ? [$month] : [], 'paidAmounts' => $paid ? [$month => 100.0] : [],
+			'unrecordedMonths' => $unrecorded ? [$month] : [],
+			'expectedAmounts' => [$month => 100.0],
+		];
+
+		$grouped = $method->invoke($this->service, [
+			$row(1, 7, false, true),
+			$row(2, 4, true, false),
+			$row(3, 9, false, false),
+		]);
+
+		$this->assertCount(1, $grouped);
+		$this->assertSame([4], $grouped[0]['paidMonths']);
+		$this->assertSame([7], $grouped[0]['unrecordedMonths']);
 	}
 
 	/**
@@ -802,6 +960,33 @@ class BillServiceTest extends TestCase {
 
 		$this->assertFalse($result['bill']->getIsActive());
 		$this->assertNull($result['bill']->getNextDueDate());
+	}
+
+	/**
+	 * Paying a one-time bill cleared its next due date, and a bill created
+	 * before the date field existed had nothing else to show - so a paid
+	 * invoice read "No due date" in the list and opened with an empty Due
+	 * Date (#333). The date it was due is kept as its start date.
+	 */
+	public function testMarkPaidOneTimeKeepsItsDueDateAsTheStartDate(): void {
+		$bill = $this->makeBill(['frequency' => 'one-time', 'dueDay' => 31, 'dueMonth' => 8, 'nextDueDate' => '2026-08-31']);
+		$this->mapper->method('find')->willReturn($bill);
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$result = $this->service->markPaid(1, 'user1', '2026-08-30');
+
+		$this->assertNull($result['bill']->getNextDueDate());
+		$this->assertSame('2026-08-31', $result['bill']->getStartDate());
+	}
+
+	public function testMarkPaidOneTimeLeavesAnExistingDateAlone(): void {
+		$bill = $this->makeBill(['frequency' => 'one-time', 'startDate' => '2026-08-31', 'nextDueDate' => '2026-08-31']);
+		$this->mapper->method('find')->willReturn($bill);
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$result = $this->service->markPaid(1, 'user1', '2026-09-05');
+
+		$this->assertSame('2026-08-31', $result['bill']->getStartDate());
 	}
 
 	public function testMarkPaidDecrementsRemainingPayments(): void {

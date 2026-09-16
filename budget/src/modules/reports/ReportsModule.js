@@ -1954,6 +1954,11 @@ export default class ReportsModule {
             // first paid in September showed January to August paid too (#375).
             const paidMonths = new Set(bill.paidMonths || []);
             const paidAmounts = bill.paidAmounts || {};
+            // Months the bill has moved past with nothing recorded against
+            // them - marked paid without a transaction, or skipped. Not owed,
+            // so not drawn as due; struck through like a paid month but the
+            // tooltip says no payment was recorded (#333)
+            const unrecordedMonths = new Set(bill.unrecordedMonths || []);
             // Per-month expected amounts: one-time bills sharing a name arrive
             // as one row, each month carrying its own invoice's amount (#375)
             const expectedAmounts = bill.expectedAmounts || {};
@@ -1962,14 +1967,25 @@ export default class ReportsModule {
             for (let month = 1; month <= 12; month++) {
                 const occurs = bill.occurrences[month];
                 const isPaid = occurs && paidMonths.has(month);
+                const isUnrecorded = occurs && !isPaid && unrecordedMonths.has(month);
                 // What was actually paid where there is a payment; the
                 // expected amount for the months still to come
                 const cellAmount = isPaid && paidAmounts[month] !== undefined
                     ? paidAmounts[month]
                     : (expectedAmounts[month] !== undefined ? expectedAmounts[month] : bill.amount);
                 const amount = occurs ? this.formatCurrency(cellAmount, bill.currency || currency) : '';
-                const cellClass = occurs ? (isPaid ? 'has-bill paid' : 'has-bill') : 'no-bill';
-                const title = isPaid ? t('budget', 'Paid') : (occurs ? t('budget', 'Due') : '');
+                let cellClass = 'no-bill';
+                let title = '';
+                if (isPaid) {
+                    cellClass = 'has-bill paid';
+                    title = t('budget', 'Paid');
+                } else if (isUnrecorded) {
+                    cellClass = 'has-bill paid unrecorded';
+                    title = t('budget', 'No payment recorded - the bill has moved on from this date');
+                } else if (occurs) {
+                    cellClass = 'has-bill';
+                    title = t('budget', 'Due');
+                }
                 months.push(`<td class="month-cell ${cellClass}" title="${title}">${amount}</td>`);
             }
 
