@@ -394,7 +394,7 @@ class ReportAggregator {
      * Generate budget report with category-by-category breakdown.
      * OPTIMIZED: Uses single batch query instead of N queries for N categories.
      */
-    public function getBudgetReport(string $userId, string $startDate, string $endDate, ?int $accountId = null, ?array $visibleAccountIds = null): array {
+    public function getBudgetReport(string $userId, string $startDate, string $endDate, ?int $accountId = null, ?array $visibleAccountIds = null, ?string $snapshotMonth = null): array {
         $categories = $this->categoryMapper->findAll($userId);
         $budgetReport = [];
         $totals = [
@@ -403,8 +403,12 @@ class ReportAggregator {
             'remaining' => 0
         ];
 
-        // Resolve effective budgets for the report month (snapshot-aware)
-        $reportMonth = substr($startDate, 0, 7); // YYYY-MM from startDate
+        // A custom cycle spans calendar months, so its budget snapshot cannot
+        // be inferred from the transaction range's start date.
+        $reportMonth = $snapshotMonth ?? substr($startDate, 0, 7);
+        if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/D', $reportMonth)) {
+            throw new \InvalidArgumentException('Invalid snapshot month');
+        }
         $snapshotOverrides = $this->budgetSnapshotMapper->findEffectiveBatch($userId, $reportMonth);
 
         // Auto-derived recurring budgets (#269) apply to current/future months
