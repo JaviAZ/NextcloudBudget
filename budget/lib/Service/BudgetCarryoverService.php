@@ -129,7 +129,7 @@ class BudgetCarryoverService {
             return array_fill_keys(array_keys($eligible), 0.0);
         }
 
-        $currentMonth = $this->getCurrentMonth();
+        $currentMonth = $this->currentBudgetMonth($userId);
         $startDay = $this->getBudgetStartDay($userId);
 
         // Spending per category per chain month (direct + splits), batched.
@@ -358,7 +358,7 @@ class BudgetCarryoverService {
         // Custom start day: budget month m spans [startDay of m, startDay of m+1)
         $ranges = [];
         foreach ($months as $month) {
-            $ranges[$month] = $this->periodRange($month, $startDay);
+            $ranges[$month] = BudgetPeriod::range($month, $startDay);
         }
         $startDate = $ranges[$firstMonth][0];
         $endDate = $ranges[$lastMonth][1];
@@ -404,58 +404,22 @@ class BudgetCarryoverService {
     }
 
     /**
-     * Period range [start, end] (Y-m-d) of budget month $month with a custom
-     * start day. Mirrors the app-wide convention (frontend
-     * getPeriodDateRange with the 15th as reference, and
-     * BudgetAlertService::calculateMonthlyRange): budget month M is the
-     * period CONTAINING the 15th of M. With start day 25, "June" is
-     * May 25 – Jun 24; with start day 10, "June" is Jun 10 – Jul 9.
-     *
-     * @return array{0: string, 1: string}
-     */
-    private function periodRange(string $month, int $startDay): array {
-        $monthStart = \DateTime::createFromFormat('!Y-m-d', $month . '-01');
-        $daysInMonth = (int) $monthStart->format('t');
-        $effectiveStartDay = min($startDay, $daysInMonth);
-
-        if ($effectiveStartDay <= 15) {
-            // Period starts in $month, ends the day before next month's start day
-            $start = sprintf('%s-%02d', $month, $effectiveStartDay);
-            $next = (clone $monthStart)->modify('first day of next month');
-            $end = $this->clampedDay($next, $startDay)->modify('-1 day')->format('Y-m-d');
-        } else {
-            // Period starts in the PREVIOUS month, ends the day before $month's start day
-            $prev = (clone $monthStart)->modify('first day of last month');
-            $start = $this->clampedDay($prev, $startDay)->format('Y-m-d');
-            $end = sprintf('%s-%02d', $month, $effectiveStartDay);
-            $end = \DateTime::createFromFormat('!Y-m-d', $end)->modify('-1 day')->format('Y-m-d');
-        }
-
-        return [$start, $end];
-    }
-
-    /**
      * The dates [start, end] (Y-m-d) budget month $month covers for this
      * user: the calendar month, or with a custom start day the period
-     * containing $month's 15th (see periodRange()).
+     * containing $month's 15th (see BudgetPeriod).
      *
      * @return array{0: string, 1: string}
      */
     public function budgetMonthRange(string $userId, string $month): array {
-        $startDay = $this->getBudgetStartDay($userId);
-        if ($startDay === 1) {
-            return [$month . '-01', date('Y-m-t', strtotime($month . '-01'))];
-        }
-        return $this->periodRange($month, $startDay);
+        return BudgetPeriod::range($month, $this->getBudgetStartDay($userId));
     }
 
-    private function clampedDay(\DateTime $monthStart, int $startDay): \DateTime {
-        $day = min($startDay, (int) $monthStart->format('t'));
-        return (clone $monthStart)->setDate(
-            (int) $monthStart->format('Y'),
-            (int) $monthStart->format('n'),
-            $day
-        );
+    /**
+     * The budget month (Y-m) today falls in for this user. With a custom
+     * start day that can be the calendar month before or after this one.
+     */
+    public function currentBudgetMonth(string $userId): string {
+        return BudgetPeriod::monthContaining($this->getToday(), $this->getBudgetStartDay($userId));
     }
 
     private function getBudgetStartDay(string $userId): int {
@@ -465,9 +429,9 @@ class BudgetCarryoverService {
     }
 
     /**
-     * Overridable in tests.
+     * Today (Y-m-d). Overridable in tests.
      */
-    protected function getCurrentMonth(): string {
-        return date('Y-m');
+    protected function getToday(): string {
+        return date('Y-m-d');
     }
 }

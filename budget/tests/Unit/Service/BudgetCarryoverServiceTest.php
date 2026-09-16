@@ -16,10 +16,14 @@ use OCA\Budget\Service\SettingService;
 use PHPUnit\Framework\TestCase;
 
 class TestableBudgetCarryoverService extends BudgetCarryoverService {
+    /** The budget month "today" falls in */
     public string $currentMonth = '2026-06';
+    /** Overrides $currentMonth when set */
+    public ?string $today = null;
 
-    protected function getCurrentMonth(): string {
-        return $this->currentMonth;
+    protected function getToday(): string {
+        // The 15th of a month always lies in that budget month
+        return $this->today ?? $this->currentMonth . '-15';
     }
 }
 
@@ -376,6 +380,43 @@ class BudgetCarryoverServiceTest extends TestCase {
             ['2026-08-28', '2026-09-27'],
             $this->serviceWithStartDay('28')->budgetMonthRange('alice', '2026-09')
         );
+    }
+
+    public function testCurrentBudgetMonthIsTheCalendarMonthWithoutAStartDay(): void {
+        $service = $this->serviceWithStartDay(null);
+        $service->today = '2026-09-30';
+
+        $this->assertSame('2026-09', $service->currentBudgetMonth('alice'));
+    }
+
+    public function testCurrentBudgetMonthIsLastMonthBeforeAnEarlyStartDay(): void {
+        // Start day 10: 5 Sep is in 10 Aug - 9 Sep, the August period
+        $service = $this->serviceWithStartDay('10');
+        $service->today = '2026-09-05';
+
+        $this->assertSame('2026-08', $service->currentBudgetMonth('alice'));
+    }
+
+    public function testCurrentBudgetMonthIsNextMonthAfterALateStartDay(): void {
+        // Start day 28: 29 Sep is in 28 Sep - 27 Oct, the October period
+        $service = $this->serviceWithStartDay('28');
+        $service->today = '2026-09-29';
+
+        $this->assertSame('2026-10', $service->currentBudgetMonth('alice'));
+    }
+
+    public function testRecurringFallbackFollowsTheCurrentBudgetMonth(): void {
+        // Start day 28, today 29 Sep: the September period (28 Aug - 27 Sep)
+        // is over, so it must not borrow today's recurring figure.
+        $service = $this->serviceWithStartDay('28');
+        $service->today = '2026-09-29';
+        $this->recurring = [1 => 200.0];
+
+        $result = $service->getCarryovers('alice', '2026-10', [
+            $this->makeCategory(['budgetAmount' => 0.0, 'rolloverStart' => '2026-09']),
+        ]);
+
+        $this->assertSame(0.0, $result[1]);
     }
 
     public function testBudgetMonthRangeClampsAStartDayOf31(): void {

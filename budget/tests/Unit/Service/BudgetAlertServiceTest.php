@@ -40,6 +40,8 @@ class BudgetAlertServiceTest extends TestCase {
     /** @var array<int, float> Recurring budgets returned by the mock */
     private array $recurringBudgets = [];
     private array $carryovers = [];
+    /** @var string[] months the snapshot and carryover lookups were asked for */
+    private array $budgetMonthsAsked = [];
     /** @var array<string, string> persisted budget_settings */
     private array $settings = [];
     /** @var array[] subject parameters of each notification sent */
@@ -56,6 +58,11 @@ class BudgetAlertServiceTest extends TestCase {
         $this->settingService = $this->createMock(SettingService::class);
 
         $budgetSnapshotMapper = $this->createMock(BudgetSnapshotMapper::class);
+        $budgetSnapshotMapper->method('findEffectiveBatch')
+            ->willReturnCallback(function (string $userId, string $month): array {
+                $this->budgetMonthsAsked[] = "snapshot $month";
+                return [];
+            });
 
         // Per-test recurring budgets via $this->recurringBudgets; conversion
         // uses the real (pure) math
@@ -72,7 +79,10 @@ class BudgetAlertServiceTest extends TestCase {
 
         $carryoverService = $this->createMock(\OCA\Budget\Service\BudgetCarryoverService::class);
         $carryoverService->method('getCarryovers')
-            ->willReturnCallback(fn() => $this->carryovers);
+            ->willReturnCallback(function (string $userId, string $month): array {
+                $this->budgetMonthsAsked[] = "carryover $month";
+                return $this->carryovers;
+            });
 
         $this->service = new TestableBudgetAlertService(
             $this->categoryMapper,
@@ -422,6 +432,45 @@ class BudgetAlertServiceTest extends TestCase {
         $statuses = $this->service->getBudgetStatus(self::USER_ID);
         $this->assertCount(1, $statuses);
         $this->assertEquals('March 2026', $statuses[0]['periodLabel']);
+    }
+
+    // ===== Which month's budgets apply (custom start day) =====
+
+    /**
+     * The current period's budgets are the ones the Budget page shows for
+     * it: the month holding the period's 15th, not today's calendar month.
+     */
+    public function testEarlyStartDayUsesLastMonthsBudgetsBeforeTheStartDay(): void {
+        // Start day 10, 5 Sep: the period is 10 Aug - 9 Sep, i.e. August
+        $status = $this->getMonthlyPeriod('10', '2026-09-05');
+
+        $this->assertStringContainsString('Aug 10', $status['periodLabel']);
+        $this->assertSame(['snapshot 2026-08', 'carryover 2026-08'], $this->budgetMonthsAsked);
+    }
+
+    public function testLateStartDayUsesNextMonthsBudgetsAfterTheStartDay(): void {
+        // Start day 28, 29 Sep: the period is 28 Sep - 27 Oct, i.e. October
+        $status = $this->getMonthlyPeriod('28', '2026-09-29');
+
+        $this->assertStringContainsString('Sep 28', $status['periodLabel']);
+        $this->assertSame(['snapshot 2026-10', 'carryover 2026-10'], $this->budgetMonthsAsked);
+    }
+
+    public function testAlertsUseTheCurrentBudgetMonthsBudgets(): void {
+        $this->service->setNow(new \DateTime('2026-09-05'));
+        $this->settingService->method('get')
+            ->willReturnCallback(fn($u, $key) => $key === 'budget_start_day' ? '10' : null);
+        $this->setupMocksForBudgetStatus([$this->makeCategory()], 0.0);
+
+        $this->service->getAlerts(self::USER_ID);
+
+        $this->assertSame(['snapshot 2026-08', 'carryover 2026-08'], $this->budgetMonthsAsked);
+    }
+
+    public function testStartDayOneUsesTheCalendarMonthsBudgets(): void {
+        $this->getMonthlyPeriod('1', '2026-09-30');
+
+        $this->assertSame(['snapshot 2026-09', 'carryover 2026-09'], $this->budgetMonthsAsked);
     }
 
     // ===== Mid-month start day =====

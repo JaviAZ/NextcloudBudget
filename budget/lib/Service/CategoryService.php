@@ -63,7 +63,9 @@ class CategoryService extends AbstractCrudService {
             $entity = $this->find($id, $userId);
             $wasEnabled = $entity->getBudgetRollover() ?? false;
             if ($updates['budgetRollover'] && !$wasEnabled) {
-                $updates['rolloverStart'] = date('Y-m');
+                // The envelope starts with the budget period running now,
+                // which a custom start day can name after another month
+                $updates['rolloverStart'] = $this->carryoverService->currentBudgetMonth($userId);
             }
         }
         return parent::update($id, $userId, $updates);
@@ -681,7 +683,7 @@ class CategoryService extends AbstractCrudService {
         $notBudgeted = BudgetScope::excludedCategoryIds($categories);
 
         // Recurring fallback only applies to current/future months (#269)
-        $recurring = $month >= date('Y-m')
+        $recurring = $month >= $this->carryoverService->currentBudgetMonth($userId)
             ? $this->recurringBudgetService->getMonthlyBudgetsByCategory($userId)
             : [];
 

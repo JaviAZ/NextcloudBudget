@@ -27,6 +27,10 @@ class CategoryServiceTest extends TestCase {
     private TagMapper $tagMapper;
     private TransactionTagMapper $transactionTagMapper;
     private TransactionSplitMapper $splitMapper;
+    /** The budget month the mocked carryover service reports as current */
+    private string $currentBudgetMonth;
+    /** @var array<int, float> recurring budgets the mock returns */
+    private array $recurring = [];
 
     protected function setUp(): void {
         $this->categoryMapper = $this->createMock(CategoryMapper::class);
@@ -45,10 +49,16 @@ class CategoryServiceTest extends TestCase {
         });
         $budgetSnapshotMapper = $this->createMock(BudgetSnapshotMapper::class);
 
+        $this->currentBudgetMonth = date('Y-m');
         $carryoverService = $this->createMock(\OCA\Budget\Service\BudgetCarryoverService::class);
         $carryoverService->method('getCarryovers')->willReturn([]);
+        $carryoverService->method('currentBudgetMonth')
+            ->willReturnCallback(fn() => $this->currentBudgetMonth);
         $recurringBudgetService = $this->createMock(\OCA\Budget\Service\RecurringBudgetService::class);
-        $recurringBudgetService->method('getMonthlyBudgetsByCategory')->willReturn([]);
+        $recurringBudgetService->method('getMonthlyBudgetsByCategory')
+            ->willReturnCallback(fn() => $this->recurring);
+        $recurringBudgetService->method('convertMonthlyToPeriod')
+            ->willReturnCallback(fn(float $monthly) => $monthly);
 
         $this->service = new CategoryService(
             $this->categoryMapper,
@@ -207,6 +217,35 @@ class CategoryServiceTest extends TestCase {
 
         $result = $this->service->update(5, 'user1', ['parentId' => 10]);
         $this->assertEquals(10, $result->getParentId());
+    }
+
+    // ===== current budget month (custom start day) =====
+
+    public function testEnablingRolloverAnchorsAtTheCurrentBudgetMonth(): void {
+        // Start day 28 on 29 Sep: the running period is October's
+        $this->currentBudgetMonth = '2026-10';
+        $category = $this->makeCategory(['id' => 5]);
+        $category->setBudgetRollover(false);
+        $this->categoryMapper->method('find')->willReturn($category);
+        $this->categoryMapper->method('update')->willReturnArgument(0);
+
+        $result = $this->service->update(5, 'user1', ['budgetRollover' => true]);
+
+        $this->assertSame('2026-10', $result->getRolloverStart());
+    }
+
+    public function testRecurringFallbackSkipsBudgetMonthsBeforeTheCurrentOne(): void {
+        $this->currentBudgetMonth = '2026-10';
+        $this->recurring = [1 => 80.0];
+        $this->categoryMapper->method('findAll')->willReturn([
+            $this->makeCategory(['id' => 1, 'budgetAmount' => 0.0]),
+        ]);
+
+        $september = $this->service->resolveEffectiveBudgets('user1', '2026-09');
+        $october = $this->service->resolveEffectiveBudgets('user1', '2026-10');
+
+        $this->assertSame(0.0, $september[1]['available']);
+        $this->assertSame(80.0, $october[1]['available']);
     }
 
     // ===== beforeDelete() =====

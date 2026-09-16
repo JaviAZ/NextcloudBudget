@@ -17,7 +17,9 @@ export default class CategoriesModule {
         this.expandedCategories = new Set();
         this.currentCategoryType = 'expense';
         this.budgetType = 'expense';
-        this.budgetMonth = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })(); // YYYY-MM
+        // YYYY-MM; the Budget view opens on the current budget month, which
+        // needs the user's settings, so it is chosen on first load
+        this.budgetMonth = null;
         this.budgetEventListenersSetup = false;
         this.categoryEventListenersSetup = false;
         this.categorySpending = {};
@@ -1626,7 +1628,7 @@ export default class CategoriesModule {
     async loadBudgetView() {
         // Initialize budget state
         this.budgetType = this.budgetType || 'expense';
-        this.budgetMonth = this.budgetMonth || (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })(); // YYYY-MM
+        this.budgetMonth = this.budgetMonth || this._currentBudgetMonth();
         this._snapshotMonths = this._snapshotMonths || [];
         this._effectiveBudgets = null;
 
@@ -1751,12 +1753,19 @@ export default class CategoriesModule {
      * (including overriding budgets the user explicitly zeroed back then).
      */
     _getRecurringBudgetAmount(categoryId, period) {
-        const now = new Date();
-        const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-        if (this.budgetMonth && this.budgetMonth < currentMonth) return 0;
+        if (this.budgetMonth && this.budgetMonth < this._currentBudgetMonth()) return 0;
         const monthly = this._recurringBudgets ? parseFloat(this._recurringBudgets[categoryId]) : 0;
         if (!monthly) return 0;
         return this._convertMonthlyToPeriod(monthly, period || 'monthly');
+    }
+
+    /**
+     * The budget month running today (YYYY-MM). With a budget start day that
+     * can be last or next calendar month: start day 28 on 29 September is
+     * already October's period.
+     */
+    _currentBudgetMonth() {
+        return formatters.currentBudgetMonth(parseInt(this.app.settings?.budget_start_day || '1', 10));
     }
 
     /** Convert a monthly amount into the equivalent amount for a budget period. */
@@ -1803,7 +1812,7 @@ export default class CategoriesModule {
         const container = document.getElementById('budget-snapshot-controls');
         if (!container) return;
 
-        const monthLabel = new Date(this.budgetMonth + '-01').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+        const monthLabel = formatters.parseLocalDate(this.budgetMonth + '-01').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
         if (this._currentMonthHasSnapshot) {
             // Show notice that this month has adjusted budgets
@@ -1834,7 +1843,7 @@ export default class CategoriesModule {
     }
 
     confirmCreateSnapshot() {
-        const monthLabel = new Date(this.budgetMonth + '-01').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+        const monthLabel = formatters.parseLocalDate(this.budgetMonth + '-01').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
         OC.dialogs.confirmDestructive(
             t('budget', 'This will save the current budget values as a new baseline from {month} onwards. Previous months will keep their existing values. You can edit the new values after confirming.', { month: monthLabel }),
@@ -2214,8 +2223,7 @@ export default class CategoriesModule {
             const carried = this._getCarriedAmount(category.id);
             const effectiveBudgetAmount = this._getEffectiveBudgetForCalc(category.id, category.budgetAmount, effectivePeriod);
             const rolloverEligible = category.type === 'expense' && effectivePeriod === 'monthly';
-            const nowMonth = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2, '0');
-            const carriedProjected = this.budgetMonth && this.budgetMonth > nowMonth;
+            const carriedProjected = this.budgetMonth && this.budgetMonth > this._currentBudgetMonth();
 
             // Get spending for this category (already calculated for the period)
             const spent = this.categorySpending[category.id] || 0;

@@ -490,6 +490,19 @@ export function budgetMonthForCycle(start, end) {
     return parseInt(start.slice(8, 10), 10) <= 15 ? start.slice(0, 7) : end.slice(0, 7);
 }
 
+/**
+ * The budget month running on a given day (today by default): the month the
+ * Budget page lists the current monthly cycle under.
+ *
+ * @param {number} [startDay=1] - Day of month the budget cycle starts
+ * @param {Date|string} [referenceDate=null] - Stands in for "today"
+ * @returns {string} YYYY-MM
+ */
+export function currentBudgetMonth(startDay = 1, referenceDate = null) {
+    const cycle = getPeriodDateRange('monthly', startDay, referenceDate);
+    return budgetMonthForCycle(cycle.start, cycle.end);
+}
+
 /** The date-range values a dashboard tile's settings can hold. */
 export const TILE_DATE_RANGES = ['7d', '30d', '90d', '6m', '1y', 'period'];
 

@@ -414,7 +414,7 @@ class ReportAggregator {
         // Auto-derived recurring budgets (#269) apply to current/future months
         // only — they reflect today's bills and must not rewrite history.
         // Mirrors the Budget view's rule so both surfaces agree.
-        $recurringBudgets = $reportMonth >= date('Y-m')
+        $recurringBudgets = $reportMonth >= $this->carryoverService->currentBudgetMonth($userId)
             ? $this->recurringBudgetService->getMonthlyBudgetsByCategory($userId)
             : [];
 

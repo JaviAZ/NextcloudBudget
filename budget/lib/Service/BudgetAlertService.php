@@ -141,7 +141,7 @@ class BudgetAlertService {
 
         // Get all categories and resolve effective budgets for current month
         $categories = $this->categoryMapper->findAll($userId);
-        $currentMonth = date('Y-m');
+        $currentMonth = $this->currentBudgetMonth($userId);
         $snapshotOverrides = $this->budgetSnapshotMapper->findEffectiveBatch($userId, $currentMonth);
         $recurringBudgets = $this->recurringBudgetService->getMonthlyBudgetsByCategory($userId);
         $carryovers = $this->carryoverService->getCarryovers($userId, $currentMonth, $categories, $visibleAccountIds);
@@ -330,7 +330,7 @@ class BudgetAlertService {
         $statuses = [];
 
         $categories = $this->categoryMapper->findAll($userId);
-        $currentMonth = date('Y-m');
+        $currentMonth = $this->currentBudgetMonth($userId);
         $snapshotOverrides = $this->budgetSnapshotMapper->findEffectiveBatch($userId, $currentMonth);
         $recurringBudgets = $this->recurringBudgetService->getMonthlyBudgetsByCategory($userId);
         $carryovers = $this->carryoverService->getCarryovers($userId, $currentMonth, $categories, $visibleAccountIds);
@@ -449,6 +449,15 @@ class BudgetAlertService {
     }
 
     /**
+     * The budget month today falls in. With a custom start day the current
+     * period can be named after last or next calendar month, and its
+     * snapshot and carryover are that month's, as on the Budget page.
+     */
+    private function currentBudgetMonth(string $userId): string {
+        return BudgetPeriod::monthContaining($this->getNow()->format('Y-m-d'), $this->getBudgetStartDay($userId));
+    }
+
+    /**
      * Get the current date. Overridable in tests.
      */
     protected function getNow(): \DateTime {
@@ -501,68 +510,22 @@ class BudgetAlertService {
     }
 
     /**
-     * Calculate the monthly period range given a start day.
-     * Clamps start day to the number of days in the month.
+     * The monthly budget period containing $now, the same period the Budget
+     * page shows for the current budget month (see BudgetPeriod).
      */
     private function calculateMonthlyRange(\DateTime $now, int $startDay): array {
-        if ($startDay === 1) {
-            // Default behavior: 1st to last day of month
-            $monthStart = new \DateTime($now->format('Y-m-01'));
-            $monthEnd = new \DateTime($now->format('Y-m-t'));
-            return [
-                'start' => $monthStart->format('Y-m-d'),
-                'end' => $monthEnd->format('Y-m-d'),
-                'label' => $now->format('F Y'),
-            ];
-        }
-
-        $currentDay = (int) $now->format('j');
-        $year = (int) $now->format('Y');
-        $month = (int) $now->format('n');
-
-        // Clamp start day to days in current month
-        $daysInCurrentMonth = (int) $now->format('t');
-        $effectiveStartDay = min($startDay, $daysInCurrentMonth);
-
-        if ($currentDay >= $effectiveStartDay) {
-            // Period started this month
-            $periodStart = new \DateTime(sprintf('%04d-%02d-%02d', $year, $month, $effectiveStartDay));
-
-            // End is day before start day next month
-            $nextMonth = $month + 1;
-            $nextYear = $year;
-            if ($nextMonth > 12) {
-                $nextMonth = 1;
-                $nextYear++;
-            }
-            $daysInNextMonth = (int) (new \DateTime(sprintf('%04d-%02d-01', $nextYear, $nextMonth)))->format('t');
-            $effectiveNextStartDay = min($startDay, $daysInNextMonth);
-            $nextPeriodStart = new \DateTime(sprintf('%04d-%02d-%02d', $nextYear, $nextMonth, $effectiveNextStartDay));
-            $periodEnd = clone $nextPeriodStart;
-            $periodEnd->modify('-1 day');
-        } else {
-            // Period started last month
-            $prevMonth = $month - 1;
-            $prevYear = $year;
-            if ($prevMonth < 1) {
-                $prevMonth = 12;
-                $prevYear--;
-            }
-            $daysInPrevMonth = (int) (new \DateTime(sprintf('%04d-%02d-01', $prevYear, $prevMonth)))->format('t');
-            $effectivePrevStartDay = min($startDay, $daysInPrevMonth);
-            $periodStart = new \DateTime(sprintf('%04d-%02d-%02d', $prevYear, $prevMonth, $effectivePrevStartDay));
-
-            // End is day before start day this month
-            $thisPeriodEnd = new \DateTime(sprintf('%04d-%02d-%02d', $year, $month, $effectiveStartDay));
-            $periodEnd = clone $thisPeriodEnd;
-            $periodEnd->modify('-1 day');
-        }
-
-        $label = $periodStart->format('M j') . ' – ' . $periodEnd->format('M j');
+        [$start, $end] = BudgetPeriod::range(
+            BudgetPeriod::monthContaining($now->format('Y-m-d'), $startDay),
+            $startDay
+        );
+        $label = $startDay === 1
+            ? $now->format('F Y')
+            : \DateTime::createFromFormat('!Y-m-d', $start)->format('M j')
+                . ' – ' . \DateTime::createFromFormat('!Y-m-d', $end)->format('M j');
 
         return [
-            'start' => $periodStart->format('Y-m-d'),
-            'end' => $periodEnd->format('Y-m-d'),
+            'start' => $start,
+            'end' => $end,
             'label' => $label,
         ];
     }

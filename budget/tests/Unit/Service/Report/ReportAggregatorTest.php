@@ -23,6 +23,8 @@ class ReportAggregatorTest extends TestCase {
 	private CurrencyConversionService $conversionService;
 	private BudgetSnapshotMapper $budgetSnapshotMapper;
 	private $carryoverService;
+	private $recurringBudgetService;
+	private string $currentBudgetMonth;
 	private $splitMapper;
 	private $granularShareService;
 	private $categoryMuteMapper;
@@ -36,10 +38,13 @@ class ReportAggregatorTest extends TestCase {
 
 		$this->budgetSnapshotMapper = $this->createMock(BudgetSnapshotMapper::class);
 
-		$recurringBudgetService = $this->createMock(\OCA\Budget\Service\RecurringBudgetService::class);
-		$recurringBudgetService->method('getMonthlyBudgetsByCategory')->willReturn([]);
+		$this->recurringBudgetService = $this->createMock(\OCA\Budget\Service\RecurringBudgetService::class);
+		$this->recurringBudgetService->method('getMonthlyBudgetsByCategory')->willReturn([]);
 
+		$this->currentBudgetMonth = date('Y-m');
 		$this->carryoverService = $this->createMock(\OCA\Budget\Service\BudgetCarryoverService::class);
+		$this->carryoverService->method('currentBudgetMonth')
+			->willReturnCallback(fn() => $this->currentBudgetMonth);
 
 		$this->splitMapper = $this->createMock(\OCA\Budget\Db\TransactionSplitMapper::class);
 
@@ -55,7 +60,7 @@ class ReportAggregatorTest extends TestCase {
 			$this->budgetSnapshotMapper,
 			$this->calculator,
 			$this->conversionService,
-			$recurringBudgetService,
+			$this->recurringBudgetService,
 			$this->carryoverService,
 			$this->splitMapper,
 			$this->granularShareService,
@@ -528,6 +533,27 @@ class ReportAggregatorTest extends TestCase {
 		$this->carryoverService->expects($this->never())->method('getCarryovers');
 
 		$this->aggregator->getBudgetReport('user1', '2026-08-28', '2026-09-15', null, null, '2026-09');
+	}
+
+	/**
+	 * Recurring budgets reflect today's bills, so they fill in for the current
+	 * budget month onwards only. With start day 28 on 29 Sep that is October:
+	 * the September period (28 Aug - 27 Sep) is already history.
+	 */
+	public function testBudgetReportSkipsRecurringBudgetsBeforeTheCurrentBudgetMonth(): void {
+		$this->currentBudgetMonth = '2026-10';
+		$this->categoryMapper->method('findAll')->willReturn([]);
+		$this->recurringBudgetService->expects($this->never())->method('getMonthlyBudgetsByCategory');
+
+		$this->aggregator->getBudgetReport('user1', '2026-08-28', '2026-09-27', null, null, '2026-09');
+	}
+
+	public function testBudgetReportUsesRecurringBudgetsForTheCurrentBudgetMonth(): void {
+		$this->currentBudgetMonth = '2026-10';
+		$this->categoryMapper->method('findAll')->willReturn([]);
+		$this->recurringBudgetService->expects($this->once())->method('getMonthlyBudgetsByCategory');
+
+		$this->aggregator->getBudgetReport('user1', '2026-09-28', '2026-10-27', null, null, '2026-10');
 	}
 
 	public function testBudgetReportAddsTheCarryoverToABudgetPeriodBudget(): void {

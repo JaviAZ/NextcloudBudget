@@ -20,6 +20,7 @@ import CategoriesModule from '../../src/modules/categories/CategoriesModule.js';
 
 function makeModule(spentByCategory) {
     const mod = Object.create(CategoriesModule.prototype);
+    mod.app = { settings: {} };
     mod.categorySpending = spentByCategory;
     mod._ownSpending = {};
     mod.budgetMonth = '2026-08';
