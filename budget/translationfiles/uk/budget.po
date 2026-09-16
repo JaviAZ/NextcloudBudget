@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-09-12 13:22+0000\n"
+"POT-Creation-Date: 2026-09-16 22:09+0000\n"
 "PO-Revision-Date: 2026-09-12 15:14+0000\n"
 "Last-Translator: Leonid Zaliubovskyi <la399fox@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/nextcloud-"
@@ -734,7 +734,7 @@ msgid "Failed to record the payment"
 msgstr "Не вдалося зареєструвати платіж"
 
 #: /app/lib/Controller/BillController.php:780
-#: /app/src/modules/bills/BillsModule.js:1252
+#: /app/src/modules/bills/BillsModule.js:1277
 msgid "Failed to mark bill as paid"
 msgstr "Не вдалося позначити платіж як сплачений"
 
@@ -743,13 +743,13 @@ msgid "Failed to undo mark as paid"
 msgstr "Не вдалося скасувати позначку про сплату"
 
 #: /app/lib/Controller/BillController.php:836
-#: /app/src/modules/bills/BillsModule.js:1530
-#: /app/src/modules/bills/BillsModule.js:1537
+#: /app/src/modules/bills/BillsModule.js:1555
+#: /app/src/modules/bills/BillsModule.js:1562
 msgid "Failed to mark bill as unpaid"
 msgstr "Не вдалося позначити платіж як несплачений"
 
 #: /app/lib/Controller/BillController.php:853
-#: /app/src/modules/bills/BillsModule.js:1581
+#: /app/src/modules/bills/BillsModule.js:1606
 msgid "Failed to skip bill payment"
 msgstr "Не вдалося пропустити платіж"
 
@@ -782,7 +782,7 @@ msgid "Failed to retrieve bill status"
 msgstr "Не вдалося отримати стан платежів"
 
 #: /app/lib/Controller/BillController.php:956
-#: /app/src/modules/bills/BillsModule.js:1702
+#: /app/src/modules/bills/BillsModule.js:1727
 msgid "Failed to detect recurring bills"
 msgstr "Не вдалося виявити регулярні платежі"
 
@@ -821,7 +821,7 @@ msgstr "Не вдалося експортувати календар плате
 #: /app/lib/Service/Report/ReportExporter.php:494
 #: /app/lib/Service/Report/ReportExporter.php:571
 #: /app/lib/Service/Report/ReportExporter.php:614 /app/src/main.js:3825
-#: /app/src/modules/bills/BillsModule.js:946
+#: /app/src/modules/bills/BillsModule.js:961
 #: /app/src/modules/rules/RulesModule.js:955
 #: /app/src/modules/rules/RulesModule.js:1177
 #: /app/src/modules/rules/components/CriteriaBuilder.js:154
@@ -934,12 +934,12 @@ msgid "Custom pattern must contain either \"months\" or \"dates\" field"
 msgstr "Користувацький шаблон має містити поле «months» або «dates»"
 
 #: /app/lib/Controller/CalendarFeedController.php:94
-#: /app/src/modules/bills/BillsModule.js:1160
+#: /app/src/modules/bills/BillsModule.js:1185
 msgid "Failed to get calendar feed"
 msgstr "Не вдалося отримати канал календаря"
 
 #: /app/lib/Controller/CalendarFeedController.php:108
-#: /app/src/modules/bills/BillsModule.js:1211
+#: /app/src/modules/bills/BillsModule.js:1236
 msgid "Failed to regenerate calendar feed token"
 msgstr "Не вдалося повторно створити токен каналу календаря"
 
@@ -1874,7 +1874,7 @@ msgid "Monday"
 msgstr "Понеділок"
 
 #: /app/lib/Controller/SettingController.php:319
-#: /app/src/modules/bills/BillsModule.js:324
+#: /app/src/modules/bills/BillsModule.js:327
 #: /app/src/modules/categories/CategoriesModule.js:2260
 #: /app/src/modules/income/IncomeModule.js:117
 #: /app/src/modules/transfers/TransfersModule.js:297
@@ -1887,7 +1887,7 @@ msgstr "Щотижня"
 
 #: /app/lib/Controller/SettingController.php:320
 #: /app/src/modules/accounts/AccountsModule.js:1398
-#: /app/src/modules/bills/BillsModule.js:327
+#: /app/src/modules/bills/BillsModule.js:330
 #: /app/src/modules/categories/CategoriesModule.js:2259
 #: /app/src/modules/income/IncomeModule.js:120
 #: /app/src/modules/pensions/PensionsModule.js:1075
@@ -1901,7 +1901,7 @@ msgid "Monthly"
 msgstr "Щомісяця"
 
 #: /app/lib/Controller/SettingController.php:321
-#: /app/src/modules/bills/BillsModule.js:328
+#: /app/src/modules/bills/BillsModule.js:331
 #: /app/src/modules/categories/CategoriesModule.js:2261
 #: /app/src/modules/income/IncomeModule.js:121
 #: /app/src/modules/pensions/PensionsModule.js:1076
@@ -1915,7 +1915,7 @@ msgstr "Щокварталу"
 
 #: /app/lib/Controller/SettingController.php:322
 #: /app/src/modules/accounts/AccountsModule.js:1399
-#: /app/src/modules/bills/BillsModule.js:330
+#: /app/src/modules/bills/BillsModule.js:333
 #: /app/src/modules/categories/CategoriesModule.js:2262
 #: /app/src/modules/income/IncomeModule.js:123
 #: /app/src/modules/pensions/PensionsModule.js:1077
@@ -2066,7 +2066,8 @@ msgstr ""
 
 #: /app/lib/Controller/ShareController.php:274
 msgid "Failed to update auto-share configuration"
-msgstr "Не вдалося оновити налаштування автоматичного надання спільного доступу"
+msgstr ""
+"Не вдалося оновити налаштування автоматичного надання спільного доступу"
 
 #: /app/lib/Controller/SharedExpenseController.php:65
 msgid "Failed to get contacts"
@@ -2363,7 +2364,7 @@ msgstr "Частина %1$s: сума не може дорівнювати ну�
 #: /app/lib/Controller/TransactionController.php:979 /app/src/main.js:1197
 #: /app/src/main.js:1264 /app/src/modules/accounts/AccountsModule.js:1665
 #: /app/src/modules/accounts/AccountsModule.js:1688
-#: /app/src/modules/bills/BillsModule.js:357
+#: /app/src/modules/bills/BillsModule.js:360
 #: /app/src/modules/dashboard/DashboardModule.js:1238
 #: /app/src/modules/rules/RulesModule.js:1004
 #: /app/src/modules/transactions/TransactionsModule.js:5378
@@ -2943,27 +2944,27 @@ msgstr ""
 msgid "A transaction for this payment already exists"
 msgstr "Транзакція для цього платежу вже існує"
 
-#: /app/lib/Service/BillService.php:1000 /app/lib/Service/BillService.php:1014
+#: /app/lib/Service/BillService.php:1008 /app/lib/Service/BillService.php:1022
 msgid "This bill has no recorded payment to undo"
 msgstr "Для цього платежу немає зареєстрованої сплати, яку можна скасувати"
 
-#: /app/lib/Service/BillService.php:1042
+#: /app/lib/Service/BillService.php:1050
 msgid "Cannot skip a one-time bill"
 msgstr "Не можна пропустити одноразовий платіж"
 
-#: /app/lib/Service/BillService.php:1046
+#: /app/lib/Service/BillService.php:1054
 msgid "Cannot skip an inactive bill"
 msgstr "Не можна пропустити неактивний платіж"
 
-#: /app/lib/Service/BillService.php:1463
+#: /app/lib/Service/BillService.php:1471
 msgid "Auto-pay is not enabled for this bill"
 msgstr "Для цього платежу не ввімкнено автоматичну оплату"
 
-#: /app/lib/Service/BillService.php:1476
+#: /app/lib/Service/BillService.php:1484
 msgid "Bill has no account associated"
 msgstr "Із платежем не пов’язано рахунок"
 
-#: /app/lib/Service/BillService.php:1486
+#: /app/lib/Service/BillService.php:1494
 msgid "Bill auto-paid successfully"
 msgstr "Платіж успішно сплачено автоматично"
 
@@ -3381,7 +3382,7 @@ msgstr "Кві"
 #: /app/lib/Service/Report/MonthNames.php:25
 #: /app/lib/Service/Report/MonthNames.php:46
 #: /app/src/modules/reports/ReportsModule.js:1901
-#: /app/src/modules/reports/ReportsModule.js:2005
+#: /app/src/modules/reports/ReportsModule.js:2021
 #: /app/src/utils/formatters.js:202 /app/templates/index.php:3426
 #: /app/templates/index.php:3539 /app/templates/index.php:5996
 #: /app/templates/index.php:6022 /app/templates/index.php:6498
@@ -3438,67 +3439,67 @@ msgid "Dec"
 msgstr "Гру"
 
 #: /app/lib/Service/Report/MonthNames.php:42
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3422
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3422
 #: /app/templates/index.php:6018 /app/templates/index.php:6494
 msgid "January"
 msgstr "Січень"
 
 #: /app/lib/Service/Report/MonthNames.php:43
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3423
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3423
 #: /app/templates/index.php:6019 /app/templates/index.php:6495
 msgid "February"
 msgstr "Лютий"
 
 #: /app/lib/Service/Report/MonthNames.php:44
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3424
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3424
 #: /app/templates/index.php:6020 /app/templates/index.php:6496
 msgid "March"
 msgstr "Березень"
 
 #: /app/lib/Service/Report/MonthNames.php:45
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3425
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3425
 #: /app/templates/index.php:6021 /app/templates/index.php:6497
 msgid "April"
 msgstr "Квітень"
 
 #: /app/lib/Service/Report/MonthNames.php:47
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3427
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3427
 #: /app/templates/index.php:6023 /app/templates/index.php:6499
 msgid "June"
 msgstr "Червень"
 
 #: /app/lib/Service/Report/MonthNames.php:48
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3428
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3428
 #: /app/templates/index.php:6024 /app/templates/index.php:6500
 msgid "July"
 msgstr "Липень"
 
 #: /app/lib/Service/Report/MonthNames.php:49
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3429
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3429
 #: /app/templates/index.php:6025 /app/templates/index.php:6501
 msgid "August"
 msgstr "Серпень"
 
 #: /app/lib/Service/Report/MonthNames.php:50
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3430
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3430
 #: /app/templates/index.php:6026 /app/templates/index.php:6502
 msgid "September"
 msgstr "Вересень"
 
 #: /app/lib/Service/Report/MonthNames.php:51
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3431
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3431
 #: /app/templates/index.php:6027 /app/templates/index.php:6503
 msgid "October"
 msgstr "Жовтень"
 
 #: /app/lib/Service/Report/MonthNames.php:52
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3432
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3432
 #: /app/templates/index.php:6028 /app/templates/index.php:6504
 msgid "November"
 msgstr "Листопад"
 
 #: /app/lib/Service/Report/MonthNames.php:53
-#: /app/src/modules/reports/ReportsModule.js:2005 /app/templates/index.php:3433
+#: /app/src/modules/reports/ReportsModule.js:2021 /app/templates/index.php:3433
 #: /app/templates/index.php:6029 /app/templates/index.php:6505
 msgid "December"
 msgstr "Грудень"
@@ -4125,7 +4126,7 @@ msgstr "Витрати за рахунком"
 #: /app/src/modules/categories/CategoriesModule.js:768
 #: /app/src/modules/dashboard/DashboardModule.js:1207
 #: /app/src/modules/import/ImportModule.js:157
-#: /app/src/modules/import/ImportModule.js:1961
+#: /app/src/modules/import/ImportModule.js:1966
 #: /app/src/modules/rules/RulesModule.js:1009
 #: /app/src/modules/transactions/TransactionsModule.js:509
 #: /app/src/modules/transactions/TransactionsModule.js:1202
@@ -4333,7 +4334,7 @@ msgstr "Категорії"
 
 #: /app/src/core/KeyboardShortcuts.js:336
 #: /app/src/modules/accounts/AccountsModule.js:1994
-#: /app/src/modules/bills/BillsModule.js:1823
+#: /app/src/modules/bills/BillsModule.js:1848
 #: /app/src/modules/help/HelpModule.js:26
 #: /app/src/modules/reports/ReportsModule.js:442
 #: /app/src/modules/rules/RulesModule.js:830
@@ -4440,10 +4441,10 @@ msgstr "Сполучення клавіш"
 
 #: /app/src/core/KeyboardShortcuts.js:393 /app/src/main.js:2059
 #: /app/src/main.js:2066 /app/src/main.js:2070
-#: /app/src/modules/bills/BillsModule.js:1183
-#: /app/src/modules/bills/BillsModule.js:1396
-#: /app/src/modules/import/ImportModule.js:2169
-#: /app/src/modules/import/ImportModule.js:2182
+#: /app/src/modules/bills/BillsModule.js:1208
+#: /app/src/modules/bills/BillsModule.js:1421
+#: /app/src/modules/import/ImportModule.js:2174
+#: /app/src/modules/import/ImportModule.js:2187
 #: /app/src/modules/sharing/SharingModule.js:134
 #: /app/src/modules/transactions/TransactionsModule.js:5271
 #: /app/src/modules/transfers/TransfersModule.js:145
@@ -4567,7 +4568,7 @@ msgid "Donate via PayPal"
 msgstr "Зробити пожертву через PayPal"
 
 #: /app/src/main.js:1188 /app/src/modules/accounts/AccountsModule.js:1651
-#: /app/src/modules/reports/ReportsModule.js:1976
+#: /app/src/modules/reports/ReportsModule.js:1992
 #: /app/src/modules/transactions/TransactionsModule.js:2057
 #: /app/src/modules/transfers/TransfersModule.js:434
 #: /app/templates/index.php:5621
@@ -4703,7 +4704,7 @@ msgid "{displayed} of {total} transactions"
 msgstr "{displayed} із {total} транзакцій"
 
 #: /app/src/main.js:1624 /app/src/modules/dashboard/DashboardModule.js:2334
-#: /app/src/modules/import/ImportModule.js:2081
+#: /app/src/modules/import/ImportModule.js:2086
 msgid "%n transaction"
 msgid_plural "%n transactions"
 msgstr[0] "%n транзакція"
@@ -4971,7 +4972,7 @@ msgstr "Ви цілком упевнені, що хочете продовжит
 msgid "Importing data... This may take a moment."
 msgstr "Імпорт даних... Це може тривати деякий час."
 
-#: /app/src/main.js:2523 /app/src/modules/import/ImportModule.js:2315
+#: /app/src/main.js:2523 /app/src/modules/import/ImportModule.js:2320
 msgid "Import failed"
 msgstr "Не вдалося виконати імпорт"
 
@@ -5227,7 +5228,7 @@ msgstr "Загальна сума"
 msgid "Optional note"
 msgstr "Необов’язкова примітка"
 
-#: /app/src/main.js:3843 /app/src/modules/bills/BillsModule.js:973
+#: /app/src/main.js:3843 /app/src/modules/bills/BillsModule.js:988
 #: /app/src/modules/transactions/TransactionsModule.js:3879
 msgid "Remove split"
 msgstr "Видалити частину"
@@ -5524,7 +5525,7 @@ msgstr ""
 "приблизними."
 
 #: /app/src/modules/accounts/AccountsModule.js:1621
-#: /app/src/modules/import/ImportModule.js:1907
+#: /app/src/modules/import/ImportModule.js:1912
 msgid "No transactions found"
 msgstr "Транзакцій не знайдено"
 
@@ -5537,7 +5538,7 @@ msgid "Transfer {direction} {account}"
 msgstr "Переказ {direction} {account}"
 
 #: /app/src/modules/accounts/AccountsModule.js:1832
-#: /app/src/modules/bills/BillsModule.js:353
+#: /app/src/modules/bills/BillsModule.js:356
 #: /app/src/modules/transfers/TransfersModule.js:322
 msgid "No due date"
 msgstr "Без строку сплати"
@@ -5599,7 +5600,7 @@ msgstr "Немає доступних рахунків. Спочатку ств�
 
 #: /app/src/modules/accounts/AccountsModule.js:2317
 #: /app/src/modules/accounts/AccountsModule.js:2438
-#: /app/src/modules/import/ImportModule.js:2250
+#: /app/src/modules/import/ImportModule.js:2255
 msgid "Please select an account"
 msgstr "Виберіть рахунок"
 
@@ -5646,8 +5647,8 @@ msgid "Failed to add transaction"
 msgstr "Не вдалося додати транзакцію"
 
 #: /app/src/modules/accounts/AccountsModule.js:2557
-#: /app/src/modules/bills/BillsModule.js:892
-#: /app/src/modules/bills/BillsModule.js:956
+#: /app/src/modules/bills/BillsModule.js:907
+#: /app/src/modules/bills/BillsModule.js:971
 #: /app/src/modules/income/IncomeModule.js:460
 #: /app/src/modules/transactions/TransactionsModule.js:2034
 #: /app/src/modules/transfers/TransfersModule.js:527
@@ -6044,7 +6045,8 @@ msgstr "Зіставлено рахунків: {count}"
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:199
 msgid "Auto-apply import rules to synced transactions"
-msgstr "Автоматично застосовувати правила імпорту до синхронізованих транзакцій"
+msgstr ""
+"Автоматично застосовувати правила імпорту до синхронізованих транзакцій"
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:201
 msgid "Apply rules"
@@ -6265,7 +6267,7 @@ msgid "Transaction recorded"
 msgstr "Транзакцію зареєстровано"
 
 #: /app/src/modules/bills/BillsModule.js:183
-#: /app/src/modules/bills/BillsModule.js:1726
+#: /app/src/modules/bills/BillsModule.js:1751
 #: /app/src/modules/income/IncomeModule.js:759
 #: /app/src/modules/transfers/TransfersModule.js:1191
 #, javascript-format
@@ -6297,35 +6299,35 @@ msgstr "Відхилити всі пропозиції? Вони більше н
 msgid "Failed to dismiss suggestions"
 msgstr "Не вдалося відхилити пропозиції"
 
-#: /app/src/modules/bills/BillsModule.js:310
-#: /app/src/modules/reports/ReportsModule.js:1972
+#: /app/src/modules/bills/BillsModule.js:313
+#: /app/src/modules/reports/ReportsModule.js:1981
 #: /app/src/modules/shared-expenses/SharedExpensesModule.js:502
 #: /app/src/modules/transfers/TransfersModule.js:282
 #: /app/templates/index.php:2596
 msgid "Paid"
 msgstr "Сплачено"
 
-#: /app/src/modules/bills/BillsModule.js:313
+#: /app/src/modules/bills/BillsModule.js:316
 #: /app/src/modules/transfers/TransfersModule.js:119
 #: /app/src/modules/transfers/TransfersModule.js:285
 #: /app/templates/index.php:2568 /app/templates/index.php:2595
 msgid "Overdue"
 msgstr "Прострочено"
 
-#: /app/src/modules/bills/BillsModule.js:316
+#: /app/src/modules/bills/BillsModule.js:319
 #: /app/src/modules/transfers/TransfersModule.js:118
 #: /app/src/modules/transfers/TransfersModule.js:288
 #: /app/templates/index.php:2594
 msgid "Due Soon"
 msgstr "Незабаром до сплати"
 
-#: /app/src/modules/bills/BillsModule.js:319
+#: /app/src/modules/bills/BillsModule.js:322
 #: /app/src/modules/income/IncomeModule.js:112
 #: /app/src/modules/transfers/TransfersModule.js:291
 msgid "Upcoming"
 msgstr "Майбутні"
 
-#: /app/src/modules/bills/BillsModule.js:325
+#: /app/src/modules/bills/BillsModule.js:328
 #: /app/src/modules/income/IncomeModule.js:118
 #: /app/src/modules/transfers/TransfersModule.js:298
 #: /app/src/modules/transfers/TransfersModule.js:465
@@ -6334,7 +6336,7 @@ msgstr "Майбутні"
 msgid "Bi-Weekly"
 msgstr "Раз на два тижні"
 
-#: /app/src/modules/bills/BillsModule.js:326
+#: /app/src/modules/bills/BillsModule.js:329
 #: /app/src/modules/income/IncomeModule.js:119
 #: /app/src/modules/transfers/TransfersModule.js:299
 #: /app/src/modules/transfers/TransfersModule.js:466
@@ -6343,7 +6345,7 @@ msgstr "Раз на два тижні"
 msgid "Semi-Monthly"
 msgstr "Двічі на місяць"
 
-#: /app/src/modules/bills/BillsModule.js:329
+#: /app/src/modules/bills/BillsModule.js:332
 #: /app/src/modules/income/IncomeModule.js:122
 #: /app/src/modules/transfers/TransfersModule.js:302
 #: /app/src/modules/transfers/TransfersModule.js:1000
@@ -6351,7 +6353,7 @@ msgstr "Двічі на місяць"
 msgid "Semi-Annually"
 msgstr "Раз на пів року"
 
-#: /app/src/modules/bills/BillsModule.js:331
+#: /app/src/modules/bills/BillsModule.js:334
 #: /app/src/modules/income/IncomeModule.js:124
 #: /app/src/modules/transfers/TransfersModule.js:296
 #: /app/src/modules/transfers/TransfersModule.js:463
@@ -6360,102 +6362,102 @@ msgstr "Раз на пів року"
 msgid "One-Time"
 msgstr "Одноразово"
 
-#: /app/src/modules/bills/BillsModule.js:357 /app/templates/index.php:5665
+#: /app/src/modules/bills/BillsModule.js:360 /app/templates/index.php:5665
 #: /app/templates/index.php:6054
 msgid "Split across categories"
 msgstr "Розподілено між категоріями"
 
-#: /app/src/modules/bills/BillsModule.js:358
+#: /app/src/modules/bills/BillsModule.js:361
 #: /app/src/modules/transfers/TransfersModule.js:326
 msgid "Auto-pay enabled"
 msgstr "Автоматичну оплату ввімкнено"
 
-#: /app/src/modules/bills/BillsModule.js:358
+#: /app/src/modules/bills/BillsModule.js:361
 #: /app/src/modules/transfers/TransfersModule.js:326
 msgid "Auto-pay"
 msgstr "Автоматична оплата"
 
-#: /app/src/modules/bills/BillsModule.js:359
+#: /app/src/modules/bills/BillsModule.js:362
 #: /app/src/modules/transfers/TransfersModule.js:327
 msgid "Auto-pay failed - disabled"
 msgstr "Автоматична оплата не вдалася — функцію вимкнено"
 
-#: /app/src/modules/bills/BillsModule.js:359
+#: /app/src/modules/bills/BillsModule.js:362
 #: /app/src/modules/transfers/TransfersModule.js:327
 msgid "Auto-pay Failed"
 msgstr "Помилка автоматичної оплати"
 
-#: /app/src/modules/bills/BillsModule.js:360
+#: /app/src/modules/bills/BillsModule.js:363
 msgid "Remaining payments"
 msgstr "Залишилося платежів"
 
-#: /app/src/modules/bills/BillsModule.js:360
+#: /app/src/modules/bills/BillsModule.js:363
 msgid "{count} left"
 msgstr "Залишилося: {count}"
 
-#: /app/src/modules/bills/BillsModule.js:361
+#: /app/src/modules/bills/BillsModule.js:364
 msgid "Ends {date}"
 msgstr "Завершується {date}"
 
-#: /app/src/modules/bills/BillsModule.js:366
+#: /app/src/modules/bills/BillsModule.js:369
 #: /app/src/modules/transfers/TransfersModule.js:332
 msgid "Mark as paid"
 msgstr "Позначити як сплачений"
 
-#: /app/src/modules/bills/BillsModule.js:368
+#: /app/src/modules/bills/BillsModule.js:371
 #: /app/src/modules/transfers/TransfersModule.js:334
 msgid "Mark Paid"
 msgstr "Позначити як сплачений"
 
-#: /app/src/modules/bills/BillsModule.js:372
+#: /app/src/modules/bills/BillsModule.js:375
 msgid "Skip this payment"
 msgstr "Пропустити цей платіж"
 
-#: /app/src/modules/bills/BillsModule.js:374
+#: /app/src/modules/bills/BillsModule.js:377
 msgid "Skip"
 msgstr "Пропустити"
 
-#: /app/src/modules/bills/BillsModule.js:378
+#: /app/src/modules/bills/BillsModule.js:381
 #: /app/src/modules/transfers/TransfersModule.js:338
 msgid "Revert the last payment"
 msgstr "Скасувати останню сплату"
 
-#: /app/src/modules/bills/BillsModule.js:380
+#: /app/src/modules/bills/BillsModule.js:383
 #: /app/src/modules/transfers/TransfersModule.js:340
 msgid "Mark Unpaid"
 msgstr "Позначити як несплачений"
 
-#: /app/src/modules/bills/BillsModule.js:383
+#: /app/src/modules/bills/BillsModule.js:386
 msgid "Edit bill"
 msgstr "Редагувати платіж"
 
-#: /app/src/modules/bills/BillsModule.js:386
+#: /app/src/modules/bills/BillsModule.js:389
 msgid "Delete bill"
 msgstr "Видалити платіж"
 
-#: /app/src/modules/bills/BillsModule.js:635
+#: /app/src/modules/bills/BillsModule.js:638
 msgid "Edit Bill"
 msgstr "Редагувати платіж"
 
-#: /app/src/modules/bills/BillsModule.js:720 /app/templates/index.php:2528
+#: /app/src/modules/bills/BillsModule.js:723 /app/templates/index.php:2528
 msgid "Add Bill"
 msgstr "Додати платіж"
 
-#: /app/src/modules/bills/BillsModule.js:794
+#: /app/src/modules/bills/BillsModule.js:797
 msgid "Unavailable (not shared with you)"
 msgstr "Недоступно (вам не надано спільний доступ)"
 
-#: /app/src/modules/bills/BillsModule.js:857
+#: /app/src/modules/bills/BillsModule.js:868
 msgid "Due Date"
 msgstr "Дата сплати"
 
-#: /app/src/modules/bills/BillsModule.js:857
+#: /app/src/modules/bills/BillsModule.js:868
 #: /app/src/modules/transfers/TransfersModule.js:506
 #: /app/templates/index.php:6086
 msgid "Start Date"
 msgstr "Дата початку"
 
-#: /app/src/modules/bills/BillsModule.js:861
+#: /app/src/modules/bills/BillsModule.js:872
 msgid ""
 "The date this bill is due. It can be in the past - an invoice you are "
 "entering late stays due on its own date."
@@ -6463,93 +6465,93 @@ msgstr ""
 "Дата, коли потрібно сплатити цей платіж. Вона може бути в минулому — "
 "рахунок, який ви вводите із запізненням, зберігає свою початкову дату сплати."
 
-#: /app/src/modules/bills/BillsModule.js:862 /app/templates/index.php:6088
+#: /app/src/modules/bills/BillsModule.js:873 /app/templates/index.php:6088
 msgid "Bill only occurs on or after this date (optional)"
 msgstr "Платіж виникає лише в цю дату або після неї (необов’язково)"
 
-#: /app/src/modules/bills/BillsModule.js:873
+#: /app/src/modules/bills/BillsModule.js:888
 #: /app/src/modules/transfers/TransfersModule.js:711
 msgid "Due Day (1-7)"
 msgstr "День сплати (1–7)"
 
-#: /app/src/modules/bills/BillsModule.js:874
+#: /app/src/modules/bills/BillsModule.js:889
 #: /app/src/modules/income/IncomeModule.js:432
 #: /app/src/modules/transfers/TransfersModule.js:712
 msgid "Day of the week (1=Monday, 7=Sunday)"
 msgstr "День тижня (1 — понеділок, 7 — неділя)"
 
-#: /app/src/modules/bills/BillsModule.js:877
-#: /app/src/modules/bills/BillsModule.js:881 /app/templates/index.php:6009
+#: /app/src/modules/bills/BillsModule.js:892
+#: /app/src/modules/bills/BillsModule.js:896 /app/templates/index.php:6009
 msgid "Due Day"
 msgstr "День сплати"
 
-#: /app/src/modules/bills/BillsModule.js:878
+#: /app/src/modules/bills/BillsModule.js:893
 msgid "Day of the selected months when bill is due"
 msgstr "День вибраних місяців, коли потрібно сплатити платіж"
 
-#: /app/src/modules/bills/BillsModule.js:882 /app/templates/index.php:6011
+#: /app/src/modules/bills/BillsModule.js:897 /app/templates/index.php:6011
 msgid "Day of the month when bill is due"
 msgstr "День місяця, коли потрібно сплатити платіж"
 
-#: /app/src/modules/bills/BillsModule.js:901
+#: /app/src/modules/bills/BillsModule.js:916
 #: /app/src/modules/income/IncomeModule.js:469 /app/templates/index.php:6062
 #: /app/templates/index.php:6521
 msgid "No specific account"
 msgstr "Без конкретного рахунку"
 
-#: /app/src/modules/bills/BillsModule.js:963 /app/templates/index.php:6908
+#: /app/src/modules/bills/BillsModule.js:978 /app/templates/index.php:6908
 msgid "Description (optional)"
 msgstr "Опис (необов’язково)"
 
-#: /app/src/modules/bills/BillsModule.js:999
+#: /app/src/modules/bills/BillsModule.js:1014
 msgid "Balanced"
 msgstr "Суми збігаються"
 
-#: /app/src/modules/bills/BillsModule.js:1002
+#: /app/src/modules/bills/BillsModule.js:1017
 msgid "{amount} remaining"
 msgstr "Залишилося {amount}"
 
-#: /app/src/modules/bills/BillsModule.js:1005
+#: /app/src/modules/bills/BillsModule.js:1020
 msgid "{amount} over"
 msgstr "Перевищення на {amount}"
 
-#: /app/src/modules/bills/BillsModule.js:1071
+#: /app/src/modules/bills/BillsModule.js:1096
 msgid "Please select at least one month for custom frequency"
 msgstr "Виберіть принаймні один місяць для користувацької періодичності"
 
-#: /app/src/modules/bills/BillsModule.js:1101
+#: /app/src/modules/bills/BillsModule.js:1126
 msgid "Bill created successfully"
 msgstr "Платіж успішно створено"
 
-#: /app/src/modules/bills/BillsModule.js:1101
+#: /app/src/modules/bills/BillsModule.js:1126
 msgid "Bill updated successfully"
 msgstr "Платіж успішно оновлено"
 
-#: /app/src/modules/bills/BillsModule.js:1105
+#: /app/src/modules/bills/BillsModule.js:1130
 msgid "Failed to save bill"
 msgstr "Не вдалося зберегти платіж"
 
-#: /app/src/modules/bills/BillsModule.js:1121
+#: /app/src/modules/bills/BillsModule.js:1146
 msgid "Failed to load bill"
 msgstr "Не вдалося завантажити платіж"
 
-#: /app/src/modules/bills/BillsModule.js:1126
+#: /app/src/modules/bills/BillsModule.js:1151
 msgid "Are you sure you want to delete this bill?"
 msgstr "Справді видалити цей платіж?"
 
-#: /app/src/modules/bills/BillsModule.js:1138
+#: /app/src/modules/bills/BillsModule.js:1163
 msgid "Bill deleted successfully"
 msgstr "Платіж успішно видалено"
 
-#: /app/src/modules/bills/BillsModule.js:1142
+#: /app/src/modules/bills/BillsModule.js:1167
 msgid "Failed to delete bill"
 msgstr "Не вдалося видалити платіж"
 
-#: /app/src/modules/bills/BillsModule.js:1173
+#: /app/src/modules/bills/BillsModule.js:1198
 msgid "Bills calendar subscription"
 msgstr "Підписка на календар платежів"
 
-#: /app/src/modules/bills/BillsModule.js:1174
+#: /app/src/modules/bills/BillsModule.js:1199
 msgid ""
 "Subscribe to this URL from any calendar app (Nextcloud Calendar, "
 "Thunderbird, your phone) to see upcoming bill due dates. Bills appear as all-"
@@ -6560,11 +6562,11 @@ msgstr ""
 "Платежі відображаються як події на весь день протягом наступних 12 місяців і "
 "оновлюються автоматично."
 
-#: /app/src/modules/bills/BillsModule.js:1176
+#: /app/src/modules/bills/BillsModule.js:1201
 msgid "Subscription URL"
 msgstr "URL-адреса підписки"
 
-#: /app/src/modules/bills/BillsModule.js:1179
+#: /app/src/modules/bills/BillsModule.js:1204
 msgid ""
 "Anyone with this URL can read your bill names and amounts. Regenerate the "
 "link if it leaks."
@@ -6572,38 +6574,38 @@ msgstr ""
 "Кожен, хто має цю URL-адресу, може бачити назви та суми ваших платежів. Якщо "
 "посилання стане відомим стороннім, створіть його заново."
 
-#: /app/src/modules/bills/BillsModule.js:1181
+#: /app/src/modules/bills/BillsModule.js:1206
 msgid "Copy link"
 msgstr "Копіювати посилання"
 
-#: /app/src/modules/bills/BillsModule.js:1182
+#: /app/src/modules/bills/BillsModule.js:1207
 msgid "Regenerate link"
 msgstr "Створити посилання заново"
 
-#: /app/src/modules/bills/BillsModule.js:1192
+#: /app/src/modules/bills/BillsModule.js:1217
 msgid "Link copied to clipboard"
 msgstr "Посилання скопійовано до буфера обміну"
 
-#: /app/src/modules/bills/BillsModule.js:1195
+#: /app/src/modules/bills/BillsModule.js:1220
 msgid "Press Ctrl+C to copy the selected link"
 msgstr "Натисніть Ctrl+C, щоб скопіювати вибране посилання"
 
-#: /app/src/modules/bills/BillsModule.js:1200
+#: /app/src/modules/bills/BillsModule.js:1225
 msgid ""
 "Regenerate the link? Existing calendar subscriptions will stop updating."
 msgstr ""
 "Створити посилання заново? Наявні підписки на календар перестануть "
 "оновлюватися."
 
-#: /app/src/modules/bills/BillsModule.js:1209
+#: /app/src/modules/bills/BillsModule.js:1234
 msgid "New link generated"
 msgstr "Створено нове посилання"
 
-#: /app/src/modules/bills/BillsModule.js:1304
+#: /app/src/modules/bills/BillsModule.js:1329
 msgid "Bill marked as paid. Linked to existing transaction."
 msgstr "Платіж позначено як сплачений і пов’язано з наявною транзакцією."
 
-#: /app/src/modules/bills/BillsModule.js:1308
+#: /app/src/modules/bills/BillsModule.js:1333
 msgid ""
 "No transaction was recorded for this payment — your account balance will not "
 "reflect it."
@@ -6611,11 +6613,11 @@ msgstr ""
 "Для цього платежу транзакцію не зареєстровано — баланс рахунку не "
 "враховуватиме його."
 
-#: /app/src/modules/bills/BillsModule.js:1309
+#: /app/src/modules/bills/BillsModule.js:1334
 msgid "Bill marked as paid. No transaction created."
 msgstr "Платіж позначено як сплачений. Транзакцію не створено."
 
-#: /app/src/modules/bills/BillsModule.js:1318
+#: /app/src/modules/bills/BillsModule.js:1343
 msgid ""
 "The bill was marked as paid, but linking the selected transaction failed. "
 "You can link it manually from the transaction."
@@ -6623,7 +6625,7 @@ msgstr ""
 "Платіж позначено як сплачений, але не вдалося пов’язати вибрану транзакцію. "
 "Її можна пов’язати вручну з транзакції."
 
-#: /app/src/modules/bills/BillsModule.js:1320
+#: /app/src/modules/bills/BillsModule.js:1345
 msgid ""
 "No transaction was recorded for this payment — your account balance will not "
 "reflect it. Assign an account to the bill, or add the transaction manually."
@@ -6631,86 +6633,86 @@ msgstr ""
 "Для цього платежу транзакцію не зареєстровано — баланс рахунку не "
 "враховуватиме його. Призначте платежу рахунок або додайте транзакцію вручну."
 
-#: /app/src/modules/bills/BillsModule.js:1322
+#: /app/src/modules/bills/BillsModule.js:1347
 msgid "Bill marked as paid — without a transaction."
 msgstr "Платіж позначено як сплачений — без транзакції."
 
-#: /app/src/modules/bills/BillsModule.js:1326
+#: /app/src/modules/bills/BillsModule.js:1351
 msgid "Bill marked as paid. Transaction created."
 msgstr "Платіж позначено як сплачений. Транзакцію створено."
 
-#: /app/src/modules/bills/BillsModule.js:1327
+#: /app/src/modules/bills/BillsModule.js:1352
 msgid "Bill marked as paid. Future transaction created."
 msgstr "Платіж позначено як сплачений. Майбутню транзакцію створено."
 
-#: /app/src/modules/bills/BillsModule.js:1355
+#: /app/src/modules/bills/BillsModule.js:1380
 msgid "Exact amount"
 msgstr "Точна сума"
 
-#: /app/src/modules/bills/BillsModule.js:1356
+#: /app/src/modules/bills/BillsModule.js:1381
 msgid "Similar amount (±5%)"
 msgstr "Подібна сума (±5%)"
 
-#: /app/src/modules/bills/BillsModule.js:1357
+#: /app/src/modules/bills/BillsModule.js:1382
 msgid "Approximate amount (±20%)"
 msgstr "Приблизна сума (±20%)"
 
-#: /app/src/modules/bills/BillsModule.js:1358
+#: /app/src/modules/bills/BillsModule.js:1383
 msgid "Vendor matches"
 msgstr "Продавець збігається"
 
-#: /app/src/modules/bills/BillsModule.js:1359
+#: /app/src/modules/bills/BillsModule.js:1384
 msgid "Vendor partially matches"
 msgstr "Продавець частково збігається"
 
-#: /app/src/modules/bills/BillsModule.js:1360
+#: /app/src/modules/bills/BillsModule.js:1385
 msgid "Description matches"
 msgstr "Опис збігається"
 
-#: /app/src/modules/bills/BillsModule.js:1361
+#: /app/src/modules/bills/BillsModule.js:1386
 msgid "Description partially matches"
 msgstr "Опис частково збігається"
 
-#: /app/src/modules/bills/BillsModule.js:1362
+#: /app/src/modules/bills/BillsModule.js:1387
 msgid "Same day"
 msgstr "Той самий день"
 
-#: /app/src/modules/bills/BillsModule.js:1363
+#: /app/src/modules/bills/BillsModule.js:1388
 msgid "±1 day"
 msgstr "±1 день"
 
-#: /app/src/modules/bills/BillsModule.js:1364
+#: /app/src/modules/bills/BillsModule.js:1389
 msgid "±3 days"
 msgstr "±3 дні"
 
-#: /app/src/modules/bills/BillsModule.js:1365
+#: /app/src/modules/bills/BillsModule.js:1390
 msgid "±7 days"
 msgstr "±7 днів"
 
-#: /app/src/modules/bills/BillsModule.js:1370
+#: /app/src/modules/bills/BillsModule.js:1395
 #: /app/src/modules/transactions/TransactionsModule.js:5354
 msgid "(no description)"
 msgstr "(без опису)"
 
-#: /app/src/modules/bills/BillsModule.js:1383
+#: /app/src/modules/bills/BillsModule.js:1408
 msgid "Strong match"
 msgstr "Висока відповідність"
 
-#: /app/src/modules/bills/BillsModule.js:1395
+#: /app/src/modules/bills/BillsModule.js:1420
 msgid "Existing Transaction Found"
 msgstr "Знайдено наявну транзакцію"
 
-#: /app/src/modules/bills/BillsModule.js:1399
+#: /app/src/modules/bills/BillsModule.js:1424
 msgid ""
 "We found existing transactions that may already represent this bill payment "
 "({billName}, {amount}). Would you like to link one instead of creating a new "
 "transaction?"
 msgstr ""
-"Знайдено наявні транзакції, які можуть уже відповідати цьому платежу ("
-"{billName}, {amount}). Пов’язати одну з них замість створення нової "
+"Знайдено наявні транзакції, які можуть уже відповідати цьому платежу "
+"({billName}, {amount}). Пов’язати одну з них замість створення нової "
 "транзакції?"
 
-#: /app/src/modules/bills/BillsModule.js:1400
+#: /app/src/modules/bills/BillsModule.js:1425
 msgid ""
 "Whichever you choose, the bill is marked as paid and moves on to its next "
 "due date."
@@ -6718,19 +6720,19 @@ msgstr ""
 "Незалежно від вибору платіж буде позначено як сплачений і перенесено на "
 "наступну дату сплати."
 
-#: /app/src/modules/bills/BillsModule.js:1407
+#: /app/src/modules/bills/BillsModule.js:1432
 msgid "Create a new transaction instead"
 msgstr "Натомість створити нову транзакцію"
 
-#: /app/src/modules/bills/BillsModule.js:1413
+#: /app/src/modules/bills/BillsModule.js:1438
 msgid "Don't create any transaction (just mark as paid)"
 msgstr "Не створювати транзакцію (лише позначити як сплачений)"
 
-#: /app/src/modules/bills/BillsModule.js:1414
+#: /app/src/modules/bills/BillsModule.js:1439
 msgid "Your account balance will NOT reflect this payment."
 msgstr "Баланс вашого рахунку НЕ враховуватиме цей платіж."
 
-#: /app/src/modules/bills/BillsModule.js:1419
+#: /app/src/modules/bills/BillsModule.js:1444
 #: /app/src/modules/categories/CategoriesModule.js:1829
 #: /app/src/modules/transfers/TransfersModule.js:151
 #: /app/src/modules/transfers/TransfersModule.js:572
@@ -6758,25 +6760,25 @@ msgstr "Баланс вашого рахунку НЕ враховуватиме
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: /app/src/modules/bills/BillsModule.js:1420
+#: /app/src/modules/bills/BillsModule.js:1445
 #: /app/src/modules/categories/CategoriesModule.js:1828
 #: /app/src/utils/dialogs.js:230
 msgid "Confirm"
 msgstr "Підтвердити"
 
-#: /app/src/modules/bills/BillsModule.js:1490
-#: /app/src/modules/bills/BillsModule.js:1610
+#: /app/src/modules/bills/BillsModule.js:1515
+#: /app/src/modules/bills/BillsModule.js:1635
 #: /app/src/modules/income/IncomeModule.js:645
 msgid "Action undone"
 msgstr "Дію скасовано"
 
-#: /app/src/modules/bills/BillsModule.js:1493
-#: /app/src/modules/bills/BillsModule.js:1613
+#: /app/src/modules/bills/BillsModule.js:1518
+#: /app/src/modules/bills/BillsModule.js:1638
 #: /app/src/modules/income/IncomeModule.js:648
 msgid "Failed to undo action: {message}"
 msgstr "Не вдалося скасувати дію: {message}"
 
-#: /app/src/modules/bills/BillsModule.js:1508
+#: /app/src/modules/bills/BillsModule.js:1533
 #: /app/src/modules/transfers/TransfersModule.js:934
 msgid ""
 "Mark this bill as unpaid? Transactions created for the payment will be "
@@ -6787,7 +6789,7 @@ msgstr ""
 "видалено, пов’язану імпортовану транзакцію буде відв’язано, а графік платежу "
 "повернуто до попереднього стану."
 
-#: /app/src/modules/bills/BillsModule.js:1513
+#: /app/src/modules/bills/BillsModule.js:1538
 #: /app/src/modules/transfers/TransfersModule.js:937
 msgid ""
 "Auto-pay is on for this bill — it may pay it again on the next run. Disable "
@@ -6797,19 +6799,19 @@ msgstr ""
 "його може бути сплачено знову. Якщо платіж не має повторюватися, спочатку "
 "вимкніть автоматичну оплату."
 
-#: /app/src/modules/bills/BillsModule.js:1534
+#: /app/src/modules/bills/BillsModule.js:1559
 msgid "Payment reverted — the bill is marked as unpaid."
 msgstr "Сплату скасовано — платіж позначено як несплачений."
 
-#: /app/src/modules/bills/BillsModule.js:1548
+#: /app/src/modules/bills/BillsModule.js:1573
 msgid "Skip this payment and advance to the next due date?"
 msgstr "Пропустити цей платіж і перейти до наступної дати сплати?"
 
-#: /app/src/modules/bills/BillsModule.js:1574
+#: /app/src/modules/bills/BillsModule.js:1599
 msgid "Payment skipped. Advanced to next due date."
 msgstr "Платіж пропущено. Установлено наступну дату сплати."
 
-#: /app/src/modules/bills/BillsModule.js:1623
+#: /app/src/modules/bills/BillsModule.js:1648
 #: /app/src/modules/categories/CategoriesModule.js:1880
 #: /app/src/modules/income/IncomeModule.js:658
 #: /app/src/modules/transactions/TransactionsModule.js:4295
@@ -6817,37 +6819,37 @@ msgstr "Платіж пропущено. Установлено наступну
 msgid "Undo"
 msgstr "Скасувати"
 
-#: /app/src/modules/bills/BillsModule.js:1682
+#: /app/src/modules/bills/BillsModule.js:1707
 #: /app/src/modules/income/IncomeModule.js:710
 #: /app/src/modules/transfers/TransfersModule.js:1140
 msgid "Detecting..."
 msgstr "Виявлення..."
 
-#: /app/src/modules/bills/BillsModule.js:1694
+#: /app/src/modules/bills/BillsModule.js:1719
 #: /app/src/modules/transfers/TransfersModule.js:1152
 msgid "No recurring transactions detected"
 msgstr "Регулярних транзакцій не виявлено"
 
-#: /app/src/modules/bills/BillsModule.js:1705 /app/templates/index.php:2524
+#: /app/src/modules/bills/BillsModule.js:1730 /app/templates/index.php:2524
 msgid "Detect Bills"
 msgstr "Виявити платежі"
 
-#: /app/src/modules/bills/BillsModule.js:1742
+#: /app/src/modules/bills/BillsModule.js:1767
 msgid "Please select at least one bill to add"
 msgstr "Виберіть принаймні один платіж для додавання"
 
-#: /app/src/modules/bills/BillsModule.js:1762
+#: /app/src/modules/bills/BillsModule.js:1787
 msgid "%n bill added successfully"
 msgid_plural "%n bills added successfully"
 msgstr[0] "Успішно додано %n платіж"
 msgstr[1] "Успішно додано %n платежі"
 msgstr[2] "Успішно додано %n платежів"
 
-#: /app/src/modules/bills/BillsModule.js:1766
+#: /app/src/modules/bills/BillsModule.js:1791
 msgid "Failed to add selected bills"
 msgstr "Не вдалося додати вибрані платежі"
 
-#: /app/src/modules/bills/BillsModule.js:1859
+#: /app/src/modules/bills/BillsModule.js:1884
 #: /app/src/modules/tagsets/TagSetsModule.js:704
 #: /app/src/modules/transfers/TransfersModule.js:1074
 msgid "No tags defined"
@@ -7092,7 +7094,7 @@ msgid "Exists"
 msgstr "Існує"
 
 #: /app/src/modules/categories/CategoriesModule.js:1579
-#: /app/src/modules/import/ImportModule.js:1921
+#: /app/src/modules/import/ImportModule.js:1926
 msgid "New"
 msgstr "Нова"
 
@@ -8386,55 +8388,55 @@ msgstr ""
 "нелатинські символи в попередньому перегляді нижче відображаються "
 "неправильно."
 
-#: /app/src/modules/import/ImportModule.js:1469
+#: /app/src/modules/import/ImportModule.js:1472
 msgid "Please select a file first"
 msgstr "Спочатку виберіть файл"
 
-#: /app/src/modules/import/ImportModule.js:1588
+#: /app/src/modules/import/ImportModule.js:1591
 msgid "Processing file, please wait..."
 msgstr "Файл опрацьовується, зачекайте..."
 
-#: /app/src/modules/import/ImportModule.js:1624
-#: /app/src/modules/import/ImportModule.js:2243
+#: /app/src/modules/import/ImportModule.js:1627
+#: /app/src/modules/import/ImportModule.js:2248
 msgid "Please map at least one account"
 msgstr "Зіставте принаймні один рахунок"
 
-#: /app/src/modules/import/ImportModule.js:1631
+#: /app/src/modules/import/ImportModule.js:1634
 msgid "Please select an account first"
 msgstr "Спочатку виберіть рахунок"
 
-#: /app/src/modules/import/ImportModule.js:1663
+#: /app/src/modules/import/ImportModule.js:1666
 msgid "Processing failed"
 msgstr "Не вдалося опрацювати"
 
-#: /app/src/modules/import/ImportModule.js:1667
+#: /app/src/modules/import/ImportModule.js:1670
 msgid "Failed to process import data: {message}"
 msgstr "Не вдалося опрацювати дані імпорту: {message}"
 
-#: /app/src/modules/import/ImportModule.js:1718
+#: /app/src/modules/import/ImportModule.js:1723
 msgid "Accounts to create:"
 msgstr "Буде створено рахунки:"
 
-#: /app/src/modules/import/ImportModule.js:1722
+#: /app/src/modules/import/ImportModule.js:1727
 msgid "Existing accounts matched:"
 msgstr "Зіставлено наявні рахунки:"
 
-#: /app/src/modules/import/ImportModule.js:1745
+#: /app/src/modules/import/ImportModule.js:1750
 msgid "Categories to create:"
 msgstr "Буде створено категорії:"
 
-#: /app/src/modules/import/ImportModule.js:1747
+#: /app/src/modules/import/ImportModule.js:1752
 msgid "{count} transfer rows will be skipped"
 msgstr "Буде пропущено рядків переказів: {count}"
 
-#: /app/src/modules/import/ImportModule.js:1810
+#: /app/src/modules/import/ImportModule.js:1815
 msgid "This import will create %n new account"
 msgid_plural "This import will create %n new accounts"
 msgstr[0] "Цей імпорт створить %n новий рахунок"
 msgstr[1] "Цей імпорт створить %n нові рахунки"
 msgstr[2] "Цей імпорт створить %n нових рахунків"
 
-#: /app/src/modules/import/ImportModule.js:1819
+#: /app/src/modules/import/ImportModule.js:1824
 msgid ""
 "The names look like dates, so the date column has probably been mapped to "
 "Account. Go back and check the column mapping - importing now would leave "
@@ -8444,7 +8446,7 @@ msgstr ""
 "Поверніться та перевірте зіставлення стовпців — якщо імпортувати зараз, для "
 "кожної дати буде створено окремий рахунок, який потім доведеться видаляти."
 
-#: /app/src/modules/import/ImportModule.js:1820
+#: /app/src/modules/import/ImportModule.js:1825
 msgid ""
 "One account is created for every distinct value in the column mapped to "
 "Account. If that is more than you expected, go back and check the column "
@@ -8454,15 +8456,15 @@ msgstr ""
 "створюється окремий рахунок. Якщо рахунків більше, ніж ви очікували, "
 "поверніться та перевірте зіставлення стовпців перед імпортом."
 
-#: /app/src/modules/import/ImportModule.js:1849
+#: /app/src/modules/import/ImportModule.js:1854
 msgid "this account"
 msgstr "цей рахунок"
 
-#: /app/src/modules/import/ImportModule.js:1854
+#: /app/src/modules/import/ImportModule.js:1859
 msgid "{matching} of {total} rows have no usable transaction type"
 msgstr "У {matching} із {total} рядків немає придатного типу транзакції"
 
-#: /app/src/modules/import/ImportModule.js:1858
+#: /app/src/modules/import/ImportModule.js:1863
 msgid ""
 "The type column is empty or unrecognized on those rows, so they will be "
 "added based on whether the amount is negative. Fill the type in, or check "
@@ -8472,11 +8474,11 @@ msgstr ""
 "тип буде визначено за тим, чи є сума від’ємною. Якщо це не те, що вам "
 "потрібно, заповніть тип або перевірте зіставлення."
 
-#: /app/src/modules/import/ImportModule.js:1860
+#: /app/src/modules/import/ImportModule.js:1865
 msgid "{matching} of {total} rows would be added as income"
 msgstr "Як дохід буде додано {matching} із {total} рядків"
 
-#: /app/src/modules/import/ImportModule.js:1864
+#: /app/src/modules/import/ImportModule.js:1869
 #, javascript-format
 msgid ""
 "but {percent}% of what is already in {account} is an expense. If that looks "
@@ -8487,11 +8489,11 @@ msgstr ""
 "здається неправильним, поверніться й перед імпортом зіставте стовпець із "
 "типом транзакції."
 
-#: /app/src/modules/import/ImportModule.js:1869
+#: /app/src/modules/import/ImportModule.js:1874
 msgid "{matching} of {total} rows would be added as an expense"
 msgstr "Як витрату буде додано {matching} із {total} рядків"
 
-#: /app/src/modules/import/ImportModule.js:1873
+#: /app/src/modules/import/ImportModule.js:1878
 #, javascript-format
 msgid ""
 "but {percent}% of what is already in {account} is income. If that looks "
@@ -8502,76 +8504,76 @@ msgstr ""
 "здається неправильним, поверніться й перед імпортом зіставте стовпець із "
 "типом транзакції."
 
-#: /app/src/modules/import/ImportModule.js:1905
+#: /app/src/modules/import/ImportModule.js:1910
 msgid "No transactions to import"
 msgstr "Немає транзакцій для імпорту"
 
-#: /app/src/modules/import/ImportModule.js:1920
-#: /app/src/modules/import/ImportModule.js:1960
+#: /app/src/modules/import/ImportModule.js:1925
+#: /app/src/modules/import/ImportModule.js:1965
 msgid "Duplicate"
 msgstr "Дублікат"
 
-#: /app/src/modules/import/ImportModule.js:1942
-#: /app/src/modules/import/ImportModule.js:1984
+#: /app/src/modules/import/ImportModule.js:1947
+#: /app/src/modules/import/ImportModule.js:1989
 msgid "Showing {shown} of {total}"
 msgstr "Показано {shown} із {total}"
 
-#: /app/src/modules/import/ImportModule.js:1999
+#: /app/src/modules/import/ImportModule.js:2004
 msgid "Skip rows without an account"
 msgstr "Пропускати рядки без рахунку"
 
-#: /app/src/modules/import/ImportModule.js:1999
+#: /app/src/modules/import/ImportModule.js:2004
 msgid "Select account…"
 msgstr "Виберіть рахунок…"
 
-#: /app/src/modules/import/ImportModule.js:2013
+#: /app/src/modules/import/ImportModule.js:2018
 msgid "Account for rows without one:"
 msgstr "Рахунок для рядків без рахунку:"
 
-#: /app/src/modules/import/ImportModule.js:2014 /app/templates/index.php:2421
+#: /app/src/modules/import/ImportModule.js:2019 /app/templates/index.php:2421
 msgid "Import to Account:"
 msgstr "Імпортувати до рахунку:"
 
-#: /app/src/modules/import/ImportModule.js:2083
+#: /app/src/modules/import/ImportModule.js:2088
 msgid "Balance: {balance}"
 msgstr "Баланс: {balance}"
 
-#: /app/src/modules/import/ImportModule.js:2088
+#: /app/src/modules/import/ImportModule.js:2093
 msgid "Skip this account"
 msgstr "Пропустити цей рахунок"
 
-#: /app/src/modules/import/ImportModule.js:2158
+#: /app/src/modules/import/ImportModule.js:2163
 msgid "Rows {rows} and {count} more"
 msgstr "Рядки {rows} і ще {count}"
 
-#: /app/src/modules/import/ImportModule.js:2159
+#: /app/src/modules/import/ImportModule.js:2164
 msgid "Rows {rows}"
 msgstr "Рядки {rows}"
 
-#: /app/src/modules/import/ImportModule.js:2168
+#: /app/src/modules/import/ImportModule.js:2173
 msgid "%n row was not imported"
 msgid_plural "%n rows were not imported"
 msgstr[0] "%n рядок не імпортовано"
 msgstr[1] "%n рядки не імпортовано"
 msgstr[2] "%n рядків не імпортовано"
 
-#: /app/src/modules/import/ImportModule.js:2200
+#: /app/src/modules/import/ImportModule.js:2205
 msgid "No file data available"
 msgstr "Немає доступних даних файлу"
 
-#: /app/src/modules/import/ImportModule.js:2264
+#: /app/src/modules/import/ImportModule.js:2269
 msgid "Importing…"
 msgstr "Імпорт…"
 
-#: /app/src/modules/import/ImportModule.js:2282
+#: /app/src/modules/import/ImportModule.js:2287
 msgid "Server error ({status}): Invalid response"
 msgstr "Помилка сервера ({status}): неприпустима відповідь"
 
-#: /app/src/modules/import/ImportModule.js:2286
+#: /app/src/modules/import/ImportModule.js:2291
 msgid "Successfully imported {imported} transactions ({skipped} skipped)"
 msgstr "Успішно імпортовано транзакцій: {imported} (пропущено: {skipped})"
 
-#: /app/src/modules/import/ImportModule.js:2290
+#: /app/src/modules/import/ImportModule.js:2295
 msgid "%n bill was automatically marked as paid from matching transactions"
 msgid_plural ""
 "%n bills were automatically marked as paid from matching transactions"
@@ -8583,7 +8585,7 @@ msgstr[2] ""
 "%n платежів автоматично позначено як сплачені на основі відповідних "
 "транзакцій"
 
-#: /app/src/modules/import/ImportModule.js:2306
+#: /app/src/modules/import/ImportModule.js:2311
 msgid "Import complete. %n category created — it may take a moment to appear."
 msgid_plural ""
 "Import complete. %n categories created — they may take a moment to appear."
@@ -8594,68 +8596,69 @@ msgstr[1] ""
 msgstr[2] ""
 "Імпорт завершено. Створено %n категорій — вони можуть з’явитися не відразу."
 
-#: /app/src/modules/import/ImportModule.js:2319
+#: /app/src/modules/import/ImportModule.js:2324
 msgid "Failed to import transactions: {message}"
 msgstr "Не вдалося імпортувати транзакції: {message}"
 
-#: /app/src/modules/import/ImportModule.js:2342
+#: /app/src/modules/import/ImportModule.js:2347
 msgid "Auto-linked {count} transfer pairs"
 msgstr "Автоматично пов’язано пар переказів: {count}"
 
-#: /app/src/modules/import/ImportModule.js:2451
+#: /app/src/modules/import/ImportModule.js:2456
 msgid "Download"
 msgstr "Завантажити"
 
-#: /app/src/modules/import/ImportModule.js:2452
+#: /app/src/modules/import/ImportModule.js:2457
 msgid "Rollback"
 msgstr "Відкотити"
 
-#: /app/src/modules/import/ImportModule.js:2475
+#: /app/src/modules/import/ImportModule.js:2480
 msgid "0 Bytes"
 msgstr "0 байтів"
 
-#: /app/src/modules/import/ImportModule.js:2477
+#: /app/src/modules/import/ImportModule.js:2482
 msgid "Bytes"
 msgstr "Байти"
 
-#: /app/src/modules/import/ImportModule.js:2477
+#: /app/src/modules/import/ImportModule.js:2482
 msgid "KB"
 msgstr "КБ"
 
-#: /app/src/modules/import/ImportModule.js:2477
+#: /app/src/modules/import/ImportModule.js:2482
 msgid "MB"
 msgstr "МБ"
 
-#: /app/src/modules/import/ImportModule.js:2477
+#: /app/src/modules/import/ImportModule.js:2482
 msgid "GB"
 msgstr "ГБ"
 
-#: /app/src/modules/import/ImportModule.js:2499
+#: /app/src/modules/import/ImportModule.js:2504
 msgid "Download failed"
 msgstr "Не вдалося завантажити файл"
 
-#: /app/src/modules/import/ImportModule.js:2503
+#: /app/src/modules/import/ImportModule.js:2508
 msgid "Failed to download import file"
 msgstr "Не вдалося завантажити файл імпорту"
 
-#: /app/src/modules/import/ImportModule.js:2508
+#: /app/src/modules/import/ImportModule.js:2513
 msgid ""
 "Are you sure you want to rollback this import? All imported transactions "
 "will be deleted."
-msgstr "Справді відкотити цей імпорт? Усі імпортовані транзакції буде видалено."
+msgstr ""
+"Справді відкотити цей імпорт? Усі імпортовані транзакції буде видалено."
 
-#: /app/src/modules/import/ImportModule.js:2523
+#: /app/src/modules/import/ImportModule.js:2528
 msgid "Rolled back %n transaction"
 msgid_plural "Rolled back %n transactions"
 msgstr[0] "Відкочено %n транзакцію"
 msgstr[1] "Відкочено %n транзакції"
 msgstr[2] "Відкочено %n транзакцій"
 
-#: /app/src/modules/import/ImportModule.js:2528
+#: /app/src/modules/import/ImportModule.js:2533
 msgid "Rollback failed"
 msgstr "Не вдалося відкотити імпорт"
 
-#: /app/src/modules/import/ImportModule.js:2532
+#: /app/src/modules/import/ImportModule.js:2537
 msgid "Failed to rollback import: {message}"
 msgstr "Не вдалося відкотити імпорт: {message}"
 
@@ -9136,16 +9139,20 @@ msgstr "Не вдалося створити календар платежів"
 msgid "Total Bills"
 msgstr "Усього платежів"
 
-#: /app/src/modules/reports/ReportsModule.js:1972
+#: /app/src/modules/reports/ReportsModule.js:1984
+msgid "No payment recorded - the bill has moved on from this date"
+msgstr ""
+
+#: /app/src/modules/reports/ReportsModule.js:1987
 msgid "Due"
 msgstr "До сплати"
 
-#: /app/src/modules/reports/ReportsModule.js:1994
+#: /app/src/modules/reports/ReportsModule.js:2010
 msgid "Monthly Totals"
 msgstr "Підсумки за місяцями"
 
-#: /app/src/modules/reports/ReportsModule.js:2023
-#: /app/src/modules/reports/ReportsModule.js:2025
+#: /app/src/modules/reports/ReportsModule.js:2039
+#: /app/src/modules/reports/ReportsModule.js:2041
 msgid "%n bill"
 msgid_plural "%n bills"
 msgstr[0] "%n платіж"
@@ -9962,8 +9969,8 @@ msgstr "Умова за шляхом {path} містить неприпусти�
 msgid ""
 "Condition at {path} 'between' pattern must have 'min' and 'max' properties"
 msgstr ""
-"Шаблон «between» в умові за шляхом {path} повинен мати властивості «min» і «"
-"max»"
+"Шаблон «between» в умові за шляхом {path} повинен мати властивості «min» і "
+"«max»"
 
 #: /app/src/modules/rules/components/CriteriaBuilder.js:520
 msgid "Condition at {path} 'between' pattern must be valid JSON with min/max"
@@ -10856,8 +10863,10 @@ msgstr "застосовується до {count} з {total}"
 msgid "%n selected transaction is in a category these tags do not cover."
 msgid_plural ""
 "%n selected transactions are in categories these tags do not cover."
-msgstr[0] "%n вибрана транзакція належить до категорії, якої ці теги не охоплюють."
-msgstr[1] "%n вибрані транзакції належать до категорій, яких ці теги не охоплюють."
+msgstr[0] ""
+"%n вибрана транзакція належить до категорії, якої ці теги не охоплюють."
+msgstr[1] ""
+"%n вибрані транзакції належать до категорій, яких ці теги не охоплюють."
 msgstr[2] ""
 "%n вибраних транзакцій належать до категорій, яких ці теги не охоплюють."
 
@@ -11242,7 +11251,8 @@ msgstr "Залишилося: {amount}"
 
 #: /app/src/modules/transactions/TransactionsModule.js:3294
 msgid "Auto-calculated from the transaction total minus the other splits"
-msgstr "Автоматично обчислюється як загальна сума транзакції мінус інші частини"
+msgstr ""
+"Автоматично обчислюється як загальна сума транзакції мінус інші частини"
 
 #: /app/src/modules/transactions/TransactionsModule.js:3297
 msgid "Amount (remaining)"
@@ -13681,7 +13691,8 @@ msgstr "Оновити курси з онлайнових джерел"
 
 #: /app/templates/index.php:4148
 msgid "Rates shown as 1 base currency = X target currency."
-msgstr "Курси показано як 1 одиниця базової валюти = X одиниць цільової валюти."
+msgstr ""
+"Курси показано як 1 одиниця базової валюти = X одиниць цільової валюти."
 
 #: /app/templates/index.php:4149
 msgid "Fiat rates from"
@@ -14571,7 +14582,8 @@ msgstr "Пов’язаний тег (необов’язково)"
 #: /app/templates/index.php:5050
 msgid ""
 "Current amount will be automatically calculated from tagged transactions."
-msgstr "Поточна сума автоматично обчислюватиметься за транзакціями з цим тегом."
+msgstr ""
+"Поточна сума автоматично обчислюватиметься за транзакціями з цим тегом."
 
 #: /app/templates/index.php:5064
 msgid "Any notes about this goal..."
@@ -15825,8 +15837,8 @@ msgid ""
 "Matches require: same amount, same currency, opposite type (income/expense), "
 "different accounts, within your configured date window."
 msgstr ""
-"Умови збігу: однакова сума, однакова валюта, протилежний тип (дохід/витрата)"
-", різні рахунки та дати в межах налаштованого діапазону."
+"Умови збігу: однакова сума, однакова валюта, протилежний тип (дохід/"
+"витрата), різні рахунки та дати в межах налаштованого діапазону."
 
 #: /app/templates/index.php:6876
 msgid "Scan for Matches"
