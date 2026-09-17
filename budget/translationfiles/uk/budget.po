@@ -2066,7 +2066,8 @@ msgstr ""
 
 #: /app/lib/Controller/ShareController.php:274
 msgid "Failed to update auto-share configuration"
-msgstr "Не вдалося оновити налаштування автоматичного надання спільного доступу"
+msgstr ""
+"Не вдалося оновити налаштування автоматичного надання спільного доступу"
 
 #: /app/lib/Controller/SharedExpenseController.php:65
 msgid "Failed to get contacts"
@@ -6044,7 +6045,8 @@ msgstr "Зіставлено рахунків: {count}"
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:199
 msgid "Auto-apply import rules to synced transactions"
-msgstr "Автоматично застосовувати правила імпорту до синхронізованих транзакцій"
+msgstr ""
+"Автоматично застосовувати правила імпорту до синхронізованих транзакцій"
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:201
 msgid "Apply rules"
@@ -6706,8 +6708,8 @@ msgid ""
 "({billName}, {amount}). Would you like to link one instead of creating a new "
 "transaction?"
 msgstr ""
-"Знайдено наявні транзакції, які можуть уже відповідати цьому платежу ("
-"{billName}, {amount}). Пов’язати одну з них замість створення нової "
+"Знайдено наявні транзакції, які можуть уже відповідати цьому платежу "
+"({billName}, {amount}). Пов’язати одну з них замість створення нової "
 "транзакції?"
 
 #: /app/src/modules/bills/BillsModule.js:1425
@@ -8642,7 +8644,8 @@ msgstr "Не вдалося завантажити файл імпорту"
 msgid ""
 "Are you sure you want to rollback this import? All imported transactions "
 "will be deleted."
-msgstr "Справді відкотити цей імпорт? Усі імпортовані транзакції буде видалено."
+msgstr ""
+"Справді відкотити цей імпорт? Усі імпортовані транзакції буде видалено."
 
 #: /app/src/modules/import/ImportModule.js:2528
 msgid "Rolled back %n transaction"
@@ -9992,8 +9995,8 @@ msgstr "Умова за шляхом {path} містить неприпусти�
 msgid ""
 "Condition at {path} 'between' pattern must have 'min' and 'max' properties"
 msgstr ""
-"Шаблон «between» в умові за шляхом {path} повинен мати властивості «min» і «"
-"max»"
+"Шаблон «between» в умові за шляхом {path} повинен мати властивості «min» і "
+"«max»"
 
 #: /app/src/modules/rules/components/CriteriaBuilder.js:520
 msgid "Condition at {path} 'between' pattern must be valid JSON with min/max"
@@ -10886,8 +10889,10 @@ msgstr "застосовується до {count} з {total}"
 msgid "%n selected transaction is in a category these tags do not cover."
 msgid_plural ""
 "%n selected transactions are in categories these tags do not cover."
-msgstr[0] "%n вибрана транзакція належить до категорії, якої ці теги не охоплюють."
-msgstr[1] "%n вибрані транзакції належать до категорій, яких ці теги не охоплюють."
+msgstr[0] ""
+"%n вибрана транзакція належить до категорії, якої ці теги не охоплюють."
+msgstr[1] ""
+"%n вибрані транзакції належать до категорій, яких ці теги не охоплюють."
 msgstr[2] ""
 "%n вибраних транзакцій належать до категорій, яких ці теги не охоплюють."
 
@@ -11272,7 +11277,8 @@ msgstr "Залишилося: {amount}"
 
 #: /app/src/modules/transactions/TransactionsModule.js:3294
 msgid "Auto-calculated from the transaction total minus the other splits"
-msgstr "Автоматично обчислюється як загальна сума транзакції мінус інші частини"
+msgstr ""
+"Автоматично обчислюється як загальна сума транзакції мінус інші частини"
 
 #: /app/src/modules/transactions/TransactionsModule.js:3297
 msgid "Amount (remaining)"
@@ -13706,7 +13712,8 @@ msgstr "Оновити курси з онлайнових джерел"
 
 #: /app/templates/index.php:4148
 msgid "Rates shown as 1 base currency = X target currency."
-msgstr "Курси показано як 1 одиниця базової валюти = X одиниць цільової валюти."
+msgstr ""
+"Курси показано як 1 одиниця базової валюти = X одиниць цільової валюти."
 
 #: /app/templates/index.php:4149
 msgid "Fiat rates from"
@@ -14596,7 +14603,8 @@ msgstr "Пов’язаний тег (необов’язково)"
 #: /app/templates/index.php:5050
 msgid ""
 "Current amount will be automatically calculated from tagged transactions."
-msgstr "Поточна сума автоматично обчислюватиметься за транзакціями з цим тегом."
+msgstr ""
+"Поточна сума автоматично обчислюватиметься за транзакціями з цим тегом."
 
 #: /app/templates/index.php:5064
 msgid "Any notes about this goal..."
@@ -15850,8 +15858,8 @@ msgid ""
 "Matches require: same amount, same currency, opposite type (income/expense), "
 "different accounts, within your configured date window."
 msgstr ""
-"Умови збігу: однакова сума, однакова валюта, протилежний тип (дохід/витрата)"
-", різні рахунки та дати в межах налаштованого діапазону."
+"Умови збігу: однакова сума, однакова валюта, протилежний тип (дохід/"
+"витрата), різні рахунки та дати в межах налаштованого діапазону."
 
 #: /app/templates/index.php:6876
 msgid "Scan for Matches"
