@@ -492,7 +492,8 @@ class CategoryController extends Controller {
             if ($owner === null) {
                 return new DataResponse(['error' => $this->l->t('%1$s not found', [$this->l->t('Category')])], Http::STATUS_NOT_FOUND);
             }
-            $details = $this->service->getCategoryDetails($id, $owner, $startDate, $endDate, $accountId);
+            // The months follow the viewer's budget start day, like the rest of their view
+            $details = $this->service->getCategoryDetails($id, $owner, $startDate, $endDate, $accountId, $this->userId);
             return new DataResponse($details);
         } catch (\Exception $e) {
             return $this->handleNotFoundError($e, $this->l->t('Category'), ['categoryId' => $id]);

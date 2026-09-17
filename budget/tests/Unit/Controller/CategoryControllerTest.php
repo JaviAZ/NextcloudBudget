@@ -469,7 +469,7 @@ class CategoryControllerTest extends TestCase {
 			->with('user1', 'category', 137)->willReturn('owner1');
 		$this->service->expects($this->once())
 			->method('getCategoryDetails')
-			->with(137, 'owner1', null, null, null)
+			->with(137, 'owner1', null, null, null, 'user1')
 			->willReturn(['count' => 3, 'total' => 60.0]);
 
 		$response = $this->controller->details(137);

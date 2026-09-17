@@ -15,8 +15,16 @@ vi.mock('@nextcloud/l10n', () => ({
     translatePlural: (_app, singular, plural, count) => (count === 1 ? singular : plural),
 }));
 
+const charts = vi.hoisted(() => []);
+vi.mock('chart.js/auto', () => ({
+    default: class {
+        constructor(_ctx, config) { charts.push(config); }
+        destroy() {}
+    },
+}));
+
 import CategoriesModule from '../../src/modules/categories/CategoriesModule.js';
-import { currentBudgetMonth } from '../../src/utils/formatters.js';
+import { currentBudgetMonth, shiftMonth } from '../../src/utils/formatters.js';
 
 const at = (y, m, d) => new Date(y, m - 1, d);
 
@@ -52,6 +60,55 @@ describe('currentBudgetMonth', () => {
     it('crosses the year end', () => {
         expect(currentBudgetMonth(25, at(2026, 12, 28))).toBe('2027-01');
         expect(currentBudgetMonth(10, at(2027, 1, 5))).toBe('2026-12');
+    });
+});
+
+describe('shiftMonth', () => {
+    it('moves across year ends both ways', () => {
+        expect(shiftMonth('2026-01', -1)).toBe('2025-12');
+        expect(shiftMonth('2026-12', 1)).toBe('2027-01');
+        expect(shiftMonth('2026-10', -12)).toBe('2025-10');
+    });
+});
+
+/**
+ * The Category Details panel counts budget months too: its window starts
+ * where a whole period begins, and its chart ends with the period running
+ * today, keyed the way the server keys them.
+ */
+describe('Category Details panel', () => {
+    it('opens its window at the start of a budget period', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(at(2026, 9, 29));
+
+        // Start day 28: this is October's period, so 12 back is October 2025,
+        // which began on 28 September 2025
+        expect(makeModule('28')._detailWindow(12)).toMatchObject({ startStr: '2025-09-28', endStr: '2026-09-29' });
+    });
+
+    it('keeps the calendar window without a start day', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(at(2026, 9, 17));
+
+        expect(makeModule()._detailWindow(12)).toMatchObject({ startStr: '2025-09-01', endStr: '2026-09-17' });
+    });
+
+    it('charts the budget months ending with the running one', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(at(2026, 9, 29));
+        document.body.innerHTML = '<canvas id="category-spending-chart"></canvas><select id="category-chart-period"><option value="3" selected>3</option></select>';
+        vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+        const mod = makeModule('28');
+        charts.length = 0;
+
+        mod.renderCategorySpendingChartFromServer([
+            { month: '2026-09', total: 50 },
+            { month: '2026-10', total: 20 },
+        ], '#123456');
+
+        const expectedLabels = [8, 9, 10].map(m => new Date(2026, m - 1, 1).toLocaleDateString(undefined, { month: 'short' }));
+        expect(charts[0].data.labels).toEqual(expectedLabels);
+        expect(charts[0].data.datasets[0].data).toEqual([0, 50, 20]);
     });
 });
 

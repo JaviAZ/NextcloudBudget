@@ -392,15 +392,28 @@ class CategoryService extends AbstractCrudService {
 
     /**
      * Get full detail summary for a single category (analytics + monthly chart data)
+     *
+     * The months are budget months: with a custom start day each one is the
+     * period the Budget page lists under it, and "this month" is the period
+     * running today. They follow $viewerId's start day (the person looking,
+     * who may not own a shared category); null means $userId.
      */
-    public function getCategoryDetails(int $categoryId, string $userId, ?string $startDate = null, ?string $endDate = null, ?int $accountId = null): array {
+    public function getCategoryDetails(int $categoryId, string $userId, ?string $startDate = null, ?string $endDate = null, ?int $accountId = null, ?string $viewerId = null): array {
         $category = $this->find($categoryId, $userId); // Verify ownership
 
         $scope = $this->resolveDetailScope($category, $userId);
         $categoryIds = $scope['ids'];
 
+        $viewerId ??= $userId;
+        $startDay = $this->carryoverService->budgetStartDay($viewerId);
+
         $summary = $this->transactionMapper->getCategorySummary($userId, $categoryId, $categoryIds);
-        $monthlySpending = $this->transactionMapper->getCategoryMonthlySpending($userId, $categoryId, 12, $categoryIds, $startDate, $endDate, $accountId, $category->getType());
+        $monthlySpending = $this->transactionMapper->getCategoryMonthlySpending(
+            $userId, $categoryId, 12, $categoryIds, $startDate, $endDate, $accountId, $category->getType(), $startDay > 1
+        );
+        if ($startDay > 1) {
+            $monthlySpending = $this->foldDaysIntoBudgetMonths($monthlySpending, $startDay);
+        }
 
         // Include budget amount for chart overlay
         $budget = (float)($category->getBudgetAmount() ?? 0);
@@ -418,7 +431,7 @@ class CategoryService extends AbstractCrudService {
         }
 
         // This month's total from monthly data
-        $currentMonth = date('Y-m');
+        $currentMonth = $this->carryoverService->currentBudgetMonth($viewerId);
         $thisMonth = 0.0;
         foreach ($monthlySpending as $entry) {
             if ($entry['month'] === $currentMonth) {
@@ -467,6 +480,26 @@ class CategoryService extends AbstractCrudService {
                 'splitCount' => $splitCount,
             ],
         ];
+    }
+
+    /**
+     * Sum per-day spending rows into the budget months they fall in.
+     *
+     * @param array<array{month: string, total: float, count: int, splitCount: int}> $days 'month' holds Y-m-d
+     * @return array<array{month: string, total: float, count: int, splitCount: int}>
+     */
+    private function foldDaysIntoBudgetMonths(array $days, int $startDay): array {
+        $byMonth = [];
+        foreach ($days as $row) {
+            $month = BudgetPeriod::monthContaining((string)$row['month'], $startDay);
+            $byMonth[$month] ??= ['month' => $month, 'total' => 0.0, 'count' => 0, 'splitCount' => 0];
+            $byMonth[$month]['total'] = round($byMonth[$month]['total'] + (float)$row['total'], 2);
+            $byMonth[$month]['count'] += (int)$row['count'];
+            $byMonth[$month]['splitCount'] += (int)($row['splitCount'] ?? 0);
+        }
+        ksort($byMonth);
+
+        return array_values($byMonth);
     }
 
     /**

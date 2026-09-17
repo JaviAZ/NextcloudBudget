@@ -659,10 +659,12 @@ export default class CategoriesModule {
         const accountSelect = document.getElementById('category-chart-account');
         const m = months || (periodSelect ? parseInt(periodSelect.value) : 12);
         const accountId = accountSelect ? accountSelect.value : '';
-        const now = new Date();
-        const startDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
-        const startStr = formatters.getMonthStart(startDate.getFullYear(), startDate.getMonth() + 1);
-        const endStr = formatters.formatDateForAPI(now);
+        // Budget months, so a custom start day's periods arrive whole: the
+        // window opens where the period m months before this one begins.
+        const startDay = this._budgetStartDay();
+        const firstMonth = formatters.shiftMonth(this._currentBudgetMonth(), -m);
+        const startStr = formatters.getPeriodDateRange('monthly', startDay, `${firstMonth}-15`).start;
+        const endStr = formatters.formatDateForAPI(new Date());
         return { startStr, endStr, accountId };
     }
 
@@ -825,8 +827,10 @@ export default class CategoriesModule {
         const periodSelect = document.getElementById('category-chart-period');
         const monthCount = periodSelect ? parseInt(periodSelect.value) : 12;
 
-        // Build labels and amounts from server data, filling gaps for missing months
-        const now = new Date();
+        // Build labels and amounts from server data, filling gaps for missing
+        // months. The server keys them by budget month, ending with the one
+        // running today.
+        const currentMonth = this._currentBudgetMonth();
         const labels = [];
         const amounts = [];
         const serverMap = {};
@@ -834,8 +838,8 @@ export default class CategoriesModule {
             serverMap[entry.month] = entry.total;
         }
         for (let i = monthCount - 1; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const key = formatters.shiftMonth(currentMonth, -i);
+            const d = formatters.parseLocalDate(`${key}-01`);
             const label = monthCount > 12
                 ? d.toLocaleDateString(undefined, { month: 'short', year: '2-digit' })
                 : d.toLocaleDateString(undefined, { month: 'short' });
@@ -1765,7 +1769,12 @@ export default class CategoriesModule {
      * already October's period.
      */
     _currentBudgetMonth() {
-        return formatters.currentBudgetMonth(parseInt(this.app.settings?.budget_start_day || '1', 10));
+        return formatters.currentBudgetMonth(this._budgetStartDay());
+    }
+
+    /** The user's budget start day; 1 means calendar months. */
+    _budgetStartDay() {
+        return parseInt(this.app.settings?.budget_start_day || '1', 10);
     }
 
     /** Convert a monthly amount into the equivalent amount for a budget period. */

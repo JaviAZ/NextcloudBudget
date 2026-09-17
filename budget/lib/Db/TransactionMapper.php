@@ -848,9 +848,12 @@ class TransactionMapper extends QBMapper {
      * getCategorySummary: the categories of a split live on its parts, so a
      * chart drawn from category_id alone leaves them out (#359).
      *
+     * With $byDay the rows are per day instead ('month' holds Y-m-d), for a
+     * caller that folds them into budget months under a custom start day.
+     *
      * @return array<array{month: string, total: float, count: int, splitCount: int}>
      */
-    public function getCategoryMonthlySpending(string $userId, int $categoryId, int $months = 6, ?array $categoryIds = null, ?string $startDate = null, ?string $endDate = null, ?int $accountId = null, string $categoryType = 'expense'): array {
+    public function getCategoryMonthlySpending(string $userId, int $categoryId, int $months = 6, ?array $categoryIds = null, ?string $startDate = null, ?string $endDate = null, ?int $accountId = null, string $categoryType = 'expense', bool $byDay = false): array {
         if (!$startDate) {
             $startDate = date('Y-m-01', strtotime("-{$months} months"));
         }
@@ -864,9 +867,10 @@ class TransactionMapper extends QBMapper {
         // expense categories sum debits, income categories sum credits (#265).
         // ($primaryType is strictly 'credit' or 'debit' — safe to interpolate.)
         $primaryType = $categoryType === 'income' ? 'credit' : 'debit';
+        $bucketExpr = $byDay ? 'CAST(t.date AS CHAR(10))' : $this->monthExpr();
 
         $qb = $this->db->getQueryBuilder();
-        $qb->select($qb->createFunction($this->monthExpr() . ' as month'))
+        $qb->select($qb->createFunction($bucketExpr . ' as month'))
             ->selectAlias($qb->createFunction(
                 "SUM(CASE WHEN t.type = '{$primaryType}' THEN t.amount ELSE -t.amount END)"
             ), 'total')
@@ -889,8 +893,8 @@ class TransactionMapper extends QBMapper {
         $this->excludeScheduledFuture($qb);
         $this->excludeReportExcludedAccounts($qb);
 
-        $qb->groupBy($qb->createFunction($this->monthExpr()))
-            ->orderBy($qb->createFunction($this->monthExpr()), 'ASC');
+        $qb->groupBy($qb->createFunction($bucketExpr))
+            ->orderBy($qb->createFunction($bucketExpr), 'ASC');
 
         $result = $qb->executeQuery();
         $data = $result->fetchAll();
@@ -904,7 +908,7 @@ class TransactionMapper extends QBMapper {
         ], $data);
 
         $split = $this->getCategorySplitMonthlySpending(
-            $userId, $ids, $startDate, $endDate, $accountId, $primaryType
+            $userId, $ids, $startDate, $endDate, $accountId, $primaryType, $bucketExpr
         );
 
         return $this->mergeCategoryMonthlySeries($direct, $split);
@@ -923,10 +927,11 @@ class TransactionMapper extends QBMapper {
         string $startDate,
         string $endDate,
         ?int $accountId,
-        string $primaryType
+        string $primaryType,
+        string $bucketExpr
     ): array {
         $qb = $this->db->getQueryBuilder();
-        $qb->select($qb->createFunction($this->monthExpr() . ' as month'))
+        $qb->select($qb->createFunction($bucketExpr . ' as month'))
             ->selectAlias($qb->createFunction(
                 "SUM(CASE WHEN t.type = '{$primaryType}' THEN s.amount ELSE -s.amount END)"
             ), 'total')
@@ -947,7 +952,7 @@ class TransactionMapper extends QBMapper {
         $this->excludeScheduledFuture($qb);
         $this->excludeReportExcludedAccounts($qb);
 
-        $qb->groupBy($qb->createFunction($this->monthExpr()));
+        $qb->groupBy($qb->createFunction($bucketExpr));
 
         $result = $qb->executeQuery();
         $data = $result->fetchAll();

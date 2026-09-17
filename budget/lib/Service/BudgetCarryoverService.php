@@ -130,7 +130,7 @@ class BudgetCarryoverService {
         }
 
         $currentMonth = $this->currentBudgetMonth($userId);
-        $startDay = $this->getBudgetStartDay($userId);
+        $startDay = $this->budgetStartDay($userId);
 
         // Spending per category per chain month (direct + splits), batched.
         // Every contributor, not just the envelope categories: a branch's
@@ -411,7 +411,7 @@ class BudgetCarryoverService {
      * @return array{0: string, 1: string}
      */
     public function budgetMonthRange(string $userId, string $month): array {
-        return BudgetPeriod::range($month, $this->getBudgetStartDay($userId));
+        return BudgetPeriod::range($month, $this->budgetStartDay($userId));
     }
 
     /**
@@ -419,10 +419,13 @@ class BudgetCarryoverService {
      * start day that can be the calendar month before or after this one.
      */
     public function currentBudgetMonth(string $userId): string {
-        return BudgetPeriod::monthContaining($this->getToday(), $this->getBudgetStartDay($userId));
+        return BudgetPeriod::monthContaining($this->getToday(), $this->budgetStartDay($userId));
     }
 
-    private function getBudgetStartDay(string $userId): int {
+    /**
+     * The user's budget start day (1-31); 1 means calendar months.
+     */
+    public function budgetStartDay(string $userId): int {
         $value = $this->settingService->get($userId, 'budget_start_day');
         $startDay = $value !== null ? (int) $value : 1;
         return max(1, min(31, $startDay));

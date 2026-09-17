@@ -503,6 +503,19 @@ export function currentBudgetMonth(startDay = 1, referenceDate = null) {
     return budgetMonthForCycle(cycle.start, cycle.end);
 }
 
+/**
+ * Move a YYYY-MM month by whole months.
+ *
+ * @param {string} month - YYYY-MM
+ * @param {number} offset - Signed number of months
+ * @returns {string} YYYY-MM
+ */
+export function shiftMonth(month, offset) {
+    const [year, mon] = month.split('-').map(Number);
+    const d = new Date(year, mon - 1 + offset, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
 /** The date-range values a dashboard tile's settings can hold. */
 export const TILE_DATE_RANGES = ['7d', '30d', '90d', '6m', '1y', 'period'];
 

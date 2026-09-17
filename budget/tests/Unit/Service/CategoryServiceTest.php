@@ -31,6 +31,10 @@ class CategoryServiceTest extends TestCase {
     private string $currentBudgetMonth;
     /** @var array<int, float> recurring budgets the mock returns */
     private array $recurring = [];
+    /** The budget start day the mocked carryover service reports */
+    private int $budgetStartDay = 1;
+    /** @var string[] users whose start day was asked for */
+    private array $startDayAskedFor = [];
 
     protected function setUp(): void {
         $this->categoryMapper = $this->createMock(CategoryMapper::class);
@@ -54,6 +58,11 @@ class CategoryServiceTest extends TestCase {
         $carryoverService->method('getCarryovers')->willReturn([]);
         $carryoverService->method('currentBudgetMonth')
             ->willReturnCallback(fn() => $this->currentBudgetMonth);
+        $carryoverService->method('budgetStartDay')
+            ->willReturnCallback(function (string $userId): int {
+                $this->startDayAskedFor[] = $userId;
+                return $this->budgetStartDay;
+            });
         $recurringBudgetService = $this->createMock(\OCA\Budget\Service\RecurringBudgetService::class);
         $recurringBudgetService->method('getMonthlyBudgetsByCategory')
             ->willReturnCallback(fn() => $this->recurring);
@@ -945,6 +954,74 @@ class CategoryServiceTest extends TestCase {
         $this->assertSame('expense', $details['scope']['type']);
         $this->assertSame(2, $details['scope']['splitCount']);
         $this->assertContains(2, $details['scope']['categoryIds']);
+    }
+
+    // ── details follow budget months (custom start day) ──────────────
+
+    /**
+     * With start day 25, 24 August is in the August period and 25 August in
+     * the September one, so the chart, "this month" and the trend all have to
+     * be counted per period, not per calendar month.
+     */
+    public function testDetailsCountBudgetMonthsWithAStartDay(): void {
+        $this->budgetStartDay = 25;
+        $this->currentBudgetMonth = '2026-09';
+        $tree = $this->detailTree();
+        $this->categoryMapper->method('findAll')->willReturn($tree);
+        $this->categoryMapper->method('find')->willReturn($tree[0]);
+        $this->transactionMapper->method('getCategorySummary')->willReturn(['count' => 4, 'total' => 180.0]);
+        $byDayAsked = [];
+        $this->transactionMapper->method('getCategoryMonthlySpending')
+            ->willReturnCallback(function (...$args) use (&$byDayAsked) {
+                $byDayAsked[] = $args[8] ?? false;
+                return [
+                    ['month' => '2026-08-24', 'total' => 40.0, 'count' => 1, 'splitCount' => 0],
+                    ['month' => '2026-08-25', 'total' => 60.0, 'count' => 1, 'splitCount' => 0],
+                    ['month' => '2026-09-10', 'total' => 80.0, 'count' => 2, 'splitCount' => 1],
+                ];
+            });
+
+        $details = $this->service->getCategoryDetails(1, 'user1', '2026-07-25', '2026-09-17');
+
+        $this->assertSame([true], $byDayAsked);
+        $this->assertSame([
+            ['month' => '2026-08', 'total' => 40.0, 'count' => 1, 'splitCount' => 0],
+            ['month' => '2026-09', 'total' => 140.0, 'count' => 3, 'splitCount' => 1],
+        ], $details['monthlySpending']);
+        $this->assertSame(140.0, $details['thisMonth']);
+        $this->assertSame('increasing', $details['trend']);
+        $this->assertSame(1, $details['scope']['splitCount']);
+    }
+
+    public function testDetailsKeepCalendarMonthsWithoutAStartDay(): void {
+        $tree = $this->detailTree();
+        $this->categoryMapper->method('findAll')->willReturn($tree);
+        $this->categoryMapper->method('find')->willReturn($tree[0]);
+        $this->transactionMapper->method('getCategorySummary')->willReturn(['count' => 0, 'total' => 0.0]);
+        $byDayAsked = [];
+        $this->transactionMapper->method('getCategoryMonthlySpending')
+            ->willReturnCallback(function (...$args) use (&$byDayAsked) {
+                $byDayAsked[] = $args[8] ?? false;
+                return [['month' => $this->currentBudgetMonth, 'total' => 25.0, 'count' => 1, 'splitCount' => 0]];
+            });
+
+        $details = $this->service->getCategoryDetails(1, 'user1');
+
+        $this->assertSame([false], $byDayAsked);
+        $this->assertSame(25.0, $details['thisMonth']);
+    }
+
+    public function testDetailsFollowTheViewersStartDay(): void {
+        $tree = $this->detailTree();
+        $this->categoryMapper->method('findAll')->willReturn($tree);
+        $this->categoryMapper->method('find')->willReturn($tree[0]);
+        $this->transactionMapper->method('getCategorySummary')->willReturn(['count' => 0, 'total' => 0.0]);
+        $this->transactionMapper->method('getCategoryMonthlySpending')->willReturn([]);
+
+        $this->service->getCategoryDetails(1, 'owner1', null, null, null, 'viewer1');
+        $this->service->getCategoryDetails(1, 'owner1');
+
+        $this->assertSame(['viewer1', 'owner1'], $this->startDayAskedFor);
     }
 
     /**
