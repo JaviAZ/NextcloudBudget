@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-16 23:01+0000\n"
-"PO-Revision-Date: 2026-09-16 18:51+0000\n"
-"Last-Translator: SGiersch <Forum@SGiersch.de>\n"
+"PO-Revision-Date: 2026-09-17 01:43+0000\n"
+"Last-Translator: St0rml <n.f@mailbox.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
 "Language: de\n"
@@ -10692,8 +10692,8 @@ msgstr ""
 #: /app/src/modules/rules/components/CriteriaBuilder.js:520
 msgid "Condition at {path} 'between' pattern must be valid JSON with min/max"
 msgstr ""
-"Bedingung bei {path}: 'zwischen'-Muster muss validen JSON-Syntax mit "
-"'min'/'max' enthalten"
+"Bedingung bei {path}: 'zwischen'-Muster muss validen JSON-Syntax mit 'min'/"
+"'max' enthalten"
 
 #: /app/src/modules/savings/SavingsModule.js:49
 msgid "Failed to load savings goals"
@@ -16769,8 +16769,8 @@ msgstr "Automatisch verknüpfte Buchungspaare"
 msgid ""
 "These transactions were automatically linked. Click Undo to unlink a pair."
 msgstr ""
-"Diese Buchungen wurden automatisch miteinander verknüpft. Klicke auf "
-"„Rückgängig“, um die Verknüpfung eines Paares aufzuheben."
+"Diese Buchungen wurden automatisch miteinander verknüpft. Klicke auf „"
+"Rückgängig“, um die Verknüpfung eines Paares aufzuheben."
 
 #: /app/templates/index.php:6863
 msgid "Needs Manual Review"
@@ -16841,8 +16841,7 @@ msgstr "Empfänger für alle ausgewählten Buchungen aktualisieren (optional)"
 
 #: /app/templates/index.php:6963
 msgid "Update reference number for all selected transactions (optional)"
-msgstr ""
-"Referenznummer für alle ausgewählten Buchungen aktualisieren (optional)"
+msgstr "Referenznummer für alle ausgewählten Buchungen aktualisieren (optional)"
 
 #: /app/templates/index.php:6969
 msgid "Update notes for all selected transactions (optional)"
