@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-16 23:01+0000\n"
 "PO-Revision-Date: 2026-09-17 01:44+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: SGiersch <Forum@SGiersch.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/de/>\n"
 "Language: de\n"
@@ -156,8 +156,7 @@ msgstr "Fehler beim Löschen des Kontos"
 
 #: /app/lib/Controller/AccountController.php:672
 msgid "This account has no sensitive banking data to reveal"
-msgstr ""
-"Dieses Konto hat keine sensiblen Bankdaten, die angezeigt werden können"
+msgstr "Dieses Konto hat keine sensiblen Bankdaten, die angezeigt werden können"
 
 #: /app/lib/Controller/AccountController.php:698
 msgid "Failed to retrieve account summary"
@@ -5908,8 +5907,7 @@ msgstr "Gültig ab (JJJJ-MM-TT)"
 
 #: /app/src/modules/accounts/AccountsModule.js:1465
 msgid "Compounding frequency (daily, monthly, yearly, simple)"
-msgstr ""
-"Zinseszinsintervall (täglich, monatlich, jährlich, einfache Verzinsung)"
+msgstr "Zinseszinsintervall (täglich, monatlich, jährlich, einfache Verzinsung)"
 
 #: /app/src/modules/accounts/AccountsModule.js:1486
 msgid "Rate change added"
@@ -7485,8 +7483,8 @@ msgstr ""
 #: /app/src/modules/categories/CategoriesModule.js:1148
 msgid "Category deleted; its transactions are now Uncategorized"
 msgstr ""
-"Die Kategorie wurde gelöscht. Die zugehörigen Transaktionen wurden nach "
-"„Nicht kategorisiert“ verschoben"
+"Die Kategorie wurde gelöscht. Die zugehörigen Transaktionen wurden nach „"
+"Nicht kategorisiert“ verschoben"
 
 #: /app/src/modules/categories/CategoriesModule.js:1120
 #: /app/src/modules/categories/CategoriesModule.js:1149
@@ -8617,8 +8615,8 @@ msgid ""
 "values for future months."
 msgstr ""
 "Lege Ausgabenlimits für jede Kategorie fest. Wechsle zwischen wöchentlichen, "
-"monatlichen, vierteljährlichen und jährlichen Budgetzeiträumen. Nutze "
-"„Budgets ab diesem Monat anpassen“, um für zukünftige Monate andere Werte "
+"monatlichen, vierteljährlichen und jährlichen Budgetzeiträumen. Nutze „"
+"Budgets ab diesem Monat anpassen“, um für zukünftige Monate andere Werte "
 "festzulegen."
 
 #: /app/src/modules/help/HelpModule.js:28
