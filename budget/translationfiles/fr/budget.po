@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-16 23:01+0000\n"
 "PO-Revision-Date: 2026-09-17 01:41+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Matyu9 <mathieu.degueurce@icloud.com>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/fr/>\n"
 "Language: fr\n"
@@ -953,8 +953,8 @@ msgstr "Le jour doit être un nombre compris entre 1 et 31"
 #: /app/lib/Controller/BillController.php:1328
 msgid "Custom pattern must contain either \"months\" or \"dates\" field"
 msgstr ""
-"Le modèle personnalisé doit contenir soit le champ “mois”, soit le champ "
-"“dates”"
+"Le modèle personnalisé doit contenir soit le champ “mois”, soit le champ “"
+"dates”"
 
 #: /app/lib/Controller/CalendarFeedController.php:94
 #: /app/src/modules/bills/BillsModule.js:1185
@@ -1014,8 +1014,8 @@ msgstr "Catégorie"
 #: /app/lib/Controller/CategoryController.php:281
 msgid "Invalid budget period. Must be monthly, weekly, yearly, or quarterly"
 msgstr ""
-"Période budgétaire invalide. Doit être “mensuelle”, “hebdomadaire”, "
-"“annuelle” ou “trimestrielle”"
+"Période budgétaire invalide. Doit être “mensuelle”, “hebdomadaire”, “annuelle"
+"” ou “trimestrielle”"
 
 #: /app/lib/Controller/CategoryController.php:326
 msgid "Failed to update category"
