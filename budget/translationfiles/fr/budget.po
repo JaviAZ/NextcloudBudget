@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-16 23:01+0000\n"
-"PO-Revision-Date: 2026-09-03 19:01+0000\n"
-"Last-Translator: Zpiboo <zpiboo@outlook.com>\n"
+"PO-Revision-Date: 2026-09-17 01:41+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/fr/>\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 2026.9\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: /app/lib/Controller/AccountController.php:82
 #: /app/lib/Controller/ApiV1AccountController.php:56
@@ -3330,8 +3330,8 @@ msgid ""
 "File does not appear to be a valid QIF file. Missing !Type: or !Account "
 "header."
 msgstr ""
-"Le fichier ne semble pas être un fichier QIF valide. En-tête « !Type: » ou "
-"« !Account » manquant."
+"Le fichier ne semble pas être un fichier QIF valide. En-tête « !Type: » ou « "
+"!Account » manquant."
 
 #: /app/lib/Service/Import/FileValidator.php:214
 msgid ""
@@ -4903,8 +4903,8 @@ msgstr "Échec de la recherche de problèmes : {error}"
 #: /app/src/main.js:1895
 msgid "No data integrity issues found. Everything looks good!"
 msgstr ""
-"Aucun problème d'intégrité des données n'a été détecté. Tout semble en "
-"ordre !"
+"Aucun problème d'intégrité des données n'a été détecté. Tout semble en ordre "
+"!"
 
 #: /app/src/main.js:1897
 msgid "Found {count} issue(s) across {categories} categories."
@@ -10215,8 +10215,8 @@ msgstr ""
 msgid ""
 "Condition at {path} 'between' pattern must have 'min' and 'max' properties"
 msgstr ""
-"La condition « entre » au niveau de {path} doit comporter les propriétés "
-"« min » et « max »"
+"La condition « entre » au niveau de {path} doit comporter les propriétés « "
+"min » et « max »"
 
 #: /app/src/modules/rules/components/CriteriaBuilder.js:520
 msgid "Condition at {path} 'between' pattern must be valid JSON with min/max"
@@ -10785,8 +10785,7 @@ msgstr "Étiquette créée"
 #: /app/src/modules/tagsets/TagSetsModule.js:538
 #: /app/src/modules/tagsets/TagSetsModule.js:902
 msgid "Delete this tag? It will be removed from all transactions."
-msgstr ""
-"Supprimer cette étiquette ? Elle sera retirée de toutes les opérations."
+msgstr "Supprimer cette étiquette ? Elle sera retirée de toutes les opérations."
 
 #: /app/src/modules/tagsets/TagSetsModule.js:281
 #: /app/src/modules/tagsets/TagSetsModule.js:543
@@ -11014,10 +11013,8 @@ msgstr "Échec du rapprochement des opérations"
 #: /app/src/modules/transactions/TransactionsModule.js:1149
 msgid "Are you sure you want to mark %n transaction as unreconciled?"
 msgid_plural "Are you sure you want to mark %n transactions as unreconciled?"
-msgstr[0] ""
-"Êtes-vous sûr de vouloir marquer %n opération comme non rapprochée ?"
-msgstr[1] ""
-"Êtes-vous sûr de vouloir marquer %n opérations comme non rapprochées ?"
+msgstr[0] "Êtes-vous sûr de vouloir marquer %n opération comme non rapprochée ?"
+msgstr[1] "Êtes-vous sûr de vouloir marquer %n opérations comme non rapprochées ?"
 
 #: /app/src/modules/transactions/TransactionsModule.js:1169
 msgid "Successfully unreconciled %n transaction"
@@ -11496,8 +11493,8 @@ msgstr "Une ventilation nécessite au moins deux parties avec un montant."
 #: /app/src/modules/transactions/TransactionsModule.js:3357
 msgid "Split amounts must add up to the transaction total ({total})."
 msgstr ""
-"La somme des montants ventilés doit être égale au total de l'opération "
-"({total})."
+"La somme des montants ventilés doit être égale au total de l'opération ("
+"{total})."
 
 #: /app/src/modules/transactions/TransactionsModule.js:3437
 msgid "The transaction was saved, but not split: {reason}"
@@ -13292,8 +13289,7 @@ msgstr "Créez votre première règle"
 
 #: /app/templates/index.php:2739
 msgid "Auto-detect recurring income from transactions"
-msgstr ""
-"Détecter automatiquement les revenus récurrents à partir des opérations"
+msgstr "Détecter automatiquement les revenus récurrents à partir des opérations"
 
 #: /app/templates/index.php:2743
 msgid "Add recurring income"
@@ -15551,8 +15547,7 @@ msgstr "Date de fin"
 
 #: /app/templates/index.php:6094
 msgid "Bill will automatically stop after this date (optional)"
-msgstr ""
-"La facturation s'arrêtera automatiquement après cette date (facultatif)"
+msgstr "La facturation s'arrêtera automatiquement après cette date (facultatif)"
 
 #: /app/templates/index.php:6098
 msgid "Remaining Payments"
@@ -16002,8 +15997,8 @@ msgid ""
 msgstr ""
 "Il s'agit de dépenses que vous suivez sans pour autant leur allouer de "
 "budget. La catégorie continue d'être prise en compte dans les rapports, le "
-"tableau de bord et tous les totaux ; elle disparaît simplement de la page "
-"« Budget », des alertes budgétaires et du rapport budgétaire, tout comme ses "
+"tableau de bord et tous les totaux ; elle disparaît simplement de la page « "
+"Budget », des alertes budgétaires et du rapport budgétaire, tout comme ses "
 "sous-catégories."
 
 #: /app/templates/index.php:6650
@@ -16040,8 +16035,7 @@ msgstr "Recherche de correspondances..."
 
 #: /app/templates/index.php:6807
 msgid "No matching transactions found within the date range."
-msgstr ""
-"Aucune opération correspondante n'a été trouvée dans la plage de dates."
+msgstr "Aucune opération correspondante n'a été trouvée dans la plage de dates."
 
 #: /app/templates/index.php:6808
 msgid ""
