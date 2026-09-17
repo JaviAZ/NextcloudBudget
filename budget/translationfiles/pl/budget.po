@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-16 23:01+0000\n"
-"PO-Revision-Date: 2026-09-12 15:13+0000\n"
+"PO-Revision-Date: 2026-09-17 01:46+0000\n"
 "Last-Translator: Leonid Zaliubovskyi <la399fox@gmail.com>\n"
 "Language-Team: Polish <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/pl/>\n"
@@ -2722,8 +2722,8 @@ msgstr "Automatyczne utworzenie nie powiodło się: {income}"
 msgid ""
 "Failed to auto-create transaction for {income} ({amount}). Reason: {reason}"
 msgstr ""
-"Nie udało się automatycznie utworzyć transakcji dla przychodu {income} "
-"({amount}). Powód: {reason}"
+"Nie udało się automatycznie utworzyć transakcji dla przychodu {income} ("
+"{amount}). Powód: {reason}"
 
 #: /app/lib/Notification/Notifier.php:329
 msgid "{user} shared their budget with you"
@@ -3084,8 +3084,8 @@ msgstr "Nadchodzące rachunki"
 #, php-format
 msgid "%1$s is %2$s%% above your typical spending (%3$s so far this month)."
 msgstr ""
-"Wydatki %1$s są o %2$s%% wyższe niż zwykle (%3$s wydano dotąd w tym "
-"miesiącu)."
+"Wydatki %1$s są o %2$s%% wyższe niż zwykle (%3$s wydano dotąd w tym miesiącu)"
+"."
 
 #: /app/lib/Service/DigestService.php:168
 msgid "Unusual spending"
@@ -3233,8 +3233,7 @@ msgstr "Plik jest pusty lub nie można go odczytać."
 #: /app/lib/Service/Import/FileValidator.php:118
 msgid ""
 "File appears to be binary. Only text-based financial files are supported."
-msgstr ""
-"Plik wygląda na binarny. Obsługiwane są tylko tekstowe pliki finansowe."
+msgstr "Plik wygląda na binarny. Obsługiwane są tylko tekstowe pliki finansowe."
 
 #: /app/lib/Service/Import/FileValidator.php:175
 msgid "CSV file must contain at least a header row and one data row."
@@ -3259,8 +3258,8 @@ msgid ""
 "File does not appear to be a valid QIF file. Missing !Type: or !Account "
 "header."
 msgstr ""
-"Plik nie wygląda na prawidłowy plik QIF. Brakuje nagłówka !Type: lub !"
-"Account."
+"Plik nie wygląda na prawidłowy plik QIF. Brakuje nagłówka !Type: lub "
+"!Account."
 
 #: /app/lib/Service/Import/FileValidator.php:214
 msgid ""
@@ -4757,8 +4756,7 @@ msgstr "Nie udało się przeskanować pod kątem problemów: {error}"
 
 #: /app/src/main.js:1895
 msgid "No data integrity issues found. Everything looks good!"
-msgstr ""
-"Nie znaleziono problemów ze spójnością danych. Wszystko wygląda dobrze!"
+msgstr "Nie znaleziono problemów ze spójnością danych. Wszystko wygląda dobrze!"
 
 #: /app/src/main.js:1897
 msgid "Found {count} issue(s) across {categories} categories."
@@ -6169,8 +6167,7 @@ msgstr "Trwa wymuszona synchronizacja..."
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:688
 msgid "Sync complete: {imported} imported, {skipped} skipped"
-msgstr ""
-"Synchronizacja ukończona: zaimportowano {imported}, pominięto {skipped}"
+msgstr "Synchronizacja ukończona: zaimportowano {imported}, pominięto {skipped}"
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:697
 msgid "Sync failed: {error}"
@@ -7021,12 +7018,9 @@ msgid ""
 "Are you sure you want to delete %n category? This action cannot be undone."
 msgid_plural ""
 "Are you sure you want to delete %n categories? This action cannot be undone."
-msgstr[0] ""
-"Czy na pewno chcesz usunąć %n kategorię? Tej operacji nie można cofnąć."
-msgstr[1] ""
-"Czy na pewno chcesz usunąć %n kategorie? Tej operacji nie można cofnąć."
-msgstr[2] ""
-"Czy na pewno chcesz usunąć %n kategorii? Tej operacji nie można cofnąć."
+msgstr[0] "Czy na pewno chcesz usunąć %n kategorię? Tej operacji nie można cofnąć."
+msgstr[1] "Czy na pewno chcesz usunąć %n kategorie? Tej operacji nie można cofnąć."
+msgstr[2] "Czy na pewno chcesz usunąć %n kategorii? Tej operacji nie można cofnąć."
 
 #: /app/src/modules/categories/CategoriesModule.js:1262
 #: /app/src/modules/pensions/PensionsModule.js:861
@@ -7527,8 +7521,7 @@ msgstr "Brak emerytur do prognozowania"
 #: /app/src/modules/dashboard/DashboardModule.js:2154
 msgid ""
 "Set your date of birth in your Nextcloud profile for an accurate horizon"
-msgstr ""
-"Ustaw datę urodzenia w profilu Nextcloud, aby uzyskać dokładny horyzont"
+msgstr "Ustaw datę urodzenia w profilu Nextcloud, aby uzyskać dokładny horyzont"
 
 #: /app/src/modules/dashboard/DashboardModule.js:2160
 msgid "Projected at retirement"
@@ -8028,8 +8021,8 @@ msgid ""
 "values for future months."
 msgstr ""
 "Ustawiaj limity wydatków dla poszczególnych kategorii. Przełączaj się między "
-"okresami tygodniowymi, miesięcznymi, kwartalnymi i rocznymi. Użyj opcji "
-"„Dostosuj budżety od tego miesiąca”, aby ustawić inne kwoty na przyszłe "
+"okresami tygodniowymi, miesięcznymi, kwartalnymi i rocznymi. Użyj opcji „"
+"Dostosuj budżety od tego miesiąca”, aby ustawić inne kwoty na przyszłe "
 "miesiące."
 
 #: /app/src/modules/help/HelpModule.js:28
@@ -8311,8 +8304,8 @@ msgid ""
 "No saved templates yet. Map your columns, then use “Save mapping as "
 "template”."
 msgstr ""
-"Nie ma jeszcze zapisanych szablonów. Zmapuj kolumny, a następnie użyj opcji "
-"„Zapisz mapowanie jako szablon”."
+"Nie ma jeszcze zapisanych szablonów. Zmapuj kolumny, a następnie użyj opcji „"
+"Zapisz mapowanie jako szablon”."
 
 #: /app/src/modules/import/ImportModule.js:620
 msgid "%n column mapped"
@@ -10025,8 +10018,8 @@ msgstr ""
 msgid ""
 "Condition at {path} 'between' pattern must have 'min' and 'max' properties"
 msgstr ""
-"Wzorzec „between” warunku w lokalizacji {path} musi zawierać właściwości "
-"„min” i „max”"
+"Wzorzec „between” warunku w lokalizacji {path} musi zawierać właściwości „min"
+"” i „max”"
 
 #: /app/src/modules/rules/components/CriteriaBuilder.js:520
 msgid "Condition at {path} 'between' pattern must be valid JSON with min/max"
@@ -10727,8 +10720,7 @@ msgstr "Nie udało się wczytać zestawów tagów"
 
 #: /app/src/modules/tagsets/TagSetsModule.js:869
 msgid "Delete this tag set? All tags in this set will be removed."
-msgstr ""
-"Usunąć ten zestaw tagów? Wszystkie zawarte w nim tagi zostaną usunięte."
+msgstr "Usunąć ten zestaw tagów? Wszystkie zawarte w nim tagi zostaną usunięte."
 
 #: /app/src/modules/tagsets/TagSetsModule.js:1016
 msgid "Tag set updated successfully"
@@ -10751,8 +10743,7 @@ msgstr "Nie udało się zaznaczyć wszystkich pasujących transakcji"
 
 #: /app/src/modules/transactions/TransactionsModule.js:985
 msgid "All {total} transactions matching the current filter are selected."
-msgstr ""
-"Zaznaczono wszystkie transakcje ({total}) pasujące do bieżącego filtra."
+msgstr "Zaznaczono wszystkie transakcje ({total}) pasujące do bieżącego filtra."
 
 #: /app/src/modules/transactions/TransactionsModule.js:986
 msgid "Clear selection"
@@ -10926,8 +10917,7 @@ msgstr "dotyczy {count} z {total}"
 msgid "%n selected transaction is in a category these tags do not cover."
 msgid_plural ""
 "%n selected transactions are in categories these tags do not cover."
-msgstr[0] ""
-"%n wybrana transakcja należy do kategorii, której te tagi nie obejmują."
+msgstr[0] "%n wybrana transakcja należy do kategorii, której te tagi nie obejmują."
 msgstr[1] ""
 "%n wybrane transakcje należą do kategorii, których te tagi nie obejmują."
 msgstr[2] ""
@@ -11331,8 +11321,7 @@ msgstr "Podział wymaga co najmniej dwóch części z podaną kwotą."
 
 #: /app/src/modules/transactions/TransactionsModule.js:3357
 msgid "Split amounts must add up to the transaction total ({total})."
-msgstr ""
-"Suma kwot części musi być równa całkowitej kwocie transakcji ({total})."
+msgstr "Suma kwot części musi być równa całkowitej kwocie transakcji ({total})."
 
 #: /app/src/modules/transactions/TransactionsModule.js:3437
 msgid "The transaction was saved, but not split: {reason}"
@@ -11833,8 +11822,7 @@ msgstr "Pozostaw puste, aby użyć następnego terminu"
 
 #: /app/src/modules/transfers/TransfersModule.js:560
 msgid "Enable auto-pay (automatically create transactions when due)"
-msgstr ""
-"Włącz automatyczną płatność (automatycznie twórz transakcje w terminie)"
+msgstr "Włącz automatyczną płatność (automatycznie twórz transakcje w terminie)"
 
 #: /app/src/modules/transfers/TransfersModule.js:570
 msgid "Update Transfer"
@@ -14886,8 +14874,8 @@ msgid ""
 "Positive for appreciation (e.g., 3.5), negative for depreciation (e.g., "
 "-15). Used for value projections."
 msgstr ""
-"Wartość dodatnia oznacza wzrost (np. 3,5), a ujemna spadek wartości (np. "
-"-15). Używana w prognozach wartości."
+"Wartość dodatnia oznacza wzrost (np. 3,5), a ujemna spadek wartości (np. -15)"
+". Używana w prognozach wartości."
 
 #: /app/templates/index.php:5445
 msgid "Save Asset"
