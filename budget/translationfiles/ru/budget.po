@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Nextcloud Budget\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
 "POT-Creation-Date: 2026-09-16 23:01+0000\n"
-"PO-Revision-Date: 2026-09-12 15:13+0000\n"
+"PO-Revision-Date: 2026-09-17 01:42+0000\n"
 "Last-Translator: Leonid Zaliubovskyi <la399fox@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/nextcloud-budget/"
 "budget/ru/>\n"
@@ -3057,8 +3057,7 @@ msgstr ""
 #: /app/lib/Service/CategoryTransferService.php:362
 #, php-format
 msgid "\"%1$s\": the budget \"%2$s\" is not a number and was ignored"
-msgstr ""
-"Категория «%1$s»: бюджет «%2$s» не является числом и был проигнорирован"
+msgstr "Категория «%1$s»: бюджет «%2$s» не является числом и был проигнорирован"
 
 #: /app/lib/Service/DigestService.php:132
 #, php-format
@@ -3261,8 +3260,8 @@ msgid ""
 "File does not appear to be a valid QIF file. Missing !Type: or !Account "
 "header."
 msgstr ""
-"Файл не похож на допустимый QIF-файл. Отсутствует заголовок !Type: или !"
-"Account."
+"Файл не похож на допустимый QIF-файл. Отсутствует заголовок !Type: или "
+"!Account."
 
 #: /app/lib/Service/Import/FileValidator.php:214
 msgid ""
@@ -5215,8 +5214,7 @@ msgstr "Не удалось открыть связанную транзакци
 #: /app/src/modules/transactions/TransactionsModule.js:3755
 msgid ""
 "Are you sure you want to unlink this transaction from its transfer pair?"
-msgstr ""
-"Вы уверены, что хотите убрать связь этой транзакции с парным переводом?"
+msgstr "Вы уверены, что хотите убрать связь этой транзакции с парным переводом?"
 
 #: /app/src/main.js:3718
 #: /app/src/modules/transactions/TransactionsModule.js:3761
@@ -5260,8 +5258,8 @@ msgstr "Разбивка транзакции должна состоять ка
 msgid ""
 "Split amounts ({splitTotal}) must equal transaction amount ({totalAmount})"
 msgstr ""
-"Общая сумма частей ({splitTotal}) должна совпадать с суммой транзакции "
-"({totalAmount})"
+"Общая сумма частей ({splitTotal}) должна совпадать с суммой транзакции ("
+"{totalAmount})"
 
 #: /app/src/main.js:3993
 #: /app/src/modules/transactions/TransactionsModule.js:3977
@@ -5338,8 +5336,8 @@ msgid ""
 "unavailable. Add rates in Settings > Exchange Rates."
 msgstr ""
 "Счета в валютах {currencies} исключены из итоговых сумм, поскольку для них "
-"недоступны курсы обмена. Добавьте курсы в разделе «Настройки» > «Курсы "
-"валют»."
+"недоступны курсы обмена. Добавьте курсы в разделе «Настройки» > «Курсы валют"
+"»."
 
 #: /app/src/modules/accounts/AccountsModule.js:315
 msgid "No asset accounts yet"
@@ -5435,11 +5433,11 @@ msgstr[0] ""
 "На %n счёте ещё есть транзакции: {names}. Удалить счёт вместе с его "
 "транзакциями ({rows})? Это действие нельзя отменить."
 msgstr[1] ""
-"На %n счетах ещё есть транзакции: {names}. Удалить их вместе с транзакциями "
-"({rows})? Это действие нельзя отменить."
+"На %n счетах ещё есть транзакции: {names}. Удалить их вместе с транзакциями ("
+"{rows})? Это действие нельзя отменить."
 msgstr[2] ""
-"На %n счетах ещё есть транзакции: {names}. Удалить их вместе с транзакциями "
-"({rows})? Это действие нельзя отменить."
+"На %n счетах ещё есть транзакции: {names}. Удалить их вместе с транзакциями ("
+"{rows})? Это действие нельзя отменить."
 
 #: /app/src/modules/accounts/AccountsModule.js:761
 msgid "%n account and {count} transaction(s) deleted"
@@ -6198,8 +6196,8 @@ msgid ""
 "Synced {synced} of {total} connections: {imported} imported, {skipped} "
 "skipped, {errors} failed"
 msgstr ""
-"Синхронизировано подключений: {synced} из {total}; импортировано: "
-"{imported}, пропущено: {skipped}, ошибок: {errors}"
+"Синхронизировано подключений: {synced} из {total}; импортировано: {imported}"
+", пропущено: {skipped}, ошибок: {errors}"
 
 #: /app/src/modules/bank-sync/BankSyncModule.js:742
 msgid "Synced {synced} connections: {imported} imported, {skipped} skipped"
@@ -7021,8 +7019,8 @@ msgid ""
 "This category still has transactions assigned to it. Move them to "
 "Uncategorized and delete \"{name}\"?"
 msgstr ""
-"К этой категории всё ещё относятся транзакции. Переместить их в категорию "
-"«Без категории» и удалить «{name}»?"
+"К этой категории всё ещё относятся транзакции. Переместить их в категорию «"
+"Без категории» и удалить «{name}»?"
 
 #: /app/src/modules/categories/CategoriesModule.js:1239
 msgid ""
@@ -8316,8 +8314,8 @@ msgid ""
 "No saved templates yet. Map your columns, then use “Save mapping as "
 "template”."
 msgstr ""
-"Сохранённых шаблонов пока нет. Сопоставьте столбцы, затем выберите "
-"«Сохранить сопоставление как шаблон»."
+"Сохранённых шаблонов пока нет. Сопоставьте столбцы, затем выберите «"
+"Сохранить сопоставление как шаблон»."
 
 #: /app/src/modules/import/ImportModule.js:620
 msgid "%n column mapped"
@@ -8597,8 +8595,7 @@ msgstr "Импортировано транзакций: {imported}, пропу�
 msgid "%n bill was automatically marked as paid from matching transactions"
 msgid_plural ""
 "%n bills were automatically marked as paid from matching transactions"
-msgstr[0] ""
-"%n платёж автоматически отмечен как оплаченный по совпавшей транзакции"
+msgstr[0] "%n платёж автоматически отмечен как оплаченный по совпавшей транзакции"
 msgstr[1] ""
 "%n платежа автоматически отмечены как оплаченные по совпавшим транзакциям"
 msgstr[2] ""
@@ -8608,12 +8605,9 @@ msgstr[2] ""
 msgid "Import complete. %n category created — it may take a moment to appear."
 msgid_plural ""
 "Import complete. %n categories created — they may take a moment to appear."
-msgstr[0] ""
-"Импорт завершён. Создана %n категория — она может появиться не сразу."
-msgstr[1] ""
-"Импорт завершён. Созданы %n категории — они могут появиться не сразу."
-msgstr[2] ""
-"Импорт завершён. Создано %n категорий — они могут появиться не сразу."
+msgstr[0] "Импорт завершён. Создана %n категория — она может появиться не сразу."
+msgstr[1] "Импорт завершён. Созданы %n категории — они могут появиться не сразу."
+msgstr[2] "Импорт завершён. Создано %n категорий — они могут появиться не сразу."
 
 #: /app/src/modules/import/ImportModule.js:2324
 msgid "Failed to import transactions: {message}"
@@ -10018,8 +10012,7 @@ msgstr ""
 
 #: /app/src/modules/rules/components/CriteriaBuilder.js:520
 msgid "Condition at {path} 'between' pattern must be valid JSON with min/max"
-msgstr ""
-"Шаблон 'between' в условии {path} должен быть корректным JSON с min/max"
+msgstr "Шаблон 'between' в условии {path} должен быть корректным JSON с min/max"
 
 #: /app/src/modules/savings/SavingsModule.js:49
 msgid "Failed to load savings goals"
@@ -13780,8 +13773,7 @@ msgstr ""
 
 #: /app/templates/index.php:4239
 msgid "Bank Sync is in beta. If you encounter any issues, please"
-msgstr ""
-"Синхронизация с банком находится в бета-версии. Если возникнут проблемы"
+msgstr "Синхронизация с банком находится в бета-версии. Если возникнут проблемы"
 
 #: /app/templates/index.php:4239
 msgid "report them on GitHub"
@@ -16116,8 +16108,7 @@ msgstr "Введите DELETE для подтверждения"
 
 #: /app/templates/index.php:7216
 msgid "You must type DELETE (all caps) exactly to proceed"
-msgstr ""
-"Чтобы продолжить, введите DELETE точно в таком виде, заглавными буквами"
+msgstr "Чтобы продолжить, введите DELETE точно в таком виде, заглавными буквами"
 
 #: /app/templates/index.php:7245 /app/templates/index.php:7249
 msgid "Add Bank Connection"
